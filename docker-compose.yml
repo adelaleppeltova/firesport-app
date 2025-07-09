@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  backend:
+    build: ./backend
+    container_name: firesport-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    container_name: firesport-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
