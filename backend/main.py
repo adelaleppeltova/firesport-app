@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from bson import ObjectId
 from typing import Optional
 from app.routers import athlete_router
+from fastapi.middleware.cors import CORSMiddleware
+
 
 
 app = FastAPI()
@@ -18,3 +20,11 @@ def root():
 
 
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Nebo konkrétní doména frontendu
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
