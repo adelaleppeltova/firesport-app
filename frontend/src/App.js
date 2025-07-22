@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AthletesPage from "./pages/AthletesPage";
+import "./styles/main.scss";
 
-function App() {
+const App = () => {
   return (
     <BrowserRouter>
       <Routes>
@@ -11,6 +12,6 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
-}
+};
 
 export default App;
