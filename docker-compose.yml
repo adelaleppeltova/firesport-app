@@ -9,6 +9,7 @@ services:
       - ./backend:/app
     depends_on:
       - mongo
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   mongo:
     image: mongo
@@ -24,6 +25,11 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 
 volumes:
   mongo-data:
