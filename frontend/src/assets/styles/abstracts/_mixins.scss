@@ -1,0 +1,12 @@
+@use "../abstracts/variables";
+
+@mixin link-resetter {
+  cursor: pointer;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  text-decoration: none;
+}

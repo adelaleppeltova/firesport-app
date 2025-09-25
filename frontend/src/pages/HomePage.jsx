@@ -1,8 +1,11 @@
+import Card from "../components/Card";
+
 function HomePage() {
-  return;
-  <div>
-    <h2>Welcome to FireSport!y</h2>;<h2>Welcome to FireSport!</h2>;
-  </div>;
+  return (
+    <div>
+      <Card title="Moje záznamy" content="fewkfo" />
+    </div>
+  );
 }
 
 export default HomePage;

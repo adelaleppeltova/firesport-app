@@ -1,4 +1,4 @@
-const Error = () => {
+const ErrorPage = () => {
   return (
     <div className="error-page">
       <h1>404 - Stránka nenalezena</h1>
@@ -6,4 +6,4 @@ const Error = () => {
   );
 };
 
-export default Error;
+export default ErrorPage;
