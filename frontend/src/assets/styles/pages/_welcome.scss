@@ -16,11 +16,13 @@
     font-size: variables.$font-size-xl;
     font-weight: variables.$font-weight-extrabold;
     margin: 0;
+    color: variables.$color-text;
   }
 
   &__content {
     margin-top: 16px;
     font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-regular;
   }
 
   &__link {
