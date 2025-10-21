@@ -1,0 +1,36 @@
+@use "../abstracts/variables.scss";
+
+.btn {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  padding: 18px 28px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: variables.$font-size-m;
+  line-height: 1;
+  transition: transform 0.06s ease, background-color 0.2s ease;
+  user-select: none;
+  background: variables.$color-background-dark;
+  color: variables.$color-primary;
+  width: min(300px, 100%);
+  letter-spacing: 0.2px;
+
+  &:hover {
+    background: variables.$hover-color-dark;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}

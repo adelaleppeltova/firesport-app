@@ -3,20 +3,33 @@ $color-primary: #f5f5f5;
 $color-secondary: #cf362e;
 $color-accent: #0f4d92;
 $color-background: #f5f5f5;
+$color-background-dark: #1b1b1b;
 $color-text: #1b1b1b;
 $gray-light: #efefef;
 $gray-dark: #3d3d3d;
 
+$hover-color-dark: #333333;
+$hover-color-light: #e0e0e0;
+
 // typography
 $font-family-base: "Inter", sans-serif;
+$font-weight-extrabold: 800;
 $font-weight-bold: 700;
 $font-weight-semibold: 600;
 $font-weight-medium: 500;
 $font-weight-regular: 400;
 $font-weight-light: 300;
 $font-weight-thin: 200;
+
 $line-height-base: 1.5;
+
 $font-size-base: 1.8rem;
+$font-size-s: 1.4rem;
+$font-size-m: 1.6rem;
+$font-size-l: 2.4rem;
+$font-size-xl: 3.2rem;
+
+$text-underline: underline;
 
 // borders
 $border-radius-base: 4px;
@@ -24,9 +37,9 @@ $border-width-base: 1px;
 $border-color-base: #ddd;
 
 //breakpoints
-$breakpoint-sm: 640px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 1024px;
+$breakpoint-s: 640px;
+$breakpoint-m: 768px;
+$breakpoint-l: 1024px;
 $breakpoint-xl: 1280px;
 
 //transitions

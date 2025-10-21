@@ -11,6 +11,8 @@
 @use "./layout/_bottomnavbar.scss";
 
 // components
+@use "./components/_button.scss";
 
 // pages
 @use "./pages/_home.scss";
+@use "./pages/_welcome.scss";
