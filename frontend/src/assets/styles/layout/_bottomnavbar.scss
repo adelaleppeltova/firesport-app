@@ -50,3 +50,50 @@
     }
   }
 }
+
+.side-menu {
+  position: fixed;
+  top: variables.$header-height;
+  left: 0;
+  width: 200px;
+  background: variables.$gray-light;
+  box-shadow: 2px 6px 6px rgba(0, 0, 0, 0.1);
+  padding-top: 20px;
+  z-index: 999;
+  height: 100%;
+
+  @media (max-width: variables.$breakpoint-l) {
+    display: none;
+  }
+
+  @media (min-width: variables.$breakpoint-l) {
+    top: variables.$header-height-l;
+    display: block !important;
+  }
+  @media (min-width: variables.$breakpoint-xl) {
+    top: variables.$header-height-xl;
+  }
+
+  &__links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .nav-item {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: variables.$gray-dark;
+      font-family: variables.$font-family-base;
+      font-weight: variables.$font-weight-semibold;
+
+      i {
+        margin-right: 10px;
+      }
+
+      &[aria-current="page"] {
+        color: variables.$color-accent; // aktivní záložka
+      }
+    }
+  }
+}

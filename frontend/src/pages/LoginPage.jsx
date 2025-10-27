@@ -1,25 +1,33 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import PrimaryButton from "../components/PrimaryButton";
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
 
-// const schema = z.object({
-//   email: z.string().email("Neplatný e-mail"),
-//   password: z.string().min(6, "Min. 6 znaků"),
-// });
+import PrimaryButton from "../components/PrimaryButton";
+import api from "../api/axios";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  //   const {
-  //     register,
-  //     handleSubmit,
-  //     formState: { errors, isSubmitting },
-  //   } = useForm({ resolver: zodResolver(schema) });
+  const submit = async (e) => {
+    e.preventDefault();
+    try {
+      const resp = await api.post("/auth/login", { email, password });
+      const access = resp.data.access_token;
+      // nastavit default header pro další volání
+      api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+      // zde nastavit user context / redirect
+      nav("/");
+    } catch (err) {
+      console.error(err);
+      alert("Login failed");
+    }
+  };
+
   return (
     <div className="login">
       <h1 className="login__title">Přihlášení</h1>
-      <form className="login__form">
+      <form onSubmit={submit} className="login__form">
         <label className="login__label" htmlFor="email">
           Email:
           <input

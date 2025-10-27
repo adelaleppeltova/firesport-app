@@ -1,3 +1,10 @@
 fastapi
 uvicorn
 pymongo
+python-dotenv
+argon2-cffi
+python-jose[cryptography]
+email-validator
+fastapi-utils
+motor
+jose

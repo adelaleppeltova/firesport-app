@@ -46,4 +46,8 @@ $breakpoint-xl: 1280px;
 $default-transition: 0.3s;
 
 //variables for header and footer
-$header-height: 56px;
+$header-height: 56px; //výchozí výška headeru
+$header-height-s: 64px;
+$header-height-m: 72px;
+$header-height-l: 80px;
+$header-height-xl: 80px;

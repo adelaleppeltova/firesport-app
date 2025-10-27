@@ -1,6 +1,4 @@
-import axios from "axios";
+import api from "./axios";
 
-const API_URL = "http://localhost:8000/athletes";
-
-export const fetchAthletes = () => axios.get(API_URL);
-export const createAthlete = (data) => axios.post(API_URL, data);
+export const fetchAthletes = () => api.get("/athletes");
+export const createAthlete = (data) => api.post("/athletes", data);
