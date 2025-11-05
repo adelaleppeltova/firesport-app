@@ -1,26 +1,14 @@
 import React from "react";
 
-function PrimaryButton({
-  className,
-  onClick,
-  ariaLabel,
-  children,
-  type,
+export default function PrimaryButton({
   isLoading,
-  disabled,
+  children,
+  className = "",
+  ...rest
 }) {
   return (
-    <button
-      className={className}
-      onClick={onClick}
-      type={type}
-      isLoading={isLoading}
-      aria-label={ariaLabel}
-      disabled={disabled}
-    >
-      {children}
+    <button className={`btn ${className}`} {...rest}>
+      {isLoading ? "..." : children}
     </button>
   );
 }
-
-export default PrimaryButton;

@@ -1,25 +1,35 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-function Header({ isLoggedIn, onLogin, onLogout }) {
+function Header() {
+  const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
+
   return (
     <nav className="header">
       <div className="header__content">
-        {/* <img src="" alt="logo" className="header-logo" /> */}
         <div className="header__content--center">
-          <NavLink className="header__title" href="/">
+          <NavLink className="header__title" to="/">
             firesport
           </NavLink>
         </div>
         <div className="header__items">
-          {/* <NavLink className="header__item">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>Odhlásit se</span>
-          </NavLink> */}
-
-          <NavLink className="header__item" to="/login">
-            <i class="fa-solid fa-user"></i>
-            <span>Přihlásit se</span>
-          </NavLink>
+          {isAuthenticated ? (
+            <NavLink className="header__item" onClick={handleLogout}>
+              <i className="fa-solid fa-right-from-bracket"></i>
+              <span>Odhlásit se</span>
+            </NavLink>
+          ) : (
+            <NavLink className="header__item" to="/login">
+              <i className="fa-solid fa-user"></i>
+              <span>Přihlásit se</span>
+            </NavLink>
+          )}
         </div>
       </div>
     </nav>

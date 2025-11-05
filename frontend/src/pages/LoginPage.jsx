@@ -1,26 +1,31 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import api, { setAuthToken } from "../api/axios";
 import PrimaryButton from "../components/PrimaryButton";
-import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
+import usePersistedState, {
+  clearPersistedState,
+} from "../hooks/usePersistedState";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const { login } = useAuth();
+  const [email, setEmail] = usePersistedState("login:email", "", {
+    ttlMs: 30 * 60_000,
+  });
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
     try {
-      const resp = await api.post("/auth/login", { email, password });
-      const access = resp.data.access_token;
-      // nastavit default header pro další volání
-      api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
-      // zde nastavit user context / redirect
-      nav("/");
+      await login(email, password);
+      clearPersistedState("login:email"); // po úspěchu smazat
+      navigate("/");
     } catch (err) {
-      console.error(err);
-      alert("Login failed");
+      console.error("Login failed:", err);
+      alert(err?.response?.data?.detail || "Login failed");
     }
   };
 
@@ -37,28 +42,44 @@ function LoginPage() {
             name="email"
             autoComplete="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </label>
 
         <label className="login__label" htmlFor="password">
           Heslo:
-          <input
-            className="login__input"
-            type="password"
-            id="password"
-            name="password"
-            required
-          />
+          <div className="password-field">
+            <input
+              className="login__input"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Skrýt heslo" : "Zobrazit heslo"}
+              title={showPassword ? "Skrýt heslo" : "Zobrazit heslo"}
+            >
+              <i
+                className={
+                  showPassword ? "fa-solid fa-eye-slash" : "fa-solid fa-eye"
+                }
+              />
+            </button>
+          </div>
         </label>
 
         <PrimaryButton
           className="btn login__button"
-          onClick={() => navigate("/")}
-          ariaLabel="Přihlásit se"
+          aria-label="Přihlásit se"
           type="submit"
           isLoading={false}
-          //   disabled={isSubmitting}
-          //   {...(isSubmitting ? "Přihlašuji..." : "Přihlásit se")}
         >
           Přihlásit se
         </PrimaryButton>

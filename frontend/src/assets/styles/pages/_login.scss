@@ -27,6 +27,7 @@
   }
 
   &__input {
+    min-width: 350px;
     margin-top: 8px;
     padding: 12px 16px;
     font-size: variables.$font-size-s;
@@ -51,4 +52,32 @@
   &__link {
     text-decoration: variables.$text-underline;
   }
+}
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 44px; /* místo pro ikonku */
+}
+
+.password-field .password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 28px;
+  width: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.password-field .password-toggle:focus {
+  outline: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }

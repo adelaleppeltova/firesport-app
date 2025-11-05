@@ -1,113 +1,163 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
 import api from "../api/axios";
+import usePersistedState, {
+  clearPersistedState,
+} from "../hooks/usePersistedState";
 
 const passwordRules =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&#^().,_-]{8,}$/;
 
-// const schema = z
-//   .object({
-//     email: z.string().email("Zadej platný e-mail"),
-//     password: z
-//       .string()
-//       .regex(passwordRules, "Min. 8 znaků, malé/VELKÉ písmeno a číslo"),
-//     confirm: z.string(),
-//     firstName: z.string().min(2, "Min. 2 znaky"),
-//     lastName: z.string().min(2, "Min. 2 znaky"),
-//     agree: z.literal(true, {
-//       errorMap: () => ({ message: "Musíš souhlasit s podmínkami" }),
-//     }),
-//   })
-//   .refine((data) => data.password === data.confirm, {
-//     message: "Hesla se neshodují",
-//     path: ["confirm"],
-//   });
-
-const submit = async (e) => {
-  debugger;
-
-  e.preventDefault();
-  try {
-    await api.post("/auth/register", { email, password });
-    nav("/login");
-  } catch (err) {
-    console.error(err);
-    alert("Register failed");
-  }
-};
-
 function RegisterPage() {
   const navigate = useNavigate();
+
+  // persistované hodnoty
+  const [firstName, setFirstName] = usePersistedState(
+    "register:firstName",
+    "",
+    {
+      ttlMs: 30 * 60_000,
+    }
+  );
+  const [lastName, setLastName] = usePersistedState("register:lastName", "", {
+    ttlMs: 30 * 60_000,
+  });
+  const [email, setEmail] = usePersistedState("register:email", "", {
+    ttlMs: 30 * 60_000,
+  });
+  const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [showPass2, setShowPass2] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post("/auth/register", { email, password });
+      // po úspěchu vyčistit sessionStorage
+      clearPersistedState("register:firstName");
+      clearPersistedState("register:lastName");
+      clearPersistedState("register:email");
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      alert("Register failed");
+    }
+  };
+
   return (
     <div className="register">
       <h1 className="register__title">Registrace</h1>
-      <form onSubmit={submit} className="register__form">
+      <form onSubmit={submit} className="register__form" autoComplete="on">
         <label className="register__label" htmlFor="firstName">
           Jméno:
-          <input
-            className="register__input"
-            type="text"
-            id="firstName"
-            name="name"
-            autoComplete="given-name"
-            required
-          />
+          <div className="text-field">
+            <input
+              className="register__input"
+              type="text"
+              id="firstName"
+              name="given-name" // změněno
+              autoComplete="section-register given-name" // upřesněno
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
         </label>
 
         <label className="register__label" htmlFor="lastName">
           Příjmení:
-          <input
-            className="register__input"
-            type="text"
-            id="lastName"
-            name="lastName"
-            autoComplete="family-name"
-            required
-          />
+          <div className="text-field">
+            <input
+              className="register__input"
+              type="text"
+              id="lastName"
+              name="family-name" // změněno
+              autoComplete="section-register family-name" // upřesněno
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
         </label>
 
         <label className="register__label" htmlFor="email">
           Email:
-          <input
-            className="register__input"
-            type="email"
-            id="email"
-            name="email"
-            autoComplete="email"
-            required
-          />
+          <div className="text-field">
+            <input
+              className="register__input"
+              type="email"
+              id="email"
+              name="email"
+              autoComplete="section-register email" // upřesněno
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
         </label>
 
         <label className="register__label" htmlFor="password">
           Heslo:
-          <input
-            className="register__input"
-            type="password"
-            id="password"
-            name="password"
-            required
-          />
+          <div className="password-field">
+            <input
+              className="register__input"
+              type={showPass ? "text" : "password"}
+              id="password"
+              name="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPass((v) => !v)}
+              aria-label={showPass ? "Skrýt heslo" : "Zobrazit heslo"}
+              title={showPass ? "Skrýt heslo" : "Zobrazit heslo"}
+            >
+              <i
+                className={
+                  showPass ? "fa-solid fa-eye-slash" : "fa-solid fa-eye"
+                }
+              />
+            </button>
+          </div>
         </label>
 
-        <label className="register__label" htmlFor="password">
+        <label className="register__label" htmlFor="password2">
           Heslo znovu:
-          <input
-            className="register__input"
-            type="password"
-            id="password"
-            name="password"
-            required
-          />
+          <div className="password-field">
+            <input
+              className="register__input"
+              type={showPass2 ? "text" : "password"}
+              id="password2"
+              name="password2"
+              required
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPass2((v) => !v)}
+              aria-label={showPass2 ? "Skrýt heslo" : "Zobrazit heslo"}
+              title={showPass2 ? "Skrýt heslo" : "Zobrazit heslo"}
+            >
+              <i
+                className={
+                  showPass2 ? "fa-solid fa-eye-slash" : "fa-solid fa-eye"
+                }
+              />
+            </button>
+          </div>
         </label>
 
         <PrimaryButton
           className="btn register__button"
-          onClick={() => navigate("/")}
           ariaLabel="Registrovat se"
           type="submit"
           isLoading={false}
-          //   disabled={isSubmitting}
-          //   {...(isSubmitting ? "Přihlašuji..." : "Přihlásit se")}
         >
           Registrovat se
         </PrimaryButton>
