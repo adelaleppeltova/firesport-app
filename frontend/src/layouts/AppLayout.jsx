@@ -3,15 +3,20 @@ import Footer from "../components/Footer";
 import BottomNavbar from "../components/BottomNavbar";
 import { Outlet } from "react-router-dom";
 import SideNavbar from "../components/SideNavbar";
+import FlashBanner from "../components/FlashBanner";
 
 const AppLayout = () => {
   return (
-    <div>
+    <div className="app-layout">
       <Header />
-      <SideNavbar />
-      <main className="main">
-        <Outlet />
-      </main>
+      <FlashBanner />
+      <div className="app-body">
+        <SideNavbar />
+        <main className="main">
+          <Outlet />
+        </main>
+      </div>
+      {/* <Footer /> */}
       <BottomNavbar />
     </div>
   );

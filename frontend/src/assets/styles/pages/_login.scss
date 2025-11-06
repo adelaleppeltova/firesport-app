@@ -81,3 +81,14 @@
   outline: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
 }
+
+.form-error {
+  color: #cf222e;
+  font-size: variables.$font-size-s;
+  margin: 8px 0;
+  padding: 8px 12px;
+  background: #ffebeb;
+  border-left: 3px solid #cf222e;
+  border-radius: 4px;
+  min-width: 350px;
+}

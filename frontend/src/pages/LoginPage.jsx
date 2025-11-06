@@ -16,16 +16,39 @@ function LoginPage() {
   });
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    // validace emailu
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Zadejte platný email.");
+      return;
+    }
+
+    // validace min. délky hesla
+    if (password.length < 8) {
+      setError("Heslo musí mít alespoň 8 znaků.");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       await login(email, password);
-      clearPersistedState("login:email"); // po úspěchu smazat
-      navigate("/");
+      clearPersistedState("login:email");
+      navigate("/", {
+        state: {
+          flash: { type: "success", message: "Přihlášení proběhlo úspěšně." },
+        },
+      });
     } catch (err) {
       console.error("Login failed:", err);
-      alert(err?.response?.data?.detail || "Login failed");
+      setError("Nesprávný email nebo heslo.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -46,7 +69,6 @@ function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-
         <label className="login__label" htmlFor="password">
           Heslo:
           <div className="password-field">
@@ -74,12 +96,13 @@ function LoginPage() {
             </button>
           </div>
         </label>
-
+        {error && <p className="form-error">{error}</p>} {/* přidáno */}
         <PrimaryButton
           className="btn login__button"
           aria-label="Přihlásit se"
           type="submit"
-          isLoading={false}
+          isLoading={isSubmitting}
+          disabled={isSubmitting}
         >
           Přihlásit se
         </PrimaryButton>

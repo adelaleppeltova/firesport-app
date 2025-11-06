@@ -3,11 +3,15 @@ import { useAuth } from "../context/AuthContext";
 
 function Header() {
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, loading, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate("/login", {
+      state: {
+        flash: { type: "success", message: "Odhlášení proběhlo úspěšně." },
+      },
+    });
   };
 
   return (
