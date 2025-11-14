@@ -1,69 +1,59 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import api, { setAuthToken } from "../api/axios";
 
-const AuthContext = createContext(null);
-
-// Modulový guard proti duplicitnímu refreshi ve StrictMode
-let BOOTSTRAPPED = false;
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (BOOTSTRAPPED) {
-      setLoading(false);
-      return;
-    }
-    BOOTSTRAPPED = true;
-
-    (async () => {
-      try {
-        const r = await api.post("/auth/refresh");
-        const access = r.data?.access_token;
-        if (access) {
-          setAuthToken(access);
-          setIsAuthenticated(true);
-        } else {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setAuthToken(token);
+      api
+        .get("/auth/me")
+        .then(({ data }) => setUser(data))
+        .catch(() => {
+          localStorage.removeItem("token");
           setAuthToken(null);
-          setIsAuthenticated(false);
-        }
-      } catch {
-        // 401 je OK, pokud nejste přihlášen/a
-        setAuthToken(null);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
-      }
-    })();
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const login = async (email, password) => {
-    const r = await api.post("/auth/login", { email, password });
-    const access = r.data?.access_token;
-    if (access) {
-      setAuthToken(access);
-      setIsAuthenticated(true);
-    }
-    return r;
+    const { data } = await api.post("/auth/login", { email, password });
+    localStorage.setItem("token", data.access_token);
+    setAuthToken(data.access_token);
+    setUser(data.user);
+    window.location.href = "/";
   };
 
-  const logout = async () => {
-    try {
-      await api.post("/auth/logout");
-    } finally {
-      setAuthToken(null);
-      setIsAuthenticated(false);
-    }
+  const logout = () => {
+    localStorage.removeItem("token");
+    setAuthToken(null);
+    setUser(null);
+    window.location.href = "/login";
   };
+
+  const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, loading, isAuthenticated }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return context;
 }

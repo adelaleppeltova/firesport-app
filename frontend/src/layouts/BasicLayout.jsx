@@ -1,13 +1,13 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Outlet } from "react-router-dom";
-import FlashBanner from "../components/FlashBanner"; // přidáno
+import FlashBanner from "../components/FlashBanner";
 
 export default function BasicLayout() {
   return (
-    <div>
+    <div className="basic-layout">
       <Header />
-      <FlashBanner /> {/* přidáno */}
+      <FlashBanner />
       <main className="main">
         <Outlet />
       </main>

@@ -10,7 +10,7 @@ function WelcomePage() {
         <PrimaryButton
           className="btn welcome__button"
           onClick={() => navigate("/login")}
-          ariaLabel="Přihlásit se"
+          aria-label="Přihlásit se"
           type="button"
           isLoading={false}
           disabled={false}

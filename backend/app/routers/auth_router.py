@@ -125,7 +125,13 @@ async def get_current_user(authorization: str = Header(None)):
     user = await users.find_one({"_id": ObjectId(payload.get("sub"))})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
-    return {"id": str(user["_id"]), "email": user["email"], "role": user.get("role", "user"), "is_active": user.get("is_active", True)}
+    return {
+        "id": str(user["_id"]), 
+        "email": user["email"], 
+        "role": user.get("role", "user"), 
+        "is_active": user.get("is_active", True),
+        "athlete_id": user.get("athlete_id")
+    }
 
 @router.get("/me")
 async def me(current=Depends(get_current_user)):

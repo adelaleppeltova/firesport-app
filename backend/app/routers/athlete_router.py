@@ -1,20 +1,128 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query, HTTPException, Depends
 from app.models.athlete import Athlete
 from app.db.database import db
+from app.dependencies import get_current_user
+from bson import ObjectId
+from typing import Optional
+import logging
 
 
 router = APIRouter(prefix="/athletes", tags=["athletes"])
 
-collection = db["athletes"]
+athletes_collection = db["athletes"]
+results_collection = db["results"]
+competitions_collection = db["competitions"]
+categories_collection = db["categories"]
+
+logger = logging.getLogger("firesport.overview")
 
 @router.post("/")
-def create_athlete(athlete: Athlete):
-    result = collection.insert_one(athlete.dict())
+async def create_athlete(athlete: Athlete):
+    result = await athletes_collection.insert_one(athlete.dict())
     return {"id": str(result.inserted_id)}
 
 @router.get("/")
-def list_athletes():
-    athletes = list(collection.find())
+async def list_athletes():
+    athletes = await athletes_collection.find().to_list(length=None)
     for a in athletes:
         a["_id"] = str(a["_id"])
     return athletes
+
+@router.get("/search")
+async def search_athletes(q: str = Query(..., min_length=2)):
+    """Vyhledá atlety podle jména, příjmení nebo FS kódu"""
+    query = {
+        "$or": [
+            {"first_name": {"$regex": q, "$options": "i"}},
+            {"last_name": {"$regex": q, "$options": "i"}},
+            {"fscode": {"$regex": q, "$options": "i"}}
+        ]
+    }
+    athletes = await athletes_collection.find(query).to_list(length=20)
+    for a in athletes:
+        a["_id"] = str(a["_id"])
+    return {"items": athletes}
+
+@router.get("/{athlete_id}/overview")
+async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
+    """Vrátí přehled výkonů atleta (poslední aktivita, statistiky)"""
+    logger.warning(f"[overview] athlete_id param: {athlete_id}")
+    try:
+        oid = ObjectId(athlete_id)
+    except:
+        logger.error(f"[overview] Invalid athlete_id: {athlete_id}")
+        raise HTTPException(status_code=400, detail="Invalid athlete_id")
+    
+    athlete = await athletes_collection.find_one({"_id": oid})
+    logger.warning(f"[overview] athlete from DB: {athlete}")
+    if not athlete:
+        logger.error(f"[overview] Athlete not found for id: {athlete_id}")
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    results = await results_collection.find({"athlete_id": oid}).sort("rank", 1).to_list(length=None)
+    logger.warning(f"[overview] results found: {len(results)}")
+    if results:
+        logger.warning(f"[overview] first result: {results[0]}")
+    def to_str_id(val):
+        if isinstance(val, ObjectId):
+            return str(val)
+        return val
+
+    if not results:
+        logger.warning(f"[overview] No results for athlete {athlete_id}")
+        return {
+            "athlete_id": str(athlete_id),
+            "athlete_name": f"{athlete.get('first_name', '')} {athlete.get('last_name', '')}".strip(),
+            "athlete_team": athlete.get("team"),
+            "category": None,
+            "last_activity": None,
+            "avg_time": None,
+            "best_time": None
+        }
+
+    # Poslední aktivita = nejlepší výsledek (rank = 1)
+    best_result = results[0]
+
+    # Join s competitions pro získání názvu a data
+    competition_id = to_str_id(best_result.get("competition_id"))
+    logger.warning(f"[overview] competition_id: {competition_id}")
+    competition = await competitions_collection.find_one({"_id": best_result.get("competition_id")})
+    logger.warning(f"[overview] competition from DB: {competition}")
+
+    # Join s categories pro získání názvu kategorie
+    category_id = to_str_id(best_result.get("category"))
+    category_name = None
+    if category_id:
+        try:
+            cat_oid = ObjectId(category_id)
+            category = await categories_collection.find_one({"_id": cat_oid})
+            logger.warning(f"[overview] category from DB: {category}")
+            category_name = category.get("category_name") if category else None
+        except Exception:
+            category_name = category_id  # už je to string
+
+    last_activity = {
+        "competition_id": competition_id,
+        "competition_name": competition.get("competition_name", "Neznámá soutěž") if competition else "Neznámá soutěž",
+        "competition_date": competition.get("competition_date") if competition else None,
+        "competition_place": competition.get("competition_place", "") if competition else "",
+        "final_time": best_result.get("final_time", 0),
+        "rank": best_result.get("rank", 0)
+    }
+    logger.warning(f"[overview] last_activity: {last_activity}")
+
+    # Statistiky z výsledků
+    times = [r.get("final_time", 0) for r in results if r.get("final_time")]
+    avg_time = sum(times) / len(times) if times else None
+    best_time = min(times) if times else None
+    logger.warning(f"[overview] avg_time: {avg_time}, best_time: {best_time}")
+
+    return {
+        "athlete_id": str(athlete_id),
+        "athlete_name": f"{athlete.get('first_name', '')} {athlete.get('last_name', '')}".strip(),
+        "athlete_team": athlete.get("team"),
+        "category": category_name,
+        "last_activity": last_activity,
+        "avg_time": avg_time,
+        "best_time": best_time
+    }
