@@ -32,8 +32,10 @@
     padding: 12px 16px;
     font-size: variables.$font-size-s;
     border: 1px solid black;
-    border-radius: 8px;
+    border-radius: variables.$border-radius-base;
     outline: none;
+    color: variables.$color-text;
+    transition: box-shadow 0.2s ease, border 0.2s ease;
 
     &:focus {
       border-color: variables.$color-primary;

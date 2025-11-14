@@ -33,9 +33,11 @@ $font-size-xl: 3.2rem;
 $text-underline: underline;
 
 // borders
-$border-radius-base: 4px;
+$border-radius-base: 10px;
 $border-width-base: 1px;
 $border-color-base: #ddd;
+
+$box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
 //breakpoints
 $breakpoint-s: 640px;

@@ -23,9 +23,9 @@ const BottomNavbar = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/tymy" className="nav-item">
-            <i className="fa-solid fa-people-group"></i>
-            <span>Týmy</span>
+          <NavLink to="/zavody" className="nav-item">
+            <i className="fa-solid fa-flag-checkered"></i>
+            <span>Závody</span>
           </NavLink>
         </li>
       </ul>

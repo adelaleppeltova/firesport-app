@@ -6,6 +6,7 @@ import BasicLayout from "./layouts/BasicLayout";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import AthletesPage from "./pages/AthletesPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,6 +29,7 @@ function App() {
             </Route>
             <Route element={<AppLayout />}>
               <Route path="/" element={<HomePage />} />
+              <Route path="/zavodnici" element={<AthletesPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

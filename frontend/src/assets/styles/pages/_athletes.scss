@@ -1,0 +1,90 @@
+@use "../abstracts/variables";
+
+.athletes-page {
+  padding: 2rem 1rem;
+  background: variables.$color-background;
+  min-height: 100vh;
+
+  h1 {
+    font-size: variables.$font-size-l;
+    margin-bottom: 1.5rem;
+    color: variables.$color-text;
+  }
+
+  .athletes-table-wrapper {
+    background: white;
+    border-radius: variables.$border-radius-base;
+    box-shadow: variables.$box-shadow;
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  .athletes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: variables.$font-size-s;
+    th,
+    td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background: white;
+      color: variables.$color-text;
+      font-weight: variables.$font-weight-semibold;
+      border-bottom: 2px solid variables.$color-background-dark;
+    }
+    tr {
+      transition: background 0.15s;
+      cursor: pointer;
+      &:hover {
+        background: variables.$hover-color-light;
+      }
+    }
+    td {
+      border-bottom: 1px solid variables.$gray-light;
+    }
+  }
+
+  .athletes-searchbar-wrapper {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .athletes-searchbar-iconwrap {
+    position: relative;
+    width: 100%;
+  }
+
+  .athletes-searchbar {
+    width: 100%;
+
+    padding-right: 2.5rem;
+    padding: 0.75rem 1rem;
+    font-size: variables.$font-size-s;
+    border: 1px solid black;
+    border-radius: variables.$border-radius-base;
+    outline: none;
+    color: variables.$color-text;
+    transition: box-shadow 0.2s ease, border 0.2s ease;
+    &:focus {
+      border-color: variables.$color-primary;
+      box-shadow: 0 0 2px 1px variables.$color-accent;
+    }
+  }
+
+  .athletes-searchbar-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: variables.$gray-dark;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .athletes-searchbar:focus + .athletes-searchbar-icon {
+    opacity: 0;
+  }
+}

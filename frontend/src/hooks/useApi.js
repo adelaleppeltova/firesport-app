@@ -49,3 +49,14 @@ export function useAthleteOverview(athleteId) {
     enabled: !!athleteId,
   });
 }
+
+// GET /athletes
+export function useAthletes() {
+  return useQuery({
+    queryKey: ["athletes", "all"],
+    queryFn: async () => {
+      const { data } = await api.get("/athletes");
+      return data;
+    },
+  });
+}
