@@ -1,9 +1,11 @@
 @use "../abstracts/variables";
 
 .athletes-page {
-  padding: 2rem 1rem;
+  padding: 0 1rem;
   background: variables.$color-background;
   min-height: 100vh;
+  max-width: 640px;
+  margin: 0 auto;
 
   h1 {
     font-size: variables.$font-size-l;

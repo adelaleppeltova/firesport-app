@@ -60,3 +60,15 @@ export function useAthletes() {
     },
   });
 }
+
+// GET /athletes/:id/detail
+export function useAthleteDetail(id) {
+  return useQuery({
+    queryKey: ["athlete", id, "detail"],
+    queryFn: async () => {
+      const { data } = await api.get(`/athletes/${id}/detail`);
+      return data;
+    },
+    enabled: !!id,
+  });
+}

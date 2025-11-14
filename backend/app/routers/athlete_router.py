@@ -126,3 +126,57 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
         "avg_time": avg_time,
         "best_time": best_time
     }
+
+@router.get("/{athlete_id}/detail")
+async def get_athlete_detail(athlete_id: str):
+    try:
+        oid = ObjectId(athlete_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid athlete_id")
+    athlete = await athletes_collection.find_one({"_id": oid})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    # Najdi všechny výsledky závodníka
+    results = await results_collection.find({"athlete_id": oid}).sort("competition_date", 1).to_list(length=None)
+    # Join s competitions
+    rows = []
+    best_time = None
+    category = None
+    for r in results:
+        comp = None
+        if r.get("competition_id"):
+            comp = await competitions_collection.find_one({"_id": r["competition_id"]})
+        date = comp["competition_date"].strftime("%d. %m. %Y") if comp and comp.get("competition_date") else "-"
+        place = comp["competition_place"] if comp and comp.get("competition_place") else "-"
+        final_time = r.get("final_time")
+        if final_time is not None:
+            if best_time is None or final_time < best_time:
+                best_time = final_time
+        # Kategorie z results (ObjectId)
+        if not category and r.get("category"):
+            cat_id = r["category"]
+            try:
+                cat_oid = ObjectId(cat_id)
+                cat = await categories_collection.find_one({"_id": cat_oid})
+                if cat:
+                    category = cat.get("category_name")
+            except Exception:
+                category = str(cat_id)
+        rows.append({
+            "_id": str(r["_id"]),
+            "date": date,
+            "place": place,
+            "final_time": final_time
+        })
+    return {
+        "athlete": {
+            "first_name": athlete.get("first_name"),
+            "last_name": athlete.get("last_name"),
+            "birth_year": athlete.get("birth_year"),
+            "team": athlete.get("team"),
+            "fscode": athlete.get("fscode"),
+            "category": category,
+        },
+        "best_time": best_time,
+        "results": rows
+    }

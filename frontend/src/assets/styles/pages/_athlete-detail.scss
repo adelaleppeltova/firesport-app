@@ -1,0 +1,84 @@
+@use "../abstracts/variables";
+
+.athlete-detail-page {
+  padding: 0 1rem;
+  background: variables.$color-background;
+  min-height: 100vh;
+  max-width: 640px;
+  margin: 0 auto;
+
+  h1 {
+    font-size: variables.$font-size-l;
+    margin-bottom: 1rem;
+    color: variables.$color-text;
+  }
+
+  h2 {
+    font-size: variables.$font-size-m;
+    margin-bottom: 1rem;
+    color: variables.$color-text;
+  }
+
+  .athletes-table-wrapper {
+    background: white;
+    border-radius: variables.$border-radius-base;
+    box-shadow: variables.$box-shadow;
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  .athlete-detail-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    th,
+    td {
+      font-size: variables.$font-size-s;
+      padding: 0.7rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid variables.$gray-light;
+    }
+    th {
+      font-weight: variables.$font-weight-semibold;
+      color: variables.$color-text;
+      width: 160px;
+      background: white;
+    }
+    td {
+      color: variables.$color-text;
+      background: white;
+    }
+    tr:last-child th,
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  .athlete-detail-divider {
+    border: none;
+    border-top: 2px solid variables.$color-background-dark;
+    margin: 2rem 0 1.5rem 0;
+  }
+
+  .athlete-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: variables.$font-size-s;
+
+    th,
+    td {
+      padding: 0.7rem 1rem;
+      text-align: left;
+    }
+    th {
+      font-weight: variables.$font-weight-semibold;
+      border-bottom: 2px solid variables.$color-background-dark;
+      background: white;
+      color: variables.$color-text;
+    }
+    td {
+      border-bottom: 1px solid variables.$gray-light;
+      background: white;
+    }
+  }
+}
