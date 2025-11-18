@@ -98,6 +98,7 @@ async def get_results_for_category(
     for r in results:
         athlete = athletes.get(r.get("athlete_id"), {})
         response.append({
+            "start_number": r.get("start_number"),
             "first_name": athlete.get("first_name", ""),
             "last_name": athlete.get("last_name", ""),
             "birth_year": athlete.get("birth_year", ""),

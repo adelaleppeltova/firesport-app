@@ -17,16 +17,22 @@ export default function ResultsPage() {
   return (
     <div className="results-page">
       <h1>Výsledky</h1>
-      <h2>{competition?.competition_name || "Název soutěže neznámý"}</h2>
-      <p>
+      <h2>
+        {competition?.competition_name || "Název soutěže neznámý"},{" "}
         {competition?.competition_date
           ? new Date(competition.competition_date).toLocaleDateString("cs-CZ")
           : "Datum neznámé"}
+      </h2>
+      <p>
+        {competition?.categories?.find(
+          (cat) => String(cat._id) === String(categoryId)
+        )?.name || "Název kategorie neznámý"}
       </p>
       <div className="results-table-wrapper">
         <table className="results-table">
           <thead>
             <tr>
+              <th>Startovní číslo</th>
               <th>Jméno</th>
               <th>Příjmení</th>
               <th>Rok narození</th>
@@ -42,6 +48,7 @@ export default function ResultsPage() {
             {results && results.length > 0 ? (
               results.map((r, idx) => (
                 <tr key={idx}>
+                  <td>{r.start_number ?? ""}</td>
                   <td>{r.first_name}</td>
                   <td>{r.last_name}</td>
                   <td>{r.birth_year}</td>
@@ -55,7 +62,7 @@ export default function ResultsPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={9}>Žádné výsledky</td>
+                <td colSpan={10}>Žádné výsledky</td>
               </tr>
             )}
           </tbody>
