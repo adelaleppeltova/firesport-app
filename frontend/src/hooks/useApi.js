@@ -1,6 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../api/axios";
 
+// GET /competitions/:id/detail
+export function useCompetitionDetail(id) {
+  return useQuery({
+    queryKey: ["competition", id, "detail"],
+    queryFn: async () => {
+      const { data } = await api.get(`/competitions/${id}/detail`);
+      return data;
+    },
+    enabled: !!id,
+  });
+}
+
 // GET /auth/me
 export function useMe() {
   return useQuery({
@@ -70,5 +82,16 @@ export function useAthleteDetail(id) {
       return data;
     },
     enabled: !!id,
+  });
+}
+
+// GET /competitions
+export function useCompetitions() {
+  return useQuery({
+    queryKey: ["competitions"],
+    queryFn: async () => {
+      const { data } = await api.get("/competitions");
+      return data;
+    },
   });
 }

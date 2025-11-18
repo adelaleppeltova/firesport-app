@@ -10,7 +10,7 @@ import MyData from "../components/home/MyData";
 import WelcomePage from "./WelcomePage";
 
 export default function HomePage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const { data: me, isLoading: meLoading, error: meError } = useMe();
   const {
     data: overview,
@@ -20,6 +20,9 @@ export default function HomePage() {
 
   const [showPairDialog, setShowPairDialog] = useState(false);
 
+  if (loading) {
+    return null;
+  }
   if (!isAuthenticated) {
     return <WelcomePage />;
   }

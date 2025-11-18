@@ -51,7 +51,7 @@ export default function AthletesPage() {
                 <tr
                   key={athlete._id}
                   className="athlete-row"
-                  onClick={() => navigate(`/athletes/${athlete._id}`)}
+                  onClick={() => navigate(`/zavodnici/${athlete._id}`)}
                 >
                   <td>
                     {athlete.first_name} {athlete.last_name}

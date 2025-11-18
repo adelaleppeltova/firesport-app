@@ -1,3 +1,4 @@
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from os import getenv
 
@@ -7,6 +8,9 @@ db = client["firesport"]
 
 users_col = db["users"]
 sessions_col = db["sessions"]
+
+def get_db():
+    return db
 
 # Indexy při startu
 async def ensure_indexes():

@@ -8,6 +8,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AthletesPage from "./pages/AthletesPage";
 import AthleteDetailPage from "./pages/AthleteDetailPage";
+import CompetitionsPage from "./pages/CompetitionsPage";
+import CompetitionDetailPage from "./pages/CompetitionDetailPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,7 +33,9 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/zavodnici" element={<AthletesPage />} />
-              <Route path="/athletes/:id" element={<AthleteDetailPage />} />
+              <Route path="/zavody" element={<CompetitionsPage />} />
+              <Route path="/zavody/:id" element={<CompetitionDetailPage />} />
+              <Route path="/zavodnici/:id" element={<AthleteDetailPage />} />
             </Route>
           </Routes>
         </BrowserRouter>
