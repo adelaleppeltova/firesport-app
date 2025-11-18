@@ -1,6 +1,7 @@
 @use "../abstracts/variables";
 
-.athlete-detail-page {
+.athlete-detail-page,
+.results-page {
   padding: 0 1rem;
   background: variables.$color-background;
   min-height: 100vh;
@@ -19,15 +20,24 @@
     color: variables.$color-text;
   }
 
-  .athletes-table-wrapper {
+  p {
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+    margin-bottom: 1rem;
+  }
+
+  .athletes-table-wrapper,
+  .results-table-wrapper {
     background: white;
     border-radius: variables.$border-radius-base;
     box-shadow: variables.$box-shadow;
     overflow-x: auto;
     padding: 1rem;
+    width: 100%;
   }
 
-  .athlete-detail-info-table {
+  .athlete-detail-info-table,
+  .results-info-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
@@ -54,13 +64,15 @@
     }
   }
 
-  .athlete-detail-divider {
+  .athlete-detail-divider,
+  .results-divider {
     border: none;
     border-top: 2px solid variables.$color-background-dark;
     margin: 2rem 0 1.5rem 0;
   }
 
-  .athlete-detail-table {
+  .athlete-detail-table,
+  .results-table {
     width: 100%;
     border-collapse: collapse;
     font-size: variables.$font-size-s;
@@ -83,7 +95,8 @@
   }
 }
 
-.athlete-results-card-row {
+.athlete-results-card-row,
+.results-list {
   margin-bottom: 1rem;
   padding: 1rem;
   cursor: pointer;

@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useCompetitionDetail } from "../hooks/useApi";
 import "../assets/styles/pages/_athlete-detail.scss";
 import Card from "../components/Card";
@@ -8,9 +8,9 @@ export default function CompetitionDetailPage() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useCompetitionDetail(id);
 
-  if (isLoading) return <div className="athlete-detail-page">Načítání...</div>;
+  if (isLoading) return <div className="results-page">Načítání...</div>;
   if (error || !data)
-    return <div className="athlete-detail-page">Chyba při načítání dat.</div>;
+    return <div className="results-page">Chyba při načítání dat.</div>;
 
   const {
     competition_name,
@@ -22,10 +22,10 @@ export default function CompetitionDetailPage() {
   } = data;
 
   return (
-    <div className="athlete-detail-page">
+    <div className="results-page">
       <h1>Závod</h1>
-      <div className="athletes-table-wrapper">
-        <table className="athlete-detail-info-table">
+      <div className="results-table-wrapper">
+        <table className="results-info-table">
           <tbody>
             <tr>
               <th>Datum</th>
@@ -58,24 +58,22 @@ export default function CompetitionDetailPage() {
           </tbody>
         </table>
       </div>
-      <hr className="athlete-detail-divider" />
+      <hr className="results-divider" />
 
       <h2>Výsledkové listiny</h2>
-      <div className="athlete-results">
+      <div className="results-list">
         {categories && categories.length > 0 ? (
           categories.map((cat) => (
-            <Card
+            <Link
               key={cat._id}
-              className="athlete-results-card-row"
-              onClick={() =>
-                navigate(
-                  `/zavody/${id}/vysledky/${encodeURIComponent(cat._id)}`
-                )
-              }
+              to={`/zavody/${id}/vysledky/${encodeURIComponent(cat._id)}`}
+              style={{ textDecoration: "none", color: "inherit" }}
             >
-              {cat.name}
-              <span style={{ float: "right" }}>&#8250;</span>
-            </Card>
+              <Card className="athlete-results-card-row">
+                {cat.name}
+                <span style={{ float: "right" }}>&#8250;</span>
+              </Card>
+            </Link>
           ))
         ) : (
           <div>Výsledky nejsou k dispozici.</div>

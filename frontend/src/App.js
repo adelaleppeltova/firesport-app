@@ -10,6 +10,7 @@ import AthletesPage from "./pages/AthletesPage";
 import AthleteDetailPage from "./pages/AthleteDetailPage";
 import CompetitionsPage from "./pages/CompetitionsPage";
 import CompetitionDetailPage from "./pages/CompetitionDetailPage";
+import ResultsPage from "./pages/ResultsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +36,10 @@ function App() {
               <Route path="/zavodnici" element={<AthletesPage />} />
               <Route path="/zavody" element={<CompetitionsPage />} />
               <Route path="/zavody/:id" element={<CompetitionDetailPage />} />
+              <Route
+                path="/zavody/:id/vysledky/:categoryId"
+                element={<ResultsPage />}
+              />
               <Route path="/zavodnici/:id" element={<AthleteDetailPage />} />
             </Route>
           </Routes>
