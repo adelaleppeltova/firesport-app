@@ -11,6 +11,7 @@ import AthleteDetailPage from "./pages/AthleteDetailPage";
 import CompetitionsPage from "./pages/CompetitionsPage";
 import CompetitionDetailPage from "./pages/CompetitionDetailPage";
 import ResultsPage from "./pages/ResultsPage";
+import StatisticsPage from "./pages/StatisticsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +42,7 @@ function App() {
                 element={<ResultsPage />}
               />
               <Route path="/zavodnici/:id" element={<AthleteDetailPage />} />
+              <Route path="/statistiky" element={<StatisticsPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

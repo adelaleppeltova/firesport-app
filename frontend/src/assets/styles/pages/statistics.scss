@@ -1,0 +1,62 @@
+@use "../abstracts/variables";
+
+.statistics-page {
+  padding: 0 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: variables.$color-background;
+
+  h1 {
+    font-size: variables.$font-size-l;
+    margin-bottom: 2rem;
+    color: variables.$color-text;
+  }
+
+  .statistics-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .statistics-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: variables.$border-radius-base;
+    box-shadow: variables.$box-shadow;
+    padding: 1.2rem 1.5rem;
+    transition: box-shadow 0.15s;
+    position: relative;
+    min-height: 80px;
+  }
+
+  .statistics-card-icon {
+    font-size: 2rem;
+    margin-right: 1.2rem;
+    color: variables.$color-text;
+    flex-shrink: 0;
+    width: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .statistics-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .statistics-card-title {
+    font-size: variables.$font-size-m;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$color-text;
+  }
+
+  .statistics-card-desc {
+    font-size: variables.$font-size-s;
+    color: variables.$gray-dark;
+  }
+}

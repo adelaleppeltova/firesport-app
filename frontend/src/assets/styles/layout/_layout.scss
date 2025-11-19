@@ -8,10 +8,12 @@
   }
   @media (min-width: variables.$breakpoint-l) {
     padding-top: variables.$header-height-l + 20px;
-    padding-left: 200px;
   }
   @media (min-width: variables.$breakpoint-xl) {
     padding-top: variables.$header-height-xl + 20px;
+  }
+  @media (max-width: variables.$breakpoint-l) {
+    padding-bottom: 90px;
   }
 }
 
