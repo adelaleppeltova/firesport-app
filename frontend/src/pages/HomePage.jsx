@@ -8,6 +8,7 @@ import Statistics from "../components/home/Statistics";
 import CompareAthletes from "../components/home/CompareAthletes";
 import MyData from "../components/home/MyData";
 import WelcomePage from "./WelcomePage";
+import PrimaryButton from "../components/PrimaryButton";
 
 export default function HomePage() {
   const { isAuthenticated, loading } = useAuth();
@@ -53,14 +54,13 @@ export default function HomePage() {
     return (
       <div className="home-page">
         <Card status="empty">
-          <h2>Spoj účet s atletem</h2>
-          <p>Pro zobrazení statistik musíš najít sebe v databázi atletů.</p>
-          <button
-            className="btn-primary"
-            onClick={() => setShowPairDialog(true)}
-          >
-            Najít sebe
-          </button>
+          <div className="pairathlete-card">
+            <h1>Spoj účet s atletem</h1>
+            <p>Pro zobrazení statistik najdi atleta v databázi.</p>
+            <PrimaryButton onClick={() => setShowPairDialog(true)}>
+              Najít atleta
+            </PrimaryButton>
+          </div>
         </Card>
 
         {showPairDialog && (

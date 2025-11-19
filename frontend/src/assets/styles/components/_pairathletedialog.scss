@@ -1,3 +1,5 @@
+@use "../abstracts/variables";
+
 .dialog-overlay {
   position: fixed;
   inset: 0;
@@ -16,18 +18,57 @@
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
-}
 
-.dialog-content h2 {
-  margin-bottom: 1rem;
-}
+  h2 {
+    font-size: variables.$font-size-m;
+    margin-bottom: 1rem;
+    color: variables.$color-text;
+  }
+  p {
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+    margin-bottom: 1rem;
+  }
 
-.dialog-content input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  margin-bottom: 1rem;
+  .athletes-searchbar-wrapper {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .athletes-searchbar-iconwrap {
+    position: relative;
+    width: 100%;
+  }
+  .athletes-searchbar {
+    width: 100%;
+
+    padding-right: 2.5rem;
+    padding: 0.75rem 1rem;
+    font-size: variables.$font-size-s;
+    border: 1px solid black;
+    border-radius: variables.$border-radius-base;
+    outline: none;
+    color: variables.$color-text;
+    transition: box-shadow 0.2s ease, border 0.2s ease;
+    &:focus {
+      border-color: variables.$color-primary;
+      box-shadow: 0 0 2px 1px variables.$color-accent;
+    }
+  }
+  .athletes-searchbar-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: variables.$gray-dark;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .athletes-searchbar:focus + .athletes-searchbar-icon {
+    opacity: 0;
+  }
 }
 
 .athlete-list {
@@ -57,4 +98,18 @@
 .athlete-meta {
   font-size: 0.875rem;
   color: #6b7280;
+}
+
+.pairathlete-card {
+  h1 {
+    font-size: variables.$font-size-l;
+    margin-bottom: 1rem;
+    color: variables.$color-text;
+  }
+
+  p {
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+    margin-bottom: 1rem;
+  }
 }

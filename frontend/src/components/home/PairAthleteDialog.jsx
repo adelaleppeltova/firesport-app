@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSearchAthletes, usePairAthlete } from "../../hooks/useApi";
+import PrimaryButton from "../PrimaryButton";
 
 export default function PairAthleteDialog({ onClose }) {
   const [query, setQuery] = useState("");
@@ -20,14 +21,20 @@ export default function PairAthleteDialog({ onClose }) {
   return (
     <div className="dialog-overlay" onClick={onClose}>
       <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Najít sebe</h2>
-        <input
-          type="text"
-          placeholder="Jméno, příjmení nebo FS kód..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          autoFocus
-        />
+        <h2>Najít atleta</h2>
+        <div className="athletes-searchbar-wrapper">
+          <div className="athletes-searchbar-iconwrap">
+            <input
+              className="athletes-searchbar"
+              type="text"
+              placeholder="Jméno, příjmení nebo FS kód..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              autoFocus
+            />
+            <i className="fa-solid fa-magnifying-glass athletes-searchbar-icon" />
+          </div>
+        </div>
 
         {isLoading && <p>Hledám...</p>}
 
@@ -50,9 +57,11 @@ export default function PairAthleteDialog({ onClose }) {
           <p className="empty-state">Žádný atlet nenalezen</p>
         )}
 
-        <button className="btn-secondary" onClick={onClose}>
-          Zavřít
-        </button>
+        <div className="button-center">
+          <PrimaryButton className="btn-secondary" onClick={onClose}>
+            Zavřít
+          </PrimaryButton>
+        </div>
       </div>
     </div>
   );

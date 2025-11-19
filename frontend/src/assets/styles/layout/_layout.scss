@@ -1,0 +1,23 @@
+@use "../abstracts/variables.scss";
+
+.main {
+  padding-top: variables.$header-height + 20px;
+
+  @media (min-width: variables.$breakpoint-m) {
+    padding-top: variables.$header-height-m + 20px;
+  }
+  @media (min-width: variables.$breakpoint-l) {
+    padding-top: variables.$header-height-l + 20px;
+    padding-left: 200px;
+  }
+  @media (min-width: variables.$breakpoint-xl) {
+    padding-top: variables.$header-height-xl + 20px;
+  }
+}
+
+h2 {
+  font-size: variables.$font-size-l;
+}
+h3 {
+  font-size: variables.$font-size-m;
+}
