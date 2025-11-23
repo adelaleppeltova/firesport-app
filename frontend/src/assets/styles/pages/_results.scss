@@ -4,7 +4,7 @@
   padding: 0 1rem;
   background: variables.$color-background;
   min-height: 100vh;
-  max-width: 750px;
+  max-width: 640px;
   margin: 0 auto;
 
   h1 {
@@ -70,7 +70,7 @@
   .results-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: variables.$font-size-s;
+    font-size: variables.$font-size-xs;
 
     th,
     td {

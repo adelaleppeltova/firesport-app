@@ -105,8 +105,11 @@ async def get_results_for_category(
             "fscode": athlete.get("fscode", ""),
             "team": athlete.get("team", ""),
             "time_1": r.get("time_1"),
+            "time_1_status": r.get("time_1_status"),
             "time_2": r.get("time_2"),
+            "time_2_status": r.get("time_2_status"),
             "final_time": r.get("final_time"),
+            "final_time_status": r.get("final_time_status"),
             "rank": r.get("rank"),
         })
     response.sort(key=lambda x: (x["rank"] if x["rank"] is not None else 9999))

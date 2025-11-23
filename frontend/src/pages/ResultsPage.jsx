@@ -1,6 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useResultsByCategory, useCompetitionDetail } from "../hooks/useApi";
 
+// Pomocná funkce pro zobrazení času
+function renderTime(time, status) {
+  if (status === "invalid") return "NP";
+  if (time == null) return "";
+  return time;
+}
+
 export default function ResultsPage() {
   const { id, categoryId } = useParams();
   const {
@@ -54,9 +61,9 @@ export default function ResultsPage() {
                   <td>{r.birth_year}</td>
                   <td>{r.fscode}</td>
                   <td>{r.team}</td>
-                  <td>{r.time_1}</td>
-                  <td>{r.time_2}</td>
-                  <td>{r.final_time}</td>
+                  <td>{renderTime(r.time_1, r.time_1_status)}</td>
+                  <td>{renderTime(r.time_2, r.time_2_status)}</td>
+                  <td>{renderTime(r.final_time, r.final_time_status)}</td>
                   <td>{r.rank}</td>
                 </tr>
               ))
