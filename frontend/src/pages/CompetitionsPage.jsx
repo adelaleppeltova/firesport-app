@@ -10,21 +10,21 @@ export default function CompetitionsPage() {
     return <div className="competitions-page">Chyba při načítání dat.</div>;
 
   return (
-    <div className="competitions-page athletes-page">
+    <div className="competitions-page">
       <h1>Závody</h1>
-      <div className="athletes-searchbar-wrapper">
-        <div className="athletes-searchbar-iconwrap">
+      <div className="competitions-searchbar-wrapper">
+        <div className="competitions-searchbar-iconwrap">
           <input
-            className="athletes-searchbar"
+            className="competitions-searchbar"
             type="text"
             placeholder="Hledat název, místo nebo datum..."
             disabled
           />
-          <i className="fa-solid fa-magnifying-glass athletes-searchbar-icon" />
+          <i className="fa-solid fa-magnifying-glass competitions-searchbar-icon" />
         </div>
       </div>
-      <div className="athletes-table-wrapper">
-        <table className="athletes-table">
+      <div className="competitions-table-wrapper">
+        <table className="competitions-table">
           <thead>
             <tr>
               <th>Název</th>
@@ -37,7 +37,7 @@ export default function CompetitionsPage() {
               competitions.map((comp) => (
                 <tr
                   key={comp._id}
-                  className="athlete-row"
+                  className="competition-row"
                   onClick={() => navigate(`/zavody/${comp._id}`)}
                   style={{ cursor: "pointer" }}
                 >

@@ -152,11 +152,11 @@ async def get_athlete_detail(athlete_id: str):
         if final_time is not None:
             if best_time is None or final_time < best_time:
                 best_time = final_time
-        # Kategorie z results (ObjectId)
-        if not category and r.get("category"):
-            cat_id = r["category"]
+        # Kategorie z results (nově category_id)
+        if not category and r.get("category_id"):
+            cat_id = r["category_id"]
             try:
-                cat_oid = ObjectId(cat_id)
+                cat_oid = ObjectId(cat_id) if not isinstance(cat_id, ObjectId) else cat_id
                 cat = await categories_collection.find_one({"_id": cat_oid})
                 if cat:
                     category = cat.get("category_name")

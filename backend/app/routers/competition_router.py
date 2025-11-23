@@ -85,7 +85,7 @@ async def get_results_for_category(
     from bson import ObjectId
     results_cursor = db["results"].find({
         "competition_id": ObjectId(competition_id),
-        "category": ObjectId(category_id)
+        "category_id": ObjectId(category_id)
     })
     results = await results_cursor.to_list(length=None)
     athlete_ids = [r["athlete_id"] for r in results if "athlete_id" in r]
