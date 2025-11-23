@@ -18,6 +18,7 @@ export default function CompetitionDetailPage() {
     competition_name,
     competition_date,
     competition_place,
+    competition_type,
     athlete_count,
     categories,
     results_by_category,
@@ -44,6 +45,10 @@ export default function CompetitionDetailPage() {
             <tr>
               <th>Název</th>
               <td>{competition_name || "-"}</td>
+            </tr>
+            <tr>
+              <th>Typ soutěže</th>
+              <td>{competition_type || "-"}</td>
             </tr>
             <tr>
               <th>Počet závodníků</th>

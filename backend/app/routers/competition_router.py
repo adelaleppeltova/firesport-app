@@ -57,6 +57,7 @@ async def get_competition_detail(id: str, db=Depends(get_db)):
         "competition_name": comp.get("competition_name", "-"),
         "competition_date": comp.get("competition_date", None),
         "competition_place": comp.get("competition_place", "-"),
+        "competition_type": comp.get("competition_type", "-"),
         "athlete_count": athlete_count,
         "categories": category_objs,
     }
