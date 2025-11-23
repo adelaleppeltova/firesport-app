@@ -23,14 +23,34 @@ async def create_athlete(athlete: Athlete):
 
 @router.get("/")
 async def list_athletes():
+    def convert_objectids(doc):
+        for k, v in doc.items():
+            if isinstance(v, ObjectId):
+                doc[k] = str(v)
+            elif isinstance(v, list):
+                doc[k] = [str(i) if isinstance(i, ObjectId) else i for i in v]
+            elif isinstance(v, dict):
+                doc[k] = convert_objectids(v)
+        return doc
+
     athletes = await athletes_collection.find().to_list(length=None)
     for a in athletes:
-        a["_id"] = str(a["_id"])
+        convert_objectids(a)
     return athletes
 
 @router.get("/search")
 async def search_athletes(q: str = Query(..., min_length=2)):
     """Vyhledá atlety podle jména, příjmení nebo FS kódu"""
+    def convert_objectids(doc):
+        for k, v in doc.items():
+            if isinstance(v, ObjectId):
+                doc[k] = str(v)
+            elif isinstance(v, list):
+                doc[k] = [str(i) if isinstance(i, ObjectId) else i for i in v]
+            elif isinstance(v, dict):
+                doc[k] = convert_objectids(v)
+        return doc
+
     query = {
         "$or": [
             {"first_name": {"$regex": q, "$options": "i"}},
@@ -40,7 +60,7 @@ async def search_athletes(q: str = Query(..., min_length=2)):
     }
     athletes = await athletes_collection.find(query).to_list(length=20)
     for a in athletes:
-        a["_id"] = str(a["_id"])
+        convert_objectids(a)
     return {"items": athletes}
 
 @router.get("/{athlete_id}/overview")
@@ -89,8 +109,8 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
     competition = await competitions_collection.find_one({"_id": best_result.get("competition_id")})
     logger.warning(f"[overview] competition from DB: {competition}")
 
-    # Join s categories pro získání názvu kategorie
-    category_id = to_str_id(best_result.get("category"))
+    # Join s categories pro získání názvu kategorie (podpora category i category_id)
+    category_id = to_str_id(best_result.get("category") or best_result.get("category_id"))
     category_name = None
     if category_id:
         try:

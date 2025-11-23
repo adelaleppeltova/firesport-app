@@ -58,7 +58,11 @@ export default function PairAthleteDialog({ onClose }) {
         )}
 
         <div className="button-center">
-          <PrimaryButton className="btn-secondary" onClick={onClose}>
+          <PrimaryButton
+            className="btn-secondary"
+            onClick={onClose}
+            style={{ width: "min(200px,100%)", fontSize: "1.2rem" }}
+          >
             Zavřít
           </PrimaryButton>
         </div>

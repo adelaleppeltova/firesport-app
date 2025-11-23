@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from app.dependencies import get_current_user
 from pymongo import MongoClient
 import os
@@ -22,14 +23,17 @@ def get_me(user=Depends(get_current_user)):
         "athlete_id": user.get("athlete_id")  # může být None
     }
 
+
+# Model pro tělo požadavku
+class PairAthleteRequest(BaseModel):
+    athlete_id: str
+
 @router.patch("/me/athlete")
-def pair_athlete(athlete_id: str, user=Depends(get_current_user)):
+def pair_athlete(payload: PairAthleteRequest, user=Depends(get_current_user)):
     """Spáruje uživatele s atletem"""
     from bson import ObjectId
-    
     users_collection.update_one(
         {"_id": ObjectId(user["id"])},
-        {"$set": {"athlete_id": athlete_id}}
+        {"$set": {"athlete_id": payload.athlete_id}}
     )
-    
     return {"ok": True}
