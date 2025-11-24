@@ -1,9 +1,10 @@
+from typing import Dict, List
 from fastapi import APIRouter, Query, HTTPException, Depends
 from app.models.athlete import Athlete
 from app.db.database import db
 from app.dependencies import get_current_user
 from bson import ObjectId
-from typing import Optional
+
 import logging
 
 
@@ -21,18 +22,18 @@ async def create_athlete(athlete: Athlete):
     result = await athletes_collection.insert_one(athlete.dict())
     return {"id": str(result.inserted_id)}
 
+def convert_objectids(doc):
+    for k, v in doc.items():
+        if isinstance(v, ObjectId):
+            doc[k] = str(v)
+        elif isinstance(v, list):
+            doc[k] = [str(i) if isinstance(i, ObjectId) else i for i in v]
+        elif isinstance(v, dict):
+            doc[k] = convert_objectids(v)
+    return doc
+
 @router.get("/")
 async def list_athletes():
-    def convert_objectids(doc):
-        for k, v in doc.items():
-            if isinstance(v, ObjectId):
-                doc[k] = str(v)
-            elif isinstance(v, list):
-                doc[k] = [str(i) if isinstance(i, ObjectId) else i for i in v]
-            elif isinstance(v, dict):
-                doc[k] = convert_objectids(v)
-        return doc
-
     athletes = await athletes_collection.find().to_list(length=None)
     for a in athletes:
         convert_objectids(a)
@@ -41,16 +42,6 @@ async def list_athletes():
 @router.get("/search")
 async def search_athletes(q: str = Query(..., min_length=2)):
     """Vyhledá atlety podle jména, příjmení nebo FS kódu"""
-    def convert_objectids(doc):
-        for k, v in doc.items():
-            if isinstance(v, ObjectId):
-                doc[k] = str(v)
-            elif isinstance(v, list):
-                doc[k] = [str(i) if isinstance(i, ObjectId) else i for i in v]
-            elif isinstance(v, dict):
-                doc[k] = convert_objectids(v)
-        return doc
-
     query = {
         "$or": [
             {"first_name": {"$regex": q, "$options": "i"}},
@@ -68,18 +59,18 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
     """Vrátí přehled výkonů atleta (poslední aktivita, statistiky)"""
     logger.warning(f"[overview] athlete_id param: {athlete_id}")
     try:
-        oid = ObjectId(athlete_id)
+        athlete_oid = ObjectId(athlete_id)
     except:
         logger.error(f"[overview] Invalid athlete_id: {athlete_id}")
         raise HTTPException(status_code=400, detail="Invalid athlete_id")
     
-    athlete = await athletes_collection.find_one({"_id": oid})
+    athlete = await athletes_collection.find_one({"_id": athlete_oid})
     logger.warning(f"[overview] athlete from DB: {athlete}")
     if not athlete:
         logger.error(f"[overview] Athlete not found for id: {athlete_id}")
         raise HTTPException(status_code=404, detail="Athlete not found")
     
-    results = await results_collection.find({"athlete_id": oid}).sort("rank", 1).to_list(length=None)
+    results = await results_collection.find({"athlete_id": athlete_oid}).sort("rank", 1).to_list(length=None)
     logger.warning(f"[overview] results found: {len(results)}")
     if results:
         logger.warning(f"[overview] first result: {results[0]}")
@@ -97,10 +88,10 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
             "category": None,
             "last_activity": None,
             "avg_time": None,
-            "best_time": None
+            "best_time": None,
+            "competition_count": 0
         }
 
-    # Poslední aktivita = nejlepší výsledek (rank = 1)
     best_result = results[0]
 
     # Join s competitions pro získání názvu a data
@@ -119,7 +110,7 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
             logger.warning(f"[overview] category from DB: {category}")
             category_name = category.get("category_name") if category else None
         except Exception:
-            category_name = category_id  # už je to string
+            category_name = category_id 
 
     last_activity = {
         "competition_id": competition_id,
@@ -137,6 +128,8 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
     best_time = min(times) if times else None
     logger.warning(f"[overview] avg_time: {avg_time}, best_time: {best_time}")
 
+    competition_count = await get_athlete_competition_count(athlete_oid)
+
     return {
         "athlete_id": str(athlete_id),
         "athlete_name": f"{athlete.get('first_name', '')} {athlete.get('last_name', '')}".strip(),
@@ -144,8 +137,12 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
         "category": category_name,
         "last_activity": last_activity,
         "avg_time": avg_time,
-        "best_time": best_time
+        "best_time": best_time,
+        "competition_count": competition_count,
+        "athlete_birth_year": athlete.get("birth_year")  
     }
+
+
 
 @router.get("/{athlete_id}/detail")
 async def get_athlete_detail(athlete_id: str):
@@ -200,3 +197,24 @@ async def get_athlete_detail(athlete_id: str):
         "best_time": best_time,
         "results": rows
     }
+
+
+# Počet závodů atleta
+async def get_athlete_competition_count(oid: ObjectId):
+    """
+    Vrátí počet unikátních závodů, kterých se atlet zúčastnil.
+
+    Args:
+        oid (ObjectId): ID atleta (MongoDB ObjectId)
+
+    Returns:
+        int: Počet unikátních závodů
+    """
+    results: List[Dict] = await results_collection.find({"athlete_id": oid}).to_list(length=None)
+    competition_ids = set()
+    for r in results:
+        if r.get("competition_id"):
+            competition_ids.add(r["competition_id"])
+    competition_count = len(competition_ids)
+    return competition_count
+    

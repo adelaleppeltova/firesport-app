@@ -17,39 +17,31 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
   &__title {
-    font-size: variables.$font-size-base;
+    font-size: variables.$font-size-l;
     font-weight: variables.$font-weight-semibold;
     margin: 0 0 16px;
   }
 }
 
-.recent-activity {
+.my-profile {
   &__athlete {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  &__icon {
-    font-size: 32px;
+    color: variables.$color-text;
   }
 
   &__name {
     font-size: variables.$font-size-s;
     font-weight: variables.$font-weight-semibold;
-    margin: 0;
   }
 
   &__team {
     font-size: variables.$font-size-s;
-    color: #666;
-    margin: 4px 0 0;
+    color: variables.$gray-medium;
   }
 
-  &__time {
-    margin-left: auto;
+  &__time,
+  &__competitions {
     font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-semibold;
+    font-weight: variables.$font-weight-medium;
   }
 }
 

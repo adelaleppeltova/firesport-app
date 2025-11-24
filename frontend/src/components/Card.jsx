@@ -1,18 +1,8 @@
-const Card = ({
-  title,
-  content,
-  children,
-  status = "ready",
-  className = "",
-}) => {
+const Card = ({ title, children, status = "ready", className = "" }) => {
   return (
     <div className={`card ${className} ${status ? `card--${status}` : ""}`}>
-      {title && <h2 className="card-title">{title}</h2>}
-      {children ? (
-        <div className="card-content">{children}</div>
-      ) : content ? (
-        <p className="card-content">{content}</p>
-      ) : null}
+      {title && <h2 className="card__title">{title}</h2>}
+      {children ? <div className="card__content">{children}</div> : null}
     </div>
   );
 };
