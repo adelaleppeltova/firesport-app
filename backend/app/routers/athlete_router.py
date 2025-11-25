@@ -4,6 +4,8 @@ from app.models.athlete import Athlete
 from app.db.database import db
 from app.dependencies import get_current_user
 from bson import ObjectId
+from datetime import datetime
+
 
 import logging
 
@@ -89,7 +91,8 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
             "last_activity": None,
             "avg_time": None,
             "best_time": None,
-            "competition_count": 0
+            "competition_count": 0,
+            "best_time_in_actual_year": None  
         }
 
     best_result = results[0]
@@ -129,6 +132,8 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
     logger.warning(f"[overview] avg_time: {avg_time}, best_time: {best_time}")
 
     competition_count = await get_athlete_competition_count(athlete_oid)
+    best_time_in_year = await get_athlete_best_time_in_year(athlete_oid, datetime.now().year)
+    average_time_in_year = await get_athlete_average_time_in_year(athlete_oid, datetime.now().year)
 
     return {
         "athlete_id": str(athlete_id),
@@ -139,9 +144,102 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
         "avg_time": avg_time,
         "best_time": best_time,
         "competition_count": competition_count,
-        "athlete_birth_year": athlete.get("birth_year")  
+        "athlete_birth_year": athlete.get("birth_year"),  
+        "best_time_in_year": best_time_in_year,
+        "average_time_in_year": average_time_in_year
     }
 
+
+# Počet závodů atleta
+async def get_athlete_competition_count(oid: ObjectId):
+    """
+    Vrátí počet unikátních závodů, kterých se atlet zúčastnil.
+
+    Args:
+        oid (ObjectId): ID atleta (MongoDB ObjectId)
+
+    Returns:
+        int: Počet unikátních závodů
+    """
+    results: List[Dict] = await results_collection.find({"athlete_id": oid}).to_list(length=None)
+    competition_ids = set()
+    for r in results:
+        if r.get("competition_id"):
+            competition_ids.add(r["competition_id"])
+    competition_count = len(competition_ids)
+    return competition_count
+
+# Získání soutěží v daném roce
+async def get_competitions_in_year(oid: ObjectId, year:int):
+    """
+    Vrátí seznam soutěží, kterých se atlet zúčastnil v daném roce.
+
+    Args:
+        oid (ObjectId): ID atleta (MongoDB ObjectId)
+        year (int): Rok pro filtraci výsledků"""
+    start_of_year = datetime(year, 1, 1)
+    end_of_year = datetime(year, 12, 31, 23, 59, 59)
+
+    competitions_in_year = await competitions_collection.find({
+        "competition_date": {"$gte": start_of_year, "$lte": end_of_year}
+    }).to_list(length=None)
+    competition_ids = [c["_id"] for c in competitions_in_year]
+    if not competition_ids:
+        return None
+
+    return competition_ids
+
+
+# Získání nejlepšího času atleta v daném roce
+async def get_athlete_best_time_in_year(oid: ObjectId, year: int):
+    """
+    Vrátí nejlepší čas atleta v daném roce.
+
+    Args:
+        oid (ObjectId): ID atleta (MongoDB ObjectId)
+        year (int): Rok pro filtraci výsledků
+
+    Returns:
+        float | None: Nejlepší čas v sekundách nebo None, pokud nejsou výsledky
+    """
+
+    results: List[Dict] = await results_collection.find({
+        "athlete_id": oid,
+        "competition_id": {"$in": await get_competitions_in_year(oid, year)},
+        "final_time": {"$ne": None}
+    }).to_list(length=None)
+
+    if not results:
+        return None
+
+    return min(r["final_time"] for r in results if r.get("final_time") is not None)
+
+
+# Získání průměrného času atleta v daném roce
+async def get_athlete_average_time_in_year(oid: ObjectId, year: int):
+    """
+    Vrátí průměrný čas atleta v daném roce.
+    Args:
+        oid (ObjectId): ID atleta (MongoDB ObjectId)
+        year (int): Rok pro filtraci výsledků  
+    Returns:
+        float | None: Průměrný čas v sekundách nebo None, pokud nejsou výsledky
+    """
+
+    results: List[Dict] = await results_collection.find({
+        "athlete_id": oid,
+        "competition_id": {"$in": await get_competitions_in_year(oid, year)},
+        "final_time": {"$ne": None}
+    }).to_list(length=None)
+
+    if not results:
+        return None
+
+    times = [r["final_time"] for r in results if r.get("final_time") is not None]
+    if not times:
+        return None
+
+    return sum(times) / len(times)
 
 
 @router.get("/{athlete_id}/detail")
@@ -199,22 +297,5 @@ async def get_athlete_detail(athlete_id: str):
     }
 
 
-# Počet závodů atleta
-async def get_athlete_competition_count(oid: ObjectId):
-    """
-    Vrátí počet unikátních závodů, kterých se atlet zúčastnil.
 
-    Args:
-        oid (ObjectId): ID atleta (MongoDB ObjectId)
-
-    Returns:
-        int: Počet unikátních závodů
-    """
-    results: List[Dict] = await results_collection.find({"athlete_id": oid}).to_list(length=None)
-    competition_ids = set()
-    for r in results:
-        if r.get("competition_id"):
-            competition_ids.add(r["competition_id"])
-    competition_count = len(competition_ids)
-    return competition_count
     

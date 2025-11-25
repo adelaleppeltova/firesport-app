@@ -12,7 +12,7 @@ export default function MyProfile() {
   if (meError || overviewError)
     return <p className="empty-state">Chyba načítání</p>;
   if (!overview?.last_activity)
-    return <p className="empty-state">Žádná aktivita</p>;
+    return <p className="empty-state">Žádná data o profilu</p>;
 
   const activity = overview.last_activity;
 

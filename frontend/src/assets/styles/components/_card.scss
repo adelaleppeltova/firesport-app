@@ -45,64 +45,22 @@
   }
 }
 
-.statistics {
-  &__header {
+.season {
+  &__info {
     font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-semibold;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  &__icon {
-    font-size: 20px;
-  }
-
-  &__category {
-    font-size: variables.$font-size-sm;
     font-weight: variables.$font-weight-medium;
   }
-
-  &__row {
+  &__best-time {
     font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-regular;
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-
-    &:last-child {
-      border: 0;
-    }
+    font-weight: variables.$font-weight-medium;
   }
-}
-
-.compare-athletes,
-.my-data {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  text-decoration: none;
-  color: inherit;
-  border-radius: 8px;
-  transition: background 0.2s;
-  font-size: variables.$font-size-sm;
-  font-weight: variables.$font-weight-medium;
-
-  &:hover {
-    background: #f5f5f5;
+  &__average-time {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
   }
-
-  &__icon {
-    font-size: 24px;
-  }
-
-  &__arrow {
-    margin-left: auto;
-    font-size: 24px;
-    color: #999;
+  &__competition-count {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
   }
 }
 
