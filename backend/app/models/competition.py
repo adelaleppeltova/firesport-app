@@ -7,7 +7,7 @@ class CompetitionBase(BaseModel):
     competition_name: str
     competition_place: str
     competition_date: date
-    categories: List[ObjectId] 
+    categories: List[str] 
     competition_type: str
 
 class CompetitionCreate(CompetitionBase):

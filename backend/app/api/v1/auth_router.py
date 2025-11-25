@@ -3,7 +3,8 @@ from fastapi import APIRouter, HTTPException, status, Response, Depends, Request
 from fastapi.concurrency import run_in_threadpool
 from bson import ObjectId
 
-from app.models.auth import UserCreate, UserOut, Token
+from app.models.user import UserCreate, UserOut
+from app.models.auth import Token
 from app.services.auth import (
     hash_password,
     verify_password,

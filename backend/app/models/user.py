@@ -5,8 +5,7 @@ from enum import Enum
 from typing import Optional
 class UserRole(str, Enum):
     admin = "admin"
-    coach = "coach"
-    athlete = "athlete"
+    user = "user"
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -30,3 +29,13 @@ class UserInDB(UserBase):
 class UserPublic(UserBase):
     id: str
     created_at: datetime
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserOut(BaseModel):
+    id: str
+    email: EmailStr
+    role: str
+    is_active: bool
