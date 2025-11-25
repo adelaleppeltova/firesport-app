@@ -6,8 +6,8 @@ logging.warning('TEST LOG: Backend successfully started and logger is working.')
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth_router, athlete_router, user_router
-from app.routers import competition_router
+from app.api.v1  import auth_router, athlete_router, user_router
+from app.api.v1 import competition_router
 from app.api import me
 
 app = FastAPI()
