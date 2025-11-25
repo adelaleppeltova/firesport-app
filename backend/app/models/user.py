@@ -1,11 +1,12 @@
-from datetime import date
-import datetime
-from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from datetime import datetime
+from bson import ObjectId
 
 class User(BaseModel):
-    id: int
-    username: str
-    email: str
-    password: str
-    rights: str
+    _id: ObjectId
+    email: EmailStr
+    hashed_password: str
+    role: str
+    is_active: bool = True
+    created_at: datetime
+    
