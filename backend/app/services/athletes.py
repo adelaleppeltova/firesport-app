@@ -1,141 +1,170 @@
 from bson import ObjectId
 from app.db.database import db
-from app.models.athlete import AthleteInDB
-from app.models.result import ResultInDB
-from app.models.competition import CompetitionInDB
-from app.models.category import CategoryInDB
+from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail, AthleteDetailAthlete, AthleteResultRow
 from datetime import datetime
 from typing import List, Dict
+
 
 
 athletes_collection = db["athletes"]
 results_collection = db["results"]
 competitions_collection = db["competitions"]
 categories_collection = db["categories"]
+
+
 async def list_athletes_service() -> List[AthleteInDB]:
     """Vrátí všechny atlety jako seznam Pydantic modelů."""
     athletes = await athletes_collection.find().to_list(length=1000)
-    return [AthleteInDB(**{**a, "_id": str(a["_id"])}) for a in athletes]
+    return [AthleteInDB.model_validate(a) for a in athletes]
 
-async def get_athlete_overview_service(athlete_id: str) -> Dict:
-    """Vrátí přehled výkonů atleta (poslední aktivita, statistiky)"""
+async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
+    """Vrátí přehled výkonů atleta jako AthleteOverview."""
     try:
         athlete_oid = ObjectId(athlete_id)
     except Exception:
         raise ValueError("Invalid athlete_id")
+    
     athlete = await athletes_collection.find_one({"_id": athlete_oid})
     if not athlete:
         raise ValueError("Athlete not found")
-    results = await results_collection.find({"athlete_id": athlete_oid}).sort("rank", 1).to_list(length=None)
-    def to_str_id(val):
-        if isinstance(val, ObjectId):
-            return str(val)
-        return val
-    if not results:
-        return {
-            "athlete_id": str(athlete_id),
-            "athlete_name": f"{athlete.get('first_name', '')} {athlete.get('last_name', '')}".strip(),
-            "athlete_team": athlete.get("team"),
-            "category": None,
-            "last_activity": None,
-            "avg_time": None,
-            "best_time": None,
-            "competition_count": 0,
-            "best_time_in_actual_year": None
-        }
-    best_result = results[0]
-    competition_id = to_str_id(best_result.get("competition_id"))
-    competition = await competitions_collection.find_one({"_id": best_result.get("competition_id")})
-    category_id = to_str_id(best_result.get("category") or best_result.get("category_id"))
-    category_name = None
-    if category_id:
-        try:
-            cat_oid = ObjectId(category_id)
-            category = await categories_collection.find_one({"_id": cat_oid})
-            category_name = category.get("category_name") if category else None
-        except Exception:
-            category_name = category_id
-    last_activity = {
-        "competition_id": competition_id,
-        "competition_name": competition.get("competition_name", "Neznámá soutěž") if competition else "Neznámá soutěž",
-        "competition_date": competition.get("competition_date") if competition else None,
-        "competition_place": competition.get("competition_place", "") if competition else "",
-        "final_time": best_result.get("final_time", 0),
-        "rank": best_result.get("rank", 0)
-    }
-    times = [r.get("final_time", 0) for r in results if r.get("final_time")]
-    avg_time = sum(times) / len(times) if times else None
-    best_time = min(times) if times else None
-    competition_count = await get_athlete_competition_count(athlete_oid)
-    best_time_in_year = await get_athlete_best_time_in_year(athlete_oid, datetime.now().year)
-    average_time_in_year = await get_athlete_average_time_in_year(athlete_oid, datetime.now().year)
-    return {
-        "athlete_id": str(athlete_id),
-        "athlete_name": f"{athlete.get('first_name', '')} {athlete.get('last_name', '')}".strip(),
-        "athlete_team": athlete.get("team"),
-        "category": category_name,
-        "last_activity": last_activity,
-        "avg_time": avg_time,
-        "best_time": best_time,
-        "competition_count": competition_count,
-        "athlete_birth_year": athlete.get("birth_year"),
-        "best_time_in_year": best_time_in_year,
-        "average_time_in_year": average_time_in_year
-    }
+    
+    results = await results_collection.find({"athlete_id": athlete_oid}).to_list(length=None)
 
-async def get_athlete_detail_service(athlete_id: str) -> Dict:
-    from bson import ObjectId
-    try:
-        oid = ObjectId(athlete_id)
-    except Exception:
-        raise ValueError("Invalid athlete_id")
-    athlete = await athletes_collection.find_one({"_id": oid})
-    if not athlete:
-        raise ValueError("Athlete not found")
-    results = await results_collection.find({"athlete_id": oid}).sort("competition_date", 1).to_list(length=None)
-    rows = []
-    best_time = None
-    category = None
+    if not results:
+        return AthleteOverview(
+            id=str(athlete["_id"]),
+            first_name=athlete.get("first_name", ""),
+            last_name=athlete.get("last_name", ""),
+            birth_year=athlete.get("birth_year"),
+            team=athlete.get("team"),
+            last_active=None,
+            total_competitions=0,
+            best_time=None,
+            average_time=None,
+            best_time_in_year=None,
+            average_time_in_year=None,
+        )
+    
+    times = [r.get("final_time") for r in results if r.get("final_time") is not None]
+    average_time = sum(times) / len(times) if times else None
+    best_time = min(times) if times else None
+
+    #Počet soutěží
+    total_competitions = await get_athlete_competition_count(athlete_oid)
+
+    # Poslední aktivita
+    latest_competition_date = None
     for r in results:
         comp = None
         if r.get("competition_id"):
             comp = await competitions_collection.find_one({"_id": r["competition_id"]})
-        date = comp["competition_date"].strftime("%d. %m. %Y") if comp and comp.get("competition_date") else "-"
-        place = comp["competition_place"] if comp and comp.get("competition_place") else "-"
+        comp_date = comp.get("competition_date") if comp else None
+        if comp_date:
+            if latest_competition_date is None or comp_date > latest_competition_date:
+                latest_competition_date = comp_date
+
+    if latest_competition_date:
+        last_active = latest_competition_date.strftime("%d. %m. %Y")
+    else:
+        last_active = None
+
+    # Výkon v aktuálním roce
+    current_year = datetime.now().year
+    best_time_in_year = await get_athlete_best_time_in_year(athlete_oid, current_year)
+    average_time_in_year = await get_athlete_average_time_in_year(athlete_oid, current_year)
+
+    return AthleteOverview(
+        id=str(athlete["_id"]),
+        first_name=athlete.get("first_name"),
+        last_name=athlete.get("last_name"),
+        birth_year=athlete.get("birth_year"),
+        team=athlete.get("team"),
+        last_active=last_active,
+        total_competitions=total_competitions,
+        best_time=best_time,
+        average_time=average_time,
+        best_time_in_year=best_time_in_year,
+        average_time_in_year=average_time_in_year,
+        )
+
+
+async def get_athlete_detail_service(athlete_id: str) -> AthleteDetail:
+
+    """Vrátí detail atleta jako AthleteDetail."""
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+    
+    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    if not athlete:
+        raise ValueError("Athlete not found")
+    
+    results = await results_collection.find({"athlete_id": athlete_oid}).sort("competition_date", 1).to_list(length=None)
+
+    rows: list[AthleteResultRow] = []
+    best_time: float | None = None
+    category_name: str | None = None
+
+    for r in results:
+        comp = None
+        if r.get("competition_id"):
+            comp = await competitions_collection.find_one({"_id": r["competition_id"]})
+        
+        competition_id = str(r.get("competition_id")) if r.get("competition_id") else ""
+        competition_name = comp.get("competition_name") if comp and comp.get("competition_name") else "Neznámá soutěž"
+        competition_date = (comp["competition_date"].strftime("%d. %m. %Y")
+                            if comp and comp.get("competition_date") else "-")
+
+        competition_place = comp.get("competition_place") if comp and comp.get("competition_place") else "-"
+
         final_time = r.get("final_time")
+        rank = r.get("rank")
+
+        # nejlepší čas
         if final_time is not None:
             if best_time is None or final_time < best_time:
                 best_time = final_time
-        if not category and r.get("category_id"):
+
+        # kategorie
+        if category_name is None and r.get("category_id"):
             cat_id = r["category_id"]
             try:
                 cat_oid = ObjectId(cat_id) if not isinstance(cat_id, ObjectId) else cat_id
                 cat = await categories_collection.find_one({"_id": cat_oid})
                 if cat:
-                    category = cat.get("category_name")
+                    category_name = cat.get("category_name")
             except Exception:
-                category = str(cat_id)
-        rows.append({
-            "_id": str(r["_id"]),
-            "date": date,
-            "place": place,
-            "final_time": final_time
-        })
-    return {
-        "athlete": {
-            "first_name": athlete.get("first_name"),
-            "last_name": athlete.get("last_name"),
-            "birth_year": athlete.get("birth_year"),
-            "team": athlete.get("team"),
-            "fscode": athlete.get("fscode"),
-            "category": category,
-        },
-        "best_time": best_time,
-        "results": rows
-    }
+                category_name = str(cat_id)
+
+        row = AthleteResultRow(
+            competition_id=competition_id,
+            competition_name=competition_name,
+            competition_date=competition_date,
+            competition_place=competition_place,
+            final_time=final_time,
+            rank=rank
+        )
+        rows.append(row)
+
+    athlete_detail_athlete = AthleteDetailAthlete(
+        id=str(athlete["_id"]),
+        first_name=athlete.get("first_name"),
+        last_name=athlete.get("last_name"),
+        birth_year=athlete.get("birth_year"),
+        fscode=athlete.get("fscode"),
+        team=athlete.get("team"),
+        category=category_name
+    )
+
+    return AthleteDetail(
+        athlete=athlete_detail_athlete,
+        best_time=best_time,
+        results=rows
+    )
 
 
-async def search_athletes_service(q: str) -> dict:
+async def search_athletes_service(q: str) -> AthletesSearch:
     query = {
         "$or": [
             {"first_name": {"$regex": q, "$options": "i"}},
@@ -145,22 +174,12 @@ async def search_athletes_service(q: str) -> dict:
     }
     athletes = await athletes_collection.find(query).to_list(length=20)
     # Validace pomocí Pydantic modelu (Athlete)
-    result = {"items": [AthleteInDB(**{**a, "_id": str(a["_id"])}) for a in athletes]}
-    return result
-
-
-
-
-results_collection = db["results"]
-competitions_collection = db["competitions"]
-categories_collection = db["categories"]
-athletes_collection = db["athletes"]
-
-
+    items = [AthleteInDB.model_validate(a) for a in athletes]
+    return AthletesSearch(items=items)
 
 
 # Počet závodů atleta
-async def get_athlete_competition_count(oid: ObjectId):
+async def get_athlete_competition_count(oid: ObjectId) -> int:
     """
     Vrátí počet unikátních závodů, kterých se atlet zúčastnil.
 
@@ -193,8 +212,6 @@ async def get_competitions_in_year(oid: ObjectId, year:int):
         "competition_date": {"$gte": start_of_year, "$lte": end_of_year}
     }).to_list(length=None)
     competition_ids = [c["_id"] for c in competitions_in_year]
-    if not competition_ids:
-        return None
 
     return competition_ids
 
@@ -218,10 +235,11 @@ async def get_athlete_best_time_in_year(oid: ObjectId, year: int):
         "final_time": {"$ne": None}
     }).to_list(length=None)
 
-    if not results:
+    times = [r["final_time"] for r in results if r.get("final_time") is not None]
+    if not times:
         return None
 
-    return min(r["final_time"] for r in results if r.get("final_time") is not None)
+    return min(times)
 
 
 # Získání průměrného času atleta v daném roce
