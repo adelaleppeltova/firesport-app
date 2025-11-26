@@ -23,7 +23,7 @@ class ResultCreate(ResultBase):
     pass   
 
 class ResultInDB(ResultBase):
-    id: str = Field(..., alias="_id")
+    id: ObjectId = Field(alias="_id")
 
     class Config:
         allow_population_by_field_name = True

@@ -1,7 +1,8 @@
-
-
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from typing import List
+
+from app.models.competition import CompetitionInDB
+from app.models.result import ResultInDB
 from app.services.competitions import (
     get_competition_detail_service,
     get_competitions_service,
@@ -11,25 +12,29 @@ from app.services.competitions import (
 
 router = APIRouter(prefix="/competitions", tags=["competitions"])
 
-@router.get("/{id}/detail")
+@router.get("/{id}/detail", response_model=CompetitionInDB)
 async def get_competition_detail(id: str):
-    result = await get_competition_detail_service(id)
-    if not result:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="Competition not found")
-    return result
-
-from app.models.competition import CompetitionInDB
+    """Vrátí detail soutěže jako CompetitionInDB."""
+    try:
+        return await get_competition_detail_service(id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 @router.get("", response_model=List[CompetitionInDB])
 async def get_competitions():
+    """Vrátí seznam všech soutěží."""
+
     return await get_competitions_service()
 
 
-@router.get("/{competition_id}/results/{category_id}")
+@router.get("/{competition_id}/results/{category_id}", response_model=List[ResultInDB])
 async def get_results_for_category(competition_id: str, category_id: str):
-    return await get_results_for_category_service(competition_id, category_id)
+    """Vrátí výsledky pro danou soutěž a kategorii jako seznam ResultInDB."""
 
+    try:
+        return await get_results_for_category_service(competition_id, category_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
     
 
