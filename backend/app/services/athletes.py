@@ -15,7 +15,7 @@ categories_collection = db["categories"]
 async def list_athletes_service() -> List[AthleteInDB]:
     """Vrátí všechny atlety jako seznam Pydantic modelů."""
     athletes = await athletes_collection.find().to_list(length=1000)
-    return [AthleteInDB(**a) for a in athletes]
+    return [AthleteInDB(**{**a, "_id": str(a["_id"])}) for a in athletes]
 
 async def get_athlete_overview_service(athlete_id: str) -> Dict:
     """Vrátí přehled výkonů atleta (poslední aktivita, statistiky)"""
@@ -145,7 +145,7 @@ async def search_athletes_service(q: str) -> dict:
     }
     athletes = await athletes_collection.find(query).to_list(length=20)
     # Validace pomocí Pydantic modelu (Athlete)
-    result = {"items": [AthleteInDB(**a) for a in athletes]}
+    result = {"items": [AthleteInDB(**{**a, "_id": str(a["_id"])}) for a in athletes]}
     return result
 
 
