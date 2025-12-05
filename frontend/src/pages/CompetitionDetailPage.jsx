@@ -3,9 +3,9 @@ import { useCompetitionDetail } from "../hooks/useApi";
 import Card from "../components/Card";
 
 export default function CompetitionDetailPage() {
-  const { id } = useParams();
+  const { id, categoryId } = useParams();
   const navigate = useNavigate();
-  const { data, isLoading, error } = useCompetitionDetail(id);
+  const { data, isLoading, error } = useCompetitionDetail(id, categoryId);
 
   if (isLoading)
     return <div className="competition-detail-page">Načítání...</div>;
@@ -15,10 +15,10 @@ export default function CompetitionDetailPage() {
     );
 
   const {
-    competition_name,
-    competition_date,
-    competition_place,
-    competition_type,
+    name,
+    date,
+    place,
+    type,
     athlete_count,
     categories,
     results_by_category,
@@ -32,23 +32,19 @@ export default function CompetitionDetailPage() {
           <tbody>
             <tr>
               <th>Datum</th>
-              <td>
-                {competition_date
-                  ? new Date(competition_date).toLocaleDateString("cs-CZ")
-                  : "-"}
-              </td>
+              <td>{date ? new Date(date).toLocaleDateString("cs-CZ") : "-"}</td>
             </tr>
             <tr>
               <th>Místo</th>
-              <td>{competition_place || "-"}</td>
+              <td>{place || "-"}</td>
             </tr>
             <tr>
               <th>Název</th>
-              <td>{competition_name || "-"}</td>
+              <td>{name || "-"}</td>
             </tr>
             <tr>
               <th>Typ soutěže</th>
-              <td>{competition_type || "-"}</td>
+              <td>{type || "-"}</td>
             </tr>
             <tr>
               <th>Počet závodníků</th>
@@ -72,8 +68,8 @@ export default function CompetitionDetailPage() {
         {categories && categories.length > 0 ? (
           categories.map((cat) => (
             <Link
-              key={cat._id}
-              to={`/zavody/${id}/vysledky/${encodeURIComponent(cat._id)}`}
+              key={cat.id}
+              to={`/zavody/${id}/vysledky/${encodeURIComponent(cat.id)}`}
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <Card className="competition-detail-results-card-row">

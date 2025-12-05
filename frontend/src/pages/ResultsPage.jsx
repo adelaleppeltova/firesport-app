@@ -25,14 +25,14 @@ export default function ResultsPage() {
     <div className="results-page">
       <h1>Výsledky</h1>
       <h2>
-        {competition?.competition_name || "Název soutěže neznámý"},{" "}
-        {competition?.competition_date
-          ? new Date(competition.competition_date).toLocaleDateString("cs-CZ")
+        {competition?.name || "Název soutěže neznámý"},{" "}
+        {competition?.date
+          ? new Date(competition.date).toLocaleDateString("cs-CZ")
           : "Datum neznámé"}
       </h2>
       <p>
         {competition?.categories?.find(
-          (cat) => String(cat._id) === String(categoryId)
+          (cat) => String(cat.id) === String(categoryId)
         )?.name || "Název kategorie neznámý"}
       </p>
       <div className="results-table-wrapper">
@@ -56,11 +56,11 @@ export default function ResultsPage() {
               results.map((r, idx) => (
                 <tr key={idx}>
                   <td>{r.start_number ?? ""}</td>
-                  <td>{r.first_name}</td>
-                  <td>{r.last_name}</td>
-                  <td>{r.birth_year}</td>
-                  <td>{r.fscode}</td>
-                  <td>{r.team}</td>
+                  <td>{r.athlete.first_name}</td>
+                  <td>{r.athlete.last_name}</td>
+                  <td>{r.athlete.birth_year}</td>
+                  <td>{r.athlete.fscode}</td>
+                  <td>{r.athlete.team}</td>
                   <td>{renderTime(r.time_1, r.time_1_status)}</td>
                   <td>{renderTime(r.time_2, r.time_2_status)}</td>
                   <td>{renderTime(r.final_time, r.final_time_status)}</td>

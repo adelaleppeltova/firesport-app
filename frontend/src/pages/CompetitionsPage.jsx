@@ -53,15 +53,13 @@ export default function CompetitionsPage() {
                   onClick={() => navigate(`/zavody/${comp._id}`)}
                   style={{ cursor: "pointer" }}
                 >
-                  <td>{comp.competition_name}</td>
+                  <td>{comp.name}</td>
                   <td>
-                    {comp.competition_date
-                      ? new Date(comp.competition_date).toLocaleDateString(
-                          "cs-CZ"
-                        )
+                    {comp.date
+                      ? new Date(comp.date).toLocaleDateString("cs-CZ")
                       : "-"}
                   </td>
-                  <td>{comp.competition_place}</td>
+                  <td>{comp.place}</td>
                 </tr>
               ))
             ) : (

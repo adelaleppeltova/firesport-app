@@ -1,25 +1,38 @@
 from pydantic import BaseModel, Field, ConfigDict, field_serializer
 from typing import List
 from datetime import date
-from bson import ObjectId
 
 class CompetitionBase(BaseModel):
-    competition_name: str
-    competition_place: str
-    competition_date: date
+    name: str
+    place: str
+    date: date
     categories: List[str] 
-    competition_type: str
+    type: str
 
 class CompetitionCreate(CompetitionBase):
     pass   
 
 class CompetitionInDB(CompetitionBase):
-    id: ObjectId = Field(alias="_id")
+    id: str = Field(alias="_id")
 
     model_config = ConfigDict(
         populate_by_name=True,
-        arbitrary_types_allowed=True,
     )
-    @field_serializer("id")
-    def serialize_id(self, id: ObjectId) -> str:
-        return str(id)
+
+class CompetitionCategorySummary(BaseModel):
+    id: str
+    name: str
+    competitors_count: int
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
+
+class CompetitionDetail(BaseModel):
+    id: str
+    name: str
+    place: str
+    date: date
+    type: str
+    categories: List[CompetitionCategorySummary]
+    athlete_count: int

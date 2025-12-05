@@ -59,8 +59,8 @@ export default function AthleteDetailPage() {
           </thead>
           <tbody>
             {results && results.length > 0 ? (
-              results.map((r) => (
-                <tr key={r._id}>
+              results.map((r, idx) => (
+                <tr key={r._id || `${r.date}-${r.place}-${idx}`}>
                   <td>{r.date}</td>
                   <td>{r.place}</td>
                   <td>{r.final_time ? r.final_time.toFixed(2) + " s" : "-"}</td>

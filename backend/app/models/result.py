@@ -1,33 +1,41 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict, field_serializer
 from typing import Optional
-from bson import ObjectId
 from enum import Enum
+
+from app.models.athlete import AthleteInDB
+from app.models.competition import CompetitionInDB
+from app.models.category import CategoryInDB
+
 
 class TimeStatus(str, Enum):
     valid = "valid"
     invalid = "invalid"
+
+
 class ResultBase(BaseModel):
-    athlete_id: str
-    competition_id: str
-    category_id: str
-    start_number: Optional[int]
-    time_1: Optional[float]
+    athlete: AthleteInDB
+    competition: CompetitionInDB
+    category: CategoryInDB
+
+    start_number: Optional[int] = None
+
+    time_1: Optional[float] = None
     time_1_status: TimeStatus
-    time_2: Optional[float]
+
+    time_2: Optional[float] = None
     time_2_status: TimeStatus
-    final_time: Optional[float]
+
+    final_time: Optional[float] = None
     final_time_status: TimeStatus
-    rank: Optional[int]
+
+    rank: Optional[int] = None
 
 class ResultCreate(ResultBase):
-    pass   
+    pass
 
 class ResultInDB(ResultBase):
-    id: ObjectId = Field(alias="_id")
+    id: str = Field(alias="_id")
 
-    class Config:
-        allow_population_by_field_name = True
-        json_encoders = {ObjectId: str}
-        arbitrary_types_allowed = True
-
-
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
