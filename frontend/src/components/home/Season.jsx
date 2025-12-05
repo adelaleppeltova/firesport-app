@@ -24,7 +24,7 @@ export default function Season() {
           Průměrný čas v sezóně: {overview.average_time_in_year?.toFixed(2)} s
         </p>
         <p className="season__competition-count">
-          Počet závodů v sezóně: {overview.competition_count}
+          Počet závodů v sezóně: {overview.total_competitions}
         </p>
       </div>
     </div>

@@ -1,5 +1,13 @@
 @use "../abstracts/variables";
 
+.pair-athlete {
+  &__text {
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+    margin-bottom: 1.5rem;
+  }
+}
+
 .dialog-overlay {
   position: fixed;
   inset: 0;
@@ -45,7 +53,7 @@
 
     padding-right: 2.5rem;
     padding: 0.75rem 1rem;
-    font-size: variables.$font-size-s;
+    font-size: variables.$font-size-xs;
     border: 1px solid black;
     border-radius: variables.$border-radius-base;
     outline: none;
@@ -75,12 +83,12 @@
   list-style: none;
   padding: 0;
   margin: 1rem 0;
-  max-height: 300px;
+  max-height: 250px;
   overflow-y: auto;
 }
 
 .athlete-list li {
-  padding: 1rem;
+  padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
   cursor: pointer;
   transition: background 0.2s;
@@ -92,12 +100,13 @@
 
 .athlete-list strong {
   display: block;
-  margin-bottom: 0.25rem;
+  font-size: variables.$font-size-s;
+  color: variables.$color-text;
 }
 
 .athlete-meta {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: variables.$font-size-xs;
+  color: variables.$gray-medium;
 }
 
 .pairathlete-card {

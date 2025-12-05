@@ -203,6 +203,8 @@ async def search_athletes_service(q: str) -> AthletesSearch:
     }
     athletes = await athletes_collection.find(query).to_list(length=20)
     # Validace pomocí Pydantic modelu (Athlete)
+    for a in athletes:
+        a["_id"] = str(a["_id"])
     items = [AthleteInDB.model_validate(a) for a in athletes]
     return AthletesSearch(items=items)
 
