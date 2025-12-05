@@ -1,6 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useAthleteDetail } from "../hooks/useApi";
 
+const formatDate = (dateString) => {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`;
+};
+
 export default function AthleteDetailPage() {
   const { id } = useParams();
   const { data, isLoading, error } = useAthleteDetail(id);
@@ -60,9 +66,14 @@ export default function AthleteDetailPage() {
           <tbody>
             {results && results.length > 0 ? (
               results.map((r, idx) => (
-                <tr key={r._id || `${r.date}-${r.place}-${idx}`}>
-                  <td>{r.date}</td>
-                  <td>{r.place}</td>
+                <tr
+                  key={
+                    r.id ||
+                    `${r.competition?.date}-${r.competition?.place}-${idx}`
+                  }
+                >
+                  <td>{formatDate(r.competition?.date)}</td>
+                  <td>{r.competition?.place}</td>
                   <td>{r.final_time ? r.final_time.toFixed(2) + " s" : "-"}</td>
                 </tr>
               ))

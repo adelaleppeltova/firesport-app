@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail
+from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview
+from app.models.models import AthleteDetailPage
 from app.dependencies import get_current_user
 from bson import ObjectId
 from datetime import datetime
@@ -38,7 +39,7 @@ async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-@router.get("/{athlete_id}/detail", response_model=AthleteDetail)
+@router.get("/{athlete_id}/detail", response_model=AthleteDetailPage)
 async def get_athlete_detail(athlete_id: str):
     """Vrátí detail atleta včetně výkonů jako AthleteDetail."""
     try:

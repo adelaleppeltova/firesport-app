@@ -5,6 +5,8 @@ from app.models.result import ResultBase
 from datetime import datetime
 from typing import List, Dict
 
+from app.models.models import AthleteDetailPage
+
 
 
 athletes_collection = db["athletes"]
@@ -91,7 +93,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         )
 
 
-async def get_athlete_detail_service(athlete_id: str) -> AthleteDetail:
+async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
 
     """Vrátí detail atleta jako AthleteDetail."""
     try:
@@ -173,8 +175,8 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetail:
         validated = ResultBase.model_validate(result_payload)
         results.append(validated)
 
-    # build AthleteDetail
-    return AthleteDetail(
+    # build AthleteDetail for response
+    athlete_detail = AthleteDetail(
         id=str(athlete_payload["_id"]),
         first_name=athlete.get("first_name"),
         last_name=athlete.get("last_name"),
@@ -183,6 +185,11 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetail:
         team=athlete.get("team"),
         category=category_name,
         best_time=best_time,
+    )
+    return AthleteDetailPage(
+        athlete=athlete_detail,
+        results=results,
+        best_time=best_time
     )
 
 
