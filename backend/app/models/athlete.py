@@ -1,5 +1,18 @@
 from pydantic import BaseModel, Field, ConfigDict, field_serializer
 from typing import Optional, List
+from enum import Enum
+
+
+class PerformanceTrend(str, Enum):
+    improving = "improving"
+    declining = "declining"
+    stable = "stable"
+
+
+class RecentResult(BaseModel):
+    final_time: Optional[float]
+    rank: Optional[int]
+
 
 class AthleteBase(BaseModel):
     first_name: str
@@ -34,6 +47,8 @@ class AthleteOverview(BaseModel):
     average_time: Optional[float] = None
     best_time_in_year: Optional[float] = None
     average_time_in_year: Optional[float] = None
+    performance_trend: PerformanceTrend = PerformanceTrend.stable
+    recent_results: List[RecentResult] = []
 
 class AthleteDetail(BaseModel):
     """

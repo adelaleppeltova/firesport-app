@@ -1,9 +1,10 @@
 from bson import ObjectId
 from app.db.database import db
-from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail
+from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail, PerformanceTrend, RecentResult
 from app.models.result import ResultBase
 from datetime import datetime
 from typing import List, Dict
+from ml.utils.trend_analyzer import analyze_performance_trend, get_recent_results_from_times
 
 from app.models.models import AthleteDetailPage
 
@@ -48,6 +49,8 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
             average_time=None,
             best_time_in_year=None,
             average_time_in_year=None,
+            performance_trend=PerformanceTrend.stable,
+            recent_results=[],
         )
     
     times = [r.get("final_time") for r in results if r.get("final_time") is not None]
@@ -78,6 +81,15 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     best_time_in_year = await get_athlete_best_time_in_year(athlete_oid, current_year)
     average_time_in_year = await get_athlete_average_time_in_year(athlete_oid, current_year)
 
+    # Trend výkonu - seřazení podle času (nejstarší první)
+    sorted_results = sorted(results, key=lambda r: r.get("final_time") or float('inf'))
+    times_sorted = [r.get("final_time") for r in sorted_results if r.get("final_time") is not None]
+    ranks_sorted = [r.get("rank") for r in sorted_results if r.get("rank") is not None]
+    
+    performance_trend = analyze_performance_trend(times_sorted)
+    recent_results = get_recent_results_from_times(times_sorted[-5:] if len(times_sorted) > 5 else times_sorted, 
+                                       ranks_sorted[-5:] if len(ranks_sorted) > 5 else ranks_sorted)
+
     return AthleteOverview(
         id=str(athlete["_id"]),
         first_name=athlete.get("first_name"),
@@ -90,6 +102,8 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         average_time=average_time,
         best_time_in_year=best_time_in_year,
         average_time_in_year=average_time_in_year,
+        performance_trend=performance_trend,
+        recent_results=recent_results,
         )
 
 

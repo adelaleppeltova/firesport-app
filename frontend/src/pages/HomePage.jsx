@@ -1,6 +1,7 @@
 import Card from "../components/Card";
 import MyProfile from "../components/home/MyProfile";
 import Season from "../components/home/Season";
+import History from "../components/home/History";
 import PairAthleteCard from "../components/home/PairAthleteCard";
 import { useMe } from "../hooks/useApi";
 
@@ -28,6 +29,9 @@ export default function HomePage() {
       </Card>
       <Card title="Aktuální sezóna">
         <Season />
+      </Card>
+      <Card title="Historie výkonu">
+        <History />
       </Card>
     </div>
   );
