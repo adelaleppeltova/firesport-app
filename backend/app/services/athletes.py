@@ -5,6 +5,7 @@ from app.models.result import ResultBase
 from datetime import datetime
 from typing import List, Dict
 from ml.utils.trend_analyzer import analyze_performance_trend, get_recent_results_from_times
+from ml.utils.stability_evaluator import get_stability_analysis
 
 from app.models.models import AthleteDetailPage
 
@@ -51,6 +52,8 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
             average_time_in_year=None,
             performance_trend=PerformanceTrend.stable,
             recent_results=[],
+            performance_variability=None,
+            stability_rating="Nedostatek dat",
         )
     
     times = [r.get("final_time") for r in results if r.get("final_time") is not None]
@@ -90,6 +93,18 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     recent_results = get_recent_results_from_times(times_sorted[-5:] if len(times_sorted) > 5 else times_sorted, 
                                        ranks_sorted[-5:] if len(ranks_sorted) > 5 else ranks_sorted)
 
+    # Stabilita výkonu v aktuálním roce
+    current_year = datetime.now().year
+    year_results = [
+        r.get("final_time")
+        for r in results
+        if r.get("final_time") is not None
+    ]
+    
+    stability_info = get_stability_analysis(year_results)
+    performance_variability = stability_info["stats"]["std_dev"]
+    stability_rating = stability_info["rating"]
+
     return AthleteOverview(
         id=str(athlete["_id"]),
         first_name=athlete.get("first_name"),
@@ -104,6 +119,8 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         average_time_in_year=average_time_in_year,
         performance_trend=performance_trend,
         recent_results=recent_results,
+        performance_variability=performance_variability,
+        stability_rating=stability_rating,
         )
 
 

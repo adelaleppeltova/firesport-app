@@ -2,6 +2,7 @@ import Card from "../components/Card";
 import MyProfile from "../components/home/MyProfile";
 import Season from "../components/home/Season";
 import History from "../components/home/History";
+import PerformanceStability from "../components/home/PerformanceStability";
 import PairAthleteCard from "../components/home/PairAthleteCard";
 import { useMe } from "../hooks/useApi";
 
@@ -32,6 +33,9 @@ export default function HomePage() {
       </Card>
       <Card title="Historie výkonu">
         <History />
+      </Card>
+      <Card title="Stabilita výkonu">
+        <PerformanceStability />
       </Card>
     </div>
   );

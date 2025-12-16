@@ -49,6 +49,8 @@ class AthleteOverview(BaseModel):
     average_time_in_year: Optional[float] = None
     performance_trend: PerformanceTrend = PerformanceTrend.stable
     recent_results: List[RecentResult] = []
+    performance_variability: Optional[float] = None  # Standardní odchylka časů v aktuálním roce
+    stability_rating: str = "Nedostatek dat"  # Slovní hodnocení stability
 
 class AthleteDetail(BaseModel):
     """
