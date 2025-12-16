@@ -1,0 +1,23 @@
+@use "../abstracts/variables.scss";
+
+.my-profile {
+  &__athlete {
+    color: variables.$color-text;
+  }
+
+  &__name {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-semibold;
+  }
+
+  &__team {
+    font-size: variables.$font-size-s;
+    color: variables.$gray-medium;
+  }
+
+  &__time,
+  &__competitions {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+  }
+}

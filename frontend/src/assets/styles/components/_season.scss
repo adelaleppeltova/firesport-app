@@ -1,0 +1,20 @@
+@use "../abstracts/variables.scss";
+
+.season {
+  &__info {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+  }
+  &__best-time {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+  }
+  &__average-time {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+  }
+  &__competition-count {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+  }
+}

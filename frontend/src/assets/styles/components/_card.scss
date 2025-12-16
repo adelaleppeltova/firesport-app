@@ -23,91 +23,6 @@
   }
 }
 
-.my-profile {
-  &__athlete {
-    color: variables.$color-text;
-  }
-
-  &__name {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-semibold;
-  }
-
-  &__team {
-    font-size: variables.$font-size-s;
-    color: variables.$gray-medium;
-  }
-
-  &__time,
-  &__competitions {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-medium;
-  }
-}
-
-.season {
-  &__info {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-medium;
-  }
-  &__best-time {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-medium;
-  }
-  &__average-time {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-medium;
-  }
-  &__competition-count {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-medium;
-  }
-}
-
-.activity-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.competition-name {
-  font-weight: 600;
-  font-size: 1.125rem;
-}
-
-.competition-date {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.final-time {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #3b82f6;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.stat-value {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
 .empty-state {
   color: #9ca3af;
   text-align: center;
@@ -129,19 +44,4 @@
   100% {
     background-position: -200% 0;
   }
-}
-
-.welcome-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  gap: 1.5rem;
-  text-align: center;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 1rem;
 }
