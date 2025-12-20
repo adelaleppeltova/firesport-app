@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", data.access_token);
     setAuthToken(data.access_token);
     setUser(data.user);
-    window.location.href = "/";
+    window.location.href = "/home";
   };
 
   const logout = () => {

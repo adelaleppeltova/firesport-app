@@ -66,7 +66,7 @@ function LoginPage() {
             autoComplete="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.toLowerCase())}
           />
         </label>
         <label className="login__label" htmlFor="password">

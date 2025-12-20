@@ -122,7 +122,7 @@ function RegisterPage() {
               autoComplete="section-register email" // upřesněno
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value.toLowerCase())}
             />
           </div>
         </label>

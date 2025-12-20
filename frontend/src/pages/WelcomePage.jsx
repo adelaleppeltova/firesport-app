@@ -1,8 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
+import { useAuth } from "../context/AuthContext";
 
 function WelcomePage() {
   const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <div>Loading...</div>;
+  if (isAuthenticated) return <Navigate to="/home" replace />;
+
   return (
     <div className="welcome">
       <main className="welcome__main">

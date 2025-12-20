@@ -18,7 +18,10 @@ function Header() {
     <nav className="header">
       <div className="header__content">
         <div className="header__content--center">
-          <NavLink className="header__title" to="/">
+          <NavLink
+            className="header__title"
+            to={isAuthenticated ? "/home" : "/"}
+          >
             firesport
           </NavLink>
         </div>
