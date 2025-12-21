@@ -3,10 +3,17 @@ from typing import Optional, List
 from enum import Enum
 
 
-class PerformanceTrend(str, Enum):
-    improving = "improving"
-    declining = "declining"
+class PerformanceIndicatorTrend(str, Enum):
+    up = "up"
+    down = "down"
     stable = "stable"
+    insufficient = "insufficient"
+
+class PerformanceIndicator(BaseModel):
+    trend: PerformanceIndicatorTrend = PerformanceIndicatorTrend.insufficient
+    delta_seconds: Optional[float] = None
+    new_value: Optional[float] = None
+    old_value: Optional[float] = None
 
 
 class RecentResult(BaseModel):
@@ -47,8 +54,10 @@ class AthleteOverview(BaseModel):
     average_time: Optional[float] = None
     best_time_in_year: Optional[float] = None
     average_time_in_year: Optional[float] = None
-    performance_trend: PerformanceTrend = PerformanceTrend.stable
-    recent_results: List[RecentResult] = []
+    performance_indicator: PerformanceIndicator = Field(
+        default_factory=PerformanceIndicator
+    )
+    recent_results: List[RecentResult] = Field(default_factory=list)
     performance_variability: Optional[float] = None  # Standardní odchylka časů v aktuálním roce
     stability_rating: str = "Nedostatek dat"  # Slovní hodnocení stability
 
@@ -72,4 +81,3 @@ class AthleteDetail(BaseModel):
 
 class AthletesSearch(BaseModel):
     items: List[AthleteInDB]
-

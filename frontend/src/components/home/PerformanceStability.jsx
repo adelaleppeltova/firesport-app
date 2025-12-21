@@ -18,7 +18,7 @@ export default function PerformanceStability() {
     overview;
 
   // Mapování stability na ikonu a barvu
-  const getStabilityIcon = (rating) => {
+  const getStabilityIcon = (rating = "") => {
     if (
       rating.includes("Velmi vysoká") ||
       rating.includes("Vysoká")
@@ -32,7 +32,8 @@ export default function PerformanceStability() {
     return { icon: "fa-question-circle", color: "#999" }; // Šedá
   };
 
-  const stability = getStabilityIcon(stability_rating);
+  const ratingText = stability_rating || "Nedostatek dat";
+  const stability = getStabilityIcon(ratingText);
 
   // Vypočítej relativní variabilitu
   const variabilityPercent =
@@ -54,7 +55,7 @@ export default function PerformanceStability() {
           />
           <div>
             <p className="performance-stability__rating">
-              <strong>{stability_rating}</strong>
+              <strong>{ratingText}</strong>
             </p>
             {variabilityPercent && (
               <p className="performance-stability__text">

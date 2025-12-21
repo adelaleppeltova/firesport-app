@@ -1,13 +1,13 @@
 from bson import ObjectId
 from app.db.database import db
-from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail, PerformanceTrend, RecentResult
+from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail
 from app.models.result import ResultBase
 from datetime import datetime
 from typing import List, Dict
-from ml.utils.trend_analyzer import analyze_performance_trend, get_recent_results_from_times
-from ml.utils.stability_evaluator import get_stability_analysis
 
 from app.models.models import AthleteDetailPage
+from app.services.performance_indicator import calculate_performance_indicator
+from ml.utils.stability_evaluator import get_stability_analysis
 
 
 
@@ -50,10 +50,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
             average_time=None,
             best_time_in_year=None,
             average_time_in_year=None,
-            performance_trend=PerformanceTrend.stable,
             recent_results=[],
-            performance_variability=None,
-            stability_rating="Nedostatek dat",
         )
     
     times = [r.get("final_time") for r in results if r.get("final_time") is not None]
@@ -84,24 +81,59 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     best_time_in_year = await get_athlete_best_time_in_year(athlete_oid, current_year)
     average_time_in_year = await get_athlete_average_time_in_year(athlete_oid, current_year)
 
-    # Trend výkonu - seřazení podle času (nejstarší první)
-    sorted_results = sorted(results, key=lambda r: r.get("final_time") or float('inf'))
-    times_sorted = [r.get("final_time") for r in sorted_results if r.get("final_time") is not None]
-    ranks_sorted = [r.get("rank") for r in sorted_results if r.get("rank") is not None]
-    
-    performance_trend = analyze_performance_trend(times_sorted)
-    recent_results = get_recent_results_from_times(times_sorted[-5:] if len(times_sorted) > 5 else times_sorted, 
-                                       ranks_sorted[-5:] if len(ranks_sorted) > 5 else ranks_sorted)
+    # Trend indicator: last 6 valid results ordered by competition date.
+    competition_ids = {
+        r.get("competition") for r in results if r.get("competition")
+    }
+    competition_dates = {}
+    if competition_ids:
+        competitions = await competitions_collection.find(
+            {"_id": {"$in": list(competition_ids)}}
+        ).to_list(length=None)
+        competition_dates = {
+            c["_id"]: c.get("date")
+            for c in competitions
+            if c.get("date") is not None
+        }
 
-    # Stabilita výkonu v aktuálním roce
-    current_year = datetime.now().year
-    year_results = [
-        r.get("final_time")
-        for r in results
-        if r.get("final_time") is not None
-    ]
-    
-    stability_info = get_stability_analysis(year_results)
+    indicator_entries = []
+    for r in results:
+        comp_id = r.get("competition")
+        comp_date = competition_dates.get(comp_id) if comp_id else None
+        if comp_date is None:
+            continue
+        indicator_entries.append(
+            {
+                "competition_date": comp_date,
+                "final_time": r.get("final_time"),
+                "final_time_status": r.get("final_time_status"),
+                "rank": r.get("rank"),
+            }
+        )
+
+    performance_indicator, recent_results = calculate_performance_indicator(
+        indicator_entries
+    )
+
+    # Stabilita vykonu v aktualnim roce (neplatne vysledky ignorujeme).
+    valid_times: list[float] = []
+    for r in results:
+        time_value = r.get("final_time")
+        status_raw = r.get("final_time_status")
+        status_value = (
+            str(getattr(status_raw, "value", status_raw)).lower()
+            if status_raw is not None
+            else ""
+        )
+        if time_value is None:
+            continue
+        if time_value >= 999:
+            continue
+        if status_value in {"invalid", "dnf"}:
+            continue
+        valid_times.append(time_value)
+
+    stability_info = get_stability_analysis(valid_times)
     performance_variability = stability_info["stats"]["std_dev"]
     stability_rating = stability_info["rating"]
 
@@ -117,7 +149,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         average_time=average_time,
         best_time_in_year=best_time_in_year,
         average_time_in_year=average_time_in_year,
-        performance_trend=performance_trend,
+        performance_indicator=performance_indicator,
         recent_results=recent_results,
         performance_variability=performance_variability,
         stability_rating=stability_rating,

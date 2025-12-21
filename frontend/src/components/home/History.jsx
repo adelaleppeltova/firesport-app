@@ -9,23 +9,46 @@ export default function History() {
   if (meLoading || overviewLoading) return <div className="skeleton" />;
   if (!overview) return <p className="empty-state">Žádná data</p>;
 
-  const { performance_trend, recent_results } = overview;
+  const { performance_indicator, recent_results } = overview;
 
-  // Mapování trendu na ikonu a barvu
+  const formatSeconds = (value) => {
+    if (value == null) return "-";
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return "-";
+    return numericValue.toFixed(2);
+  };
+
+  // Trend is based on last 6 valid results (newer 3 vs older 3, median).
   const getTrendIcon = (trend) => {
     switch (trend) {
-      case "improving":
+      case "up":
         return { icon: "fa-arrow-up", label: "Zlepšení", color: "#4caf50" };
-      case "declining":
+      case "down":
         return { icon: "fa-arrow-down", label: "Zhoršení", color: "#f44336" };
       case "stable":
         return { icon: "fa-minus", label: "Stabilní", color: "#ff9800" };
+      case "insufficient":
+        return { icon: "fa-minus", label: "Nedostatek dat", color: "#999" };
       default:
         return { icon: "fa-minus", label: "Bez dat", color: "#999" };
     }
   };
 
-  const trend = getTrendIcon(performance_trend);
+  const indicator = performance_indicator ?? {};
+  const {
+    trend: trendKey,
+    delta_seconds: deltaSeconds,
+    new_value: newValue,
+    old_value: oldValue,
+  } = indicator;
+
+  const trend = getTrendIcon(trendKey);
+  const deltaText =
+    deltaSeconds == null
+      ? "-"
+      : `${deltaSeconds > 0 ? "+" : ""}${formatSeconds(deltaSeconds)} s`;
+  const hasDetails =
+    trendKey && trendKey !== "insufficient" && deltaSeconds != null;
 
   return (
     <div className="history">
@@ -41,9 +64,15 @@ export default function History() {
           />
           <div>
             <p className="history__text">
-              <strong>{trend.label}</strong> - Trend výkonu v posledních
-              závodech
+              <strong>{trend.label}</strong> - Výkonnost podle posledních
+              závodů
             </p>
+            {hasDetails && (
+              <p className="history__subtext">
+                Změna: {deltaText} (starší 3: {formatSeconds(oldValue)} s,
+                novější 3: {formatSeconds(newValue)} s)
+              </p>
+            )}
             {recent_results && recent_results.length > 0 && (
               <div className="history__recent">
                 <p className="history__subtext">
@@ -54,11 +83,11 @@ export default function History() {
                     <span
                       key={idx}
                       className="history__result-badge"
-                      title={`Čas: ${result.final_time?.toFixed(2)} s${
+                      title={`Čas: ${formatSeconds(result.final_time)} s${
                         result.rank ? `, Pořadí: ${result.rank}` : ""
                       }`}
                     >
-                      {result.final_time?.toFixed(2) || "-"}s
+                      {formatSeconds(result.final_time)}s
                     </span>
                   ))}
                 </div>
