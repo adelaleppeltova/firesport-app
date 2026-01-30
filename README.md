@@ -53,6 +53,7 @@ Po spuštění je k dispozici:
 - frontend na adrese http://localhost:3000.
 
 ## Aktuální stav
+
 V současnosti aplikace umožňuje:
 
 - spuštění backendové a frontendové části v lokálním vývojovém prostředí,
@@ -76,7 +77,7 @@ Následující screenshoty dokumentují aktuální stav vývoje aplikace.
 
 Základní stránka aplikace. Finální podoba a obsah této stránky budou dopracovány.
 
-![HomePage](docs/screenshots/homepage.png)
+![HomePage](docs/screenshots/HomePage.png)
 
 ### Práce se sportovními daty
 
