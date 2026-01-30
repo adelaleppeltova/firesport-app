@@ -7,7 +7,7 @@ from typing import List, Dict
 
 from app.models.models import AthleteDetailPage
 from app.services.performance_indicator import calculate_performance_indicator
-from ml.utils.stability_evaluator import get_stability_analysis
+from app.services.performance_stability_service import evaluate_performance_stability
 
 
 
@@ -111,31 +111,11 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
             }
         )
 
-    performance_indicator, recent_results = calculate_performance_indicator(
-        indicator_entries
-    )
+    performance_indicator, recent_results = calculate_performance_indicator(indicator_entries)
 
-    # Stabilita vykonu v aktualnim roce (neplatne vysledky ignorujeme).
-    valid_times: list[float] = []
-    for r in results:
-        time_value = r.get("final_time")
-        status_raw = r.get("final_time_status")
-        status_value = (
-            str(getattr(status_raw, "value", status_raw)).lower()
-            if status_raw is not None
-            else ""
-        )
-        if time_value is None:
-            continue
-        if time_value >= 999:
-            continue
-        if status_value in {"invalid", "dnf"}:
-            continue
-        valid_times.append(time_value)
-
-    stability_info = get_stability_analysis(valid_times)
-    performance_variability = stability_info["stats"]["std_dev"]
-    stability_rating = stability_info["rating"]
+    stability_info = evaluate_performance_stability(indicator_entries)
+    performance_variability = stability_info["performance_variability"]
+    stability_rating = stability_info["stability_rating"]
 
     return AthleteOverview(
         id=str(athlete["_id"]),

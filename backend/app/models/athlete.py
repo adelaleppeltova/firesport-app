@@ -58,7 +58,7 @@ class AthleteOverview(BaseModel):
         default_factory=PerformanceIndicator
     )
     recent_results: List[RecentResult] = Field(default_factory=list)
-    performance_variability: Optional[float] = None  # Standardní odchylka časů v aktuálním roce
+    performance_variability: Optional[float] = None  # Rozsah (max - min) poslednich platnych casu
     stability_rating: str = "Nedostatek dat"  # Slovní hodnocení stability
 
 class AthleteDetail(BaseModel):

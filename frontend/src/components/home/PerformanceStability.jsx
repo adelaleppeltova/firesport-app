@@ -19,15 +19,12 @@ export default function PerformanceStability() {
 
   // Mapování stability na ikonu a barvu
   const getStabilityIcon = (rating = "") => {
-    if (
-      rating.includes("Velmi vysoká") ||
-      rating.includes("Vysoká")
-    ) {
+    const normalized = rating.toLowerCase();
+    if (normalized.includes("stabilní")) {
       return { icon: "fa-check-circle", color: "#4caf50" }; // Zelená
-    } else if (rating.includes("Průměrná")) {
-      return { icon: "fa-minus-circle", color: "#ff9800" }; // Oranžová
-    } else if (rating.includes("Nízká")) {
-      return { icon: "fa-exclamation-circle", color: "#f44336" }; // Červená
+    }
+    if (normalized.includes("kolísavé")) {
+      return { icon: "fa-exclamation-circle", color: "#ff9800" }; // Oranžová
     }
     return { icon: "fa-question-circle", color: "#999" }; // Šedá
   };
@@ -35,11 +32,8 @@ export default function PerformanceStability() {
   const ratingText = stability_rating || "Nedostatek dat";
   const stability = getStabilityIcon(ratingText);
 
-  // Vypočítej relativní variabilitu
-  const variabilityPercent =
-    average_time_in_year && performance_variability
-      ? ((performance_variability / average_time_in_year) * 100).toFixed(1)
-      : null;
+  const variabilityDisplay =
+    performance_variability == null ? "-" : performance_variability.toFixed(2);
 
   return (
     <div className="performance-stability">
@@ -57,21 +51,16 @@ export default function PerformanceStability() {
             <p className="performance-stability__rating">
               <strong>{ratingText}</strong>
             </p>
-            {variabilityPercent && (
-              <p className="performance-stability__text">
-                Variabilita: {variabilityPercent}% (relativní)
-              </p>
-            )}
           </div>
         </div>
 
         <div className="performance-stability__stats">
           <div className="performance-stability__stat">
             <span className="performance-stability__stat-label">
-              Rozptyl časů (s):
+              Rozsah časů (s):
             </span>
             <span className="performance-stability__stat-value">
-              {performance_variability?.toFixed(2) || "-"}
+              {variabilityDisplay}
             </span>
           </div>
 
