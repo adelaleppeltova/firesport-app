@@ -11,6 +11,10 @@ class TimeStatus(str, Enum):
     valid = "valid"
     invalid = "invalid"
 
+class TimeAttempt(BaseModel):
+    attempt: str  # "LP", "PP" nebo číslo
+    time: Optional[float]
+    status: TimeStatus
 
 class ResultBase(BaseModel):
     athlete: AthleteInDB
@@ -18,6 +22,8 @@ class ResultBase(BaseModel):
     category: CategoryInDB
 
     start_number: Optional[int] = None
+
+    times: list[TimeAttempt] = []
 
     time_1: Optional[float] = None
     time_1_status: TimeStatus
