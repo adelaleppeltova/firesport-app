@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
     if (token) {
       setAuthToken(token);
       api
-        .get("/auth/me")
+        .get("/v1/auth/me")
         .then(({ data }) => setUser(data))
         .catch(() => {
           localStorage.removeItem("token");
@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await api.post("/auth/login", { email, password });
+    const { data } = await api.post("/v1/auth/login", { email, password });
     localStorage.setItem("token", data.access_token);
     setAuthToken(data.access_token);
     setUser(data.user);

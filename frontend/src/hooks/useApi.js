@@ -7,7 +7,7 @@ export function useCompetitionDetail(id) {
   return useQuery({
     queryKey: ["competition", id, "detail"],
     queryFn: async () => {
-      const { data } = await api.get(`/competitions/${id}/detail`);
+      const { data } = await api.get(`/v1/competitions/${id}/detail`);
       return data;
     },
     enabled: !!id,
@@ -19,7 +19,7 @@ export function useMe() {
   return useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data } = await api.get("/auth/me");
+      const { data } = await api.get("/v1/auth/me");
       return data;
     },
   });
@@ -29,7 +29,7 @@ export function usePairAthlete() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (athlete_id) => {
-      const { data } = await api.patch("/user/me/athlete", { athlete_id });
+      const { data } = await api.patch("/v1/me/pair-athlete", { athlete_id });
       return data;
     },
     onSuccess: () => {
@@ -44,7 +44,7 @@ export function useSearchAthletes(query) {
     queryFn: async () => {
       if (!query || query.length < 2) return { items: [] };
       const { data } = await api.get(
-        `/athletes/search?q=${encodeURIComponent(query)}`
+        `/v1/athletes/search?q=${encodeURIComponent(query)}`,
       );
       return data;
     },
@@ -56,7 +56,7 @@ export function useAthleteOverview(athleteId) {
   return useQuery({
     queryKey: ["athletes", athleteId, "overview"],
     queryFn: async () => {
-      const { data } = await api.get(`/athletes/${athleteId}/overview`);
+      const { data } = await api.get(`/v1/athletes/${athleteId}/overview`);
       return data;
     },
     enabled: !!athleteId,
@@ -68,7 +68,7 @@ export function useAthletes() {
   return useQuery({
     queryKey: ["athletes", "all"],
     queryFn: async () => {
-      const { data } = await api.get("/athletes");
+      const { data } = await api.get("/v1/athletes");
       return data;
     },
   });
@@ -79,7 +79,7 @@ export function useAthleteDetail(id) {
   return useQuery({
     queryKey: ["athlete", id, "detail"],
     queryFn: async () => {
-      const { data } = await api.get(`/athletes/${id}/detail`);
+      const { data } = await api.get(`/v1/athletes/${id}/detail`);
       return data;
     },
     enabled: !!id,
@@ -91,7 +91,7 @@ export function useCompetitions() {
   return useQuery({
     queryKey: ["competitions"],
     queryFn: async () => {
-      const { data } = await api.get("/competitions");
+      const { data } = await api.get("/v1/competitions");
       return data;
     },
   });

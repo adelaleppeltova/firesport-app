@@ -7,8 +7,7 @@ logging.warning('TEST LOG: Backend successfully started and logger is working.')
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1  import auth_router, athlete_router, user_router, result_router
-from app.api.v1 import competition_router
-from app.api import me
+from app.api.v1 import competition_router, me_router
 
 app = FastAPI()
 
@@ -20,12 +19,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router.router)
-app.include_router(user_router.router)
-app.include_router(athlete_router.router)
-app.include_router(competition_router.router)
-app.include_router(result_router.router)
-app.include_router(me.router)
+app.include_router(auth_router.router, prefix="/v1")
+app.include_router(user_router.router, prefix="/v1")
+app.include_router(athlete_router.router, prefix="/v1")
+app.include_router(competition_router.router, prefix="/v1")
+app.include_router(result_router.router, prefix="/v1")
+app.include_router(me_router.router, prefix="/v1")
 
 @app.get("/")
 def read_root():

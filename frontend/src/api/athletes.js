@@ -1,4 +1,4 @@
 import api from "./axios";
 
-export const fetchAthletes = () => api.get("/athletes");
-export const createAthlete = (data) => api.post("/athletes", data);
+export const fetchAthletes = () => api.get("/v1/athletes");
+export const createAthlete = (data) => api.post("/v1/athletes", data);

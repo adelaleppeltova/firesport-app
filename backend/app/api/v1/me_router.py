@@ -5,12 +5,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api", tags=["user"])
+router = APIRouter(prefix="/me", tags=["user"])
 
 class PairAthleteRequest(BaseModel):
     athlete_id: str
 
-@router.get("/me")
+@router.get("")
 def get_me(user=Depends(get_current_user)):
     """Vrátí údaje o aktuálně přihlášeném uživateli"""
     return {
@@ -19,7 +19,7 @@ def get_me(user=Depends(get_current_user)):
         "athlete_id": user.get("athlete_id")
     }
 
-@router.patch("/me/pair-athlete")
+@router.patch("/pair-athlete")
 def pair_athlete(body: PairAthleteRequest, user=Depends(get_current_user)):
     """Spáruje uživatele s atletem"""
     from app.dependencies import sync_db

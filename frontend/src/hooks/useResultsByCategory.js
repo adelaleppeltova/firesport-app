@@ -8,7 +8,7 @@ export function useResultsByCategory(competitionId, categoryId) {
     queryFn: async () => {
       if (!competitionId || !categoryId) return [];
       const { data } = await api.get(
-        `/competitions/${competitionId}/results/${categoryId}`
+        "/v1/competitions/${competitionId}/results/${categoryId}",
       );
       return data;
     },

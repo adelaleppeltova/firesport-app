@@ -45,9 +45,9 @@ api.interceptors.response.use(
 
     // Nezkoušej refresh na auth endpointy a pokud už byl retry proveden
     const isAuthEndpoint =
-      url.includes("/auth/login") ||
-      url.includes("/auth/register") ||
-      url.includes("/auth/refresh");
+      url.includes("/v1/auth/login") ||
+      url.includes("/v1/auth/register") ||
+      url.includes("/v1/auth/refresh");
 
     if (isAuthEndpoint || original._retry) {
       return Promise.reject(error);
@@ -72,7 +72,7 @@ api.interceptors.response.use(
 
     isRefreshing = true;
     try {
-      const r = await refreshApi.post("/auth/refresh");
+      const r = await refreshApi.post("/v1/auth/refresh");
       const access = r.data?.access_token;
       setAuthToken(access);
       notifyAll(access);
@@ -84,7 +84,7 @@ api.interceptors.response.use(
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );
 
 export default api;

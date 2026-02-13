@@ -16,7 +16,7 @@ function RegisterPage() {
     "",
     {
       ttlMs: 30 * 60_000,
-    }
+    },
   );
   const [lastName, setLastName] = usePersistedState("register:lastName", "", {
     ttlMs: 30 * 60_000,
@@ -50,14 +50,14 @@ function RegisterPage() {
     // kontrola síly hesla
     if (!passwordRules.test(password)) {
       setError(
-        "Heslo musí obsahovat min. 8 znaků, velké a malé písmeno a číslici."
+        "Heslo musí obsahovat min. 8 znaků, velké a malé písmeno a číslici.",
       );
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await api.post("/auth/register", { email, password });
+      await api.post("/v1/auth/register", { email, password });
       clearPersistedState("register:firstName");
       clearPersistedState("register:lastName");
       clearPersistedState("register:email");
