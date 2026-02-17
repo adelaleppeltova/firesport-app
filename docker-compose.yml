@@ -4,11 +4,16 @@ services:
     container_name: firesport-backend
     ports:
       - "8000:8000"
+      - "5679:5679"
     volumes:
       - ./backend:/app
+      - ./data:/app/data:ro
     depends_on:
       - mongo
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+      - DEBUG=false
 
   mongo:
     image: mongo
@@ -19,6 +24,7 @@ services:
       - mongo-data:/data/db
 
   frontend:
+    container_name: firesport-frontend
     build: ./frontend
     ports:
       - "3000:3000"

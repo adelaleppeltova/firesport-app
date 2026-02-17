@@ -1,0 +1,203 @@
+{
+  "source_file": "mladsi_dorostenci.pdf",
+  "generated_at": "2026-02-10T00:00:00Z",
+  "competition": {
+    "name": "Český pohár Budíkovice",
+    "place": "Budíkovice",
+    "date": "2025-05-04",
+    "type": "100m",
+    "league": "Český pohár",
+    "categories": [
+      {
+        "name": "Mladší dorostenci",
+        "results": [
+          {
+            "start_number": "3",
+            "fscode": 81721,
+            "first_name": "Michal",
+            "last_name": "Kulha",
+            "birth_year": 2012,
+            "team": "Trusovice",
+            "district": "Olomouc",
+            "times": [
+              { "try": 1, "time": 18.56, "status": "valid" },
+              { "try": 2, "time": 23.62, "status": "valid" }
+            ],
+            "final_time": 18.56,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "14",
+            "fscode": 73201,
+            "first_name": "Miroslav",
+            "last_name": "Dokoupil",
+            "birth_year": 2012,
+            "team": "Slatina",
+            "district": "Svitavy",
+            "times": [
+              { "try": 1, "time": 18.59, "status": "valid" },
+              { "try": 2, "time": 18.75, "status": "valid" }
+            ],
+            "final_time": 18.59,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "71",
+            "fscode": 92801,
+            "first_name": "David",
+            "last_name": "Hüttner",
+            "birth_year": 2012,
+            "team": "Nová Ves",
+            "district": "Český Krumlov",
+            "times": [
+              { "try": 1, "time": 19.65, "status": "valid" },
+              { "try": 2, "time": 24.91, "status": "valid" }
+            ],
+            "final_time": 19.65,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "12",
+            "fscode": 74661,
+            "first_name": "Josef",
+            "last_name": "Novák",
+            "birth_year": 2011,
+            "team": "Hlubočky",
+            "district": "Olomouc",
+            "times": [
+              { "try": 1, "time": 20.31, "status": "valid" },
+              { "try": 2, "time": 21.18, "status": "valid" }
+            ],
+            "final_time": 20.31,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "13",
+            "fscode": 76411,
+            "first_name": "Vilém",
+            "last_name": "Vykoukal",
+            "birth_year": 2012,
+            "team": "Těrlicko-Hradiště",
+            "district": "Karviná",
+            "times": [
+              { "try": 1, "time": 20.55, "status": "valid" },
+              { "try": 2, "time": 22.86, "status": "valid" }
+            ],
+            "final_time": 20.55,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "6",
+            "fscode": 66851,
+            "first_name": "Jiří",
+            "last_name": "Mihulka",
+            "birth_year": 2011,
+            "team": "Bohousová",
+            "district": "Ústí nad Orlicí",
+            "times": [
+              { "try": 1, "time": 24.11, "status": "valid" },
+              { "try": 2, "time": 21.22, "status": "valid" }
+            ],
+            "final_time": 21.22,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "2",
+            "fscode": 80881,
+            "first_name": "Mikuláš",
+            "last_name": "Mokrosz",
+            "birth_year": 2011,
+            "team": "Těrlicko-Hradiště",
+            "district": "Karviná",
+            "times": [
+              { "try": 1, "time": 21.67, "status": "valid" },
+              { "try": 2, "time": 21.6, "status": "valid" }
+            ],
+            "final_time": 21.6,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "11",
+            "fscode": 96211,
+            "first_name": "Lukáš",
+            "last_name": "Švanda",
+            "birth_year": 2012,
+            "team": "Skalice",
+            "district": "Znojmo",
+            "times": [
+              { "try": 1, "time": 23.77, "status": "valid" },
+              { "try": 2, "time": 22.82, "status": "valid" }
+            ],
+            "final_time": 22.82,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "8",
+            "fscode": 113631,
+            "first_name": "Tomáš",
+            "last_name": "Kořínek",
+            "birth_year": 2012,
+            "team": "Slatiny",
+            "district": "Jičín",
+            "times": [
+              { "try": 1, "time": 23.49, "status": "valid" },
+              { "try": 2, "time": 31.11, "status": "valid" }
+            ],
+            "final_time": 23.49,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "4",
+            "fscode": 96791,
+            "first_name": "Jakub",
+            "last_name": "Gargula",
+            "birth_year": 2012,
+            "team": "Moutnice",
+            "district": "Brno-venkov",
+            "times": [
+              { "try": 1, "time": 24.01, "status": "valid" },
+              { "try": 2, "time": 27.13, "status": "valid" }
+            ],
+            "final_time": 24.01,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "9",
+            "fscode": 83931,
+            "first_name": "Milan",
+            "last_name": "Piskač",
+            "birth_year": 2012,
+            "team": "Bozkov",
+            "district": "Semily",
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 28.88, "status": "valid" }
+            ],
+            "final_time": 28.88,
+            "final_status": "valid",
+            "rank": 11
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Layout: jednolitá tabulka v jednom bloku textu; hlavička sloupců je sloučená (např. 'rozběhdráhast.č.FScode...'), sloupce rozpoznány podle pořadí hodnot v řádcích.",
+    "Metadata: liga/název převzaty z řádku 'Český pohár'; typ disciplíny z řádku 'v běhu na 100m s překážkami'; místo a datum z řádku 'Budíkovice, 04.05.2025'.",
+    "Kategorie: nadpis 'Výsledková listina mladší dorci' mapován na povolený název 'Mladší dorostenci'.",
+    "Časy: desetinná čárka převedena na tečku; hodnota '999' vyhodnocena jako neplatný čas."
+  ],
+  "warnings": [
+    "Kategorie v PDF je uvedena zkráceně jako 'mladší dorci'; interpretováno jako 'Mladší dorostenci' dle kontextu souboru a obsahu."
+  ]
+}

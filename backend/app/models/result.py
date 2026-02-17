@@ -12,7 +12,7 @@ class TimeStatus(str, Enum):
     invalid = "invalid"
 
 class TimeAttempt(BaseModel):
-    attempt: str  # "LP", "PP" nebo číslo
+    attempt: int
     time: Optional[float]
     status: TimeStatus
 

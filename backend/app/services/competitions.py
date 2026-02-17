@@ -20,33 +20,35 @@ async def get_competition_detail_service(competition_id: str) -> CompetitionDeta
 	if not comp:
 		raise ValueError("Competition not found")
 
-	# Convert category refs to ObjectId
-	cat_oids = []
-	for c in comp.get("categories", []):
-		if isinstance(c, ObjectId):
-			cat_oids.append(c)
-		else:
-			try:
-				cat_oids.append(ObjectId(c))
-			except Exception:
-				pass
-
-	# Fetch categories and count results
+	# Fetch all results for this competition
+	all_results = await results_collection.find({"competition": comp_oid}).to_list(length=None)
+	
+	# Group results by category
+	categories_dict = {}
+	for result in all_results:
+		cat_oid = result.get("category")
+		if cat_oid:
+			category_id_str = str(cat_oid)
+			if category_id_str not in categories_dict:
+				categories_dict[category_id_str] = []
+			categories_dict[category_id_str].append(result)
+	
+	# Build category summaries
 	categories_summaries = []
-	athlete_count = 0
-
-	if cat_oids:
-		categories_db = await categories_collection.find({"_id": {"$in": cat_oids}}).to_list(length=None)
-		for cat in categories_db:
-			count = await results_collection.count_documents(
-				{"competition": comp_oid, "category": cat["_id"]}
-			)
-			athlete_count += count
+	total_athlete_count = 0
+	
+	for category_id_str, results_in_cat in categories_dict.items():
+		# Get category details
+		cat_oid = ObjectId(category_id_str)
+		cat = await categories_collection.find_one({"_id": cat_oid})
+		if cat:
+			competitor_count = len(results_in_cat)
+			total_athlete_count += competitor_count
 			categories_summaries.append(
 				CompetitionCategorySummary(
-					id=str(cat["_id"]),
+					id=category_id_str,
 					name=cat.get("name", ""),
-					competitors_count=count,
+					competitors_count=competitor_count,
 				)
 			)
 
@@ -55,8 +57,8 @@ async def get_competition_detail_service(competition_id: str) -> CompetitionDeta
 		name=comp.get("name"),
 		place=comp.get("place"),
 		date=comp.get("date"),
-		type=comp.get("type"),
-		athlete_count=athlete_count,
+		league=comp.get("league"),
+		athlete_count=total_athlete_count,
 		categories=categories_summaries,
 	)
 
@@ -66,8 +68,6 @@ async def get_competitions_service() -> List[CompetitionInDB]:
 	result = []
 	for comp in competitions_raw:
 		comp["_id"] = str(comp["_id"])
-		if isinstance(comp.get("categories"), list):
-			comp["categories"] = [str(cat) for cat in comp["categories"]]
 		result.append(CompetitionInDB.model_validate(comp))
 
 	return result

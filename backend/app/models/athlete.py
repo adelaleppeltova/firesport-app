@@ -27,6 +27,7 @@ class AthleteBase(BaseModel):
     birth_year: int
     fscode: Optional[int] = None
     team: str
+    district: Optional[str] = None
 
 class AthleteCreate(AthleteBase):
     pass
@@ -48,6 +49,7 @@ class AthleteOverview(BaseModel):
     last_name: str
     birth_year: int
     team: str
+    district: Optional[str] = None
     last_active: Optional[str] = None
     total_competitions: int = 0
     best_time: Optional[float] = None
@@ -72,6 +74,7 @@ class AthleteDetail(BaseModel):
     birth_year: int
     fscode: Optional[int] = None
     team: str
+    district: Optional[str] = None
     category: Optional[str] = None
     best_time: Optional[float] = None
 
