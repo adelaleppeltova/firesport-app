@@ -25,7 +25,7 @@ export default function CompetitionDetailPage() {
   } = data;
 
   return (
-    <div className="competition-detail-page">
+    <div className="competition-detail-page page">
       <h1>Závod</h1>
       <div className="competition-detail-table-wrapper">
         <table className="competition-detail-info-table">

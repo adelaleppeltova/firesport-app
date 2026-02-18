@@ -18,7 +18,7 @@ export default function AthleteDetailPage() {
   const { athlete, best_time, results } = data;
 
   return (
-    <div className="athlete-detail-page">
+    <div className="athlete-detail-page page">
       <h1>Závodník</h1>
       <div className="athletes-table-wrapper">
         <table className="athlete-detail-info-table">

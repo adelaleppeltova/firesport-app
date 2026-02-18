@@ -4,7 +4,6 @@
   padding: 0 1rem;
   background: variables.$color-background;
   min-height: 100vh;
-  max-width: 640px;
   margin: 0 auto;
 
   h1 {
@@ -69,7 +68,9 @@
     border-radius: variables.$border-radius-base;
     outline: none;
     color: variables.$color-text;
-    transition: box-shadow 0.2s ease, border 0.2s ease;
+    transition:
+      box-shadow 0.2s ease,
+      border 0.2s ease;
     &:focus {
       border-color: variables.$color-primary;
       box-shadow: 0 0 2px 1px variables.$color-accent;

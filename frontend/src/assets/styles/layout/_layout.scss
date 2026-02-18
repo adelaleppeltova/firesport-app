@@ -2,12 +2,14 @@
 
 .main {
   padding-top: variables.$header-height + 20px;
+  padding-left: variables.$sidebar-width;
 
   @media (min-width: variables.$breakpoint-m) {
     padding-top: variables.$header-height-m + 20px;
   }
   @media (min-width: variables.$breakpoint-l) {
     padding-top: variables.$header-height-l + 20px;
+    padding-left: variables.$sidebar-width-l;
   }
   @media (min-width: variables.$breakpoint-xl) {
     padding-top: variables.$header-height-xl + 20px;
@@ -22,4 +24,8 @@ h2 {
 }
 h3 {
   font-size: variables.$font-size-m;
+}
+
+.page {
+  max-width: 800px;
 }
