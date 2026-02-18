@@ -3,6 +3,7 @@ import MyProfile from "../components/home/MyProfile";
 import Season from "../components/home/Season";
 import History from "../components/home/History";
 import PerformanceStability from "../components/home/PerformanceStability";
+import PerformanceByYear from "../components/home/PerformanceByYear";
 import PairAthleteCard from "../components/home/PairAthleteCard";
 import { useMe } from "../hooks/useApi";
 
@@ -36,6 +37,9 @@ export default function HomePage() {
       </Card>
       <Card title="Stabilita výkonu">
         <PerformanceStability />
+      </Card>
+      <Card title="Vývoj výkonu za sezóny">
+        <PerformanceByYear />
       </Card>
     </div>
   );

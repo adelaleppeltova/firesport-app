@@ -20,4 +20,24 @@
     font-size: variables.$font-size-s;
     font-weight: variables.$font-weight-medium;
   }
+
+  &__best-performance {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #f5f5f5;
+    border-radius: 0.4rem;
+  }
+
+  &__best-performance-label {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-semibold;
+    margin: 0 0 0.5rem 0;
+    color: variables.$color-text;
+  }
+
+  &__best-performance-detail {
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+    color: variables.$gray-medium;
+  }
 }

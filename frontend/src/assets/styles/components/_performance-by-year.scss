@@ -1,0 +1,127 @@
+@use "../abstracts/variables.scss";
+
+.performance-by-year {
+  padding: 0;
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  &__chart {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 2 / 1;
+    min-height: 300px;
+    margin: 0 auto;
+  }
+
+  &__grid-line {
+    line {
+      opacity: 0.3;
+    }
+
+    text {
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, sans-serif;
+    }
+  }
+
+  &__line {
+    transition: stroke-width 0.2s ease;
+
+    &:hover {
+      stroke-width: 3;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  &__point-group {
+    transition: all 0.2s ease;
+
+    &:hover {
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+    }
+  }
+
+  &__point {
+    transition:
+      r 0.2s ease,
+      filter 0.2s ease;
+
+    &:hover {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+  }
+
+  &__tooltip {
+    pointer-events: none;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, sans-serif;
+
+    rect {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    }
+
+    text {
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &__legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: default;
+  }
+
+  &__legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  &__legend-text {
+    font-size: 0.95rem;
+    color: variables.$color-text;
+    font-weight: 500;
+  }
+
+  &__info {
+    text-align: center;
+    padding: 0.5rem 1rem;
+    background-color: #f0f8ff;
+    border-radius: 0.5rem;
+  }
+
+  &__info-text {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #0066cc;
+  }
+
+  @media (max-width: 768px) {
+    &__legend {
+      gap: 1rem;
+      padding: 0.75rem;
+    }
+
+    &__chart {
+      min-height: 250px;
+    }
+  }
+}

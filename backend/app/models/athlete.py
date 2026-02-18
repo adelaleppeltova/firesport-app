@@ -21,6 +21,13 @@ class RecentResult(BaseModel):
     rank: Optional[int]
 
 
+class BestPerformance(BaseModel):
+    """Nejlepší výkon - čas, soutěž a místo"""
+    time: Optional[float] = None
+    competition_place: Optional[str] = None
+    competition_date: Optional[str] = None
+
+
 class AthleteBase(BaseModel):
     first_name: str
     last_name: str
@@ -62,6 +69,7 @@ class AthleteOverview(BaseModel):
     recent_results: List[RecentResult] = Field(default_factory=list)
     performance_variability: Optional[float] = None  # Rozsah (max - min) poslednich platnych casu
     stability_rating: str = "Nedostatek dat"  # Slovní hodnocení stability
+    best_performance: BestPerformance = Field(default_factory=BestPerformance)  # Nejlepší výkon s detaily soutěže
 
 class AthleteDetail(BaseModel):
     """
@@ -84,3 +92,16 @@ class AthleteDetail(BaseModel):
 
 class AthletesSearch(BaseModel):
     items: List[AthleteInDB]
+
+
+class PerformanceDataPoint(BaseModel):
+    """Datový bod pro graf vývoje výkonu v čase"""
+    date: str  # ISO formát nebo "YYYY-MM-DD"
+    time: float  # Čas v sekundách
+    rank: Optional[int] = None
+
+
+class PerformanceByYear(BaseModel):
+    """Data pro graf vývoje výkonu po sezónách"""
+    years: List[int]  # [2022, 2023, 2024]
+    data: dict  # {2022: [{"date": "2022-05-15", "time": 16.5, "rank": 1}, ...], ...}

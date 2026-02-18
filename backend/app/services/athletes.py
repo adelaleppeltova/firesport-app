@@ -1,6 +1,6 @@
 from bson import ObjectId
 from app.db.database import db
-from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail
+from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail, BestPerformance
 from app.models.result import ResultBase
 from datetime import datetime
 from typing import List, Dict
@@ -117,6 +117,25 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     performance_variability = stability_info["performance_variability"]
     stability_rating = stability_info["stability_rating"]
 
+    # Najdi soutěž s nejlepším časem
+    best_performance_info = {}
+    if best_time is not None:
+        best_result = None
+        for r in results:
+            final_time = r.get("final_time")
+            if final_time is not None and final_time == best_time:
+                best_result = r
+                break
+        
+        if best_result and best_result.get("competition"):
+            comp = await competitions_collection.find_one({"_id": best_result["competition"]})
+            if comp:
+                best_performance_info = {
+                    "time": best_time,
+                    "competition_place": comp.get("place"),
+                    "competition_date": comp.get("date").strftime("%d. %m. %Y") if comp.get("date") else None
+                }
+
     return AthleteOverview(
         id=str(athlete["_id"]),
         first_name=athlete.get("first_name"),
@@ -133,6 +152,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         recent_results=recent_results,
         performance_variability=performance_variability,
         stability_rating=stability_rating,
+        best_performance=best_performance_info,
         )
 
 
@@ -341,3 +361,72 @@ async def get_athlete_average_time_in_year(oid: ObjectId, year: int):
         return None
 
     return sum(times) / len(times)
+
+
+async def get_athlete_performance_by_year_service(athlete_id: str):
+    """
+    Vrátí data pro graf vývoje výkonu po sezónách.
+    Vrací výkonnostní data seřazená po jednotlivých letech.
+    
+    Args:
+        athlete_id (str): ID atleta
+        
+    Returns:
+        PerformanceByYear: Data obsahující roky a výkonnostní body pro každý rok
+    """
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+    
+    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    if not athlete:
+        raise ValueError("Athlete not found")
+    
+    # Získej všechny výsledky atleta
+    results = await results_collection.find({"athlete": athlete_oid}).to_list(length=None)
+    if not results:
+        return {"years": [], "data": {}}
+    
+    # Počet roků v datech
+    competition_ids = {r.get("competition") for r in results if r.get("competition")}
+    if not competition_ids:
+        return {"years": [], "data": {}}
+    
+    competitions = await competitions_collection.find(
+        {"_id": {"$in": list(competition_ids)}}
+    ).to_list(length=None)
+    
+    # Mapování competition_id -> date
+    comp_dates = {c["_id"]: c.get("date") for c in competitions if c.get("date")}
+    
+    # Seskup výsledky po jednotlivých letech
+    data_by_year = {}
+    years_set = set()
+    
+    for r in results:
+        comp_id = r.get("competition")
+        comp_date = comp_dates.get(comp_id) if comp_id else None
+        
+        if comp_date is None or r.get("final_time") is None:
+            continue
+        
+        year = comp_date.year
+        years_set.add(year)
+        
+        if year not in data_by_year:
+            data_by_year[year] = []
+        
+        data_by_year[year].append({
+            "date": comp_date.strftime("%Y-%m-%d"),
+            "time": r.get("final_time"),
+            "rank": r.get("rank")
+        })
+    
+    # Seřad výsledky pro každý rok chronologicky
+    for year in data_by_year:
+        data_by_year[year].sort(key=lambda x: x["date"])
+    
+    years = sorted(list(years_set))
+    
+    return {"years": years, "data": data_by_year}

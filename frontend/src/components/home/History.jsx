@@ -3,7 +3,7 @@ import { useMe, useAthleteOverview } from "../../hooks/useApi";
 export default function History() {
   const { data: me, isLoading: meLoading } = useMe();
   const { data: overview, isLoading: overviewLoading } = useAthleteOverview(
-    me?.athlete_id
+    me?.athlete_id,
   );
 
   if (meLoading || overviewLoading) return <div className="skeleton" />;
@@ -64,8 +64,7 @@ export default function History() {
           />
           <div>
             <p className="history__text">
-              <strong>{trend.label}</strong> - Výkonnost podle posledních
-              závodů
+              <strong>{trend.label}</strong> - Výkonnost podle posledních závodů
             </p>
             {hasDetails && (
               <p className="history__subtext">
@@ -87,7 +86,7 @@ export default function History() {
                         result.rank ? `, Pořadí: ${result.rank}` : ""
                       }`}
                     >
-                      {formatSeconds(result.final_time)}s
+                      {formatSeconds(result.final_time)} s
                     </span>
                   ))}
                 </div>

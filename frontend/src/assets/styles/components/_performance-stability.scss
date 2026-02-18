@@ -14,7 +14,6 @@
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.02);
     border-radius: 0.5rem;
   }
 
@@ -36,7 +35,6 @@
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.01);
     border-radius: 0.5rem;
 
     @media (max-width: 600px) {
@@ -49,7 +47,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem;
-    border-left: 3px solid variables.$color-primary;
     padding-left: 0.8rem;
   }
 

@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview
+from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, PerformanceByYear
 from app.models.models import AthleteDetailPage
 from app.dependencies import get_current_user
 from bson import ObjectId
@@ -14,7 +14,8 @@ from app.services.athletes import (
     search_athletes_service,
     get_athlete_overview_service,
     get_athlete_detail_service,
-    list_athletes_service
+    list_athletes_service,
+    get_athlete_performance_by_year_service
 )
 
 
@@ -44,5 +45,13 @@ async def get_athlete_detail(athlete_id: str):
     """Vrátí detail atleta včetně výkonů jako AthleteDetail."""
     try:
         return await get_athlete_detail_service(athlete_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@router.get("/{athlete_id}/performance-by-year", response_model=PerformanceByYear)
+async def get_athlete_performance_by_year(athlete_id: str, user=Depends(get_current_user)):
+    """Vrátí data vývoje výkonu atleta po jednotlivých sezónách pro graf."""
+    try:
+        return await get_athlete_performance_by_year_service(athlete_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

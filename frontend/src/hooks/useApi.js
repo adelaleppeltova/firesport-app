@@ -96,3 +96,17 @@ export function useCompetitions() {
     },
   });
 }
+
+// GET /athletes/:id/performance-by-year
+export function useAthletePerformanceByYear(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "performance-by-year"],
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/v1/athletes/${athleteId}/performance-by-year`,
+      );
+      return data;
+    },
+    enabled: !!athleteId,
+  });
+}

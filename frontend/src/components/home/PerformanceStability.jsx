@@ -57,19 +57,19 @@ export default function PerformanceStability() {
         <div className="performance-stability__stats">
           <div className="performance-stability__stat">
             <span className="performance-stability__stat-label">
-              Rozsah časů (s):
+              Rozsah časů:
             </span>
             <span className="performance-stability__stat-value">
-              {variabilityDisplay}
+              {variabilityDisplay} s
             </span>
           </div>
 
           <div className="performance-stability__stat">
             <span className="performance-stability__stat-label">
-              Průměrný čas v sezóně (s):
+              Průměrný čas v sezóně:
             </span>
             <span className="performance-stability__stat-value">
-              {average_time_in_year?.toFixed(2) || "-"}
+              {average_time_in_year?.toFixed(2) || "-"} s
             </span>
           </div>
         </div>

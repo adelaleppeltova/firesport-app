@@ -25,6 +25,11 @@ export default function MyProfile() {
         <p className="my-profile__time">
           Nejlepší čas: {overview.best_time?.toFixed(2)} s
         </p>
+        {/* <p className=" my-profile__team">
+          {overview.best_performance.competition_place || "—"},{" "}
+          {overview.best_performance.competition_date || "—"}
+        </p> */}
+
         <p className="my-profile__competitions">
           Celkový počet závodů: {overview.total_competitions}
         </p>
