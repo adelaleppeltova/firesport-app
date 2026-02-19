@@ -266,13 +266,32 @@ class DataImporter:
                     self.stats["athletes_skipped"] += 1
                     return athlete_id
             
+            # Fallback: hledej podle jméno + příjmení + rok narození + sbor
+            first_name = result_data.get("first_name", "")
+            last_name = result_data.get("last_name", "")
+            birth_year = result_data.get("birth_year")
+            team = result_data.get("team", "")
+
+            existing = await athletes_collection.find_one({
+                "first_name": first_name,
+                "last_name": last_name,
+                "birth_year": birth_year,
+                "team": team,
+            })
+            if existing:
+                athlete_id = str(existing["_id"])
+                if fscode:
+                    self.athletes_cache[fscode] = athlete_id
+                self.stats["athletes_skipped"] += 1
+                return athlete_id
+            
             # Vytvoření nového atleta
             athlete_doc = {
-                "first_name": result_data.get("first_name", ""),
-                "last_name": result_data.get("last_name", ""),
-                "birth_year": result_data.get("birth_year"),
+                "first_name": first_name,
+                "last_name": last_name,
+                "birth_year": birth_year,
                 "fscode": fscode,
-                "team": result_data.get("team", ""),
+                "team": team,
                 "district": result_data.get("district"),
                 "created_at": datetime.now()
             }
@@ -284,7 +303,7 @@ class DataImporter:
                 self.athletes_cache[fscode] = athlete_id
             
             self.stats["athletes_created"] += 1
-            logger.info(f"Vytvořen nový atleta: {result_data.get('first_name')} {result_data.get('last_name')}")
+            logger.info(f"Vytvořen nový atleta: {first_name} {last_name}")
             return athlete_id
             
         except Exception as e:

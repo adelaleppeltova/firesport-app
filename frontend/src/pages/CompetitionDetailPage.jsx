@@ -1,10 +1,9 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useCompetitionDetail } from "../hooks/useApi";
 import Card from "../components/Card";
 
 export default function CompetitionDetailPage() {
   const { id, categoryId } = useParams();
-  const navigate = useNavigate();
   const { data, isLoading, error } = useCompetitionDetail(id, categoryId);
 
   if (isLoading)
@@ -14,15 +13,7 @@ export default function CompetitionDetailPage() {
       <div className="competition-detail-page">Chyba při načítání dat.</div>
     );
 
-  const {
-    name,
-    date,
-    place,
-    league,
-    athlete_count,
-    categories,
-    results_by_category,
-  } = data;
+  const { name, date, place, league, athlete_count, categories } = data;
 
   return (
     <div className="competition-detail-page page">
