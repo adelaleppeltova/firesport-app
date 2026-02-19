@@ -94,15 +94,15 @@ async def compute_for_athlete(
         # Load valid results for athlete in window
         results = await db["results"].find(
             {
-                "athlete_id": athlete_oid,
-                "final_status": "valid",
-                "competition_date": {
+                "athlete": athlete_oid,
+                "final_time_status": "valid",
+                "date": {
                     "$gte": window_start,
                     "$lte": window_end,
                 }
             },
-            projection={"_id": 1, "final_time": 1, "competition_date": 1},
-        ).sort("competition_date", 1).to_list(None)
+            projection={"_id": 1, "final_time": 1, "date": 1},
+        ).sort("date", 1).to_list(None)
         
         n_valid_results = len(results)
         
@@ -174,7 +174,7 @@ async def compute_for_athlete(
                 "created_at": created_at,
                 "athlete_id": athlete_oid,
                 "result_id": result["_id"],
-                "competition_date": result["competition_date"],
+                "competition_date": result["date"],
                 "final_time": result["final_time"],
                 "score": scores[i] if i < len(scores) else 0.0,
                 "threshold_score": threshold_score,
