@@ -287,7 +287,6 @@ class DataImporter:
             existing = await athletes_collection.find_one({
                 "first_name": first_name,
                 "last_name": last_name,
-                "birth_year": birth_year,
                 "team": team,
             })
             if existing:
