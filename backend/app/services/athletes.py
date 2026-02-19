@@ -224,6 +224,7 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
             "athlete": athlete_payload,
             "competition": comp_payload,
             "category": cat_payload,
+            "date": r.get("date"),
             "start_number": r.get("start_number"),
             "time_1": r.get("time_1"),
             "time_1_status": r.get("time_1_status"),

@@ -23,7 +23,7 @@ const AppLayout = () => {
       <FlashBanner />
       <div className="app-body">
         {isAuthenticated && <SideNavbar />}
-        <main className="main">
+        <main className={`main ${isAuthenticated ? "sidebar" : ""}`}>
           <Outlet />
         </main>
       </div>
