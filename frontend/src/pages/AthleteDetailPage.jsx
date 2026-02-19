@@ -38,6 +38,10 @@ export default function AthleteDetailPage() {
               <td>{athlete.team}</td>
             </tr>
             <tr>
+              <th>Okres</th>
+              <td>{athlete.district || "-"}</td>
+            </tr>
+            <tr>
               <th>FSCode</th>
               <td>{athlete.fscode}</td>
             </tr>
