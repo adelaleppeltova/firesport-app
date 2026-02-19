@@ -33,6 +33,13 @@ class DataImporter:
             "errors": [],
         }
 
+    @staticmethod
+    def _normalize_name(value: str) -> str:
+        if not value:
+            return ""
+        # Capitalize first letter of each word, keep spacing tidy.
+        return " ".join(part[:1].upper() + part[1:].lower() for part in value.strip().split())
+
 
     async def import_from_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -266,9 +273,8 @@ class DataImporter:
                     self.stats["athletes_skipped"] += 1
                     return athlete_id
             
-            # Fallback: hledej podle jméno + příjmení + rok narození + sbor
-            first_name = result_data.get("first_name", "")
-            last_name = result_data.get("last_name", "")
+            first_name = self._normalize_name(result_data.get("first_name", ""))
+            last_name = self._normalize_name(result_data.get("last_name", ""))
             birth_year = result_data.get("birth_year")
             team = result_data.get("team", "")
 

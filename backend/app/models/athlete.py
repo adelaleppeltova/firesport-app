@@ -31,9 +31,9 @@ class BestPerformance(BaseModel):
 class AthleteBase(BaseModel):
     first_name: str
     last_name: str
-    birth_year: Optional[int] = None
-    fscode: Optional[int] = None
     team: str
+    fscode: Optional[int] = None
+    birth_year: Optional[int] = None
     district: Optional[str] = None
 
 class AthleteCreate(AthleteBase):
@@ -46,17 +46,10 @@ class AthleteInDB(AthleteBase):
         populate_by_name=True,
     )
 
-class AthleteOverview(BaseModel):
+class AthleteOverview(AthleteInDB):
     """
     Přehled athleta pro kartu na HomePage.
     """
-
-    id: str
-    first_name: str
-    last_name: str
-    birth_year: int
-    team: str
-    district: Optional[str] = None
     last_active: Optional[str] = None
     total_competitions: int = 0
     best_time: Optional[float] = None
@@ -71,18 +64,10 @@ class AthleteOverview(BaseModel):
     stability_rating: str = "Nedostatek dat"  # Slovní hodnocení stability
     best_performance: BestPerformance = Field(default_factory=BestPerformance)  # Nejlepší výkon s detaily soutěže
 
-class AthleteDetail(BaseModel):
+class AthleteDetail(AthleteInDB):
     """
     Detail athleta pro stránku atleta.
     """
-
-    id: str
-    first_name: str
-    last_name: str
-    birth_year: int
-    fscode: Optional[int] = None
-    team: str
-    district: Optional[str] = None
     category: Optional[str] = None
     best_time: Optional[float] = None
 
