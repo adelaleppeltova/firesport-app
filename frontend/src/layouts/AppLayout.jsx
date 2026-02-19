@@ -27,7 +27,7 @@ const AppLayout = () => {
           <Outlet />
         </main>
       </div>
-      {/* <Footer /> */}
+      <Footer />
       {isAuthenticated && <BottomNavbar />}
     </div>
   );
