@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict, field_serializer
 from typing import Optional
 from enum import Enum
@@ -20,6 +21,8 @@ class ResultBase(BaseModel):
     athlete: AthleteInDB
     competition: CompetitionInDB
     category: CategoryInDB
+    
+    date: datetime
 
     start_number: Optional[int] = None
 

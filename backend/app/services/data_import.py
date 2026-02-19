@@ -197,6 +197,11 @@ class DataImporter:
     ) -> None:
         """Importuje výsledek (a případně atleta)."""
         try:
+            competition = await competitions_collection.find_one({
+                "_id": ObjectId(competition_id)
+            })
+            competition_date = competition.get("date") if competition else None
+
             # Importuj či najdi atleta
             athlete_id = await self._import_or_get_athlete(result_data)
             if not athlete_id:
@@ -228,6 +233,7 @@ class DataImporter:
                 "athlete": ObjectId(athlete_id),
                 "competition": ObjectId(competition_id),
                 "category": ObjectId(category_id),
+                "date": competition_date,
                 "start_number": result_data.get("start_number"),
                 "time_1": time_1,
                 "time_1_status": "valid" if time_1 else "invalid",
