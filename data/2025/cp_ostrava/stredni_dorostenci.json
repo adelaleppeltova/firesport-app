@@ -1,0 +1,176 @@
+{
+  "source_file": "stredni_dorostenci.pdf",
+  "generated_at": "2026-02-18T00:00:00Z",
+  "competition": {
+    "name": "Ostravská Stovka",
+    "place": "Ostrava - Nová Ves",
+    "date": "2025-09-06",
+    "league": "Český pohár",
+    "categories": [
+      {
+        "name": "Střední dorostenci",
+        "results": [
+          {
+            "start_number": "38",
+            "fscode": 106871,
+            "first_name": "Vojtěch",
+            "last_name": "Prachař",
+            "birth_year": 2009,
+            "team": "Těmice",
+            "district": "",
+            "times": [
+              {
+                "try": 1,
+                "time": 16.65,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 16.52,
+                "status": "valid"
+              }
+            ],
+            "final_time": 16.52,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "59",
+            "fscode": 64751,
+            "first_name": "Šimon",
+            "last_name": "Guřan",
+            "birth_year": 2009,
+            "team": "Bobrovníky",
+            "district": "",
+            "times": [
+              {
+                "try": 1,
+                "time": 17.08,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 16.75,
+                "status": "valid"
+              }
+            ],
+            "final_time": 16.75,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "41",
+            "fscode": 84101,
+            "first_name": "Ondřej",
+            "last_name": "Hromada",
+            "birth_year": 2009,
+            "team": "Pozděchov",
+            "district": "",
+            "times": [
+              {
+                "try": 1,
+                "time": 17.01,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 16.98,
+                "status": "valid"
+              }
+            ],
+            "final_time": 16.98,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "46",
+            "fscode": 105751,
+            "first_name": "Šimon",
+            "last_name": "Doubek",
+            "birth_year": 2009,
+            "team": "Svatý Jiří",
+            "district": "",
+            "times": [
+              {
+                "try": 1,
+                "time": 17.25,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 17.09,
+                "status": "valid"
+              }
+            ],
+            "final_time": 17.09,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "19",
+            "fscode": 91951,
+            "first_name": "Kryštof",
+            "last_name": "Uličný",
+            "birth_year": 2009,
+            "team": "Telnice",
+            "district": "",
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 17.4,
+                "status": "valid"
+              }
+            ],
+            "final_time": 17.4,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "26",
+            "fscode": 109051,
+            "first_name": "Libor",
+            "last_name": "Keller",
+            "birth_year": 2009,
+            "team": "Buřenice",
+            "district": "",
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 17.44,
+                "status": "valid"
+              }
+            ],
+            "final_time": 17.44,
+            "final_status": "valid",
+            "rank": 6
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Layout detected as two-block PDF with preliminary result (I./II. rozběh) table and separate finálový běh block.",
+    "Recognized columns from first block: start number, FS Code, last name, first name, birth year, team (SDH), country/code, I. rozběh, II. rozběh (used as two attempts), Výsledek treated as official final_time when present.",
+    "Discipline inferred from header 'Český pohár v běhu na 100 m přes překážky' => interpreted as 100m hurdles (mapped to internal '100mPHP' during detection).",
+    "Dates parsed from '6.9.2025, Ostrava - Nová Ves' -> 2025-09-06.",
+    "FS Code parsed as numeric when >3 digits; district column not present (country code 'CZ' present in same field as team) => district left empty string.",
+    "Invalid attempt values (e.g. 998.00) parsed as invalid attempts with time=null, status='invalid', final_time retains the numeric official value from PDF where given."
+  ],
+  "warnings": [
+    "Category name normalized to 'Střední dorostenci' from source 'střední dorostenci'.",
+    "District/Okres not explicitly present in table; stored as empty string.",
+    "Only a subset of participants (top 6 parsed) extracted into results for this category; full list present in PDF but not fully parsed here.",
+    "UMÍSTĚNÍ (rank) mapping was inferred by matching official final times to the UMÍSTĚNÍ times list in the document for top results; several competitor final times did not have an unambiguous rank in the printed UMÍSTĚNÍ block and were therefore not included.",
+    "Discrepancy between finálový běh block and preliminary block (some times appear in both); final placements beyond the top entries may be ambiguous."
+  ]
+}

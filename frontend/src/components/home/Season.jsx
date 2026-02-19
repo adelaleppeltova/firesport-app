@@ -18,10 +18,10 @@ export default function Season() {
     <div className="season">
       <div className="season__info">
         <p className="season__best-time">
-          Nejlepší čas v sezóně: {overview.best_time_in_year?.toFixed(2)} s
+          Nejlepší čas v sezóně: {overview.best_time?.toFixed(2)} s
         </p>
         <p className="season__average-time">
-          Průměrný čas v sezóně: {overview.average_time_in_year?.toFixed(2)} s
+          Průměrný čas v sezóně: {overview.average_time?.toFixed(2)} s
         </p>
         <p className="season__competition-count">
           Počet závodů v sezóně: {overview.total_competitions}

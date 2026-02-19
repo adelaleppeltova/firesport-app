@@ -31,7 +31,7 @@ class BestPerformance(BaseModel):
 class AthleteBase(BaseModel):
     first_name: str
     last_name: str
-    birth_year: int
+    birth_year: Optional[int] = None
     fscode: Optional[int] = None
     team: str
     district: Optional[str] = None

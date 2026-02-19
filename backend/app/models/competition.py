@@ -1,12 +1,12 @@
 from pydantic import BaseModel, Field, ConfigDict, field_serializer
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 class CompetitionBase(BaseModel):
     name: str
     place: str
     date: datetime
-    league: str
+    league: Optional[str] = None
 
 class CompetitionCreate(CompetitionBase):
     pass   
