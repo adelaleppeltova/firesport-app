@@ -1,61 +1,249 @@
 @use "../abstracts/variables";
 
 .statistics-page {
-  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 640px;
   margin: 0 auto;
-  min-height: 100vh;
-  background: variables.$color-background;
+  padding-bottom: variables.$header-height-l;
 
-  h1 {
+  &__header {
+    margin-bottom: 4px;
+  }
+
+  &__title {
     font-size: variables.$font-size-l;
-    margin-bottom: 2rem;
-    color: variables.$color-text;
-  }
-
-  .statistics-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .statistics-card {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: variables.$border-radius-base;
-    box-shadow: variables.$box-shadow;
-    padding: 1.2rem 1.5rem;
-    transition: box-shadow 0.15s;
-    position: relative;
-    min-height: 80px;
-  }
-
-  .statistics-card-icon {
-    font-size: 2rem;
-    margin-right: 1.2rem;
-    color: variables.$color-text;
-    flex-shrink: 0;
-    width: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .statistics-card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-
-  .statistics-card-title {
-    font-size: variables.$font-size-m;
     font-weight: variables.$font-weight-semibold;
     color: variables.$color-text;
+    margin: 0 0 6px;
   }
 
-  .statistics-card-desc {
+  &__desc {
     font-size: variables.$font-size-s;
-    color: variables.$gray-dark;
+    color: variables.$gray-medium;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+// --- Summary Card ---
+
+.anomaly-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid variables.$gray-light;
+    padding-bottom: 10px;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  &__label {
+    font-size: variables.$font-size-sm;
+    color: variables.$gray-medium;
+    flex: 1;
+  }
+
+  &__value {
+    font-size: variables.$font-size-sm;
+    font-weight: variables.$font-weight-medium;
+    color: variables.$color-text;
+    text-align: right;
+
+    &--highlight {
+      font-size: variables.$font-size-m;
+      font-weight: variables.$font-weight-bold;
+      color: variables.$color-secondary;
+    }
+  }
+}
+
+// --- Chart Card ---
+
+.anomaly-chart {
+  &__header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+
+  &__season-select {
+    font-size: variables.$font-size-sm;
+    border: 1px solid variables.$border-color-base;
+    border-radius: variables.$border-radius-base;
+    padding: 5px 10px;
+    background: white;
+    color: variables.$color-text;
+    cursor: pointer;
+    outline: none;
+
+    &:focus {
+      border-color: variables.$color-accent;
+    }
+  }
+
+  &__tooltip {
+    background: white;
+    border: 1px solid variables.$border-color-base;
+    border-radius: 8px;
+    padding: 10px 14px;
+    box-shadow: variables.$box-shadow;
+    min-width: 140px;
+  }
+
+  &__tooltip-date {
+    font-size: variables.$font-size-s;
+    color: variables.$gray-medium;
+    margin-bottom: 4px;
+  }
+
+  &__tooltip-time {
+    font-size: variables.$font-size-m;
+    color: variables.$color-text;
+    margin-bottom: 4px;
+  }
+
+  &__tooltip-competition {
+    font-size: variables.$font-size-s;
+    color: variables.$gray-medium;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+
+  &__tooltip-badge {
+    display: inline-block;
+    background: #f9d0ce;
+    color: variables.$color-secondary;
+    font-size: variables.$font-size-xs;
+    font-weight: variables.$font-weight-semibold;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-top: 2px;
+  }
+}
+
+// --- Table Card ---
+
+.anomaly-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.anomaly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: variables.$font-size-sm;
+
+  th {
+    text-align: left;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$gray-medium;
+    padding: 8px 10px;
+    border-bottom: 2px solid variables.$gray-light;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 10px;
+    border-bottom: 1px solid variables.$gray-light;
+    color: variables.$color-text;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: variables.$gray-light;
+  }
+
+  &__deviation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__badge {
+    display: inline-block;
+    background: #fad6d4;
+    color: variables.$color-secondary;
+    font-size: variables.$font-size-xs;
+    font-weight: variables.$font-weight-semibold;
+    border-radius: 4px;
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+}
+
+// --- Pagination ---
+
+.anomaly-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  &__btn {
+    background: white;
+    border: 1px solid variables.$border-color-base;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    color: variables.$color-text;
+    transition: background variables.$default-transition;
+
+    &:hover:not(:disabled) {
+      background: variables.$gray-light;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+
+  &__info {
+    font-size: variables.$font-size-sm;
+    color: variables.$gray-medium;
+  }
+}
+
+// --- No athlete ---
+
+.anomaly-no-athlete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: variables.$gray-medium;
+
+  i {
+    font-size: 3rem;
+  }
+
+  p {
+    font-size: variables.$font-size-sm;
+    max-width: 280px;
   }
 }

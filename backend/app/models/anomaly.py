@@ -78,6 +78,8 @@ class AnomalyItem(BaseModel):
     score: float
     is_anomaly: bool
     direction: AnomalyDirection
+    competition_name: Optional[str] = None
+    competition_place: Optional[str] = None
 
 
 class AnomalyRunInfo(BaseModel):

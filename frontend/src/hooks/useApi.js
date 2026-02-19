@@ -110,3 +110,15 @@ export function useAthletePerformanceByYear(athleteId) {
     enabled: !!athleteId,
   });
 }
+
+// GET /athletes/:id/anomalies
+export function useAthleteAnomalies(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "anomalies"],
+    queryFn: async () => {
+      const { data } = await api.get(`/v1/athletes/${athleteId}/anomalies`);
+      return data;
+    },
+    enabled: !!athleteId,
+  });
+}
