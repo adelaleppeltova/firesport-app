@@ -1,0 +1,365 @@
+{
+  "source_file": "usti_dorci-str-100.pdf",
+  "generated_at": "2026-02-19T00:00:00Z",
+  "competition": {
+    "name": "MČR dorostu v PS",
+    "place": "Ústí nad Labem",
+    "date": "2022-07-01",
+    "league": "MČR dorostu v PS",
+    "categories": [
+      {
+        "name": "Střední dorostenci",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "19",
+            "fscode": null,
+            "first_name": "Šimon",
+            "last_name": "Šuba",
+            "birth_year": null,
+            "team": "Milotice nad Bečvou",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.63,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 16.98,
+                "status": "valid"
+              }
+            ],
+            "final_time": 16.98,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "16",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "Šulc",
+            "birth_year": null,
+            "team": "Seč",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.27,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 17,
+                "status": "valid"
+              }
+            ],
+            "final_time": 17,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "21",
+            "fscode": null,
+            "first_name": "Lukáš",
+            "last_name": "Maléř",
+            "birth_year": null,
+            "team": "Hutisko - Solanec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.32,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 17.39,
+                "status": "valid"
+              }
+            ],
+            "final_time": 17.32,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "17",
+            "fscode": null,
+            "first_name": "Matyáš",
+            "last_name": "Novák",
+            "birth_year": null,
+            "team": "Stará Říše",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.63,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 17.63,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "28",
+            "fscode": null,
+            "first_name": "Mikuláš",
+            "last_name": "Petr",
+            "birth_year": null,
+            "team": "Borovany",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.37,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.21,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.21,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "23",
+            "fscode": null,
+            "first_name": "Dan",
+            "last_name": "Málek",
+            "birth_year": null,
+            "team": "Výrovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.94,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.53,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.53,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "18",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "Šiška",
+            "birth_year": null,
+            "team": "Dobřany",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.61,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 29.5,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.61,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "15",
+            "fscode": null,
+            "first_name": "František",
+            "last_name": "Medlík",
+            "birth_year": null,
+            "team": "Choustníkovo Hradiště",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.06,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.64,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.64,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "25",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "Skácel",
+            "birth_year": null,
+            "team": "Zaječov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.28,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.84,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.84,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "26",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "Kejval",
+            "birth_year": null,
+            "team": "Srbice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.2,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.67,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.2,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "20",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "Kabát",
+            "birth_year": null,
+            "team": "Hájov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.64,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.89,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.64,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "24",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "Rajský",
+            "birth_year": null,
+            "team": "Frýdlant",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 24.3,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.77,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.77,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "27",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "Šimek",
+            "birth_year": null,
+            "team": "Řepy",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.77,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 19.77,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "22",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "Mrhálek",
+            "birth_year": null,
+            "team": "Jáchymov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 25.16,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.56,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.56,
+            "final_status": "valid",
+            "rank": 14
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Metadata extracted from line: 'MČR dorostu v PS 1. - 3. 7. 2022, Ústí nad Labem' (name/date/place).",
+    "Date normalized using first day of the stated event range (1.-3.7.2022 -> 2022-07-01).",
+    "Discipline determined from header 'Běh na 100m s přek.' -> 100mPHP.",
+    "Results parsed as: rank, start_number, first_name+last_name, team, region code (ignored), try1 time, try2 time/status, final time."
+  ],
+  "warnings": [
+    "Birth years are not present in the provided text; set to null for all results.",
+    "District/okres column not present in the provided text; district set to null for all results.",
+    "League/series not explicitly stated; league set to null."
+  ]
+}

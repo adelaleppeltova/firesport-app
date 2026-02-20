@@ -4,7 +4,7 @@ from datetime import datetime
 
 class CompetitionBase(BaseModel):
     name: str
-    place: str
+    place: Optional[str] = None
     date: datetime
     league: Optional[str] = None
 
