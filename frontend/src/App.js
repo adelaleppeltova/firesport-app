@@ -13,6 +13,7 @@ import CompetitionsPage from "./pages/CompetitionsPage";
 import CompetitionDetailPage from "./pages/CompetitionDetailPage";
 import ResultsPage from "./pages/ResultsPage";
 import StatisticsPage from "./pages/StatisticsPage";
+import ErrorPage from "./pages/ErrorPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,6 +55,7 @@ function App() {
               <Route path="/zavodnici/:id" element={<AthleteDetailPage />} />
               <Route path="/statistiky" element={<StatisticsPage />} />
             </Route>
+            <Route path="*" element={<ErrorPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

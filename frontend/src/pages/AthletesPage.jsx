@@ -21,7 +21,7 @@ export default function AthletesPage() {
   ).sort((a, b) =>
     (a.last_name || "").localeCompare(b.last_name || "", "cs", {
       sensitivity: "base",
-    })
+    }),
   );
 
   const PAGE_SIZE = 25;
@@ -33,12 +33,12 @@ export default function AthletesPage() {
     setPage(1);
   }, [query, athletes]);
 
-  if (isLoading) return <div className="athletes-page">Načítání...</div>;
+  if (isLoading) return <div className="athletes-page page">Načítání...</div>;
   if (error)
-    return <div className="athletes-page">Chyba při načítání dat.</div>;
+    return <div className="athletes-page page">Chyba při načítání dat.</div>;
 
   return (
-    <div className="athletes-page">
+    <div className="athletes-page page">
       <h1>Závodníci</h1>
       <div className="athletes-searchbar-wrapper">
         <div className="athletes-searchbar-iconwrap">

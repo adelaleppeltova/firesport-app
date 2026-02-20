@@ -45,10 +45,10 @@ export default function AthleteDetailPage() {
               <th>FSCode</th>
               <td>{athlete.fscode}</td>
             </tr>
-            <tr>
+            {/* <tr>
               <th>Kategorie</th>
               <td>{athlete.category || "-"}</td>
-            </tr>
+            </tr> */}
             <tr>
               <th>Nejrychlejší čas</th>
               <td>{best_time ? best_time.toFixed(2) + " s" : "-"}</td>
@@ -63,7 +63,9 @@ export default function AthleteDetailPage() {
           <thead>
             <tr>
               <th>Datum</th>
+              <th>Závod</th>
               <th>Místo</th>
+              <th>Kategorie</th>
               <th>Výsledný čas</th>
             </tr>
           </thead>
@@ -77,7 +79,9 @@ export default function AthleteDetailPage() {
                   }
                 >
                   <td>{formatDate(r.competition?.date)}</td>
+                  <td>{r.competition?.name}</td>
                   <td>{r.competition?.place}</td>
+                  <td>{r.category?.name}</td>
                   <td>{r.final_time ? r.final_time.toFixed(2) + " s" : "-"}</td>
                 </tr>
               ))

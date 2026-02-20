@@ -35,7 +35,7 @@ class DataImporter:
 
     @staticmethod
     def _normalize_name(value: str) -> str:
-        return " ".join(part[:1].upper() + part[1:].lower() for part in value.strip().split())
+        return "".join(part[:1].upper() + part[1:].lower() for part in value.strip().split())
 
 
     async def import_from_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -262,21 +262,19 @@ class DataImporter:
     async def _import_or_get_athlete(self, result_data: Dict[str, Any]) -> Optional[str]:
         """Importuje atleta nebo vrátí existující."""
         try:
-            fscode = result_data.get("fscode")
-            
+            fscode = result_data.get("fscode") or None
+            first_name = self._normalize_name(result_data.get("first_name", ""))
+            last_name = self._normalize_name(result_data.get("last_name", ""))
+            birth_year = result_data.get("birth_year") or None
+            team = result_data.get("team").replace("SDH", "").strip() if result_data.get("team") else None  # Odstraň mezery pro konzistentní porovnávání
+            district = result_data.get("district") or None  # Odstraň mezery pro konzistentní porovnávání
+           
             # Pokud máme fscode, zkus najít v cache či DB
+            existing = None
             if fscode:
-                if fscode in self.athletes_cache:
-                    return self.athletes_cache[fscode]
                 existing = await athletes_collection.find_one({"fscode": fscode})
-
-            if not fscode or not existing:
-                # Bez fscode zkus najít podle jména a týmu
-                first_name = self._normalize_name(result_data.get("first_name", ""))
-                last_name = self._normalize_name(result_data.get("last_name", ""))
-                birth_year = result_data.get("birth_year") or None
-                team = result_data.get("team").replace("SDH", "").strip() if result_data.get("team") else None  # Odstraň mezery pro konzistentní porovnávání
-
+            
+            if not existing:
                 if not team:
                     logger.warning(f"Atleta '{first_name} {last_name}' nemá uveden tým, nelze jednoznačně identifikovat")
                     return None
@@ -288,12 +286,8 @@ class DataImporter:
                 })
 
             if existing:
-                existing_fscode = existing.get("fscode")
-                athlete_id = str(existing["_id"])
-                if existing_fscode:
-                    self.athletes_cache[existing_fscode] = athlete_id
-                self.stats["athletes_skipped"] += 1
-                return athlete_id
+                athletes_collection.update_one({"_id": existing["_id"]}, {"$set": {"birth_year": birth_year, "district": district, "team": team, "fscode": fscode, "updated_at": datetime.now()}})
+                return str(existing["_id"])
             
             # Vytvoření nového atleta
             athlete_doc = {
@@ -301,6 +295,7 @@ class DataImporter:
                 "last_name": last_name,
                 "birth_year": birth_year,
                 "fscode": fscode,
+                "district": district,
                 "team": team,
                 "district": result_data.get("district"),
                 "created_at": datetime.now()

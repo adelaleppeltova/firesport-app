@@ -22,7 +22,7 @@ export default function ResultsPage() {
   if (error) return <div>Chyba při načítání výsledků.</div>;
 
   return (
-    <div className="results-page">
+    <div className="results-page page">
       <h1>Výsledky</h1>
       <h2>
         {competition?.name || "Název soutěže neznámý"},{" "}
@@ -32,7 +32,7 @@ export default function ResultsPage() {
       </h2>
       <p>
         {competition?.categories?.find(
-          (cat) => String(cat.id) === String(categoryId)
+          (cat) => String(cat.id) === String(categoryId),
         )?.name || "Název kategorie neznámý"}
       </p>
       <div className="results-table-wrapper">

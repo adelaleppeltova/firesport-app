@@ -22,7 +22,7 @@ export default function CompetitionsPage() {
     return <div className="competitions-page">Chyba při načítání dat.</div>;
 
   return (
-    <div className="competitions-page">
+    <div className="competitions-page page">
       <h1>Závody</h1>
       <div className="competitions-searchbar-wrapper">
         <div className="competitions-searchbar-iconwrap">

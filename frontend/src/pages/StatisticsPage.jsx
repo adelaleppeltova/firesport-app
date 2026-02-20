@@ -354,7 +354,7 @@ export default function StatisticsPage() {
   const items = data?.items ?? [];
 
   return (
-    <div className="statistics-page">
+    <div className="statistics-page page">
       <div className="statistics-page__header">
         <h1 className="statistics-page__title">Detekce neobvyklých výkonů</h1>
         <p className="statistics-page__desc">

@@ -25,7 +25,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="home-page">
+    <div className="home-page page">
       <Card title="Můj profil">
         <MyProfile />
       </Card>
