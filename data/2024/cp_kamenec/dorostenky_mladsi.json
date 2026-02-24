@@ -1,0 +1,943 @@
+{
+  "source_file": "dorostenky_mladsi.pdf",
+  "generated_at": "2026-02-19T00:00:00Z",
+  "competition": {
+    "name": "Večerní stovka",
+    "place": "Kamenec u Poličky",
+    "date": "2024-08-03",
+    "league": "Český pohár",
+    "categories": [
+      {
+        "name": "Mladší dorostenky",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "11",
+            "fscode": 38332,
+            "first_name": "Kateřina",
+            "last_name": "Nováková",
+            "birth_year": 2010,
+            "team": "Hrobce",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.55,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.68,
+                "status": "valid"
+              }
+            ],
+            "final_time": 17.55,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "25",
+            "fscode": 92372,
+            "first_name": "Sabina",
+            "last_name": "Holková",
+            "birth_year": 2010,
+            "team": "Vracov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 28.48,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.01,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.01,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "16",
+            "fscode": 53502,
+            "first_name": "Martina",
+            "last_name": "Kozelková",
+            "birth_year": 2010,
+            "team": "Moravský Beroun",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.59,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.08,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 18.59,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "29",
+            "fscode": 78762,
+            "first_name": "Michaela",
+            "last_name": "Maderová",
+            "birth_year": 2010,
+            "team": "Dubicko",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.76,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.17,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.76,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "37",
+            "fscode": 78672,
+            "first_name": "Nela",
+            "last_name": "Kuchtová",
+            "birth_year": 2010,
+            "team": "Vrchovina",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.98,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.01,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.01,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "26",
+            "fscode": 64332,
+            "first_name": "Anežka",
+            "last_name": "Stupková",
+            "birth_year": 2010,
+            "team": "Moravská Chrastová",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.17,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 19.17,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "13",
+            "fscode": 48122,
+            "first_name": "Viktorie",
+            "last_name": "Drábková",
+            "birth_year": 2010,
+            "team": "Choustníkovo Hradiš",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.45,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 31.57,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.45,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "17",
+            "fscode": 78102,
+            "first_name": "Vanesa",
+            "last_name": "Hüttnerová",
+            "birth_year": 2010,
+            "team": "Nová Ves",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.56,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.07,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.56,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "9",
+            "fscode": 74392,
+            "first_name": "Viktorie",
+            "last_name": "Chmelařová",
+            "birth_year": 2010,
+            "team": "Dolní Cerekev",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.07,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.84,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.84,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "8",
+            "fscode": 77492,
+            "first_name": "Valerie",
+            "last_name": "Novotná",
+            "birth_year": 2010,
+            "team": "Dolany",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.95,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.61,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 19.95,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "3",
+            "fscode": 78642,
+            "first_name": "Monika",
+            "last_name": "Hylmarová",
+            "birth_year": 2011,
+            "team": "Vrchovina",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.21,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.02,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.02,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "21",
+            "fscode": 73602,
+            "first_name": "Zuzana",
+            "last_name": "Bandžuchová",
+            "birth_year": 2010,
+            "team": "Stéblová",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.85,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.6,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.6,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "14",
+            "fscode": 83842,
+            "first_name": "Lenka",
+            "last_name": "Mikulicová",
+            "birth_year": 2010,
+            "team": "Kobylí",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.71,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 28.85,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.71,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "12",
+            "fscode": 64572,
+            "first_name": "Tereza",
+            "last_name": "Svatoňová",
+            "birth_year": 2010,
+            "team": "Chlumec nad Cidlino",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.89,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 20.89,
+            "final_status": "valid",
+            "rank": 14
+          },
+          {
+            "start_number": "36",
+            "fscode": 67132,
+            "first_name": "Karolína",
+            "last_name": "Víšková",
+            "birth_year": 2010,
+            "team": "Vítězov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.22,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 23.26,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.22,
+            "final_status": "valid",
+            "rank": 15
+          },
+          {
+            "start_number": "32",
+            "fscode": 91042,
+            "first_name": "Petra",
+            "last_name": "Matějková",
+            "birth_year": 2010,
+            "team": "Bystřec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.51,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.4,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.4,
+            "final_status": "valid",
+            "rank": 16
+          },
+          {
+            "start_number": "10",
+            "fscode": 82132,
+            "first_name": "Nikola",
+            "last_name": "Linhartová",
+            "birth_year": 2011,
+            "team": "Dolní Město",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 32,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.63,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.63,
+            "final_status": "valid",
+            "rank": 17
+          },
+          {
+            "start_number": "7",
+            "fscode": 91052,
+            "first_name": "Kamila",
+            "last_name": "Krátká",
+            "birth_year": 2010,
+            "team": "Bystřec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.68,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.7,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.68,
+            "final_status": "valid",
+            "rank": 18
+          },
+          {
+            "start_number": "31",
+            "fscode": 78522,
+            "first_name": "Ema",
+            "last_name": "Sedloňová",
+            "birth_year": 2011,
+            "team": "Bohousová",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 21.72,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.72,
+            "final_status": "valid",
+            "rank": 19
+          },
+          {
+            "start_number": "22",
+            "fscode": 33522,
+            "first_name": "Vanessa",
+            "last_name": "Juračková",
+            "birth_year": 2011,
+            "team": "Trusovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 26.75,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.76,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.76,
+            "final_status": "valid",
+            "rank": 20
+          },
+          {
+            "start_number": "5",
+            "fscode": 93942,
+            "first_name": "Kateřina",
+            "last_name": "Kubecová",
+            "birth_year": 2010,
+            "team": "Kunštát",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.78,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 27.53,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.78,
+            "final_status": "valid",
+            "rank": 21
+          },
+          {
+            "start_number": "30",
+            "fscode": 49892,
+            "first_name": "Tereza",
+            "last_name": "Fajgarová",
+            "birth_year": 2011,
+            "team": "Lhota u Zlína",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.96,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.86,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.86,
+            "final_status": "valid",
+            "rank": 22
+          },
+          {
+            "start_number": "2",
+            "fscode": 53712,
+            "first_name": "Anita",
+            "last_name": "Marboe",
+            "birth_year": 2010,
+            "team": "Skuteč",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.75,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.9,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.9,
+            "final_status": "valid",
+            "rank": 23
+          },
+          {
+            "start_number": "23",
+            "fscode": 70432,
+            "first_name": "Beata",
+            "last_name": "Němcová",
+            "birth_year": 2010,
+            "team": "Tuněchody",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.92,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.4,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.92,
+            "final_status": "valid",
+            "rank": 24
+          },
+          {
+            "start_number": "4",
+            "fscode": 68012,
+            "first_name": "Tereza",
+            "last_name": "Součková",
+            "birth_year": 2010,
+            "team": "Vítězov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.08,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 26.73,
+                "status": "valid"
+              }
+            ],
+            "final_time": 22.08,
+            "final_status": "valid",
+            "rank": 25
+          },
+          {
+            "start_number": "35",
+            "fscode": 53612,
+            "first_name": "Michela",
+            "last_name": "Pešková",
+            "birth_year": 2011,
+            "team": "Skuteč",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.18,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.36,
+                "status": "valid"
+              }
+            ],
+            "final_time": 22.18,
+            "final_status": "valid",
+            "rank": 26
+          },
+          {
+            "start_number": "27",
+            "fscode": 84272,
+            "first_name": "Veronika",
+            "last_name": "Findejsová",
+            "birth_year": 2011,
+            "team": "Kamenec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.58,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 31.87,
+                "status": "valid"
+              }
+            ],
+            "final_time": 22.58,
+            "final_status": "valid",
+            "rank": 27
+          },
+          {
+            "start_number": "15",
+            "fscode": 73622,
+            "first_name": "Veronika",
+            "last_name": "Cupáková",
+            "birth_year": 2010,
+            "team": "Lezník",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 31.16,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.69,
+                "status": "valid"
+              }
+            ],
+            "final_time": 22.69,
+            "final_status": "valid",
+            "rank": 28
+          },
+          {
+            "start_number": "38",
+            "fscode": 74992,
+            "first_name": "Karolína",
+            "last_name": "Steskalová",
+            "birth_year": 2010,
+            "team": "Staré Hradiště",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 26.41,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.94,
+                "status": "valid"
+              }
+            ],
+            "final_time": 22.94,
+            "final_status": "valid",
+            "rank": 29
+          },
+          {
+            "start_number": "24",
+            "fscode": 93992,
+            "first_name": "Aneta",
+            "last_name": "Kytlicová",
+            "birth_year": 2011,
+            "team": "Velké Opatovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 23.41,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 24.38,
+                "status": "valid"
+              }
+            ],
+            "final_time": 23.41,
+            "final_status": "valid",
+            "rank": 30
+          },
+          {
+            "start_number": "6",
+            "fscode": 62722,
+            "first_name": "Nela",
+            "last_name": "Kočajdová",
+            "birth_year": 2010,
+            "team": "Bohousová",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 23.72,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 23.45,
+                "status": "valid"
+              }
+            ],
+            "final_time": 23.45,
+            "final_status": "valid",
+            "rank": 31
+          },
+          {
+            "start_number": "28",
+            "fscode": 92652,
+            "first_name": "Linda",
+            "last_name": "Bednaříková",
+            "birth_year": 2010,
+            "team": "Březina",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 26.53,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 24.69,
+                "status": "valid"
+              }
+            ],
+            "final_time": 24.69,
+            "final_status": "valid",
+            "rank": 32
+          },
+          {
+            "start_number": "1",
+            "fscode": 89912,
+            "first_name": "Jana",
+            "last_name": "Nedělová",
+            "birth_year": 2011,
+            "team": "Staré Hradiště",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 25.16,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 25.54,
+                "status": "valid"
+              }
+            ],
+            "final_time": 25.16,
+            "final_status": "valid",
+            "rank": 33
+          },
+          {
+            "start_number": "34",
+            "fscode": 93922,
+            "first_name": "Rozálie",
+            "last_name": "Kučerová",
+            "birth_year": 2011,
+            "team": "Lezník",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 25.8,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 26.81,
+                "status": "valid"
+              }
+            ],
+            "final_time": 25.8,
+            "final_status": "valid",
+            "rank": 34
+          },
+          {
+            "start_number": "20",
+            "fscode": 93932,
+            "first_name": "Jaroslava",
+            "last_name": "Němcová",
+            "birth_year": 2011,
+            "team": "Staré Hradiště",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 28.87,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 29.08,
+                "status": "valid"
+              }
+            ],
+            "final_time": 28.87,
+            "final_status": "valid",
+            "rank": 35
+          },
+          {
+            "start_number": "33",
+            "fscode": 93952,
+            "first_name": "Šárka",
+            "last_name": "Doležalová",
+            "birth_year": 2011,
+            "team": "Kunštát",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.94,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 31.42,
+                "status": "valid"
+              }
+            ],
+            "final_time": 31.42,
+            "final_status": "valid",
+            "rank": 36
+          },
+          {
+            "start_number": "18",
+            "fscode": 46262,
+            "first_name": "Anna",
+            "last_name": "Spálenská",
+            "birth_year": 2010,
+            "team": "Seč",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 37
+          },
+          {
+            "start_number": "19",
+            "fscode": 81392,
+            "first_name": "Nikol",
+            "last_name": "Vančurová",
+            "birth_year": 2011,
+            "team": "Skalice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 37
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Metadata extracted from header line 'Kamenec u Poličky - Večerní stovka ...' and 'Výsledková listina 3.8.2024'.",
+    "Category derived from 'kategorie: Dorostenky mladší' and mapped to allowed category name 'Mladší dorostenky'.",
+    "Tabular columns detected by header 'PořSč FSC Jméno Roč. Družstvo Čas 1.k Čas 2.kCelkem' (rank, start_number, fscode, name, birth_year, team, try1, try2, total).",
+    "Discipline inferred from event name 'Večerní stovka' => '100m'.",
+    "Times normalized by replacing ':' with '.' and handling trailing '-' as invalid status while keeping numeric part when within plausible range."
+  ],
+  "warnings": [
+    "League/series not found in provided text (competition.league=null).",
+    "District column not present; district set to null for all results.",
+    "Some times marked invalid due to trailing '-' or '0:00-' entries.",
+    "All final statuses taken from 'Celkem' column; '0:00-' treated as invalid with final_time=null."
+  ]
+}

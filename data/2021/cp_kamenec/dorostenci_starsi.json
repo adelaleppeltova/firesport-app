@@ -1,0 +1,654 @@
+{
+  "source_file": "dorostenci_starsi.pdf",
+  "generated_at": "2026-02-24T00:00:00Z",
+  "competition": {
+    "name": "Večerní stovka",
+    "place": "Kamenec u Poličky",
+    "date": "2021-08-07",
+    "league": null,
+    "categories": [
+      {
+        "name": "Starší dorostenci",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "26",
+            "fscode": 28831,
+            "first_name": "Matěj",
+            "last_name": "Kábele",
+            "birth_year": 2004,
+            "team": "Skuteč",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.12,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 16.56,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 17.12,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "14",
+            "fscode": 36011,
+            "first_name": "Radek",
+            "last_name": "Sibera",
+            "birth_year": 2003,
+            "team": "Křešice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.09,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 17.31,
+                "status": "valid"
+              }
+            ],
+            "final_time": 17.31,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "12",
+            "fscode": 49341,
+            "first_name": "Dominik",
+            "last_name": "Svoboda",
+            "birth_year": 2003,
+            "team": "Nová Role",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.75,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 17.36,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 17.75,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "16",
+            "fscode": 59221,
+            "first_name": "Martin",
+            "last_name": "Foit",
+            "birth_year": 2004,
+            "team": "Těchov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.87,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 25.63,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 17.87,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "27",
+            "fscode": 42171,
+            "first_name": "Samuel",
+            "last_name": "Mrózek",
+            "birth_year": 2003,
+            "team": "Těrlicko-Hradiště",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 17.97,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.22,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 17.97,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "11",
+            "fscode": 56501,
+            "first_name": "David",
+            "last_name": "Drnek",
+            "birth_year": 2004,
+            "team": "Letkov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 17.32,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 18,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "15",
+            "fscode": 38211,
+            "first_name": "Filip",
+            "last_name": "Němec",
+            "birth_year": 2004,
+            "team": "Kyjovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.16,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.65,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 18.16,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "17",
+            "fscode": 31121,
+            "first_name": "Vojtěch",
+            "last_name": "Hospodka",
+            "birth_year": 2003,
+            "team": "Praha-Letňany",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.4,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.19,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.19,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "1",
+            "fscode": 57911,
+            "first_name": "Bořivoj",
+            "last_name": "Fučík",
+            "birth_year": 2004,
+            "team": "Markvartice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 37.92,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 18.32,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.32,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "5",
+            "fscode": 50941,
+            "first_name": "Marek",
+            "last_name": "Svačina",
+            "birth_year": 2004,
+            "team": "Stará Říše",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.88,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.46,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.46,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "44",
+            "fscode": 66231,
+            "first_name": "Jan",
+            "last_name": "Veverka",
+            "birth_year": 2004,
+            "team": "Skuteč",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.8,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.98,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.8,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "9",
+            "fscode": 61171,
+            "first_name": "Lukáš",
+            "last_name": "Plevka",
+            "birth_year": 2004,
+            "team": "Manětín",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.84,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 29.51,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.84,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "43",
+            "fscode": 39511,
+            "first_name": "Jiří",
+            "last_name": "Kupka",
+            "birth_year": 2003,
+            "team": "Manětín",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.91,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 28.9,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 18.91,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "42",
+            "fscode": 52271,
+            "first_name": "Filip",
+            "last_name": "Pírek",
+            "birth_year": 2004,
+            "team": "Býškovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.18,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.55,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 19.18,
+            "final_status": "valid",
+            "rank": 14
+          },
+          {
+            "start_number": "13",
+            "fscode": 80091,
+            "first_name": "Filip",
+            "last_name": "Kaloč",
+            "birth_year": 2004,
+            "team": "Nošovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.44,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.64,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.44,
+            "final_status": "valid",
+            "rank": 15
+          },
+          {
+            "start_number": "39",
+            "fscode": 58791,
+            "first_name": "Tomáš",
+            "last_name": "Polívka",
+            "birth_year": 2003,
+            "team": "Těchov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 28.51,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.45,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.45,
+            "final_status": "valid",
+            "rank": 16
+          },
+          {
+            "start_number": "41",
+            "fscode": 51591,
+            "first_name": "Jakub",
+            "last_name": "Dušek",
+            "birth_year": 2004,
+            "team": "Lanškroun",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.62,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.53,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.53,
+            "final_status": "valid",
+            "rank": 17
+          },
+          {
+            "start_number": "29",
+            "fscode": 59681,
+            "first_name": "Jakub Alexandr",
+            "last_name": "Poman",
+            "birth_year": 2004,
+            "team": "Lanškroun",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 25.19,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.86,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.86,
+            "final_status": "valid",
+            "rank": 18
+          },
+          {
+            "start_number": "36",
+            "fscode": 49721,
+            "first_name": "Jakub",
+            "last_name": "Mikulík",
+            "birth_year": 2004,
+            "team": "Býškovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.98,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.33,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.98,
+            "final_status": "valid",
+            "rank": 19
+          },
+          {
+            "start_number": "3",
+            "fscode": 42261,
+            "first_name": "Pavel",
+            "last_name": "Karásek",
+            "birth_year": 2003,
+            "team": "Bořitov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.99,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 33.67,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.99,
+            "final_status": "valid",
+            "rank": 20
+          },
+          {
+            "start_number": "38",
+            "fscode": 68171,
+            "first_name": "Aleš",
+            "last_name": "Severa",
+            "birth_year": 2003,
+            "team": "Manětín",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 24.12,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.01,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.01,
+            "final_status": "valid",
+            "rank": 21
+          },
+          {
+            "start_number": "19",
+            "fscode": 31761,
+            "first_name": "Tomáš",
+            "last_name": "Štinčík",
+            "birth_year": 2004,
+            "team": "Svit",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.35,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.35,
+            "final_status": "valid",
+            "rank": 22
+          },
+          {
+            "start_number": "20",
+            "fscode": 79811,
+            "first_name": "Adam",
+            "last_name": "Máslo",
+            "birth_year": 2004,
+            "team": "Šárovcova Lhota",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.26,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.94,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.94,
+            "final_status": "valid",
+            "rank": 23
+          },
+          {
+            "start_number": "28",
+            "fscode": 53511,
+            "first_name": "Michal",
+            "last_name": "Chovanec",
+            "birth_year": 2003,
+            "team": "Raškovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 18.67,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 17.37,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 17.37,
+            "final_status": "invalid",
+            "rank": 24
+          },
+          {
+            "start_number": "51",
+            "fscode": 48121,
+            "first_name": "Dominik",
+            "last_name": "Andrée",
+            "birth_year": 2003,
+            "team": "Kly",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.09,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 49.95,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 19.09,
+            "final_status": "invalid",
+            "rank": 24
+          },
+          {
+            "start_number": "2",
+            "fscode": 52301,
+            "first_name": "David",
+            "last_name": "Pšenička",
+            "birth_year": 2003,
+            "team": "Sestrouň",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.87,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 32.79,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 22.87,
+            "final_status": "invalid",
+            "rank": 24
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Metadata extracted from header line 'Kamenec u Poličky, Večerní stovka...' (place/name) and from 'Výsledková listina 7.8.2021' (event date).",
+    "Category detected from header 'kategorie: starší dorostenci' and normalized to allowed value 'Starší dorostenci'.",
+    "Tabular layout parsed by fixed column order: rank (Poř), start number (Sč), FSC, name, birth year (Roč.), team (Družstvo), time1, time2, total (Celkem).",
+    "Times converted from 'SS:CC' format to decimal seconds 'SS.CC'; trailing '-' marked as invalid while preserving numeric time value.",
+    "Discipline inferred from keyword 'stovka' in competition name -> 100m."
+  ],
+  "warnings": [
+    "No district/okres column present in the provided text; all 'district' set to null.",
+    "League/series not explicitly stated; 'competition.league' set to null.",
+    "FSC codes contained leading zeros in source; stored as numbers (leading zeros not preserved)."
+  ]
+}
