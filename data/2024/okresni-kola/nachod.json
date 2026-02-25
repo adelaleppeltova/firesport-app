@@ -117,7 +117,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 20.36, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 20.36,
             "final_status": "valid",
@@ -229,7 +229,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 22.21, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 22.21,
             "final_status": "valid",
@@ -245,7 +245,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 22.35, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 22.35,
             "final_status": "valid",
@@ -405,7 +405,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 26.64, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 26.64,
             "final_status": "valid",
@@ -421,7 +421,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 26.66, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 26.66,
             "final_status": "valid",
@@ -437,7 +437,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 28.03, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 28.03,
             "final_status": "valid",
@@ -453,7 +453,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 28.66, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 28.66,
             "final_status": "valid",
@@ -485,7 +485,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 29.57, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 29.57,
             "final_status": "valid",
@@ -667,7 +667,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 23.87, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 23.87,
             "final_status": "valid",
@@ -699,7 +699,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 24.21, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 24.21,
             "final_status": "valid",
@@ -811,7 +811,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 30.62, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 30.62,
             "final_status": "valid",
@@ -843,7 +843,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 33.08, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 33.08,
             "final_status": "valid",
@@ -859,7 +859,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 39.27, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 39.27,
             "final_status": "valid",

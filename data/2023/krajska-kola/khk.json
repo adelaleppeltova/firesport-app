@@ -709,7 +709,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 35.89, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 35.89,
             "final_status": "valid",

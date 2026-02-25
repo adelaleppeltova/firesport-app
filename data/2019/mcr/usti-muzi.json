@@ -117,7 +117,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 17.0, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 17.0,
             "final_status": "valid",
@@ -229,7 +229,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 17.24, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 17.24,
             "final_status": "valid",
@@ -629,7 +629,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 17.81, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 17.81,
             "final_status": "valid",
@@ -805,7 +805,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 18.06, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.06,
             "final_status": "valid",
@@ -1237,7 +1237,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 18.76, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.76,
             "final_status": "valid",
@@ -1253,7 +1253,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 18.79, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.79,
             "final_status": "valid",
@@ -1717,7 +1717,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 19.6, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 19.6,
             "final_status": "valid",
@@ -2213,7 +2213,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 21.6, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 21.6,
             "final_status": "valid",
@@ -2245,7 +2245,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 22.08, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 22.08,
             "final_status": "valid",
@@ -2325,7 +2325,7 @@
             "district": null,
             "times": [
               { "try": 1, "time": 25.04, "status": "valid" },
-              { "try": 2, "time": null, "status": "missing" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 25.04,
             "final_status": "valid",
