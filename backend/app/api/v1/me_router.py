@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.dependencies import get_current_user
 from pydantic import BaseModel
 import logging
-from app.db.database import db
+from app.dependencies import sync_db
 
 logger = logging.getLogger(__name__)
 
@@ -15,22 +15,55 @@ class PairAthleteRequest(BaseModel):
 @router.get("")
 def get_me(user=Depends(get_current_user)):
     """Vrátí údaje o aktuálně přihlášeném uživateli"""
+    users_collection = sync_db["users"]
+    athletes_collection = sync_db["athletes"]
+
+    athlete_id = user.get("athlete_id")
+    if athlete_id:
+        athlete_oid = None
+        try:
+            athlete_oid = ObjectId(athlete_id)
+        except Exception:
+            logger.warning("User %s has invalid athlete_id=%r, unsetting", user.get("id"), athlete_id)
+            users_collection.update_one(
+                {"_id": ObjectId(user["id"])},
+                {"$unset": {"athlete_id": ""}},
+            )
+            athlete_id = None
+
+        if athlete_oid is not None:
+            exists = athletes_collection.find_one({"_id": athlete_oid}, {"_id": 1})
+            if not exists:
+                logger.warning("User %s has orphan athlete_id=%s, unsetting", user.get("id"), athlete_id)
+                users_collection.update_one(
+                    {"_id": ObjectId(user["id"])},
+                    {"$unset": {"athlete_id": ""}},
+                )
+                athlete_id = None
+
     return {
         "user_id": user["id"],
         "email": user["email"],
-        "athlete_id": user.get("athlete_id")
+        "athlete_id": athlete_id,
     }
 
 @router.patch("/pair-athlete")
 def pair_athlete(body: PairAthleteRequest, user=Depends(get_current_user)):
     """Spáruje uživatele s atletem"""
-    from app.dependencies import sync_db
-    from bson import ObjectId
-    
     logger.info(f"Pairing user {user['id']} with athlete {body.athlete_id}")
     
     # Použij existující sync_db z dependencies
     users_collection = sync_db["users"]
+    athletes_collection = sync_db["athletes"]
+
+    try:
+        athlete_oid = ObjectId(body.athlete_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid athlete_id")
+
+    exists = athletes_collection.find_one({"_id": athlete_oid}, {"_id": 1})
+    if not exists:
+        raise HTTPException(status_code=404, detail="Athlete not found")
     
     result = users_collection.update_one(
         {"_id": ObjectId(user["id"])},

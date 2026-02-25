@@ -19,7 +19,7 @@ export function useMe() {
   return useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data } = await api.get("/v1/auth/me");
+      const { data } = await api.get("/v1/me/");
       return data;
     },
   });
@@ -104,6 +104,20 @@ export function useAthletePerformanceByYear(athleteId) {
     queryFn: async () => {
       const { data } = await api.get(
         `/v1/athletes/${athleteId}/performance-by-year`,
+      );
+      return data;
+    },
+    enabled: !!athleteId,
+  });
+}
+
+// GET /athletes/:id/performance-in-year
+export function useAthletePerformanceInYear(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "performance-in-year"],
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/v1/athletes/${athleteId}/performance-in-year`,
       );
       return data;
     },

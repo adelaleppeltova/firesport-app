@@ -1,4 +1,8 @@
-import { useMe, useAthleteOverview } from "../../hooks/useApi";
+import {
+  useMe,
+  useAthleteOverview,
+  useAthletePerformanceInYear,
+} from "../../hooks/useApi";
 
 export default function PerformanceStability() {
   const { data: me, isLoading: meLoading, error: meError } = useMe();
@@ -8,13 +12,17 @@ export default function PerformanceStability() {
     error: overviewError,
   } = useAthleteOverview(me?.athlete_id);
 
+  const { data: performanceInYear } = useAthletePerformanceInYear(
+    me?.athlete_id,
+  );
+
   if (meLoading || overviewLoading) return <div className="skeleton" />;
   if (meError || overviewError)
     return <p className="empty-state">Chyba načítání</p>;
   if (!overview)
     return <p className="empty-state">Žádná data o stabilitě výkonu</p>;
 
-  const { stability_rating, performance_variability, average_time_in_year } =
+  const { stability_rating, performance_variability, performance_indicator } =
     overview;
 
   // Mapování stability na ikonu a barvu
@@ -69,7 +77,7 @@ export default function PerformanceStability() {
               Průměrný čas v sezóně:
             </span>
             <span className="performance-stability__stat-value">
-              {average_time_in_year?.toFixed(2) || "-"} s
+              {performanceInYear?.average_time?.toFixed(2) || "-"} s
             </span>
           </div>
         </div>

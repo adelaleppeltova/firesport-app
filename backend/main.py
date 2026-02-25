@@ -1,5 +1,6 @@
 import logging
 
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 
 # Vypnout DEBUG logy z knihoven
@@ -12,7 +13,8 @@ logging.warning('TEST LOG: Backend successfully started and logger is working.')
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1  import auth_router, athlete_router, result_router
-from app.api.v1 import competition_router, me_router, data_import_router, ml, athlete_anomalies
+from app.api.v1 import competition_router, me_router, data_import_router
+from app.api.v1 import athlete_anomalies_router, ml_router
 
 app = FastAPI()
 
@@ -30,8 +32,8 @@ app.include_router(competition_router.router, prefix="/v1")
 app.include_router(result_router.router, prefix="/v1")
 app.include_router(me_router.router, prefix="/v1")
 app.include_router(data_import_router.router, prefix="/v1")
-app.include_router(ml.router, prefix="/v1")
-app.include_router(athlete_anomalies.router, prefix="/v1")
+app.include_router(ml_router.router, prefix="/v1")
+app.include_router(athlete_anomalies_router.router, prefix="/v1")
 
 @app.get("/")
 def read_root():

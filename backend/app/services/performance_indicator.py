@@ -56,7 +56,7 @@ def _center_value(values: Iterable[float]) -> Optional[float]:
     return median_value if median_value is not None else _mean(values)
 
 
-def calculate_performance_indicator(entries: list[dict]) -> tuple[PerformanceIndicator, list[RecentResult]]:
+def calculate_performance_indicator(entries: list[dict]) -> tuple[PerformanceIndicator]:
     """
     Compute trend from last 6 valid results by competition date (newer 3 vs older 3).
     """
@@ -98,8 +98,7 @@ def calculate_performance_indicator(entries: list[dict]) -> tuple[PerformanceInd
         return (
             PerformanceIndicator(
                 trend=PerformanceIndicatorTrend.insufficient,
-            ),
-            recent_results,
+            )
         )
 
     delta = old_value - new_value
@@ -112,12 +111,15 @@ def calculate_performance_indicator(entries: list[dict]) -> tuple[PerformanceInd
     else:
         trend = PerformanceIndicatorTrend.down
 
+    average_time = _mean([item["time"] for item in sample])
+
     return (
         PerformanceIndicator(
             trend=trend,
             delta_seconds=delta,
             new_value=new_value,
             old_value=old_value,
-        ),
-        recent_results,
+            average_time = average_time,
+            recent_results=recent_results
+        )
     )

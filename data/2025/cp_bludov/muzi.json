@@ -53,7 +53,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 16.68, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 16.68,
             "final_status": "valid",
@@ -69,7 +69,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 16.85, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 16.85,
             "final_status": "valid",
@@ -116,7 +116,7 @@
             "team": "HZS Pardubického kraje",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
+              { "try": 1, "time": null, "status": "invalid" },
               { "try": 2, "time": 17.08, "status": "valid" }
             ],
             "final_time": 17.08,
@@ -133,7 +133,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 17.17, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 17.17,
             "final_status": "valid",
@@ -229,7 +229,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 17.86, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 17.86,
             "final_status": "valid",
@@ -245,7 +245,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 17.9, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 17.9,
             "final_status": "valid",
@@ -277,7 +277,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 18.16, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.16,
             "final_status": "valid",
@@ -293,7 +293,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 18.21, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.21,
             "final_status": "valid",
@@ -309,7 +309,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 18.45, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.45,
             "final_status": "valid",
@@ -325,7 +325,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 19, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 19,
             "final_status": "valid",
@@ -340,7 +340,7 @@
             "team": "Libňatov",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
+              { "try": 1, "time": null, "status": "invalid" },
               { "try": 2, "time": 19, "status": "valid" }
             ],
             "final_time": 19,
@@ -357,7 +357,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 19.24, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 19.24,
             "final_status": "valid",
@@ -389,7 +389,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 23.67, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 23.67,
             "final_status": "valid",
@@ -405,7 +405,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 26.39, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 26.39,
             "final_status": "valid",
@@ -420,7 +420,7 @@
             "team": "Telnice",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
+              { "try": 1, "time": null, "status": "invalid" },
               { "try": 2, "time": 34.01, "status": "valid" }
             ],
             "final_time": 34.01,
@@ -436,7 +436,7 @@
             "team": "Těchov",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
+              { "try": 1, "time": null, "status": "invalid" },
               { "try": 2, "time": 34.76, "status": "valid" }
             ],
             "final_time": 34.76,
@@ -452,10 +452,10 @@
             "team": "Slatiny",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
             ],
-            "final_time": 0,
+            "final_time": null,
             "final_status": "invalid",
             "rank": 28
           },
@@ -468,10 +468,10 @@
             "team": "Dobřany v Orlických horách",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
             ],
-            "final_time": 0,
+            "final_time": null,
             "final_status": "invalid",
             "rank": 28
           },
@@ -484,10 +484,10 @@
             "team": "Hustopeče nad Bečvou",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
             ],
-            "final_time": 0,
+            "final_time": null,
             "final_status": "invalid",
             "rank": 28
           },
@@ -500,10 +500,10 @@
             "team": "Kyjovice",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
             ],
-            "final_time": 0,
+            "final_time": null,
             "final_status": "invalid",
             "rank": 28
           },
@@ -516,10 +516,10 @@
             "team": "Neplachovice",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
             ],
-            "final_time": 0,
+            "final_time": null,
             "final_status": "invalid",
             "rank": 28
           }

@@ -31,11 +31,11 @@ export default function AthleteDetailPage() {
             </tr>
             <tr>
               <th>Rok narození</th>
-              <td>{athlete.birth_year}</td>
+              <td>{athlete.birth_year || "-"}</td>
             </tr>
             <tr>
               <th>Sbor</th>
-              <td>{athlete.team}</td>
+              <td>{athlete.teams.map((team) => team).join(", ") || "-"}</td>
             </tr>
             <tr>
               <th>Okres</th>
@@ -43,7 +43,7 @@ export default function AthleteDetailPage() {
             </tr>
             <tr>
               <th>FSCode</th>
-              <td>{athlete.fscode}</td>
+              <td>{athlete.fscode || "-"}</td>
             </tr>
             {/* <tr>
               <th>Kategorie</th>
@@ -81,13 +81,16 @@ export default function AthleteDetailPage() {
                   <td>{formatDate(r.competition?.date)}</td>
                   <td>{r.competition?.name}</td>
                   <td>{r.competition?.place}</td>
-                  <td>{r.category?.name}</td>
-                  <td>{r.final_time ? r.final_time.toFixed(2) + " s" : "-"}</td>
+                  <td>{r.category}</td>
+                  <td>
+                    {(r.final_time ? r.final_time.toFixed(2) + " s" : "") +
+                      (r.final_time_status === "valid" ? "" : " NP")}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3}>Žádné výsledky</td>
+                <td colSpan={5}>Žádné výsledky</td>
               </tr>
             )}
           </tbody>

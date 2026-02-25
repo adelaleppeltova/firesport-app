@@ -8,7 +8,7 @@
     "league": null,
     "categories": [
       {
-        "name": null,
+        "name": "Muži",
         "discipline": "100m",
         "results": [
           {
@@ -778,7 +778,7 @@
               {
                 "try": 2,
                 "time": null,
-                "status": "missing"
+                "status": "invalid"
               }
             ],
             "final_time": 34.88,
@@ -788,8 +788,8 @@
         ]
       },
       {
-        "name": null,
-        "discipline": "100mPHP",
+        "name": "Dorostenci",
+        "discipline": "100m",
         "results": [
           {
             "start_number": "84",
@@ -1082,8 +1082,8 @@
         ]
       },
       {
-        "name": null,
-        "discipline": "100mPHP",
+        "name": "Dorostenky",
+        "discipline": "100m",
         "results": [
           {
             "start_number": "53",

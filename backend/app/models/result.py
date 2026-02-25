@@ -23,6 +23,7 @@ class ResultBase(BaseModel):
     category: CategoryInDB
     
     date: datetime
+    team: str
 
     start_number: Optional[int] = None
 
@@ -48,3 +49,20 @@ class ResultInDB(ResultBase):
     model_config = ConfigDict(
         populate_by_name=True,
     )
+
+class ResultAthleteDetail(BaseModel):
+    competition: CompetitionInDB
+    category: str
+    
+    date: datetime
+    team: str
+
+    start_number: Optional[int] = None
+
+    times: list[TimeAttempt] = []
+
+    final_time: Optional[float] = None
+    final_time_status: TimeStatus
+
+    rank: Optional[int] = None
+

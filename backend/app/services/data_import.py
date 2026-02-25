@@ -37,6 +37,14 @@ class DataImporter:
     def _normalize_name(value: str) -> str:
         return "".join(part[:1].upper() + part[1:].lower() for part in value.strip().split())
 
+    @staticmethod
+    def _normalize_category_name(value: str) -> str:
+        """Převede název kategorie tak, aby měl první písmeno velké a zbytek malý (např. 'ŽENY' -> 'Ženy')."""
+        stripped = value.strip()
+        if not stripped:
+            return stripped
+        return stripped[0].upper() + stripped[1:].lower()
+
 
     async def import_from_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -142,7 +150,8 @@ class DataImporter:
     ) -> None:
         """Importuje kategorii a její výsledky."""
         try:
-            category_name = category_data.get("name", "")
+            raw_name = category_data.get("name") or ""
+            category_name = self._normalize_category_name(raw_name)
             category_id = await self._import_category(category_name)
             
             if not category_id:
@@ -164,6 +173,10 @@ class DataImporter:
     async def _import_category(self, name: str) -> Optional[str]:
         """Importuje nebo najde existující kategorii."""
         try:
+            if not name:
+                logger.warning("Přeskočen import kategorie s prázdným nebo null názvem")
+                return None
+
             # Kontrola cache
             if name in self.categories_cache:
                 return self.categories_cache[name]
@@ -199,13 +212,14 @@ class DataImporter:
             })
             competition_date = competition.get("date") if competition else None
 
+            team = result_data.get("team").replace("SDH", "").strip() if result_data.get("team") else None
+
             # Importuj či najdi atleta
-            athlete_id = await self._import_or_get_athlete(result_data)
+            athlete_id = await self._import_or_get_athlete(result_data, team)
             if not athlete_id:
                 logger.warning(f"Nepodařilo se zpracovat atleta")
                 return
-            
-            # Příprava dat výsledku
+
             times_raw = result_data.get("times", [])
             time_1 = None
             time_2 = None
@@ -231,6 +245,7 @@ class DataImporter:
                 "competition": ObjectId(competition_id),
                 "category": ObjectId(category_id),
                 "date": competition_date,
+                "team": team,
                 "start_number": result_data.get("start_number"),
                 "time_1": time_1,
                 "time_1_status": "valid" if time_1 else "invalid",
@@ -259,58 +274,95 @@ class DataImporter:
             self.stats["errors"].append(f"Výsledek: {str(e)}")
 
 
-    async def _import_or_get_athlete(self, result_data: Dict[str, Any]) -> Optional[str]:
+    async def _find_by_name(
+        self,
+        first_name: str,
+        last_name: str,
+    ):
+        """Najde závodníka podle jména a příjmení."""
+        if not first_name or not last_name:
+            return None
+        
+        existing = await athletes_collection.find_one({
+            "first_name": first_name,
+            "last_name": last_name
+        })
+        return existing
+
+
+    async def _import_or_get_athlete(self, result_data: Dict[str, Any], team: Optional[str] = None) -> Optional[str]:
         """Importuje atleta nebo vrátí existující."""
         try:
             fscode = result_data.get("fscode") or None
             first_name = self._normalize_name(result_data.get("first_name", ""))
             last_name = self._normalize_name(result_data.get("last_name", ""))
             birth_year = result_data.get("birth_year") or None
-            team = result_data.get("team").replace("SDH", "").strip() if result_data.get("team") else None  # Odstraň mezery pro konzistentní porovnávání
-            district = result_data.get("district") or None  # Odstraň mezery pro konzistentní porovnávání
-           
-            # Pokud máme fscode, zkus najít v cache či DB
+            district = result_data.get("district") or None
+
             existing = None
+
+            # 1. Primární vyhledávání podle fscode
             if fscode:
                 existing = await athletes_collection.find_one({"fscode": fscode})
-            
-            if not existing:
-                if not team:
-                    logger.warning(f"Atleta '{first_name} {last_name}' nemá uveden tým, nelze jednoznačně identifikovat")
-                    return None
 
-                existing = await athletes_collection.find_one({
-                "first_name": first_name,
-                "last_name": last_name,
-                "team": team,
-                })
+            # 2. Vyhledávání podle jména a příjmení
+            if not existing and first_name and last_name:
+                existing = await self._find_by_name(first_name, last_name)
 
+            # 3. Nalezený závodník – doplnit pouze chybějící skalární hodnoty + přidat team do pole teams
             if existing:
-                athletes_collection.update_one({"_id": existing["_id"]}, {"$set": {"birth_year": birth_year, "district": district, "team": team, "fscode": fscode, "updated_at": datetime.now()}})
+                new_values = {
+                    "first_name": first_name or None,
+                    "last_name": last_name or None,
+                    "birth_year": birth_year,
+                    "fscode": fscode,
+                    "district": district,
+                }
+                update_fields = {
+                    field: value
+                    for field, value in new_values.items()
+                    if value is not None and not existing.get(field)
+                }
+                update: Dict[str, Any] = {}
+                if update_fields:
+                    update_fields["updated_at"] = datetime.now()
+                    update["$set"] = update_fields
+                if team:
+                    update["$addToSet"] = {"teams": team}
+                if update:
+                    await athletes_collection.update_one({"_id": existing["_id"]}, update)
+                    logger.info(
+                        f"Aktualizován závodník {first_name} {last_name}: set={list(update_fields.keys()) if update_fields else []}, team={team}"
+                    )
+                elif team:
+                    # I když není co doplňovat, přidej team
+                    await athletes_collection.update_one(
+                        {"_id": existing["_id"]},
+                        {"$addToSet": {"teams": team}}
+                    )
                 return str(existing["_id"])
-            
-            # Vytvoření nového atleta
-            athlete_doc = {
+
+            # 4. Vytvoření nového závodníka
+            athlete_doc: Dict[str, Any] = {
                 "first_name": first_name,
                 "last_name": last_name,
                 "birth_year": birth_year,
                 "fscode": fscode,
                 "district": district,
-                "team": team,
-                "district": result_data.get("district"),
-                "created_at": datetime.now()
+                "teams": [team] if team else [],
+                "created_at": datetime.now(),
             }
-            
+
             result = await athletes_collection.insert_one(athlete_doc)
-            athlete_id = str(result.inserted_id)
-            
+            new_athlete_id = str(result.inserted_id)
+
             if fscode:
-                self.athletes_cache[fscode] = athlete_id
-            
+                self.athletes_cache[fscode] = new_athlete_id
+
             self.stats["athletes_created"] += 1
             logger.info(f"Vytvořen nový atleta: {first_name} {last_name}")
-            return athlete_id
-            
+            return new_athlete_id
+
         except Exception as e:
             logger.error(f"Chyba při importu atleta: {e}", exc_info=True)
             return None

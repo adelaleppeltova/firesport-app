@@ -19,7 +19,10 @@ def get_current_user(authorization: str = Header(None)):
     """
     Synchronní dependency pro získání aktuálního uživatele z JWT tokenu.
     """
-    logger.info(f"get_current_user called with authorization: {authorization[:50] if authorization else None}...")
+    auth_preview = None
+    if authorization is not None:
+        auth_preview = str(authorization)[:50]
+    logger.info(f"get_current_user called with authorization: {auth_preview}...")
     
     if not authorization:
         logger.error("Missing Authorization header")

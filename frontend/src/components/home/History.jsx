@@ -8,8 +8,8 @@ export default function History() {
 
   if (meLoading || overviewLoading) return <div className="skeleton" />;
   if (!overview) return <p className="empty-state">Žádná data</p>;
-
-  const { performance_indicator, recent_results } = overview;
+  const { performance_indicator } = overview;
+  const { recent_results } = performance_indicator;
 
   const formatSeconds = (value) => {
     if (value == null) return "-";

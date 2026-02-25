@@ -9,17 +9,17 @@ class PerformanceIndicatorTrend(str, Enum):
     stable = "stable"
     insufficient = "insufficient"
 
+class RecentResult(BaseModel):
+    final_time: Optional[float]
+    rank: Optional[int]
+
 class PerformanceIndicator(BaseModel):
     trend: PerformanceIndicatorTrend = PerformanceIndicatorTrend.insufficient
     delta_seconds: Optional[float] = None
     new_value: Optional[float] = None
     old_value: Optional[float] = None
-
-
-class RecentResult(BaseModel):
-    final_time: Optional[float]
-    rank: Optional[int]
-
+    average_time: Optional[float] = None
+    recent_results: List[RecentResult] = Field(default_factory=list)
 
 class BestPerformance(BaseModel):
     """Nejlepší výkon - čas, soutěž a místo"""
@@ -31,7 +31,7 @@ class BestPerformance(BaseModel):
 class AthleteBase(BaseModel):
     first_name: str
     last_name: str
-    team: str
+    teams: List[str] = Field(default_factory=list)
     fscode: Optional[int] = None
     birth_year: Optional[int] = None
     district: Optional[str] = None
@@ -54,12 +54,9 @@ class AthleteOverview(AthleteInDB):
     total_competitions: int = 0
     best_time: Optional[float] = None
     average_time: Optional[float] = None
-    best_time_in_year: Optional[float] = None
-    average_time_in_year: Optional[float] = None
     performance_indicator: PerformanceIndicator = Field(
         default_factory=PerformanceIndicator
     )
-    recent_results: List[RecentResult] = Field(default_factory=list)
     performance_variability: Optional[float] = None  # Rozsah (max - min) poslednich platnych casu
     stability_rating: str = "Nedostatek dat"  # Slovní hodnocení stability
     best_performance: BestPerformance = Field(default_factory=BestPerformance)  # Nejlepší výkon s detaily soutěže
@@ -85,8 +82,27 @@ class PerformanceDataPoint(BaseModel):
     time: float  # Čas v sekundách
     rank: Optional[int] = None
 
-
 class PerformanceByYear(BaseModel):
     """Data pro graf vývoje výkonu po sezónách"""
     years: List[int]  # [2022, 2023, 2024]
     data: dict  # {2022: [{"date": "2022-05-15", "time": 16.5, "rank": 1}, ...], ...}
+
+class RaceInYear(BaseModel):
+    competition_id: Optional[str] = None
+    competition_name: Optional[str] = None
+    competition_place: Optional[str] = None
+    category: Optional[str] = None
+    date: Optional[str] = None  # YYYY-MM-DD
+    final_time: Optional[float] = None
+    final_time_status: Optional[str] = None
+    rank: Optional[int] = None
+    time_1: Optional[float] = None
+    time_2: Optional[float] = None
+
+
+class PerformanceInYear(BaseModel):
+    year: int
+    average_time: Optional[float]
+    best_time: Optional[float]
+    competitions: int
+    races: List[RaceInYear]

@@ -61,11 +61,13 @@ async def load_all_json_files():
     results_collection = db["results"]
     competitions_collection = db["competitions"]
     athletes_collection = db["athletes"]
+    categories_collection = db["categories"]
     
     await results_collection.delete_many({})
     await competitions_collection.delete_many({})
     await athletes_collection.delete_many({})
-    logger.info("✓ Smazány všechny existující výsledky, soutěže a atleti z MongoDB pro čistý start")
+    await categories_collection.delete_many({})
+    logger.info("✓ Smazány všechny existující výsledky, soutěže, atleti a kategorie z MongoDB pro čistý start")
     
     # Kontrola existence složky
     if not DATA_DIR.exists():

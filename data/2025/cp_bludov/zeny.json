@@ -21,7 +21,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 17.08, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 17.08,
             "final_status": "valid",
@@ -133,7 +133,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 18.46, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.46,
             "final_status": "valid",
@@ -181,7 +181,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 18.65, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 18.65,
             "final_status": "valid",
@@ -196,7 +196,7 @@
             "team": "Dolní Životice",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
+              { "try": 1, "time": null, "status": "invalid" },
               { "try": 2, "time": 18.67, "status": "valid" }
             ],
             "final_time": 18.67,
@@ -309,7 +309,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 19.79, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 19.79,
             "final_status": "valid",
@@ -325,7 +325,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 20.14, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 20.14,
             "final_status": "valid",
@@ -404,7 +404,7 @@
             "team": "Těškovice",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
+              { "try": 1, "time": null, "status": "invalid" },
               { "try": 2, "time": 21.99, "status": "valid" }
             ],
             "final_time": 21.99,
@@ -437,7 +437,7 @@
             "district": "",
             "times": [
               { "try": 1, "time": 36.57, "status": "valid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 2, "time": null, "status": "invalid" }
             ],
             "final_time": 36.57,
             "final_status": "valid",
@@ -452,10 +452,10 @@
             "team": "Karviná-Hranice",
             "district": "",
             "times": [
-              { "try": 1, "time": 999, "status": "invalid" },
-              { "try": 2, "time": 999, "status": "invalid" }
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
             ],
-            "final_time": 999,
+            "final_time": null,
             "final_status": "invalid",
             "rank": 28
           }
@@ -468,12 +468,12 @@
     "Columns recognized: start_number, fscode, last_name, first_name, birth_year, team, time1, time2, final_time, rank (extracted from trailing lines).",
     "Discipline detected from header 'Běh na 100 m s překážkami' and mapped to '100m'.",
     "Category detected from 'KATEGORIE: ŽENY' and matched to allowed category 'ŽENY'.",
-    "Invalid time markers ('NP') encoded as numeric sentinel 999 to satisfy schema while marking status 'invalid'."
+    "Invalid time markers ('NP') encoded as numeric sentinel null to satisfy schema while marking status 'invalid'."
   ],
   "warnings": [
     "No separate 'district' (okres) column present in source; 'district' set to empty string for all competitors.",
     "Non-numeric Fscode value 'xxxxx' for Treska Petra set to 0.",
-    "Invalid/no-jump times (NP) encoded as 999; original invalid markers preserved in 'status'.",
+    "Invalid/no-jump times (NP) encoded as null; original invalid markers preserved in 'status'.",
     "competition.type field not present in source; left empty to satisfy schema."
   ]
 }

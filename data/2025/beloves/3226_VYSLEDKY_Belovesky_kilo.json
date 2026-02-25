@@ -670,17 +670,17 @@
             "times": [
               {
                 "try": 1,
-                "time": 0,
-                "status": "valid"
+                "time": null,
+                "status": "invalid"
               },
               {
                 "try": 2,
                 "time": null,
-                "status": "missing"
+                "status": "invalid"
               }
             ],
             "final_time": null,
-            "final_status": "missing",
+            "final_status": "invalid",
             "rank": 28
           },
           {
@@ -694,17 +694,17 @@
             "times": [
               {
                 "try": 1,
-                "time": 0,
-                "status": "valid"
+                "time": null,
+                "status": "invalid"
               },
               {
                 "try": 2,
                 "time": null,
-                "status": "missing"
+                "status": "invalid"
               }
             ],
             "final_time": null,
-            "final_status": "missing",
+            "final_status": "invalid",
             "rank": 29
           }
         ]
@@ -1204,17 +1204,17 @@
             "times": [
               {
                 "try": 1,
-                "time": 0,
-                "status": "valid"
+                "time": null,
+                "status": "invalid"
               },
               {
                 "try": 2,
                 "time": null,
-                "status": "missing"
+                "status": "invalid"
               }
             ],
             "final_time": null,
-            "final_status": "missing",
+            "final_status": "invalid",
             "rank": 21
           }
         ]

@@ -13,6 +13,7 @@ from app.services.auth import (
     decode_token,
 )
 from app.db.database import db
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -106,33 +107,6 @@ async def logout(request: Request, response: Response):
             pass
     response.delete_cookie("refresh_token")
     return Response(status_code=204)
-
-# async dependency
-async def get_current_user(authorization: str = Header(None)):
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Missing Authorization header")
-    try:
-        scheme, token = authorization.split()
-        if scheme.lower() != "bearer":
-            raise ValueError()
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid Authorization header")
-    try:
-        payload = decode_token(token)
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    if payload.get("type") != "access":
-        raise HTTPException(status_code=401, detail="Invalid token type")
-    user = await users.find_one({"_id": ObjectId(payload.get("sub"))})
-    if not user:
-        raise HTTPException(status_code=401, detail="User not found")
-    return {
-        "id": str(user["_id"]), 
-        "email": user["email"], 
-        "role": user.get("role", "user"), 
-        "is_active": user.get("is_active", True),
-        "athlete_id": user.get("athlete_id")
-    }
 
 @router.get("/me")
 async def me(current=Depends(get_current_user)):

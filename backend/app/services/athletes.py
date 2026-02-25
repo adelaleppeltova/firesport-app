@@ -1,9 +1,9 @@
 from bson import ObjectId
 from app.db.database import db
 from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail, BestPerformance
-from app.models.result import ResultBase
+from app.models.result import ResultAthleteDetail
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Optional, Any, Set
 
 from app.models.models import AthleteDetailPage
 from app.services.performance_indicator import calculate_performance_indicator
@@ -43,7 +43,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
             first_name=athlete.get("first_name", ""),
             last_name=athlete.get("last_name", ""),
             birth_year=athlete.get("birth_year"),
-            team=athlete.get("team"),
+            teams=athlete.get("teams", []),
             last_active=None,
             total_competitions=0,
             best_time=None,
@@ -76,11 +76,6 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     else:
         last_active = None
 
-    # Výkon v aktuálním roce
-    current_year = datetime.now().year
-    best_time_in_year = await get_athlete_best_time_in_year(athlete_oid, current_year)
-    average_time_in_year = await get_athlete_average_time_in_year(athlete_oid, current_year)
-
     # Trend indicator: last 6 valid results ordered by competition date.
     competition_ids = {
         r.get("competition") for r in results if r.get("competition")
@@ -111,7 +106,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
             }
         )
 
-    performance_indicator, recent_results = calculate_performance_indicator(indicator_entries)
+    performance_indicator = calculate_performance_indicator(indicator_entries)
 
     stability_info = evaluate_performance_stability(indicator_entries)
     performance_variability = stability_info["performance_variability"]
@@ -141,15 +136,12 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         first_name=athlete.get("first_name"),
         last_name=athlete.get("last_name"),
         birth_year=athlete.get("birth_year"),
-        team=athlete.get("team"),
+        teams=athlete.get("teams", []),
         last_active=last_active,
         total_competitions=total_competitions,
         best_time=best_time,
         average_time=average_time,
-        best_time_in_year=best_time_in_year,
-        average_time_in_year=average_time_in_year,
         performance_indicator=performance_indicator,
-        recent_results=recent_results,
         performance_variability=performance_variability,
         stability_rating=stability_rating,
         best_performance=best_performance_info,
@@ -219,24 +211,21 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
             if category_name is None:
                 category_name = cat_payload.get("name")
 
-        # build result payload matching ResultBase
+        # build result payload matching ResultAthleteDetail
         result_payload = {
-            "athlete": athlete_payload,
             "competition": comp_payload,
-            "category": cat_payload,
+            "category": category_name,
             "date": r.get("date"),
+            "team": r.get("team"),
             "start_number": r.get("start_number"),
-            "time_1": r.get("time_1"),
-            "time_1_status": r.get("time_1_status"),
-            "time_2": r.get("time_2"),
-            "time_2_status": r.get("time_2_status"),
+            "times": r.get("times", []),
             "final_time": r.get("final_time"),
             "final_time_status": r.get("final_time_status"),
             "rank": r.get("rank"),
         }
 
         # validate as ResultBase and append
-        validated = ResultBase.model_validate(result_payload)
+        validated = ResultAthleteDetail.model_validate(result_payload)
         results.append(validated)
 
     # build AthleteDetail for response
@@ -246,7 +235,7 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
         last_name=athlete.get("last_name"),
         birth_year=athlete.get("birth_year"),
         fscode=athlete.get("fscode"),
-        team=athlete.get("team"),
+        teams=athlete.get("teams", []),
         category=category_name,
         best_time=best_time,
     )
@@ -431,3 +420,130 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
     years = sorted(list(years_set))
     
     return {"years": years, "data": data_by_year}
+
+
+async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Vrátí souhrn pro daný rok (nebo poslední dostupný rok):
+    - average_time: průměrný platný final_time v roce
+    - best_time: nejlepší platný final_time v roce
+    - competitions: počet unikátních závodů v roce
+    - races: detailní přehled závodů v roce (datum, soutěž, kategorie, časy)
+
+    Pokud `year` není zadán, použije se rok posledního zaznamenaného závodu
+    (sezóna pokračuje, dokud není závod v dalším roce – aktuálně tedy 2025).
+    """
+
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+
+    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    if not athlete:
+        raise ValueError("Athlete not found")
+
+    results = await results_collection.find({"athlete": athlete_oid}).to_list(length=None)
+    if not results:
+        target_year = year if year is not None else datetime.now().year
+        return {
+            "year": target_year,
+            "average_time": None,
+            "best_time": None,
+            "competitions": 0,
+            "races": [],
+        }
+
+    # Urči implicitní rok podle nejpozdějšího závodu (sezóna trvá do prvního závodu dalšího roku)
+    latest_date = max((r.get("date") for r in results if r.get("date") is not None), default=None)
+    latest_year = latest_date.year if latest_date else datetime.now().year
+    target_year = year if year is not None else latest_year
+
+    # Filtrování výsledků na daný rok podle data soutěže
+    filtered: List[Dict[str, Any]] = []
+    comp_ids: Set[ObjectId] = set()
+    cat_ids: Set[ObjectId] = set()
+
+    for r in results:
+        comp_id = r.get("competition")
+        if not comp_id:
+            continue
+        try:
+            comp_oid = comp_id if isinstance(comp_id, ObjectId) else ObjectId(str(comp_id))
+        except Exception:
+            continue
+        comp_doc = await competitions_collection.find_one({"_id": comp_oid}, {"date": 1})
+        if not comp_doc or not comp_doc.get("date"):
+            continue
+        comp_date = comp_doc["date"]
+        if comp_date.year != target_year:
+            continue
+        r_copy = dict(r)
+        r_copy["_id"] = r_copy.get("_id", None)
+        r_copy["competition_doc"] = comp_doc
+        filtered.append(r_copy)
+        comp_ids.add(comp_oid)
+        if r.get("category"):
+            try:
+                cat_ids.add(r["category"] if isinstance(r["category"], ObjectId) else ObjectId(str(r["category"])))
+            except Exception:
+                pass
+
+    if not filtered:
+        return {
+            "year": target_year,
+            "average_time": None,
+            "best_time": None,
+            "competitions": 0,
+            "races": [],
+        }
+
+    # Načti soutěže a kategorie do map
+    comp_map: Dict[ObjectId, Dict[str, Any]] = {}
+    if comp_ids:
+        comps = await competitions_collection.find({"_id": {"$in": list(comp_ids)}}).to_list(length=None)
+        comp_map = {c["_id"]: c for c in comps}
+
+    cat_map: Dict[ObjectId, Dict[str, Any]] = {}
+    if cat_ids:
+        cats = await categories_collection.find({"_id": {"$in": list(cat_ids)}}).to_list(length=None)
+        cat_map = {c["_id"]: c for c in cats}
+
+    # Výpočty metrik
+    valid_times = [r.get("final_time") for r in filtered if r.get("final_time") is not None]
+    average_time = sum(valid_times) / len(valid_times) if valid_times else None
+    best_time = min(valid_times) if valid_times else None
+
+    competitions_count = len({r.get("competition") for r in filtered if r.get("competition")})
+
+    races = []
+    for r in filtered:
+        comp_doc = comp_map.get(r.get("competition")) or r.get("competition_doc") or {}
+        cat_doc = None
+        if r.get("category"):
+            cat_doc = cat_map.get(r.get("category"))
+
+        comp_date = comp_doc.get("date")
+        races.append({
+            "competition_id": str(r.get("competition")) if r.get("competition") else None,
+            "competition_name": comp_doc.get("name"),
+            "competition_place": comp_doc.get("place"),
+            "category": cat_doc.get("name") if cat_doc else None,
+            "date": comp_date.strftime("%Y-%m-%d") if comp_date else None,
+            "final_time": r.get("final_time"),
+            "final_time_status": r.get("final_time_status"),
+            "rank": r.get("rank"),
+            "time_1": r.get("time_1"),
+            "time_2": r.get("time_2"),
+        })
+
+    # Seřaď závody podle data
+    races.sort(key=lambda x: x["date"] or "")
+
+    return {
+        "year": target_year,
+        "average_time": average_time,
+        "best_time": best_time,
+        "competitions": competitions_count,
+        "races": races,
+    }
