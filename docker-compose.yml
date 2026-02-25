@@ -13,7 +13,8 @@ services:
     entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
     environment:
       - MONGO_URL=mongodb://mongo:27017
-      - DEBUG=false
+      - DEBUG=true
+      - IMPORT_DATA=true
 
   mongo:
     image: mongo

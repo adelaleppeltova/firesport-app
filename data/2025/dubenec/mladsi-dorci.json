@@ -1,0 +1,129 @@
+{
+  "source_file": "Výsledky Mladší dorostenci.xlsx - List1.pdf",
+  "generated_at": "2026-02-25T09:18:10Z",
+  "competition": {
+    "name": "Dubenecké stovky 2025",
+    "place": "Hradec Králové",
+    "date": "2025-04-26",
+    "league": "Východočeské stovky",
+    "categories": [
+      {
+        "name": "Mladší dorostenci",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "2",
+            "fscode": null,
+            "first_name": "Matěj",
+            "last_name": "Švandrlík",
+            "birth_year": null,
+            "team": "Libňatov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 22.64, "status": "valid" },
+              { "try": 2, "time": 23.68, "status": "valid" }
+            ],
+            "final_time": 22.64,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "1",
+            "fscode": null,
+            "first_name": "Matyáš",
+            "last_name": "Machata",
+            "birth_year": null,
+            "team": "Radvanice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 24.29, "status": "valid" },
+              { "try": 2, "time": 22.86, "status": "valid" }
+            ],
+            "final_time": 22.86,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "4",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "Klůz",
+            "birth_year": null,
+            "team": "Arnultovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 23.28, "status": "valid" },
+              { "try": 2, "time": 23.31, "status": "valid" }
+            ],
+            "final_time": 23.28,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "6",
+            "fscode": null,
+            "first_name": "Tadeáš",
+            "last_name": "Stonjek",
+            "birth_year": null,
+            "team": "Radvanice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 25.17, "status": "valid" },
+              { "try": 2, "time": 25.15, "status": "valid" }
+            ],
+            "final_time": 25.15,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "5",
+            "fscode": null,
+            "first_name": "Daniel",
+            "last_name": "Krátký",
+            "birth_year": null,
+            "team": "Uhelná Příbram",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 25.29, "status": "valid" },
+              { "try": 2, "time": 25.76, "status": "valid" }
+            ],
+            "final_time": 25.29,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "3",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "Korda",
+            "birth_year": null,
+            "team": "Vrchovina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 34.67, "status": "valid" },
+              { "try": 2, "time": 62.22, "status": "valid" }
+            ],
+            "final_time": 34.67,
+            "final_status": "valid",
+            "rank": 6
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "PDF je 1 stránka s exportem z tabulky (XLSX->PDF). Detekován tabulkový layout s hlavičkou sloupců.",
+    "competition.name bylo převzato z řádku 'Dubenecké stovky 2025'.",
+    "competition.place bylo převzato z řádku obsahujícího místo: 'Hradec Králové'.",
+    "competition.date bylo převzato z řádku '26.4.2025' (datum závodu) a normalizováno na '2025-04-26'; čas '26.4.2025 14:39' vyhodnocen jako čas tisku/exportu.",
+    "competition.league nebyla v dokumentu uvedena.",
+    "Kategorie byla detekována z textu 'kategorie: Mladší dorostenci'.",
+    "discipline byla určena podle nadpisu 'Výsledková listina - běh na 100m' → 100m.",
+    "Sloupce byly mapovány: 'Číslo'→start_number, 'Družstvo'→team, 'Pokus 1/2'→times, 'Výsledný čas'→final_time, 'Umístění'→rank."
+  ],
+  "warnings": [
+    "FS Code v dokumentu chybí → fscode=null u všech výsledků.",
+    "Rok narození v dokumentu chybí → birth_year=null u všech výsledků.",
+    "Sloupec okres/district v dokumentu chybí → district=null u všech výsledků."
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "source_file": "Výsledky Starší dorostenky.xlsx - List1.pdf",
+  "generated_at": "2026-02-25T09:25:12Z",
+  "competition": {
+    "name": "Dubenecké stovky 2025",
+    "place": "Hradec Králové",
+    "date": "2025-04-26",
+    "league": "Východočeské stovky",
+    "categories": [
+      {
+        "name": "Starší dorostenky",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "2",
+            "fscode": null,
+            "first_name": "Eliška",
+            "last_name": "Ranecká",
+            "birth_year": null,
+            "team": "Česká Bělá",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.1, "status": "valid" },
+              { "try": 2, "time": 19.02, "status": "valid" }
+            ],
+            "final_time": 19.02,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "4",
+            "fscode": null,
+            "first_name": "Amálie",
+            "last_name": "Brožová",
+            "birth_year": null,
+            "team": "Dubenec",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.92, "status": "valid" },
+              { "try": 2, "time": 19.35, "status": "valid" }
+            ],
+            "final_time": 19.35,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "8",
+            "fscode": null,
+            "first_name": "Simona",
+            "last_name": "Bandžuchová",
+            "birth_year": null,
+            "team": "Stéblová",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 25.53, "status": "valid" },
+              { "try": 2, "time": 20.18, "status": "valid" }
+            ],
+            "final_time": 20.18,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "3",
+            "fscode": null,
+            "first_name": "Šárka",
+            "last_name": "Stillerová",
+            "birth_year": null,
+            "team": "Česká",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.62, "status": "valid" },
+              { "try": 2, "time": 20.21, "status": "valid" }
+            ],
+            "final_time": 20.21,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "10",
+            "fscode": null,
+            "first_name": "Markéta",
+            "last_name": "Munzarová",
+            "birth_year": null,
+            "team": "Třebihošť",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 23.4, "status": "valid" },
+              { "try": 2, "time": 21.35, "status": "valid" }
+            ],
+            "final_time": 21.35,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "7",
+            "fscode": null,
+            "first_name": "Anna",
+            "last_name": "Rajnetová",
+            "birth_year": null,
+            "team": "Pardubice Polabiny",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 29.72, "status": "valid" },
+              { "try": 2, "time": 21.55, "status": "valid" }
+            ],
+            "final_time": 21.55,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "5",
+            "fscode": null,
+            "first_name": "Veronika",
+            "last_name": "Porkertová",
+            "birth_year": null,
+            "team": "Horní Lánov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 22.95, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 22.95,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "9",
+            "fscode": null,
+            "first_name": "Lucie",
+            "last_name": "Trochová",
+            "birth_year": null,
+            "team": "Trutnov H.S.M.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 26.17, "status": "valid" },
+              { "try": 2, "time": 26.25, "status": "valid" }
+            ],
+            "final_time": 26.17,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "6",
+            "fscode": null,
+            "first_name": "Rozálie",
+            "last_name": "Kumpochová",
+            "birth_year": null,
+            "team": "Choustníkovo Hradiště",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 27.82, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 27.82,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "1",
+            "fscode": null,
+            "first_name": "Edita",
+            "last_name": "Straubeová",
+            "birth_year": null,
+            "team": "Bukovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 10
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "PDF je 1 stránka (export z XLSX) s tabulkovým layoutem; hlavička obsahuje: Číslo | Příjmení | Jméno | Družstvo | Pokus 1 | Pokus 2 | Výsledný čas | Umístění.",
+    "competition.name, competition.date a competition.place byly převzaty z horní části dokumentu ('Dubenecké stovky 2025 26.4.2025 Hradec Králové'); datum závodu bylo normalizováno na '2025-04-26'.",
+    "Text 'Hasimetr: ... 12:23' byl vyhodnocen jako čas tisku/exportu, nikoliv datum závodu.",
+    "Kategorie byla identifikována z řádku 'kategorie: Starší dorostenky'.",
+    "Disciplína byla určena z řádku 'Výsledková listina - běh na100m' → discipline=100m; řádek 'běh na 60m (100m)' byl interpretován jako obecná hlavička systému.",
+    "Časy byly převedeny z desetinné čárky na tečku; 'DNF' bylo mapováno na time=null, status='invalid'."
+  ],
+  "warnings": [
+    "FS Code v dokumentu chybí → fscode=null u všech výsledků.",
+    "Rok narození v dokumentu chybí → birth_year=null u všech výsledků.",
+    "Sloupec okres/district v dokumentu chybí → district=null u všech výsledků.",
+    "U záznamů s 'DNF' (Porkertová Veronika – pokus 2; Kumpochová Rozálie – pokus 2; Straubeová Edita – oba pokusy i výsledný čas) byly pokusy označeny jako invalid."
+  ]
+}
