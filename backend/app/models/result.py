@@ -52,7 +52,7 @@ class ResultInDB(ResultBase):
 
 class ResultAthleteDetail(BaseModel):
     competition: CompetitionInDB
-    category: str
+    category: CategoryInDB
     
     date: datetime
     team: str

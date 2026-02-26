@@ -208,13 +208,11 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
                 raise ValueError("Referenced category not found")
             cat_payload = dict(cat_doc)
             cat_payload["_id"] = str(cat_payload.get("_id"))
-            if category_name is None:
-                category_name = cat_payload.get("name")
 
         # build result payload matching ResultAthleteDetail
         result_payload = {
             "competition": comp_payload,
-            "category": category_name,
+            "category": cat_payload,
             "date": r.get("date"),
             "team": r.get("team"),
             "start_number": r.get("start_number"),

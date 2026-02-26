@@ -73,15 +73,14 @@ export default function AthleteDetailPage() {
             {results && results.length > 0 ? (
               results.map((r, idx) => (
                 <tr
-                  key={
-                    r.id ||
-                    `${r.competition?.date}-${r.competition?.place}-${idx}`
-                  }
+                  onClick={() => window.location.href = `/zavody/${r.competition._id}/vysledky/${r.category._id}#${athlete._id}`}
+                  className="athlete-results-card-row"
+                  key={idx}
                 >
                   <td>{formatDate(r.competition?.date)}</td>
                   <td>{r.competition?.name}</td>
                   <td>{r.competition?.place}</td>
-                  <td>{r.category}</td>
+                  <td>{r.category.name}</td>
                   <td>
                     {(r.final_time ? r.final_time.toFixed(2) + " s" : "") +
                       (r.final_time_status === "valid" ? "" : " NP")}

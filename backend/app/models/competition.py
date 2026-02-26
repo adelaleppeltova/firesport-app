@@ -12,7 +12,7 @@ class CompetitionCreate(CompetitionBase):
     pass   
 
 class CompetitionInDB(CompetitionBase):
-    id: str = Field(alias="_id")
+    id: str = Field(..., alias="_id")
 
     model_config = ConfigDict(
         populate_by_name=True,

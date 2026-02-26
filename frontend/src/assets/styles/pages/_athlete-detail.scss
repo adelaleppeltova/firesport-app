@@ -86,17 +86,10 @@
       border-bottom: 1px solid variables.$gray-light;
       background: white;
     }
-  }
-}
-
-.athlete-results-card-row {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  cursor: pointer;
-  transition: background 0.15s;
-  font-size: variables.$font-size-s;
-
-  &:hover {
+     tr:hover td {
     background: variables.$hover-color-light;
+    cursor: pointer;
+    }
+
   }
 }

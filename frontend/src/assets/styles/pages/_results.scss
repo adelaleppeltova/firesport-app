@@ -88,6 +88,18 @@
       background: white;
     }
   }
+
+  tr.highlight td {
+    font-weight: bold;
+  }
+
+  tr:hover td {
+    background: variables.$hover-color-light;
+  }
+
+  .results-table tbody tr {
+    cursor: pointer;
+  }
 }
 
 .results-list {

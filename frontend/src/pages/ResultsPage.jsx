@@ -1,4 +1,5 @@
-import { useParams } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useResultsByCategory, useCompetitionDetail } from "../hooks/useApi";
 
 // Pomocná funkce pro zobrazení času
@@ -10,6 +11,8 @@ function renderTime(time, status) {
 
 export default function ResultsPage() {
   const { id, categoryId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const {
     data: results,
     isLoading,
@@ -17,6 +20,22 @@ export default function ResultsPage() {
   } = useResultsByCategory(id, categoryId);
   const { data: competition, isLoading: isCompLoading } =
     useCompetitionDetail(id);
+
+  // scroll to highlighted athlete when hash present
+  useEffect(() => {
+    if (!results || results.length === 0) return;
+    const hash = location.hash;
+    if (hash) {
+      const targetId = hash.replace("#", "");
+      const row = document.getElementById(`row-${targetId}`);
+      if (row) {
+        row.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [location.hash, results]);
+
+  // compute highlight id to apply class in render
+  const highlightedId = location.hash ? location.hash.replace("#", "") : null; 
 
   if (isLoading || isCompLoading) return <div>Načítání...</div>;
   if (error) return <div>Chyba při načítání výsledků.</div>;
@@ -54,7 +73,12 @@ export default function ResultsPage() {
           <tbody>
             {results && results.length > 0 ? (
               results.map((r, idx) => (
-                <tr key={idx}>
+                <tr
+                  id={`row-${r.athlete._id}`}
+                  key={r.athlete._id}
+                  className={highlightedId === String(r.athlete._id) ? "highlight" : ""}
+                  onClick={() => navigate(`/zavodnici/${r.athlete._id}`)}
+                >
                   <td>{r.start_number ?? ""}</td>
                   <td>{r.athlete.first_name}</td>
                   <td>{r.athlete.last_name}</td>
