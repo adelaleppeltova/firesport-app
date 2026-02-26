@@ -3,6 +3,8 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
 
+from app.ml.anomaly_config import DEFAULT_CONFIG
+
 
 class AnomalyDirection(str, Enum):
     fast = "fast"
@@ -20,16 +22,17 @@ class AnomalyRunWindow(BaseModel):
     start_date: datetime
     end_date: datetime
     years: int = 3
-    min_results: int = 15
+    min_results: int = DEFAULT_CONFIG.min_results
 
 
 class AnomalyRunModel(BaseModel):
     name: str = "IsolationForest"
     params: Dict[str, Any] = Field(
         default_factory=lambda: {
-            "n_estimators": 200,
-            "contamination": 0.05,
-            "random_state": 42,
+            "n_estimators": DEFAULT_CONFIG.n_estimators,
+            "contamination": DEFAULT_CONFIG.contamination,
+            "random_state": DEFAULT_CONFIG.random_state,
+            "eps_std": DEFAULT_CONFIG.eps_std,
         }
     )
     feature: str = "final_time"
@@ -57,6 +60,14 @@ class AnomalyRunBase(BaseModel):
     summary: AnomalyRunSummary
 
 
+class SkipReasonCounts(BaseModel):
+    """Structured skip-reason counters for observability."""
+    not_enough_data: int = 0
+    not_enough_data_after_cleaning: int = 0
+    low_variance: int = 0
+    no_valid_results: int = 0
+
+
 class RecomputeResponse(BaseModel):
     """Response model for ML recomputation endpoint."""
     window_start: datetime
@@ -67,6 +78,13 @@ class RecomputeResponse(BaseModel):
     skipped: int
     failed: int
     scores_inserted: int
+    # --- new fields (backward-compatible additions) ---
+    min_results_used: int = DEFAULT_CONFIG.min_results
+    contamination_used: float = DEFAULT_CONFIG.contamination
+    eps_std_used: float = DEFAULT_CONFIG.eps_std
+    n_estimators_used: int = DEFAULT_CONFIG.n_estimators
+    random_state_used: int = DEFAULT_CONFIG.random_state
+    skip_reason_counts: SkipReasonCounts = Field(default_factory=SkipReasonCounts)
 
 
 # API Response Models

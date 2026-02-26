@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict, field_serializer
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class CategoryBase(BaseModel):

@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict, field_serializer
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from enum import Enum
 
@@ -27,7 +27,7 @@ class ResultBase(BaseModel):
 
     start_number: Optional[int] = None
 
-    times: list[TimeAttempt] = []
+    times: list[TimeAttempt] = Field(default_factory=list)
 
     time_1: Optional[float] = None
     time_1_status: TimeStatus
@@ -59,7 +59,7 @@ class ResultAthleteDetail(BaseModel):
 
     start_number: Optional[int] = None
 
-    times: list[TimeAttempt] = []
+    times: list[TimeAttempt] = Field(default_factory=list)
 
     final_time: Optional[float] = None
     final_time_status: TimeStatus

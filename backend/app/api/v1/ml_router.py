@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends
 from dateutil.relativedelta import relativedelta
 
 from app.db.database import get_db
-from app.models.anomaly import RecomputeResponse
+from app.models.anomaly import RecomputeResponse, SkipReasonCounts
 from app.services.anomaly_service import recompute_for_all_athletes
 
 
@@ -46,4 +46,13 @@ async def recompute_anomalies(db=Depends(get_db)):
         "skipped": counters["skipped"],
         "failed": counters["failed"],
         "scores_inserted": counters["scores_inserted"],
+        # new config echo fields
+        "min_results_used": counters["min_results_used"],
+        "contamination_used": counters["contamination_used"],
+        "eps_std_used": counters["eps_std_used"],
+        "n_estimators_used": counters["n_estimators_used"],
+        "random_state_used": counters["random_state_used"],
+        "skip_reason_counts": SkipReasonCounts(
+            **counters.get("skip_reason_counts", {}),
+        ),
     }

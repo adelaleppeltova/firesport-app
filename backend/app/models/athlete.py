@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict, field_serializer
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from enum import Enum
 
@@ -67,10 +67,6 @@ class AthleteDetail(AthleteInDB):
     """
     category: Optional[str] = None
     best_time: Optional[float] = None
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
 
 class AthletesSearch(BaseModel):
     items: List[AthleteInDB]
