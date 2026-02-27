@@ -30,3 +30,10 @@ class CompetitionCategorySummary(BaseModel):
 class CompetitionDetail(CompetitionInDB):
     categories: List[CompetitionCategorySummary]
     athlete_count: int
+
+class CompetitionsPage(BaseModel):
+    """Stránkovaný seznam soutěží s vyhledáváním."""
+    items: List[CompetitionInDB]
+    total: int
+    page: int
+    page_size: int

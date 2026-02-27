@@ -25,15 +25,35 @@ async def list_athletes_service(
     """Vrátí stránkovaný seznam atletů s volitelným vyhledáváním."""
     query: Dict[str, Any] = {}
     if search and search.strip():
-        q = search.strip()
-        or_conditions: list = [
-            {"first_name": {"$regex": q, "$options": "i"}},
-            {"last_name": {"$regex": q, "$options": "i"}},
-            {"teams": {"$elemMatch": {"$regex": q, "$options": "i"}}},
-        ]
-        if q.isdigit():
-            or_conditions.append({"birth_year": int(q)})
-        query["$or"] = or_conditions
+        raw = search.strip()
+        # Rozděl na klíčová slova podle mezer, ale zachovej data (např. "2024-01-15") jako celek
+        import re
+        tokens = re.findall(r'\d{4}[-/.]\d{2}[-/.]\d{2}|\S+', raw)
+
+        if len(tokens) > 1:
+            # Víc klíčových slov → každé musí matchnout alespoň jedno pole (AND logika)
+            and_conditions = []
+            for token in tokens:
+                or_cond: list = [
+                    {"first_name": {"$regex": token, "$options": "i"}},
+                    {"last_name": {"$regex": token, "$options": "i"}},
+                    {"teams": {"$elemMatch": {"$regex": token, "$options": "i"}}},
+                ]
+                if token.isdigit():
+                    or_cond.append({"birth_year": int(token)})
+                and_conditions.append({"$or": or_cond})
+            query["$and"] = and_conditions
+        else:
+            # Jedno klíčové slovo → původní OR logika
+            q = tokens[0]
+            or_conditions: list = [
+                {"first_name": {"$regex": q, "$options": "i"}},
+                {"last_name": {"$regex": q, "$options": "i"}},
+                {"teams": {"$elemMatch": {"$regex": q, "$options": "i"}}},
+            ]
+            if q.isdigit():
+                or_conditions.append({"birth_year": int(q)})
+            query["$or"] = or_conditions
 
     total = await athletes_collection.count_documents(query)
     skip = (page - 1) * page_size

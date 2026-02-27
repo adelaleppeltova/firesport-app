@@ -91,14 +91,35 @@ export function useAthleteDetail(id) {
   });
 }
 
-// GET /competitions
-export function useCompetitions() {
+// GET /competitions (paginated + search + sort)
+export function useCompetitions({
+  search = "",
+  page = 1,
+  pageSize = 25,
+  sortKey = "date",
+  sortDir = "desc",
+} = {}) {
   return useQuery({
-    queryKey: ["competitions"],
+    queryKey: [
+      "competitions",
+      "list",
+      search,
+      page,
+      pageSize,
+      sortKey,
+      sortDir,
+    ],
     queryFn: async () => {
-      const { data } = await api.get("/v1/competitions");
+      const params = new URLSearchParams();
+      if (search) params.set("q", search);
+      params.set("page", String(page));
+      params.set("page_size", String(pageSize));
+      params.set("sort_key", sortKey);
+      params.set("sort_dir", sortDir);
+      const { data } = await api.get(`/v1/competitions?${params.toString()}`);
       return data;
     },
+    keepPreviousData: true,
   });
 }
 
