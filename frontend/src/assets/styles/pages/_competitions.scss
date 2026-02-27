@@ -35,6 +35,19 @@
       font-weight: variables.$font-weight-semibold;
       border-bottom: 2px solid variables.$color-background-dark;
     }
+    .sortable-th {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      i {
+        margin-left: 0.4rem;
+        font-size: 0.85em;
+        opacity: 0.5;
+      }
+      &:hover i {
+        opacity: 1;
+      }
+    }
     tr {
       transition: background 0.15s;
       cursor: pointer;
