@@ -55,7 +55,7 @@ class DataImporter:
     def _normalize_team_name(value: str) -> str:
         """Převede název týmu tak, aby každé slovo mělo první písmeno velké (např. 'dolní lhota' -> 'Dolní Lhota').
         Zkratka 'HZS' zůstává velkými písmeny (např. 'hzs královéhradeckého kraje' -> 'HZS Královéhradeckého Kraje')."""
-        KEEP_UPPER = {"hzs", "vhj", "čhj"}
+        KEEP_UPPER = {"hzs", "vhj", "čhj", "ps"}
         stripped = value.strip()
         if not stripped:
             return stripped

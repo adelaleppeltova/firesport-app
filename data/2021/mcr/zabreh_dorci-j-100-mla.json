@@ -209,7 +209,7 @@
             "first_name": "Daniel",
             "last_name": "Adámek",
             "birth_year": null,
-            "team": "Rokytnice",
+            "team": "Rokytnice-Vsetín",
             "district": null,
             "times": [
               {
@@ -322,30 +322,6 @@
             "final_time": 28.33,
             "final_status": "valid",
             "rank": 13
-          },
-          {
-            "start_number": "8",
-            "fscode": null,
-            "first_name": "xxx",
-            "last_name": "xxx",
-            "birth_year": null,
-            "team": "Pha",
-            "district": null,
-            "times": [
-              {
-                "try": 1,
-                "time": null,
-                "status": "invalid"
-              },
-              {
-                "try": 2,
-                "time": null,
-                "status": "invalid"
-              }
-            ],
-            "final_time": null,
-            "final_status": "invalid",
-            "rank": 14
           }
         ]
       }

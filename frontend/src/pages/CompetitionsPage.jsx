@@ -9,13 +9,24 @@ export default function CompetitionsPage() {
 
   const PAGE_SIZE = 25;
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("");
   const comps = competitions || [];
-  const pageCount = Math.ceil(comps.length / PAGE_SIZE);
-  const paginated = comps.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const filtered = comps.filter((comp) => {
+    if (!query.trim()) return true;
+    const q = query.toLowerCase();
+    const name = (comp.name || "").toLowerCase();
+    const place = (comp.place || "").toLowerCase();
+    const date = comp.date
+      ? new Date(comp.date).toLocaleDateString("cs-CZ")
+      : "";
+    return name.includes(q) || place.includes(q) || date.includes(q);
+  });
+  const pageCount = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   useEffect(() => {
     setPage(1);
-  }, [competitions]);
+  }, [competitions, query]);
 
   if (isLoading) return <div className="competitions-page">Načítání...</div>;
   if (error)
@@ -30,7 +41,8 @@ export default function CompetitionsPage() {
             className="competitions-searchbar"
             type="text"
             placeholder="Hledat název, místo nebo datum..."
-            disabled
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
           <i className="fa-solid fa-magnifying-glass competitions-searchbar-icon" />
         </div>

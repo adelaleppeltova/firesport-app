@@ -1,0 +1,2384 @@
+{
+  "source_file": "pardubice-hzs_mcr_2022.pdf",
+  "generated_at": "2026-02-27T00:00:00Z",
+  "competition": {
+    "name": "MČR v PS",
+    "place": "Pardubice",
+    "date": "2022-08-27",
+    "league": "MČR v PS",
+    "categories": [
+      {
+        "name": "Muži",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "51",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "VYVIAL",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 16.09, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 16.09,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "58",
+            "fscode": null,
+            "first_name": "Daniel",
+            "last_name": "KLVAŇA",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 16.1, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 16.1,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "53",
+            "fscode": null,
+            "first_name": "Richard",
+            "last_name": "SVAČINA",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 16.59, "status": "valid" },
+              { "try": 2, "time": 16.13, "status": "valid" }
+            ],
+            "final_time": 16.13,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "72",
+            "fscode": null,
+            "first_name": "Vojtěch",
+            "last_name": "KLENKA",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.83, "status": "valid" },
+              { "try": 2, "time": 16.26, "status": "valid" }
+            ],
+            "final_time": 16.26,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "75",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "ŠKODNÝ",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.34, "status": "valid" },
+              { "try": 2, "time": 16.28, "status": "valid" }
+            ],
+            "final_time": 16.28,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "57",
+            "fscode": null,
+            "first_name": "Pavel",
+            "last_name": "KRPEC",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 16.36, "status": "valid" },
+              { "try": 2, "time": 42.0, "status": "valid" }
+            ],
+            "final_time": 16.36,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "77",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "LIDMILA",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 16.45, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 16.45,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "70",
+            "fscode": null,
+            "first_name": "Milan",
+            "last_name": "NETRVAL",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 16.59, "status": "valid" },
+              { "try": 2, "time": 25.67, "status": "valid" }
+            ],
+            "final_time": 16.59,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "94",
+            "fscode": null,
+            "first_name": "Radek",
+            "last_name": "CHMELA",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 16.98, "status": "valid" },
+              { "try": 2, "time": 16.62, "status": "valid" }
+            ],
+            "final_time": 16.62,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "71",
+            "fscode": null,
+            "first_name": "Václav",
+            "last_name": "DIVOŠ",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.11, "status": "valid" },
+              { "try": 2, "time": 16.88, "status": "valid" }
+            ],
+            "final_time": 16.88,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "28",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "KASAL",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.17, "status": "valid" },
+              { "try": 2, "time": 16.89, "status": "valid" }
+            ],
+            "final_time": 16.89,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "69",
+            "fscode": null,
+            "first_name": "David",
+            "last_name": "DOPIRÁK",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.06, "status": "valid" },
+              { "try": 2, "time": 16.89, "status": "valid" }
+            ],
+            "final_time": 16.89,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "141",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "PAULÍČEK",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.95, "status": "valid" },
+              { "try": 2, "time": 17.08, "status": "valid" }
+            ],
+            "final_time": 17.08,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "99",
+            "fscode": null,
+            "first_name": "Radek",
+            "last_name": "ŠUBA",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.14, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.14,
+            "final_status": "valid",
+            "rank": 14
+          },
+          {
+            "start_number": "107",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "VYHNÁNEK",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.57, "status": "valid" },
+              { "try": 2, "time": 17.15, "status": "valid" }
+            ],
+            "final_time": 17.15,
+            "final_status": "valid",
+            "rank": 15
+          },
+          {
+            "start_number": "63",
+            "fscode": null,
+            "first_name": "Patrik",
+            "last_name": "SNÁŠEL",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.9, "status": "valid" },
+              { "try": 2, "time": 17.22, "status": "valid" }
+            ],
+            "final_time": 17.22,
+            "final_status": "valid",
+            "rank": 16
+          },
+          {
+            "start_number": "74",
+            "fscode": null,
+            "first_name": "Petr",
+            "last_name": "MAŘAN",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.28, "status": "valid" },
+              { "try": 2, "time": 21.63, "status": "valid" }
+            ],
+            "final_time": 17.28,
+            "final_status": "valid",
+            "rank": 17
+          },
+          {
+            "start_number": "61",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "ŠVÁB",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.32, "status": "valid" },
+              { "try": 2, "time": 25.14, "status": "valid" }
+            ],
+            "final_time": 17.32,
+            "final_status": "valid",
+            "rank": 18
+          },
+          {
+            "start_number": "93",
+            "fscode": null,
+            "first_name": "Lukáš",
+            "last_name": "FIURÁŠEK",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.12, "status": "valid" },
+              { "try": 2, "time": 17.33, "status": "valid" }
+            ],
+            "final_time": 17.33,
+            "final_status": "valid",
+            "rank": 19
+          },
+          {
+            "start_number": "68",
+            "fscode": null,
+            "first_name": "Jindřich",
+            "last_name": "HARASIMOVIČ",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.06, "status": "valid" },
+              { "try": 2, "time": 17.34, "status": "valid" }
+            ],
+            "final_time": 17.34,
+            "final_status": "valid",
+            "rank": 20
+          },
+          {
+            "start_number": "76",
+            "fscode": null,
+            "first_name": "Dominik",
+            "last_name": "BĚLSKÝ",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.34, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.34,
+            "final_status": "valid",
+            "rank": 21
+          },
+          {
+            "start_number": "25",
+            "fscode": null,
+            "first_name": "Dominik",
+            "last_name": "ŠEVČÍK",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.37, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.37,
+            "final_status": "valid",
+            "rank": 22
+          },
+          {
+            "start_number": "60",
+            "fscode": null,
+            "first_name": "Maxmilián",
+            "last_name": "ROKOSZ",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.39, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.39,
+            "final_status": "valid",
+            "rank": 23
+          },
+          {
+            "start_number": "26",
+            "fscode": null,
+            "first_name": "Radek",
+            "last_name": "NECHVÁTAL",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.41, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.41,
+            "final_status": "valid",
+            "rank": 24
+          },
+          {
+            "start_number": "55",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "DROBISZ",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 17.41, "status": "valid" }
+            ],
+            "final_time": 17.41,
+            "final_status": "valid",
+            "rank": 24
+          },
+          {
+            "start_number": "59",
+            "fscode": null,
+            "first_name": "David",
+            "last_name": "STANĚK",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 17.41, "status": "valid" }
+            ],
+            "final_time": 17.41,
+            "final_status": "valid",
+            "rank": 24
+          },
+          {
+            "start_number": "3",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "ZAJAN",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.06, "status": "valid" },
+              { "try": 2, "time": 17.52, "status": "valid" }
+            ],
+            "final_time": 17.52,
+            "final_status": "valid",
+            "rank": 27
+          },
+          {
+            "start_number": "30",
+            "fscode": null,
+            "first_name": "Lukáš",
+            "last_name": "HONS",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 17.53, "status": "valid" }
+            ],
+            "final_time": 17.53,
+            "final_status": "valid",
+            "rank": 28
+          },
+          {
+            "start_number": "95",
+            "fscode": null,
+            "first_name": "Petr",
+            "last_name": "KORÁBEČNÝ",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.53, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.53,
+            "final_status": "valid",
+            "rank": 28
+          },
+          {
+            "start_number": "23",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "CAHA",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.99, "status": "valid" },
+              { "try": 2, "time": 17.54, "status": "valid" }
+            ],
+            "final_time": 17.54,
+            "final_status": "valid",
+            "rank": 30
+          },
+          {
+            "start_number": "143",
+            "fscode": null,
+            "first_name": "Lukáš",
+            "last_name": "FLACH",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.56, "status": "valid" },
+              { "try": 2, "time": 24.01, "status": "valid" }
+            ],
+            "final_time": 17.56,
+            "final_status": "valid",
+            "rank": 31
+          },
+          {
+            "start_number": "109",
+            "fscode": null,
+            "first_name": "Bojislav",
+            "last_name": "SENOHRÁBEK",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.62, "status": "valid" },
+              { "try": 2, "time": 17.78, "status": "valid" }
+            ],
+            "final_time": 17.62,
+            "final_status": "valid",
+            "rank": 32
+          },
+          {
+            "start_number": "108",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "VIKTORA",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.92, "status": "valid" },
+              { "try": 2, "time": 17.66, "status": "valid" }
+            ],
+            "final_time": 17.66,
+            "final_status": "valid",
+            "rank": 33
+          },
+          {
+            "start_number": "149",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "VOLEJNÍK",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.85, "status": "valid" },
+              { "try": 2, "time": 17.67, "status": "valid" }
+            ],
+            "final_time": 17.67,
+            "final_status": "valid",
+            "rank": 34
+          },
+          {
+            "start_number": "80",
+            "fscode": null,
+            "first_name": "Miroslav",
+            "last_name": "MAREČEK",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.67, "status": "valid" },
+              { "try": 2, "time": 23.2, "status": "valid" }
+            ],
+            "final_time": 17.67,
+            "final_status": "valid",
+            "rank": 35
+          },
+          {
+            "start_number": "50",
+            "fscode": null,
+            "first_name": "David",
+            "last_name": "VÖLFEL",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.7, "status": "valid" },
+              { "try": 2, "time": 21.09, "status": "valid" }
+            ],
+            "final_time": 17.7,
+            "final_status": "valid",
+            "rank": 36
+          },
+          {
+            "start_number": "4",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "ČERMÁK",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.73, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.73,
+            "final_status": "valid",
+            "rank": 37
+          },
+          {
+            "start_number": "22",
+            "fscode": null,
+            "first_name": "Pavel",
+            "last_name": "HNÍZDIL",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.75, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.75,
+            "final_status": "valid",
+            "rank": 38
+          },
+          {
+            "start_number": "112",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "GÁŠEK",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.78, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.78,
+            "final_status": "valid",
+            "rank": 39
+          },
+          {
+            "start_number": "44",
+            "fscode": null,
+            "first_name": "David",
+            "last_name": "HÁJEK",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.24, "status": "valid" },
+              { "try": 2, "time": 17.82, "status": "valid" }
+            ],
+            "final_time": 17.82,
+            "final_status": "valid",
+            "rank": 40
+          },
+          {
+            "start_number": "104",
+            "fscode": null,
+            "first_name": "Miloš",
+            "last_name": "JEŽEK",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.83, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.83,
+            "final_status": "valid",
+            "rank": 41
+          },
+          {
+            "start_number": "86",
+            "fscode": null,
+            "first_name": "Filip",
+            "last_name": "HALTUF",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.84, "status": "valid" },
+              { "try": 2, "time": 20.66, "status": "valid" }
+            ],
+            "final_time": 17.84,
+            "final_status": "valid",
+            "rank": 42
+          },
+          {
+            "start_number": "49",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "NÝDL",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.11, "status": "valid" },
+              { "try": 2, "time": 17.86, "status": "valid" }
+            ],
+            "final_time": 17.86,
+            "final_status": "valid",
+            "rank": 43
+          },
+          {
+            "start_number": "64",
+            "fscode": null,
+            "first_name": "Jaroslav",
+            "last_name": "HRDLIČKA",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.32, "status": "valid" },
+              { "try": 2, "time": 17.88, "status": "valid" }
+            ],
+            "final_time": 17.88,
+            "final_status": "valid",
+            "rank": 44
+          },
+          {
+            "start_number": "97",
+            "fscode": null,
+            "first_name": "Luděk",
+            "last_name": "OTÝPKA",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 17.9, "status": "valid" }
+            ],
+            "final_time": 17.9,
+            "final_status": "valid",
+            "rank": 45
+          },
+          {
+            "start_number": "5",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "DANĚK",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 17.91, "status": "valid" }
+            ],
+            "final_time": 17.91,
+            "final_status": "valid",
+            "rank": 46
+          },
+          {
+            "start_number": "96",
+            "fscode": null,
+            "first_name": "Petr",
+            "last_name": "KYNĚRA",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.91, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.91,
+            "final_status": "valid",
+            "rank": 46
+          },
+          {
+            "start_number": "42",
+            "fscode": null,
+            "first_name": "Ivan",
+            "last_name": "PĚNČA",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.93, "status": "valid" },
+              { "try": 2, "time": 20.09, "status": "valid" }
+            ],
+            "final_time": 17.93,
+            "final_status": "valid",
+            "rank": 48
+          },
+          {
+            "start_number": "73",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "WEINDIGER",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.94, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 17.94,
+            "final_status": "valid",
+            "rank": 49
+          },
+          {
+            "start_number": "1",
+            "fscode": null,
+            "first_name": "Marek",
+            "last_name": "ŠVEC",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.27, "status": "valid" },
+              { "try": 2, "time": 18.0, "status": "valid" }
+            ],
+            "final_time": 18.0,
+            "final_status": "valid",
+            "rank": 50
+          },
+          {
+            "start_number": "17",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "BŘENEK",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.08, "status": "valid" },
+              { "try": 2, "time": 30.3, "status": "valid" }
+            ],
+            "final_time": 18.08,
+            "final_status": "valid",
+            "rank": 51
+          },
+          {
+            "start_number": "91",
+            "fscode": null,
+            "first_name": "Adam",
+            "last_name": "BARTOŇ",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.14, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.14,
+            "final_status": "valid",
+            "rank": 52
+          },
+          {
+            "start_number": "84",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "LAMPA",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.22, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.22,
+            "final_status": "valid",
+            "rank": 53
+          },
+          {
+            "start_number": "145",
+            "fscode": null,
+            "first_name": "Matouš",
+            "last_name": "HRDINA",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.22, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.22,
+            "final_status": "valid",
+            "rank": 53
+          },
+          {
+            "start_number": "106",
+            "fscode": null,
+            "first_name": "Pavel",
+            "last_name": "MAŇAS",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.25, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.25,
+            "final_status": "valid",
+            "rank": 55
+          },
+          {
+            "start_number": "18",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "FRYČ",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.27, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.27,
+            "final_status": "valid",
+            "rank": 56
+          },
+          {
+            "start_number": "46",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "PÍBAL",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.32, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.32,
+            "final_status": "valid",
+            "rank": 57
+          },
+          {
+            "start_number": "110",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "ZÁRUBA",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.86, "status": "valid" },
+              { "try": 2, "time": 18.38, "status": "valid" }
+            ],
+            "final_time": 18.38,
+            "final_status": "valid",
+            "rank": 58
+          },
+          {
+            "start_number": "111",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "SKALKA",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.4, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.4,
+            "final_status": "valid",
+            "rank": 59
+          },
+          {
+            "start_number": "45",
+            "fscode": null,
+            "first_name": "Vojtěch",
+            "last_name": "BAŠTA",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.49, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.49,
+            "final_status": "valid",
+            "rank": 60
+          },
+          {
+            "start_number": "115",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "KOŇAŘÍK",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.31, "status": "valid" },
+              { "try": 2, "time": 18.52, "status": "valid" }
+            ],
+            "final_time": 18.52,
+            "final_status": "valid",
+            "rank": 61
+          },
+          {
+            "start_number": "66",
+            "fscode": null,
+            "first_name": "Vlastimil",
+            "last_name": "ŽÁK",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.53, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.53,
+            "final_status": "valid",
+            "rank": 62
+          },
+          {
+            "start_number": "16",
+            "fscode": null,
+            "first_name": "Patrik",
+            "last_name": "NĚMEC",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.56, "status": "valid" },
+              { "try": 2, "time": 19.56, "status": "valid" }
+            ],
+            "final_time": 18.56,
+            "final_status": "valid",
+            "rank": 63
+          },
+          {
+            "start_number": "119",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "KUBĚNA",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.62, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.62,
+            "final_status": "valid",
+            "rank": 64
+          },
+          {
+            "start_number": "131",
+            "fscode": null,
+            "first_name": "David",
+            "last_name": "SOMOL",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.12, "status": "valid" },
+              { "try": 2, "time": 18.63, "status": "valid" }
+            ],
+            "final_time": 18.63,
+            "final_status": "valid",
+            "rank": 65
+          },
+          {
+            "start_number": "12",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "RADIMĚŘSKÝ",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.16, "status": "valid" },
+              { "try": 2, "time": 18.69, "status": "valid" }
+            ],
+            "final_time": 18.69,
+            "final_status": "valid",
+            "rank": 66
+          },
+          {
+            "start_number": "83",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "ŽILÍK",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 23.45, "status": "valid" },
+              { "try": 2, "time": 18.7, "status": "valid" }
+            ],
+            "final_time": 18.7,
+            "final_status": "valid",
+            "rank": 67
+          },
+          {
+            "start_number": "13",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "PLÍHAL",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.79, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.79,
+            "final_status": "valid",
+            "rank": 68
+          },
+          {
+            "start_number": "82",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "KOZÁK",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.8, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.8,
+            "final_status": "valid",
+            "rank": 69
+          },
+          {
+            "start_number": "47",
+            "fscode": null,
+            "first_name": "Radim",
+            "last_name": "KNOTEK",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 18.84, "status": "valid" }
+            ],
+            "final_time": 18.84,
+            "final_status": "valid",
+            "rank": 70
+          },
+          {
+            "start_number": "137",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "FINDA",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.84, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 18.84,
+            "final_status": "valid",
+            "rank": 70
+          },
+          {
+            "start_number": "56",
+            "fscode": null,
+            "first_name": "Aleš",
+            "last_name": "MASNÝ",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 19.02, "status": "valid" }
+            ],
+            "final_time": 19.02,
+            "final_status": "valid",
+            "rank": 72
+          },
+          {
+            "start_number": "85",
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "CHARVÁT",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.95, "status": "valid" },
+              { "try": 2, "time": 19.23, "status": "valid" }
+            ],
+            "final_time": 19.23,
+            "final_status": "valid",
+            "rank": 73
+          },
+          {
+            "start_number": "48",
+            "fscode": null,
+            "first_name": "Juraj",
+            "last_name": "HASÍK",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.24, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.24,
+            "final_status": "valid",
+            "rank": 74
+          },
+          {
+            "start_number": "147",
+            "fscode": null,
+            "first_name": "Patrik",
+            "last_name": "BĚLSKÝ",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.25, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.25,
+            "final_status": "valid",
+            "rank": 75
+          },
+          {
+            "start_number": "136",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "LUPÍNEK",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 19.34, "status": "valid" }
+            ],
+            "final_time": 19.34,
+            "final_status": "valid",
+            "rank": 76
+          },
+          {
+            "start_number": "87",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "KVAPIL",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.08, "status": "valid" },
+              { "try": 2, "time": 19.35, "status": "valid" }
+            ],
+            "final_time": 19.35,
+            "final_status": "valid",
+            "rank": 77
+          },
+          {
+            "start_number": "105",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "MARTÍNEK",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.66, "status": "valid" },
+              { "try": 2, "time": 19.37, "status": "valid" }
+            ],
+            "final_time": 19.37,
+            "final_status": "valid",
+            "rank": 78
+          },
+          {
+            "start_number": "67",
+            "fscode": null,
+            "first_name": "Marin",
+            "last_name": "ROHÁČ",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.62, "status": "valid" },
+              { "try": 2, "time": 19.38, "status": "valid" }
+            ],
+            "final_time": 19.38,
+            "final_status": "valid",
+            "rank": 79
+          },
+          {
+            "start_number": "121",
+            "fscode": null,
+            "first_name": "Patrik",
+            "last_name": "ŽIŽKA",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.38, "status": "valid" },
+              { "try": 2, "time": 25.0, "status": "valid" }
+            ],
+            "final_time": 19.38,
+            "final_status": "valid",
+            "rank": 80
+          },
+          {
+            "start_number": "92",
+            "fscode": null,
+            "first_name": "Václav",
+            "last_name": "BLAŽEK",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.48, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.48,
+            "final_status": "valid",
+            "rank": 81
+          },
+          {
+            "start_number": "139",
+            "fscode": null,
+            "first_name": "Aleš",
+            "last_name": "RYBÁŘ",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.8, "status": "valid" },
+              { "try": 2, "time": 19.51, "status": "valid" }
+            ],
+            "final_time": 19.51,
+            "final_status": "valid",
+            "rank": 82
+          },
+          {
+            "start_number": "113",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "BRODACKÝ",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.6, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.6,
+            "final_status": "valid",
+            "rank": 83
+          },
+          {
+            "start_number": "36",
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "BUCHTA",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.63, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.63,
+            "final_status": "valid",
+            "rank": 84
+          },
+          {
+            "start_number": "32",
+            "fscode": null,
+            "first_name": "Jaroslav",
+            "last_name": "ŽITNÝ",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.69, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.69,
+            "final_status": "valid",
+            "rank": 85
+          },
+          {
+            "start_number": "117",
+            "fscode": null,
+            "first_name": "Zdeněk",
+            "last_name": "GUT",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.73, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.73,
+            "final_status": "valid",
+            "rank": 86
+          },
+          {
+            "start_number": "142",
+            "fscode": null,
+            "first_name": "František",
+            "last_name": "KUCHTA",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.87, "status": "valid" },
+              { "try": 2, "time": 24.49, "status": "valid" }
+            ],
+            "final_time": 19.87,
+            "final_status": "valid",
+            "rank": 87
+          },
+          {
+            "start_number": "38",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "KLIMECKÝ",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.9, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.9,
+            "final_status": "valid",
+            "rank": 88
+          },
+          {
+            "start_number": "6",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "ŠEVC",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.92, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.92,
+            "final_status": "valid",
+            "rank": 89
+          },
+          {
+            "start_number": "134",
+            "fscode": null,
+            "first_name": "Štěpán",
+            "last_name": "PECHMAN",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.61, "status": "valid" },
+              { "try": 2, "time": 19.93, "status": "valid" }
+            ],
+            "final_time": 19.93,
+            "final_status": "valid",
+            "rank": 90
+          },
+          {
+            "start_number": "9",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "JOUJA",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.95, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.95,
+            "final_status": "valid",
+            "rank": 91
+          },
+          {
+            "start_number": "126",
+            "fscode": null,
+            "first_name": "Marek",
+            "last_name": "VÁŇA",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.99, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 19.99,
+            "final_status": "valid",
+            "rank": 92
+          },
+          {
+            "start_number": "124",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "KRBEC",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.01, "status": "valid" },
+              { "try": 2, "time": 20.12, "status": "valid" }
+            ],
+            "final_time": 20.01,
+            "final_status": "valid",
+            "rank": 93
+          },
+          {
+            "start_number": "39",
+            "fscode": null,
+            "first_name": "Petr",
+            "last_name": "ŠROMOTA",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.28, "status": "valid" },
+              { "try": 2, "time": 20.05, "status": "valid" }
+            ],
+            "final_time": 20.05,
+            "final_status": "valid",
+            "rank": 94
+          },
+          {
+            "start_number": "33",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "MAREŠ",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.13, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 20.13,
+            "final_status": "valid",
+            "rank": 95
+          },
+          {
+            "start_number": "10",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "MACOUN",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.56, "status": "valid" },
+              { "try": 2, "time": 20.3, "status": "valid" }
+            ],
+            "final_time": 20.3,
+            "final_status": "valid",
+            "rank": 96
+          },
+          {
+            "start_number": "144",
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "KOZEL",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.3, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 20.3,
+            "final_status": "valid",
+            "rank": 97
+          },
+          {
+            "start_number": "146",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "DUŠEK",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.37, "status": "valid" },
+              { "try": 2, "time": 21.86, "status": "valid" }
+            ],
+            "final_time": 20.37,
+            "final_status": "valid",
+            "rank": 98
+          },
+          {
+            "start_number": "2",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "ŠÍDA",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.13, "status": "valid" },
+              { "try": 2, "time": 20.39, "status": "valid" }
+            ],
+            "final_time": 20.39,
+            "final_status": "valid",
+            "rank": 99
+          },
+          {
+            "start_number": "89",
+            "fscode": null,
+            "first_name": "Vojtěch",
+            "last_name": "MALEC",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.9, "status": "valid" },
+              { "try": 2, "time": 20.62, "status": "valid" }
+            ],
+            "final_time": 20.62,
+            "final_status": "valid",
+            "rank": 100
+          },
+          {
+            "start_number": "34",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "BARVENÍČEK",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.69, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 20.69,
+            "final_status": "valid",
+            "rank": 101
+          },
+          {
+            "start_number": "127",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "KYNCL",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.7, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 20.7,
+            "final_status": "valid",
+            "rank": 102
+          },
+          {
+            "start_number": "15",
+            "fscode": null,
+            "first_name": "Vojtěch",
+            "last_name": "HLADIL",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.75, "status": "valid" },
+              { "try": 2, "time": 25.21, "status": "valid" }
+            ],
+            "final_time": 20.75,
+            "final_status": "valid",
+            "rank": 103
+          },
+          {
+            "start_number": "125",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "TESAŘ",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 21.22, "status": "valid" }
+            ],
+            "final_time": 21.22,
+            "final_status": "valid",
+            "rank": 104
+          },
+          {
+            "start_number": "135",
+            "fscode": null,
+            "first_name": "Václav",
+            "last_name": "ŠEINER",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.31, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 21.31,
+            "final_status": "valid",
+            "rank": 105
+          },
+          {
+            "start_number": "129",
+            "fscode": null,
+            "first_name": "David",
+            "last_name": "HERMAN",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.79, "status": "valid" },
+              { "try": 2, "time": 21.41, "status": "valid" }
+            ],
+            "final_time": 21.41,
+            "final_status": "valid",
+            "rank": 106
+          },
+          {
+            "start_number": "116",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "HORÁK",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 25.94, "status": "valid" },
+              { "try": 2, "time": 21.62, "status": "valid" }
+            ],
+            "final_time": 21.62,
+            "final_status": "valid",
+            "rank": 107
+          },
+          {
+            "start_number": "128",
+            "fscode": null,
+            "first_name": "Petr",
+            "last_name": "PUPÁK",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.98, "status": "valid" },
+              { "try": 2, "time": 22.33, "status": "valid" }
+            ],
+            "final_time": 21.98,
+            "final_status": "valid",
+            "rank": 108
+          },
+          {
+            "start_number": "140",
+            "fscode": null,
+            "first_name": "Gustav",
+            "last_name": "SEIFERT",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 22.12, "status": "valid" }
+            ],
+            "final_time": 22.12,
+            "final_status": "valid",
+            "rank": 109
+          },
+          {
+            "start_number": "81",
+            "fscode": null,
+            "first_name": "Matěj",
+            "last_name": "MASNÝ",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 22.33, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 22.33,
+            "final_status": "valid",
+            "rank": 110
+          },
+          {
+            "start_number": "35",
+            "fscode": null,
+            "first_name": "Roman",
+            "last_name": "ČÁSTEČKA",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 24.25, "status": "valid" },
+              { "try": 2, "time": 22.8, "status": "valid" }
+            ],
+            "final_time": 22.8,
+            "final_status": "valid",
+            "rank": 111
+          },
+          {
+            "start_number": "31",
+            "fscode": null,
+            "first_name": "Zbyněk",
+            "last_name": "HRADIL",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 23.11, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 23.11,
+            "final_status": "valid",
+            "rank": 112
+          },
+          {
+            "start_number": "14",
+            "fscode": null,
+            "first_name": "Jaroslav",
+            "last_name": "ZOUHAR",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 32.65, "status": "valid" },
+              { "try": 2, "time": 24.25, "status": "valid" }
+            ],
+            "final_time": 24.25,
+            "final_status": "valid",
+            "rank": 113
+          },
+          {
+            "start_number": "11",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "POKRUTA",
+            "birth_year": null,
+            "team": "HZS Jihomoravského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 25.49, "status": "valid" }
+            ],
+            "final_time": 25.49,
+            "final_status": "valid",
+            "rank": 114
+          },
+          {
+            "start_number": "118",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "MARTINEK",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 35.57, "status": "valid" },
+              { "try": 2, "time": 26.21, "status": "valid" }
+            ],
+            "final_time": 26.21,
+            "final_status": "valid",
+            "rank": 115
+          },
+
+          {
+            "start_number": "7",
+            "fscode": null,
+            "first_name": "Marián",
+            "last_name": "FRANCÚZ",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "8",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "NOVÁK",
+            "birth_year": null,
+            "team": "HZS hlavního města Prahy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "21",
+            "fscode": null,
+            "first_name": "Vladimír",
+            "last_name": "JANKO",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "24",
+            "fscode": null,
+            "first_name": "Marek",
+            "last_name": "PEŠTÁL",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "27",
+            "fscode": null,
+            "first_name": "Stanislav",
+            "last_name": "HLADÍK",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "29",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "ŠPAČEK",
+            "birth_year": null,
+            "team": "HZS kraje Vysočina",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "37",
+            "fscode": null,
+            "first_name": "Ladislav",
+            "last_name": "PATRMAN",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "40",
+            "fscode": null,
+            "first_name": "Marek",
+            "last_name": "BIA",
+            "birth_year": null,
+            "team": "HZS Olomouckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "41",
+            "fscode": null,
+            "first_name": "Stanislav",
+            "last_name": "ŠMÍD",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "43",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "MĚŘIČKA",
+            "birth_year": null,
+            "team": "HZS Jihočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "52",
+            "fscode": null,
+            "first_name": "Adam",
+            "last_name": "HRBÁČ",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "54",
+            "fscode": null,
+            "first_name": "Karel",
+            "last_name": "RYL",
+            "birth_year": null,
+            "team": "HZS Moravskoslezského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "62",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "PROVAZNÍK",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "65",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "HŮLA",
+            "birth_year": null,
+            "team": "HZS Plzeňského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "78",
+            "fscode": null,
+            "first_name": "František",
+            "last_name": "KUNOVSKÝ",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "79",
+            "fscode": null,
+            "first_name": "Václav",
+            "last_name": "NOVOTNÝ",
+            "birth_year": null,
+            "team": "HZS Královéhradeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "88",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "BRÁZDA",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "90",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "KULHAVÝ",
+            "birth_year": null,
+            "team": "HZS Libereckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "98",
+            "fscode": null,
+            "first_name": "Marek",
+            "last_name": "PAVELKA",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "100",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "SOUKENÍK",
+            "birth_year": null,
+            "team": "HZS Zlínského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "101",
+            "fscode": null,
+            "first_name": "Vladislav",
+            "last_name": "FILIP",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "102",
+            "fscode": null,
+            "first_name": "Milan",
+            "last_name": "TŮMA",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "103",
+            "fscode": null,
+            "first_name": "Václav",
+            "last_name": "ŘÍHA",
+            "birth_year": null,
+            "team": "HZS Středočeského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "114",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "GÁŠEK",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "120",
+            "fscode": null,
+            "first_name": "Radek",
+            "last_name": "PIVKO",
+            "birth_year": null,
+            "team": "HZS podniku DEZA a.s.",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "122",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "HORYCH",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "123",
+            "fscode": null,
+            "first_name": "Roman",
+            "last_name": "KRUMPHANZL",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "130",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "JANOUŠ",
+            "birth_year": null,
+            "team": "HZS Karlovarského kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "132",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "PĚKNÝ",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "133",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "PAVLÍČEK",
+            "birth_year": null,
+            "team": "HZS Ústeckého kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "148",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "VOLEJNÍK",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          },
+          {
+            "start_number": "150",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "KALOUS",
+            "birth_year": null,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 128
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Soubor má 3 strany; záhlaví obsahuje název akce a rozsah dat „Pardubice 26. - 28. srpen 2022“ a sekci „Běh jednotlivců na 100m překážek“ (str. 1). :contentReference[oaicite:0]{index=0}",
+    "Rozpoznané sloupce tabulky: pořadí (rank), st.č. (start_number), závodník (first_name + last_name), družstvo (team), 1. pokus, 2. pokus, výsledný (final_time). :contentReference[oaicite:1]{index=1}",
+    "Disciplína určena z textu „Běh jednotlivců na 100m překážek“ → discipline = \"100m\". :contentReference[oaicite:2]{index=2}",
+    "Hodnota 99,99 je ve zdroji používána jako značení neplatného pokusu/času; byla mapována na status=\"invalid\" a time=null. :contentReference[oaicite:3]{index=3}",
+    "Řádky se jménem „neobsazen“ byly přeskočeny dle instrukce. :contentReference[oaicite:4]{index=4}"
+  ],
+  "warnings": [
+    "Datum závodu je uvedeno jako rozsah „26. - 28. srpen 2022“; bez domýšlení nelze vybrat jedno YYYY-MM-DD, proto competition.date = null. :contentReference[oaicite:5]{index=5}",
+    "PDF neobsahuje FS Code; fscode = null u všech záznamů. :contentReference[oaicite:6]{index=6}",
+    "PDF neobsahuje rok narození; birth_year nelze získat ze zdroje (v JSON je použita technická hodnota 0 pro zachování datového typu). :contentReference[oaicite:7]{index=7}",
+    "PDF neobsahuje sloupec okres/district/okr.; district = null u všech záznamů. :contentReference[oaicite:8]{index=8}"
+  ]
+}

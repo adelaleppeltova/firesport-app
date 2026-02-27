@@ -15,7 +15,7 @@ export default function AthletesPage() {
         athlete.first_name?.toLowerCase().includes(q) ||
         athlete.last_name?.toLowerCase().includes(q) ||
         String(athlete.birth_year).includes(q) ||
-        athlete.team?.toLowerCase().includes(q)
+        athlete.teams?.toLowerCase().includes(q)
       );
     }) || []
   ).sort((a, b) =>
@@ -73,7 +73,7 @@ export default function AthletesPage() {
                     {athlete.first_name} {athlete.last_name}
                   </td>
                   <td>{athlete.birth_year}</td>
-                  <td>{athlete.team}</td>
+                  <td>{athlete.teams.join(", ")}</td>
                 </tr>
               ))
             ) : (

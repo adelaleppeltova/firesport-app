@@ -1,0 +1,256 @@
+{
+  "source_file": "100m-dorky-str.pdf",
+  "generated_at": "2026-02-27T00:00:00Z",
+  "competition": {
+    "name": "MČR dorostu v PS – Svitavy",
+    "place": "Svitavy",
+    "date": "2019-07-05",
+    "league": "MČR dorostu v PS",
+    "categories": [
+      {
+        "name": "Střední dorostenky",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "20",
+            "fscode": null,
+            "first_name": "Hana",
+            "last_name": "Kotulková",
+            "birth_year": null,
+            "team": "Hutisko - Solanec",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.77, "status": "valid" },
+              { "try": 2, "time": 17.37, "status": "valid" }
+            ],
+            "final_time": 17.37,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "21",
+            "fscode": null,
+            "first_name": "Lucie",
+            "last_name": "Ledvinová",
+            "birth_year": null,
+            "team": "Dešenice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.4, "status": "valid" },
+              { "try": 2, "time": 19.03, "status": "valid" }
+            ],
+            "final_time": 18.4,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "27",
+            "fscode": null,
+            "first_name": "Karolína",
+            "last_name": "Vlachová",
+            "birth_year": null,
+            "team": "Rožmitál pod Třemšínem",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.91, "status": "valid" },
+              { "try": 2, "time": 18.65, "status": "valid" }
+            ],
+            "final_time": 18.65,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "16",
+            "fscode": null,
+            "first_name": "Kateřina",
+            "last_name": "Kusá",
+            "birth_year": null,
+            "team": "Desná",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.0, "status": "valid" },
+              { "try": 2, "time": 18.78, "status": "valid" }
+            ],
+            "final_time": 18.78,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "28",
+            "fscode": null,
+            "first_name": "Simona",
+            "last_name": "Páralová",
+            "birth_year": null,
+            "team": "Bořitov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.29, "status": "valid" },
+              { "try": 2, "time": 19.07, "status": "valid" }
+            ],
+            "final_time": 19.07,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "18",
+            "fscode": null,
+            "first_name": "Adéla",
+            "last_name": "Onderková",
+            "birth_year": null,
+            "team": "Hájov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 19.11, "status": "valid" }
+            ],
+            "final_time": 19.11,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "22",
+            "fscode": null,
+            "first_name": "Pavla",
+            "last_name": "Máchová",
+            "birth_year": null,
+            "team": "Strážkovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.57, "status": "valid" },
+              { "try": 2, "time": 19.98, "status": "valid" }
+            ],
+            "final_time": 19.57,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "25",
+            "fscode": null,
+            "first_name": "Lucie",
+            "last_name": "Sacherová",
+            "birth_year": null,
+            "team": "Libňatov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 29.69, "status": "valid" },
+              { "try": 2, "time": 19.63, "status": "valid" }
+            ],
+            "final_time": 19.63,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "23",
+            "fscode": null,
+            "first_name": "Adriana",
+            "last_name": "Petriková",
+            "birth_year": null,
+            "team": "Mezirolí",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.76, "status": "valid" },
+              { "try": 2, "time": 20.14, "status": "valid" }
+            ],
+            "final_time": 19.76,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "15",
+            "fscode": null,
+            "first_name": "Nicol",
+            "last_name": "Strnadová",
+            "birth_year": null,
+            "team": "Stráž nad Nisou",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.45, "status": "valid" },
+              { "try": 2, "time": 20.02, "status": "valid" }
+            ],
+            "final_time": 20.02,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "24",
+            "fscode": null,
+            "first_name": "Valérie",
+            "last_name": "Rusová",
+            "birth_year": null,
+            "team": "Jednov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.27, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 20.27,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "19",
+            "fscode": null,
+            "first_name": "Anna",
+            "last_name": "Kolářová",
+            "birth_year": null,
+            "team": "Dolní Měcholupy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.08, "status": "valid" },
+              { "try": 2, "time": 20.39, "status": "valid" }
+            ],
+            "final_time": 20.39,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "17",
+            "fscode": null,
+            "first_name": "Daniela",
+            "last_name": "Vernerová",
+            "birth_year": null,
+            "team": "Cítoliby",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": 20.68, "status": "valid" }
+            ],
+            "final_time": 20.68,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "26",
+            "fscode": null,
+            "first_name": "Veronika",
+            "last_name": "Navrátilová",
+            "birth_year": null,
+            "team": "Kojetice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.14, "status": "valid" },
+              { "try": 2, "time": 24.41, "status": "valid" }
+            ],
+            "final_time": 21.14,
+            "final_status": "valid",
+            "rank": 14
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Dokument má 1 stranu s tabulkou výsledků. Sloupce byly rozpoznány z hlavičky tabulky: Pořadí, Start. číslo, Jméno, SDH, Kraj, čas I. pokusu, čas II. pokusu, Výsledný čas. :contentReference[oaicite:0]{index=0}",
+    "Kategorie byla určena z nadpisu v tabulce: „Střední dorostenky“. :contentReference[oaicite:1]{index=1}",
+    "Disciplína byla určena z nadpisu: „Běh na 100m s přek. - Pořadí“ => discipline=100m. :contentReference[oaicite:2]{index=2}",
+    "Místo a datumový rozsah byly převzaty z řádku: „MČR dorostu v PS 5. - 7. 7. 2019, Svitavy“. :contentReference[oaicite:3]{index=3}",
+    "Neplatné pokusy byly identifikovány podle hodnoty „NP“ a uloženy jako time=null, status=invalid. :contentReference[oaicite:4]{index=4}",
+    "Sloupec „Kraj“ nebyl mapován na „district“, protože nejde o okres; „district“ je proto null. :contentReference[oaicite:5]{index=5}"
+  ],
+  "warnings": [
+    "Datum závodu je uvedeno jako rozsah 5. - 7. 7. 2019, nelze jednoznačně určit jediný den konání => competition.date = null. :contentReference[oaicite:6]{index=6}",
+    "FS Code není v dokumentu uveden => fscode = null. :contentReference[oaicite:7]{index=7}",
+    "V tabulce chybí údaj o ročníku narození => birth_year = null. :contentReference[oaicite:8]{index=8}",
+    "Sloupec okres/district v dokumentu chybí => district = null. :contentReference[oaicite:9]{index=9}"
+  ]
+}
