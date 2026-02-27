@@ -15,7 +15,7 @@ export default function AthletesPage() {
         athlete.first_name?.toLowerCase().includes(q) ||
         athlete.last_name?.toLowerCase().includes(q) ||
         String(athlete.birth_year).includes(q) ||
-        athlete.teams?.toLowerCase().includes(q)
+        athlete.teams?.some((team) => team.toLowerCase().includes(q))
       );
     }) || []
   ).sort((a, b) =>
