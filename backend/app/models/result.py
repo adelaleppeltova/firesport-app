@@ -29,12 +29,6 @@ class ResultBase(BaseModel):
 
     times: list[TimeAttempt] = Field(default_factory=list)
 
-    time_1: Optional[float] = None
-    time_1_status: TimeStatus
-
-    time_2: Optional[float] = None
-    time_2_status: TimeStatus
-
     final_time: Optional[float] = None
     final_time_status: TimeStatus
 

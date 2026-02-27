@@ -563,8 +563,7 @@ async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] 
             "final_time": r.get("final_time"),
             "final_time_status": r.get("final_time_status"),
             "rank": r.get("rank"),
-            "time_1": r.get("time_1"),
-            "time_2": r.get("time_2"),
+            "times": r.get("times", []),
         })
 
     # Seřaď závody podle data

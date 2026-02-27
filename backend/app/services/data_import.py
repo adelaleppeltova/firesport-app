@@ -242,18 +242,11 @@ class DataImporter:
                 return
 
             times_raw = result_data.get("times", [])
-            time_1 = None
-            time_2 = None
             
             # Transformace times - mapuj "try" -> "attempt"
             times_transformed = []
             for t_data in times_raw:
                 try_num = t_data.get("try")
-                if try_num == 1:
-                    time_1 = t_data.get("time")
-                elif try_num == 2:
-                    time_2 = t_data.get("time")
-                
                 # Transformuj na formát s "attempt" místo "try"
                 times_transformed.append({
                     "attempt": try_num if try_num else None,
@@ -268,10 +261,6 @@ class DataImporter:
                 "date": competition_date,
                 "team": team,
                 "start_number": result_data.get("start_number"),
-                "time_1": time_1,
-                "time_1_status": "valid" if time_1 else "invalid",
-                "time_2": time_2,
-                "time_2_status": "valid" if time_2 else "invalid",
                 "final_time": result_data.get("final_time"),
                 "final_time_status": result_data.get("final_status", "invalid"),
                 "rank": result_data.get("rank"),

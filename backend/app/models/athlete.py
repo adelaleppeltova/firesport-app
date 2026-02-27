@@ -90,6 +90,11 @@ class PerformanceByYear(BaseModel):
     years: List[int]  # [2022, 2023, 2024]
     data: dict  # {2022: [{"date": "2022-05-15", "time": 16.5, "rank": 1}, ...], ...}
 
+class TimeAttemptOut(BaseModel):
+    attempt: Optional[int] = None
+    time: Optional[float] = None
+    status: str = "invalid"
+
 class RaceInYear(BaseModel):
     competition_id: Optional[str] = None
     competition_name: Optional[str] = None
@@ -99,8 +104,7 @@ class RaceInYear(BaseModel):
     final_time: Optional[float] = None
     final_time_status: Optional[str] = None
     rank: Optional[int] = None
-    time_1: Optional[float] = None
-    time_2: Optional[float] = None
+    times: List[TimeAttemptOut] = Field(default_factory=list)
 
 
 class PerformanceInYear(BaseModel):

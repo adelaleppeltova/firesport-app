@@ -9,6 +9,12 @@ function renderTime(time, status) {
   return time;
 }
 
+// Pomocná funkce pro získání pokusu z pole times
+function getAttempt(times, attemptNum) {
+  const t = times?.find((t) => t.attempt === attemptNum);
+  return t ? renderTime(t.time, t.status) : "";
+}
+
 export default function ResultsPage() {
   const { id, categoryId } = useParams();
   const location = useLocation();
@@ -87,8 +93,8 @@ export default function ResultsPage() {
                   <td>{r.athlete.birth_year}</td>
                   <td>{r.athlete.fscode}</td>
                   <td>{r.team}</td>
-                  <td>{renderTime(r.time_1, r.time_1_status)}</td>
-                  <td>{renderTime(r.time_2, r.time_2_status)}</td>
+                  <td>{getAttempt(r.times, 1)}</td>
+                  <td>{getAttempt(r.times, 2)}</td>
                   <td>{renderTime(r.final_time, r.final_time_status)}</td>
                   <td>{r.rank}</td>
                 </tr>
