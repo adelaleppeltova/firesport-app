@@ -39,11 +39,31 @@ class DataImporter:
 
     @staticmethod
     def _normalize_category_name(value: str) -> str:
-        """Převede název kategorie tak, aby měl první písmeno velké a zbytek malý (např. 'ŽENY' -> 'Ženy')."""
+        """Převede název kategorie tak, aby každé slovo mělo první písmeno velké a zbytek malý (např. 'ŽENY' -> 'Ženy').
+        Zkratka 'HZS' zůstává velkými písmeny (např. 'MUŽI HZS' -> 'Muži HZS')."""
+        KEEP_UPPER = {"hzs"}
         stripped = value.strip()
         if not stripped:
             return stripped
-        return stripped[0].upper() + stripped[1:].lower()
+        return " ".join(
+            word.upper() if word.lower() in KEEP_UPPER
+            else (word[0].upper() + word[1:].lower() if word else "")
+            for word in stripped.split()
+        )
+
+    @staticmethod
+    def _normalize_team_name(value: str) -> str:
+        """Převede název týmu tak, aby každé slovo mělo první písmeno velké (např. 'dolní lhota' -> 'Dolní Lhota').
+        Zkratka 'HZS' zůstává velkými písmeny (např. 'hzs královéhradeckého kraje' -> 'HZS Královéhradeckého Kraje')."""
+        KEEP_UPPER = {"hzs", "vhj", "čhj"}
+        stripped = value.strip()
+        if not stripped:
+            return stripped
+        return " ".join(
+            word.upper() if word.lower() in KEEP_UPPER
+            else (word[0].upper() + word[1:].lower() if word else "")
+            for word in stripped.split()
+        )
 
 
     async def import_from_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -212,7 +232,8 @@ class DataImporter:
             })
             competition_date = competition.get("date") if competition else None
 
-            team = result_data.get("team").replace("SDH", "").strip() if result_data.get("team") else None
+            raw_team = result_data.get("team").replace("SDH", "").strip() if result_data.get("team") else None
+            team = self._normalize_team_name(raw_team) if raw_team else None
 
             # Importuj či najdi atleta
             athlete_id = await self._import_or_get_athlete(result_data, team)
