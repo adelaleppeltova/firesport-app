@@ -1,6 +1,6 @@
 from bson import ObjectId
 from app.db.database import db
-from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, AthleteDetail, BestPerformance
+from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail, BestPerformance
 from app.models.result import ResultAthleteDetail
 from datetime import datetime
 from typing import List, Dict, Optional, Any, Set
@@ -17,12 +17,44 @@ competitions_collection = db["competitions"]
 categories_collection = db["categories"]
 
 
-async def list_athletes_service() -> List[AthleteInDB]:
-    """Vrátí všechny atlety jako seznam Pydantic modelů."""
-    athletes = await athletes_collection.find().to_list(length=1000)
+async def list_athletes_service(
+    search: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 25,
+) -> AthletesPage:
+    """Vrátí stránkovaný seznam atletů s volitelným vyhledáváním."""
+    query: Dict[str, Any] = {}
+    if search and search.strip():
+        q = search.strip()
+        or_conditions: list = [
+            {"first_name": {"$regex": q, "$options": "i"}},
+            {"last_name": {"$regex": q, "$options": "i"}},
+            {"teams": {"$elemMatch": {"$regex": q, "$options": "i"}}},
+        ]
+        if q.isdigit():
+            or_conditions.append({"birth_year": int(q)})
+        query["$or"] = or_conditions
+
+    total = await athletes_collection.count_documents(query)
+    skip = (page - 1) * page_size
+
+    athletes = (
+        await athletes_collection.find(query)
+        .collation({"locale": "cs", "strength": 1})
+        .sort("last_name", 1)
+        .skip(skip)
+        .limit(page_size)
+        .to_list(length=page_size)
+    )
     for a in athletes:
         a["_id"] = str(a["_id"])
-    return [AthleteInDB.model_validate(a) for a in athletes]
+
+    return AthletesPage(
+        items=[AthleteInDB.model_validate(a) for a in athletes],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
 
 async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     """Vrátí přehled výkonů atleta jako AthleteOverview."""

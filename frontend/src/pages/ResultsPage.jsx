@@ -35,7 +35,7 @@ export default function ResultsPage() {
   }, [location.hash, results]);
 
   // compute highlight id to apply class in render
-  const highlightedId = location.hash ? location.hash.replace("#", "") : null; 
+  const highlightedId = location.hash ? location.hash.replace("#", "") : null;
 
   if (isLoading || isCompLoading) return <div>Načítání...</div>;
   if (error) return <div>Chyba při načítání výsledků.</div>;
@@ -76,7 +76,9 @@ export default function ResultsPage() {
                 <tr
                   id={`row-${r.athlete._id}`}
                   key={r.athlete._id}
-                  className={highlightedId === String(r.athlete._id) ? "highlight" : ""}
+                  className={
+                    highlightedId === String(r.athlete._id) ? "highlight" : ""
+                  }
                   onClick={() => navigate(`/zavodnici/${r.athlete._id}`)}
                 >
                   <td>{r.start_number ?? ""}</td>
@@ -84,7 +86,7 @@ export default function ResultsPage() {
                   <td>{r.athlete.last_name}</td>
                   <td>{r.athlete.birth_year}</td>
                   <td>{r.athlete.fscode}</td>
-                  <td>{r.athlete.team}</td>
+                  <td>{r.team}</td>
                   <td>{renderTime(r.time_1, r.time_1_status)}</td>
                   <td>{renderTime(r.time_2, r.time_2_status)}</td>
                   <td>{renderTime(r.final_time, r.final_time_status)}</td>

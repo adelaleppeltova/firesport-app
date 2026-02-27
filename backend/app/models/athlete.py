@@ -71,6 +71,13 @@ class AthleteDetail(AthleteInDB):
 class AthletesSearch(BaseModel):
     items: List[AthleteInDB]
 
+class AthletesPage(BaseModel):
+    """Stránkovaný seznam atletů s vyhledáváním."""
+    items: List[AthleteInDB]
+    total: int
+    page: int
+    page_size: int
+
 
 class PerformanceDataPoint(BaseModel):
     """Datový bod pro graf vývoje výkonu v čase"""

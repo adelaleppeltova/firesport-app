@@ -23,7 +23,7 @@ class ResultBase(BaseModel):
     category: CategoryInDB
     
     date: datetime
-    team: str
+    team: Optional[str]
 
     start_number: Optional[int] = None
 

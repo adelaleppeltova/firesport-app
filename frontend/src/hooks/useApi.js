@@ -63,14 +63,19 @@ export function useAthleteOverview(athleteId) {
   });
 }
 
-// GET /athletes
-export function useAthletes() {
+// GET /athletes (paginated + search)
+export function useAthletes({ search = "", page = 1, pageSize = 25 } = {}) {
   return useQuery({
-    queryKey: ["athletes", "all"],
+    queryKey: ["athletes", "list", search, page, pageSize],
     queryFn: async () => {
-      const { data } = await api.get("/v1/athletes");
+      const params = new URLSearchParams();
+      if (search) params.set("q", search);
+      params.set("page", String(page));
+      params.set("page_size", String(pageSize));
+      const { data } = await api.get(`/v1/athletes?${params.toString()}`);
       return data;
     },
+    keepPreviousData: true,
   });
 }
 

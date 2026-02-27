@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.athlete import AthleteInDB, AthletesSearch, AthleteOverview, PerformanceByYear, PerformanceInYear
+from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, PerformanceByYear, PerformanceInYear
 from app.models.models import AthleteDetailPage
 from app.dependencies import get_current_user
 from bson import ObjectId
@@ -24,9 +24,13 @@ router = APIRouter(prefix="/athletes", tags=["athletes"])
 
 logger = logging.getLogger("firesport.overview")
 
-@router.get("/", response_model=List[AthleteInDB])
-async def list_athletes():
-    return await list_athletes_service()
+@router.get("/", response_model=AthletesPage)
+async def list_athletes(
+    q: Optional[str] = Query(None, description="Hledaný výraz (jméno, rok, sbor)"),
+    page: int = Query(1, ge=1, description="Číslo stránky"),
+    page_size: int = Query(25, ge=1, le=100, description="Počet záznamů na stránku"),
+):
+    return await list_athletes_service(search=q, page=page, page_size=page_size)
 
 @router.get("/search", response_model=AthletesSearch)
 async def search_athletes(q: str):
