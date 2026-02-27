@@ -1,16 +1,37 @@
-import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAthletes } from "../hooks/useApi";
 import PrimaryButton from "../components/PrimaryButton";
 
 const PAGE_SIZE = 25;
 
 export default function AthletesPage() {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const debounceRef = useRef(null);
+
+  // Inicializace stavu z URL
+  const initialSearch = searchParams.get("q") || "";
+  const initialPage = Number(searchParams.get("page")) || 1;
+
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [page, setPage] = useState(initialPage);
+
+  // Sync stavu do URL (přes ref, aby nezpůsoboval refire efektů)
+  const updateUrl = useCallback(
+    (q, p) => {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (p > 1) params.set("page", String(p));
+      setSearchParams(params, { replace: true });
+    },
+    [setSearchParams],
+  );
+  const updateUrlRef = useRef(updateUrl);
+  useEffect(() => {
+    updateUrlRef.current = updateUrl;
+  }, [updateUrl]);
 
   // Debounce vyhledávání – 300 ms po posledním stisku klávesy
   useEffect(() => {
@@ -18,9 +39,16 @@ export default function AthletesPage() {
     debounceRef.current = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
+      updateUrlRef.current(search, 1);
     }, 300);
     return () => clearTimeout(debounceRef.current);
   }, [search]);
+
+  // Sync page do URL při změně stránky + scroll nahoru
+  useEffect(() => {
+    updateUrlRef.current(debouncedSearch, page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page, debouncedSearch]);
 
   const { data, isLoading, error, isFetching } = useAthletes({
     search: debouncedSearch,

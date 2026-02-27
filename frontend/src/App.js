@@ -14,6 +14,7 @@ import CompetitionDetailPage from "./pages/CompetitionDetailPage";
 import ResultsPage from "./pages/ResultsPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import ErrorPage from "./pages/ErrorPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +37,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route element={<BasicLayout />}>
               <Route path="/" element={<RootPage />} />

@@ -1,18 +1,43 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCompetitions } from "../hooks/useApi";
 import PrimaryButton from "../components/PrimaryButton";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const PAGE_SIZE = 25;
 
 export default function CompetitionsPage() {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [sortKey, setSortKey] = useState("date");
-  const [sortDir, setSortDir] = useState("desc");
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const debounceRef = useRef(null);
+
+  // Inicializace stavu z URL
+  const initialSearch = searchParams.get("q") || "";
+  const initialPage = Number(searchParams.get("page")) || 1;
+  const initialSortKey = searchParams.get("sort") || "date";
+  const initialSortDir = searchParams.get("dir") || "desc";
+
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [page, setPage] = useState(initialPage);
+  const [sortKey, setSortKey] = useState(initialSortKey);
+  const [sortDir, setSortDir] = useState(initialSortDir);
+
+  // Sync stavu do URL (přes ref, aby nezpůsoboval refire efektů)
+  const updateUrl = useCallback(
+    (q, p, sk, sd) => {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (p > 1) params.set("page", String(p));
+      if (sk !== "date") params.set("sort", sk);
+      if (sd !== "desc") params.set("dir", sd);
+      setSearchParams(params, { replace: true });
+    },
+    [setSearchParams],
+  );
+  const updateUrlRef = useRef(updateUrl);
+  useEffect(() => {
+    updateUrlRef.current = updateUrl;
+  }, [updateUrl]);
 
   // Debounce vyhledávání – 300 ms
   useEffect(() => {
@@ -20,9 +45,16 @@ export default function CompetitionsPage() {
     debounceRef.current = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
+      updateUrlRef.current(search, 1, sortKey, sortDir);
     }, 300);
     return () => clearTimeout(debounceRef.current);
   }, [search]);
+
+  // Sync page/sort do URL při změně + scroll nahoru
+  useEffect(() => {
+    updateUrlRef.current(debouncedSearch, page, sortKey, sortDir);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page, sortKey, sortDir, debouncedSearch]);
 
   const { data, isLoading, error, isFetching } = useCompetitions({
     search: debouncedSearch,
