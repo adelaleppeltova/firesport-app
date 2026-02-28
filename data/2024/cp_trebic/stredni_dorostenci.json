@@ -1654,6 +1654,6 @@
     "Discipline determined as 100mPHP based on '100m s překážkami' (100m hurdles) in header."
   ],
   "warnings": [
-    "Some team/district strings appear concatenated without separators in source text (e.g., 'Praha-Dolní MěcholupyPraha', 'Rokytnice nad RokytnouTřebíč', 'Choustníkovo HradištěTrutnov', 'Sp.N.VesSpišská Nová Ves(SK)'); split was inferred by treating the last token(s) before times as district."
+    "Some team/district strings appear concatenated without separators in source text (e.g., 'Praha-Dolní MěcholupyPraha', 'Rokytnice nad RokytnouTřebíč', 'Choustníkovo Hradiště', 'Sp.N.VesSpišská Nová Ves(SK)'); split was inferred by treating the last token(s) before times as district."
   ]
 }

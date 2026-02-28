@@ -785,7 +785,7 @@
             "first_name": "Anna",
             "last_name": "Medlíková",
             "birth_year": 2006,
-            "team": "Choustníkovo HradištěTrutnov",
+            "team": "Choustníkovo Hradiště",
             "district": null,
             "times": [
               {
@@ -1241,7 +1241,7 @@
             "first_name": "Rozálie",
             "last_name": "Kumpochová",
             "birth_year": 2007,
-            "team": "Choustníkovo HradištěTrutnov",
+            "team": "Choustníkovo Hradiště",
             "district": null,
             "times": [
               {
@@ -1440,7 +1440,7 @@
   ],
   "warnings": [
     "Row start_number=111: district missing due to merged token 'Praha-Dolní MěcholupyPraha' in team/district columns.",
-    "Row start_number=69: district missing due to merged token 'Choustníkovo HradištěTrutnov' in team/district columns.",
+    "Row start_number=69: district missing due to merged token 'Choustníkovo Hradiště' in team/district columns.",
     "Row start_number=81: district missing due to merged token 'Rokytnice v Orlických horáchRychnov nad Kněžnou' in team/district columns.",
     "Multiple invalid attempt times detected (e.g., 998,00 / 999,00) mapped to time=null,status=invalid.",
     "Row start_number=95: final_time in PDF is '998,00' which is invalid; stored as final_time=null, final_status=invalid."
