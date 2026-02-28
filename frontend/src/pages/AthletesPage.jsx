@@ -18,6 +18,18 @@ export default function AthletesPage() {
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [page, setPage] = useState(initialPage);
 
+  // sync state from URL params on mount and whenever they change
+  useEffect(() => {
+    // debugger;
+    const p = Number(searchParams.get("page")) || 1;
+    const q = searchParams.get("q") || "";
+    if (p !== page) setPage(p);
+    if (q !== search) {
+      setSearch(q);
+      setDebouncedSearch(q);
+    }
+  }, [searchParams]);
+
   // Sync stavu do URL (přes ref, aby nezpůsoboval refire efektů)
   const updateUrl = useCallback(
     (q, p) => {
@@ -28,6 +40,7 @@ export default function AthletesPage() {
     },
     [setSearchParams],
   );
+
   const updateUrlRef = useRef(updateUrl);
   useEffect(() => {
     updateUrlRef.current = updateUrl;
@@ -38,11 +51,15 @@ export default function AthletesPage() {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1);
-      updateUrlRef.current(search, 1);
+      const pageParam = searchParams.get("page");
+      if (!pageParam) {
+        setPage(1);
+      }
+      const p = pageParam ? Number(pageParam) : page;
+      updateUrlRef.current(search, p);
     }, 300);
     return () => clearTimeout(debounceRef.current);
-  }, [search]);
+  }, [search, searchParams]);
 
   // Sync page do URL při změně stránky + scroll nahoru
   useEffect(() => {
