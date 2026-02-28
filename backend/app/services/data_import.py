@@ -53,17 +53,56 @@ class DataImporter:
 
     @staticmethod
     def _normalize_team_name(value: str) -> str:
-        """Převede název týmu tak, aby každé slovo mělo první písmeno velké (např. 'dolní lhota' -> 'Dolní Lhota').
-        Zkratka 'HZS' zůstává velkými písmeny (např. 'hzs královéhradeckého kraje' -> 'HZS Královéhradeckého Kraje')."""
+        """
+        Converts team name to proper case with Czech-style capitalization.
+        - Prepositions (u, nad, pod, v, z, na, do, od) are lowercase
+        - Other words are title case
+        - Acronyms like 'HZS', 'VHJ', 'ČHJ', 'PS' stay uppercase
+        - Hyphenated words: both parts follow same rules
+        
+        Examples:
+        - 'DOLNÍ LHOTA' -> 'Dolní Lhota'
+        - 'KAMENEC U POLIČKY' -> 'Kamenec u Poličky'
+        - 'NAD MORAVOU' -> 'Nad Moravou'
+        - 'DOLNÍ-DVŮR' -> 'Dolní-Dvůr'
+        """
         KEEP_UPPER = {"hzs", "vhj", "čhj", "ps"}
+        LOWERCASE_WORDS = {"u", "nad", "pod", "v", "z", "na", "do", "od"}
+        
         stripped = value.strip()
         if not stripped:
             return stripped
-        return " ".join(
-            word.upper() if word.lower() in KEEP_UPPER
-            else (word[0].upper() + word[1:].lower() if word else "")
-            for word in stripped.split()
-        )
+        
+        result = []
+        words = stripped.split()
+        
+        for word in words:
+            # Handle hyphenated words (e.g., 'DOLNÍ-DVŮR')
+            if "-" in word:
+                parts = word.split("-")
+                normalized_parts = []
+                for part in parts:
+                    if part:
+                        lower = part.lower()
+                        if lower in KEEP_UPPER:
+                            normalized_parts.append(lower.upper())
+                        elif lower in LOWERCASE_WORDS:
+                            normalized_parts.append(lower)
+                        else:
+                            normalized_parts.append(part[0].upper() + part[1:].lower() if len(part) > 1 else part.upper())
+                    else:
+                        normalized_parts.append(part)
+                result.append("-".join(normalized_parts))
+            else:
+                lower = word.lower()
+                if lower in KEEP_UPPER:
+                    result.append(lower.upper())
+                elif lower in LOWERCASE_WORDS:
+                    result.append(lower)
+                else:
+                    result.append(word[0].upper() + word[1:].lower() if len(word) > 1 else word.upper())
+        
+        return " ".join(result)
 
 
     async def import_from_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
