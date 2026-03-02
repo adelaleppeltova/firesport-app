@@ -1,0 +1,301 @@
+{
+  "source_file": "ml-dorostenci_2_dráhy.pdf",
+  "generated_at": "2026-03-02T09:40:25.707967Z",
+  "competition": {
+    "name": "Pražský pohár",
+    "place": "Praha - Hostivař",
+    "date": "2022-06-18",
+    "league": "Český pohár",
+    "categories": [
+      {
+        "name": "Mladší dorostenci",
+        "discipline": "100m",
+        "results": [
+          {
+            "start_number": "4",
+            "fscode": 44961,
+            "first_name": "Pavel",
+            "last_name": "Bílek",
+            "birth_year": 2008,
+            "team": "Uhlířské Janovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 17.87, "status": "valid" },
+              { "try": 2, "time": 17.22, "status": "valid" }
+            ],
+            "final_time": 17.22,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "6",
+            "fscode": 78391,
+            "first_name": "Adam",
+            "last_name": "Nýdecký",
+            "birth_year": 2008,
+            "team": "Horní Studénky",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 18.57, "status": "valid" },
+              { "try": 2, "time": 22.36, "status": "valid" }
+            ],
+            "final_time": 18.57,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "10",
+            "fscode": 36271,
+            "first_name": "Juraj",
+            "last_name": "Pčolinský",
+            "birth_year": 2008,
+            "team": "Praha-Dolní Měcholupy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.44, "status": "valid" },
+              { "try": 2, "time": 20.02, "status": "valid" }
+            ],
+            "final_time": 19.44,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "11",
+            "fscode": 60801,
+            "first_name": "Jaroslav",
+            "last_name": "Vaněk",
+            "birth_year": 2008,
+            "team": "Zibohlavy",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 19.48, "status": "valid" },
+              { "try": 2, "time": 21.47, "status": "valid" }
+            ],
+            "final_time": 19.48,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "2",
+            "fscode": 76601,
+            "first_name": "Matěj",
+            "last_name": "Rybár",
+            "birth_year": 2008,
+            "team": "Budíkovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.09, "status": "valid" },
+              { "try": 2, "time": 23.17, "status": "valid" }
+            ],
+            "final_time": 20.09,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "19",
+            "fscode": 66271,
+            "first_name": "Jiří",
+            "last_name": "Němec",
+            "birth_year": 2008,
+            "team": "Dolní Životice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.14, "status": "valid" },
+              { "try": 2, "time": 20.17, "status": "valid" }
+            ],
+            "final_time": 20.14,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "1",
+            "fscode": 66471,
+            "first_name": "Daniel",
+            "last_name": "Janíček",
+            "birth_year": 2008,
+            "team": "Bořitov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 20.51, "status": "valid" },
+              { "try": 2, "time": 21.36, "status": "valid" }
+            ],
+            "final_time": 20.51,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "9",
+            "fscode": 46591,
+            "first_name": "Matouš",
+            "last_name": "Losert",
+            "birth_year": 2008,
+            "team": "Dolní Životice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 21.08, "status": "valid" },
+              { "try": 2, "time": 20.59, "status": "valid" }
+            ],
+            "final_time": 20.59,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "18",
+            "fscode": 87671,
+            "first_name": "Vilém",
+            "last_name": "Vítek",
+            "birth_year": 2009,
+            "team": "Hroznová Lhota",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 22.47, "status": "valid" },
+              { "try": 2, "time": 22.2, "status": "valid" }
+            ],
+            "final_time": 22.2,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "8",
+            "fscode": 66481,
+            "first_name": "Adam",
+            "last_name": "Včelař",
+            "birth_year": 2009,
+            "team": "Bořitov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 24.88, "status": "valid" },
+              { "try": 2, "time": 22.46, "status": "valid" }
+            ],
+            "final_time": 22.46,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "7",
+            "fscode": 87581,
+            "first_name": "Josef",
+            "last_name": "Kvapil",
+            "birth_year": 2008,
+            "team": "Budíkovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 27.31, "status": "valid" },
+              { "try": 2, "time": 22.79, "status": "valid" }
+            ],
+            "final_time": 22.79,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "15",
+            "fscode": 66491,
+            "first_name": "Matěj",
+            "last_name": "Kafoněk",
+            "birth_year": 2009,
+            "team": "Bořitov",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 22.92, "status": "valid" },
+              { "try": 2, "time": 25.39, "status": "valid" }
+            ],
+            "final_time": 22.92,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "12",
+            "fscode": 50171,
+            "first_name": "Jakub",
+            "last_name": "Nekovář",
+            "birth_year": 2008,
+            "team": "Praha-Cholupice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 26.23, "status": "valid" },
+              { "try": 2, "time": 28.8, "status": "valid" }
+            ],
+            "final_time": 26.23,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "16",
+            "fscode": 87181,
+            "first_name": "Daniel",
+            "last_name": "Komínek",
+            "birth_year": 2009,
+            "team": "Budíkovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 27.14, "status": "valid" },
+              { "try": 2, "time": 30.54, "status": "valid" }
+            ],
+            "final_time": 27.14,
+            "final_status": "valid",
+            "rank": 14
+          },
+          {
+            "start_number": "17",
+            "fscode": 86541,
+            "first_name": "Štěpán",
+            "last_name": "Dvorský",
+            "birth_year": 2008,
+            "team": "Jamolice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": 30.18, "status": "valid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": 30.18,
+            "final_status": "valid",
+            "rank": 15
+          },
+          {
+            "start_number": "14",
+            "fscode": 24621,
+            "first_name": "Matěj",
+            "last_name": "Mašek",
+            "birth_year": 2008,
+            "team": "Uhlířské Janovice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 16
+          },
+          {
+            "start_number": "5",
+            "fscode": 35911,
+            "first_name": "Michal",
+            "last_name": "Jindrák",
+            "birth_year": 2008,
+            "team": "Vědomice",
+            "district": null,
+            "times": [
+              { "try": 1, "time": null, "status": "invalid" },
+              { "try": 2, "time": null, "status": "invalid" }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 17
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "PDF je jednostránkové; tabulka výsledků je čitelná jako text (bez nutnosti OCR).",
+    "Metadata závodu (název/seriál/datum/místo) byla převzata z textu pod tabulkou: „Běh na 100m s překážkami“, „Český pohár 2022 - Pražský pohár“, „18. 6. 2022 - Praha - Hostivař“.",
+    "Kategorie byla určena z nadpisu tabulky „MLADŠÍ DORCI“ a mapována na povolenou hodnotu „Mladší dorostenci“.",
+    "Disciplína byla určena z hlavičky „Běh na 100m s překážkami“ a mapována na „100m“.",
+    "Sloupce byly mapovány jako: Pořadí→rank, St.č.→start_number, FSCode→fscode, Příjmení/jméno→last_name/first_name, RN→birth_year, SDH→team, Čas I/II→times, Výsledný→final_time/final_status."
+  ],
+  "warnings": [
+    "V PDF nebyl nalezen sloupec „okres/okr./district“, proto je district u všech záznamů null.",
+    "Některé časy jsou neplatné (NP, DNF, 0,00) a byly uloženy dle pravidel jako status=invalid a time=null; výsledný čas u těchto případů má final_status=invalid."
+  ]
+}
