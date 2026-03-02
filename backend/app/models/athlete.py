@@ -84,6 +84,7 @@ class PerformanceDataPoint(BaseModel):
     date: str  # ISO formát nebo "YYYY-MM-DD"
     time: float  # Čas v sekundách
     rank: Optional[int] = None
+    place: Optional[str] = None
 
 class PerformanceByYear(BaseModel):
     """Data pro graf vývoje výkonu po sezónách"""

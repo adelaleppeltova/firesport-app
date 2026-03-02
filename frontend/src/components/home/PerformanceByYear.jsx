@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { useMe, useAthletePerformanceByYear } from "../../hooks/useApi";
 
 export default function PerformanceByYear() {
   const { data: me, isLoading: meLoading } = useMe();
   const { data: performanceData, isLoading: dataLoading } =
     useAthletePerformanceByYear(me?.athlete_id);
-  const [hoveredPoint, setHoveredPoint] = useState(null);
-
-  if (meLoading || dataLoading) return <div className="skeleton" />;
-  if (!performanceData || performanceData.years.length === 0) {
-    return <p className="empty-state">Nedostatek dat pro graf</p>;
-  }
-
-  const { years, data } = performanceData;
+  const [selectedYear, setSelectedYear] = useState(null);
 
   // Dynamické generování barev pro každý rok
   const generateColors = (count) => {
@@ -33,7 +36,6 @@ export default function PerformanceByYear() {
       return baseColors.slice(0, count);
     }
 
-    // Pokud je více let než barev, generuj dynamicky
     const colors = [...baseColors];
     for (let i = baseColors.length; i < count; i++) {
       const hue = ((i * 360) / count) % 360;
@@ -42,257 +44,222 @@ export default function PerformanceByYear() {
     return colors;
   };
 
-  const colors = generateColors(years.length);
+  // Transformuj data do formátu pro Recharts
+  const chartData = useMemo(() => {
+    if (!performanceData || !performanceData.years.length) return null;
 
-  // Najdi min a max čas pro Y osu
-  let allTimes = [];
-  years.forEach((year) => {
-    if (data[year]) {
-      allTimes = allTimes.concat(data[year].map((d) => d.time));
-    }
-  });
+    const { years, data } = performanceData;
+    const colors = generateColors(years.length);
+    const yearToColor = {};
+    years.forEach((year, idx) => {
+      yearToColor[year] = colors[idx];
+    });
 
-  const minTime = Math.min(...allTimes);
-  const maxTime = Math.max(...allTimes);
-  const padding = (maxTime - minTime) * 0.1;
-  const yMin = minTime - padding;
-  const yMax = maxTime + padding;
+    // Převod data na den roku (1–365), aby každá tečka seděla na správné X pozici
+    const dateToDayOfYear = (dateStr) => {
+      const d = new Date(dateStr);
+      const start = new Date(d.getFullYear(), 0, 0);
+      return Math.floor((d - start) / (1000 * 60 * 60 * 24));
+    };
 
-  // SVG rozměry
-  const svgWidth = 800;
-  const svgHeight = 400;
-  const chartWidth = svgWidth - 80;
-  const chartHeight = svgHeight - 60;
-  const chartX = 50;
-  const chartY = 20;
+    // Každý rok má vlastní pole bodů { x, time, date, place }
+    const yearLines = {};
+    let allTimes = [];
+    let allX = [];
 
-  // Převeď čas na Y souřadnici (invertovaná osa - lepší časy výše)
-  const timeToY = (time) => {
-    const ratio = (time - yMin) / (yMax - yMin);
-    return chartY + chartHeight * ratio; // Invertovaná: ratio bez (1 - ratio)
+    years.forEach((year) => {
+      yearLines[year] = (data[year] || []).map((d) => {
+        const time = parseFloat(d.time.toFixed(1));
+        const x = dateToDayOfYear(d.date);
+        allTimes.push(time);
+        allX.push(x);
+        return {
+          x,
+          time,
+          date: d.date,
+          place: d.place ?? null,
+        };
+      });
+    });
+
+    // Omezení osy Y na rozmezí dat závodníka + malý padding
+    const minTime = Math.min(...allTimes);
+    const maxTime = Math.max(...allTimes);
+    const timePadding = (maxTime - minTime) * 0.05;
+
+    // Omezení osy X na rozmezí dat závodníka + malý padding
+    const minX = Math.min(...allX);
+    const maxX = Math.max(...allX);
+    const xPadding = Math.max(3, Math.round((maxX - minX) * 0.05));
+
+    return {
+      yearLines,
+      years,
+      colors: yearToColor,
+      minTime: parseFloat((minTime - timePadding).toFixed(1)),
+      maxTime: parseFloat((maxTime + timePadding).toFixed(1)),
+      xDomain: [minX - xPadding, maxX + xPadding],
+    };
+  }, [performanceData]);
+
+  if (meLoading || dataLoading) return <div className="skeleton" />;
+  if (!chartData || !chartData.years.length) {
+    return <p className="empty-state">Nedostatek dat pro graf</p>;
+  }
+
+  const { yearLines, years, colors, minTime, maxTime, xDomain } = chartData;
+
+  // Převod dne roku zpět na DD.MM. pro popisky osy X
+  const dayOfYearToLabel = (day) => {
+    const d = new Date(2000, 0, day); // rok 2000 (přestupný) pro správný výpočet
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}.${mm}.`;
   };
 
-  // Převeď index bodu na X souřadnici
-  const pointToX = (index, totalPoints) => {
-    if (totalPoints === 1) {
-      return chartX + chartWidth / 2;
+  const CustomTooltip = ({ active, payload }) => {
+    if (
+      active &&
+      payload &&
+      payload.length &&
+      (selectedYear === null || selectedYear === payload[0].name)
+    ) {
+      const point = payload[0].payload;
+      return (
+        <div
+          className="performance-by-year__custom-tooltip"
+          style={{
+            backgroundColor: payload[0].color,
+            color: "white",
+            padding: "8px 12px",
+            borderRadius: "6px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+          }}
+        >
+          <p
+            style={{
+              margin: "0 0 2px 0",
+              fontWeight: "bold",
+              fontSize: "15px",
+            }}
+          >
+            {point.time.toFixed(1)}s
+          </p>
+          {point.place && (
+            <p style={{ margin: "0 0 2px 0", fontSize: "13px" }}>
+              {point.place}
+            </p>
+          )}
+          <p style={{ margin: 0, fontSize: "13px" }}>
+            {new Date(point.date).toLocaleDateString("cs-CZ")}
+          </p>
+        </div>
+      );
     }
-    return chartX + (index / (totalPoints - 1)) * chartWidth;
-  };
-
-  // Vytvořit SVG path pro linku
-  const createPath = (points) => {
-    if (points.length === 0) return "";
-    return "M " + points.map(([x, y]) => `${x},${y}`).join(" L ");
+    return null;
   };
 
   return (
     <div className="performance-by-year">
       <div className="performance-by-year__container">
-        <svg
-          className="performance-by-year__chart"
-          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-          width="100%"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {/* Mřížka Y */}
-          {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
-            const y = chartY + chartHeight * (1 - ratio);
-            const value = yMax - (yMax - yMin) * ratio;
-            return (
-              <g key={`grid-${i}`} className="performance-by-year__grid-line">
-                <line
-                  x1={chartX}
-                  y1={y}
-                  x2={chartX + chartWidth}
-                  y2={y}
-                  stroke="#797979"
-                  strokeDasharray="4,4"
-                  strokeWidth="1.5"
-                />
-                <text
-                  x={chartX - 10}
-                  y={y + 4}
-                  textAnchor="end"
-                  fontSize="17"
-                  fill="#333"
-                  fontWeight="500"
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+            <CartesianGrid
+              strokeDasharray="4,4"
+              stroke="#797979"
+              strokeWidth={1.5}
+            />
+            <XAxis
+              type="number"
+              dataKey="x"
+              domain={xDomain}
+              tickFormatter={dayOfYearToLabel}
+              stroke="#666"
+              style={{ fontSize: "15px" }}
+            />
+            <YAxis
+              reversed={true}
+              domain={[minTime, maxTime]}
+              tickFormatter={(v) => `${v.toFixed(1)}s`}
+              stroke="#333"
+              style={{ fontSize: "15px" }}
+              width={55}
+            />
+            <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
+            <Legend
+              content={({ payload }) => (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    flexWrap: "wrap",
+                    gap: "1rem",
+                    paddingTop: "20px",
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                  }}
                 >
-                  {value.toFixed(1)}s
-                </text>
-              </g>
-            );
-          })}
+                  {payload.map((entry) => {
+                    const inactive =
+                      selectedYear !== null && selectedYear !== entry.value;
+                    return (
+                      <div
+                        key={entry.value}
+                        onClick={() =>
+                          setSelectedYear((prev) =>
+                            prev === entry.value ? null : entry.value,
+                          )
+                        }
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          color: inactive ? "#aaa" : "inherit",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-block",
+                            width: "10px",
+                            height: "10px",
+                            borderRadius: "50%",
+                            backgroundColor: inactive ? "#aaa" : entry.color,
+                            flexShrink: 0,
+                          }}
+                        />
+                        {entry.value}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            />
 
-          {/* Osy */}
-          <line
-            x1={chartX}
-            y1={chartY}
-            x2={chartX}
-            y2={chartY + chartHeight}
-            stroke="#333"
-            strokeWidth="2"
-          />
-          <line
-            x1={chartX}
-            y1={chartY + chartHeight}
-            x2={chartX + chartWidth}
-            y2={chartY + chartHeight}
-            stroke="#333"
-            strokeWidth="2"
-          />
-
-          {/* Linky pro každý rok */}
-          {years.map((year, yearIndex) => {
-            const yearData = data[year] || [];
-            const color = colors[yearIndex];
-
-            const points = yearData.map((d, i) => [
-              pointToX(i, yearData.length),
-              timeToY(d.time),
-            ]);
-
-            return (
-              <g key={`year-${year}`}>
-                {/* Linka */}
-                <path
-                  d={createPath(points)}
-                  stroke={color}
-                  strokeWidth="2"
-                  fill="none"
-                  className="performance-by-year__line"
-                />
-
-                {/* Body */}
-                {yearData.map((d, i) => {
-                  const [x, y] = points[i];
-                  const pointId = `${year}-${i}`;
-                  const isHovered = hoveredPoint === pointId;
-
-                  // Vypočítej optimální pozici tooltipů s ohledem na okraje
-                  let tooltipX = x - 65;
-
-                  // Pokud by tooltip vyjel z levého okraje
-                  if (tooltipX < chartX + 5) {
-                    tooltipX = chartX + 5;
-                  }
-                  // Pokud by vyjel z pravého okraje
-                  else if (tooltipX + 130 > chartX + chartWidth - 5) {
-                    tooltipX = chartX + chartWidth - 135;
-                  }
-
-                  return (
-                    <g
-                      key={pointId}
-                      onMouseEnter={() => setHoveredPoint(pointId)}
-                      onMouseLeave={() => setHoveredPoint(null)}
-                      className="performance-by-year__point-group"
-                    >
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r={isHovered ? 7 : 4}
-                        fill={color}
-                        className="performance-by-year__point"
-                        style={{ cursor: "pointer" }}
-                      />
-                      {isHovered && (
-                        <g className="performance-by-year__tooltip">
-                          <rect
-                            x={tooltipX}
-                            y={y - 55}
-                            width="130"
-                            height="60"
-                            rx="6"
-                            fill={color}
-                            opacity="0.95"
-                            filter="drop-shadow(0 2px 6px rgba(0,0,0,0.25))"
-                          />
-                          <text
-                            x={tooltipX + 65}
-                            y={y - 28}
-                            textAnchor="middle"
-                            fill="white"
-                            fontSize="17"
-                            fontWeight="bold"
-                          >
-                            {d.time.toFixed(2)}s
-                          </text>
-                          <text
-                            x={tooltipX + 65}
-                            y={y - 10}
-                            textAnchor="middle"
-                            fill="white"
-                            fontSize="15"
-                          >
-                            {new Date(d.date).toLocaleDateString("cs-CZ")}
-                          </text>
-                        </g>
-                      )}
-                    </g>
-                  );
-                })}
-              </g>
-            );
-          })}
-
-          {/* Popisky na X ose (datumy) */}
-          {years.map((year) => {
-            const yearData = data[year] || [];
-            if (yearData.length === 0) return null;
-
-            // Zobraz datumy: první, poslední a případně jeden uprostřed
-            const indicesToShow = [];
-            if (yearData.length > 0) {
-              indicesToShow.push(0); // první
-              if (yearData.length > 2) {
-                indicesToShow.push(Math.floor((yearData.length - 1) / 2)); // uprostřed
-              }
-              if (yearData.length > 1) {
-                indicesToShow.push(yearData.length - 1); // poslední
-              }
-            }
-
-            return indicesToShow.map((idx) => {
-              if (idx >= yearData.length) return null;
-              const d = yearData[idx];
-              const x = pointToX(idx, yearData.length);
-              const dateObj = new Date(d.date);
-              const day = String(dateObj.getDate()).padStart(2, "0");
-              const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-              const dateStr = `${day}.${month}.`;
-
+            {years.map((year) => {
+              const isActive =
+                selectedYear === null || selectedYear === String(year);
               return (
-                <text
-                  key={`x-label-${year}-${idx}`}
-                  x={x}
-                  y={chartY + chartHeight + 20}
-                  textAnchor="middle"
-                  fontSize="15"
-                  fill="#666"
-                >
-                  {dateStr}
-                </text>
+                <Line
+                  key={`line-${year}`}
+                  data={yearLines[year]}
+                  type="linear"
+                  dataKey="time"
+                  name={String(year)}
+                  stroke={colors[year]}
+                  strokeWidth={isActive ? 2 : 1}
+                  strokeOpacity={isActive ? 1 : 0.2}
+                  dot={{
+                    r: 2,
+                    fill: colors[year],
+                    fillOpacity: isActive ? 1 : 0.2,
+                  }}
+                  activeDot={isActive ? { r: 4 } : false}
+                  isAnimationActive={false}
+                />
               );
-            });
-          })}
-        </svg>
-
-        {/* Legenda */}
-        <div className="performance-by-year__legend">
-          {years.map((year, index) => (
-            <div
-              key={`legend-${year}`}
-              className="performance-by-year__legend-item"
-            >
-              <span
-                className="performance-by-year__legend-color"
-                style={{ backgroundColor: colors[index % colors.length] }}
-              />
-              <span className="performance-by-year__legend-text">{year}</span>
-            </div>
-          ))}
-        </div>
+            })}
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

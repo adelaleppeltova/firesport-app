@@ -437,8 +437,9 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
         {"_id": {"$in": list(competition_ids)}}
     ).to_list(length=None)
     
-    # Mapování competition_id -> date
+    # Mapování competition_id -> date a place
     comp_dates = {c["_id"]: c.get("date") for c in competitions if c.get("date")}
+    comp_places = {c["_id"]: c.get("place") for c in competitions}
     
     # Seskup výsledky po jednotlivých letech
     data_by_year = {}
@@ -460,7 +461,8 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
         data_by_year[year].append({
             "date": comp_date.strftime("%Y-%m-%d"),
             "time": r.get("final_time"),
-            "rank": r.get("rank")
+            "rank": r.get("rank"),
+            "place": comp_places.get(comp_id)
         })
     
     # Seřad výsledky pro každý rok chronologicky

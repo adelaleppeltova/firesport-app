@@ -28,7 +28,7 @@ export default function AthletesPage() {
       setSearch(q);
       setDebouncedSearch(q);
     }
-  }, [searchParams]);
+  }, [searchParams, page, search]);
 
   // Sync stavu do URL (přes ref, aby nezpůsoboval refire efektů)
   const updateUrl = useCallback(
@@ -59,7 +59,7 @@ export default function AthletesPage() {
       updateUrlRef.current(search, p);
     }, 300);
     return () => clearTimeout(debounceRef.current);
-  }, [search, searchParams]);
+  }, [search, searchParams, page]);
 
   // Sync page do URL při změně stránky + scroll nahoru
   useEffect(() => {
