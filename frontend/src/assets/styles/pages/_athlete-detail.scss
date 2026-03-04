@@ -25,39 +25,12 @@
   }
 
   .athletes-table-wrapper {
-    background: white;
-    border-radius: variables.$border-radius-base;
-    box-shadow: variables.$box-shadow;
-    overflow-x: auto;
-    padding: 1rem;
-    width: 100%;
+    @extend .table-wrapper;
   }
 
   .athlete-detail-info-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    th,
-    td {
-      font-size: variables.$font-size-s;
-      padding: 0.7rem 1rem;
-      text-align: left;
-      border-bottom: 1px solid variables.$gray-light;
-    }
-    th {
-      font-weight: variables.$font-weight-semibold;
-      color: variables.$color-text;
-      width: 160px;
-      background: white;
-    }
-    td {
-      color: variables.$color-text;
-      background: white;
-    }
-    tr:last-child th,
-    tr:last-child td {
-      border-bottom: none;
-    }
+    @extend .table;
+    @extend .table--info;
   }
 
   .athlete-detail-divider {
@@ -67,29 +40,7 @@
   }
 
   .athlete-detail-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: variables.$font-size-s;
-
-    th,
-    td {
-      padding: 0.7rem 1rem;
-      text-align: left;
-    }
-    th {
-      font-weight: variables.$font-weight-semibold;
-      border-bottom: 2px solid variables.$color-background-dark;
-      background: white;
-      color: variables.$color-text;
-    }
-    td {
-      border-bottom: 1px solid variables.$gray-light;
-      background: white;
-    }
-     tr:hover td {
-    background: variables.$hover-color-light;
-    cursor: pointer;
-    }
-
+    @extend .table;
+    @extend .table--data;
   }
 }

@@ -66,6 +66,7 @@ export default function AthleteDetailPage() {
               <th>Závod</th>
               <th>Místo</th>
               <th>Kategorie</th>
+              <th>Sbor</th>
               <th>Výsledný čas</th>
             </tr>
           </thead>
@@ -81,6 +82,7 @@ export default function AthleteDetailPage() {
                   <td>{r.competition?.name}</td>
                   <td>{r.competition?.place}</td>
                   <td>{r.category.name}</td>
+                  <td>{r.team}</td>
                   <td>
                     {(r.final_time ? r.final_time.toFixed(2) + " s" : "") +
                       (r.final_time_status === "valid" ? "" : " NP")}
