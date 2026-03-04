@@ -1,16 +1,10 @@
 @use "../abstracts/variables";
+@use "../abstracts/mixins";
+@use "../base/tables";
 
 .competitions-page {
-  padding: 0 1rem;
-  background: variables.$color-background;
-  min-height: 100vh;
-  margin: 0 auto;
-
-  h1 {
-    font-size: variables.$font-size-l;
-    margin-bottom: 1.5rem;
-    color: variables.$color-text;
-  }
+  @include mixins.page-layout;
+  @include mixins.page-typography(1.5rem);
 
   .competitions-table-wrapper {
     @extend .table-wrapper;

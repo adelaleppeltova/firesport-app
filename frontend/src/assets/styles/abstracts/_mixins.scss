@@ -10,3 +10,139 @@
   background: none;
   text-decoration: none;
 }
+
+/// Společné styly pro stránkové wrappery
+@mixin page-layout($max-width: null) {
+  padding: 0 1rem;
+  background: variables.$color-background;
+  min-height: 100vh;
+  margin: 0 auto;
+
+  @if $max-width != null {
+    max-width: $max-width;
+  }
+}
+
+/// Společné typografické styly pro stránky (h1, h2, p)
+@mixin page-typography($h1-margin-bottom: 1rem) {
+  h1 {
+    font-size: variables.$font-size-l;
+    margin-bottom: $h1-margin-bottom;
+    color: variables.$color-text;
+  }
+
+  h2 {
+    font-size: variables.$font-size-m;
+    margin-bottom: 1rem;
+    color: variables.$color-text;
+  }
+
+  p {
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+    margin-bottom: 1rem;
+  }
+}
+
+/// Společné BEM prvky pro přihlašovací / registrační formulář
+@mixin auth-form {
+  &__title {
+    font-size: variables.$font-size-xl;
+    font-weight: variables.$font-weight-extrabold;
+    text-align: center;
+    color: variables.$color-text;
+  }
+
+  &__form {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    width: min(400px, 90%);
+    margin: 0 auto;
+  }
+
+  &__label {
+    display: grid;
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-regular;
+    color: variables.$color-text;
+  }
+
+  &__input {
+    min-width: 350px;
+    margin-top: 8px;
+    padding: 12px 16px;
+    font-size: variables.$font-size-s;
+    border: 1px solid black;
+    border-radius: variables.$border-radius-base;
+    outline: none;
+    color: variables.$color-text;
+    transition:
+      box-shadow 0.2s ease,
+      border 0.2s ease;
+
+    &:focus {
+      border-color: variables.$color-primary;
+      box-shadow: 0 0 2px 1px variables.$color-accent;
+    }
+  }
+
+  &__content {
+    margin-top: 16px;
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-regular;
+    display: grid;
+    justify-items: center;
+  }
+
+  &__link {
+    text-decoration: variables.$text-underline;
+  }
+}
+
+/// Styly pro pole s heslem a přepínač viditelnosti
+@mixin password-field {
+  .password-field {
+    position: relative;
+  }
+
+  .password-field input {
+    padding-right: 44px; /* místo pro ikonku */
+  }
+
+  .password-field .password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 28px;
+    width: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+
+    &:focus {
+      outline: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+  }
+}
+
+/// Chybová hláška formuláře
+@mixin form-error($min-width: null) {
+  color: #cf222e;
+  font-size: variables.$font-size-s;
+  margin: 8px 0;
+  padding: 8px 12px;
+  background: #ffebeb;
+  border-left: 3px solid #cf222e;
+  border-radius: 4px;
+
+  @if $min-width != null {
+    min-width: $min-width;
+  }
+}

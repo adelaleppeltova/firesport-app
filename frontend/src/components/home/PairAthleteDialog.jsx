@@ -1,11 +1,30 @@
-import { useState } from "react";
-import { useSearchAthletes, usePairAthlete } from "../../hooks/useApi";
+import { useState, useEffect, useRef } from "react";
+import { useAthletes, usePairAthlete } from "../../hooks/useApi";
 import PrimaryButton from "../PrimaryButton";
 
 export default function PairAthleteDialog({ onClose }) {
   const [query, setQuery] = useState("");
-  const { data: searchResults, isLoading } = useSearchAthletes(query);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const debounceRef = useRef(null);
   const pairMutation = usePairAthlete();
+
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [query]);
+
+  const {
+    data: searchResults,
+    isLoading,
+    isFetching,
+  } = useAthletes({
+    search: debouncedQuery,
+    page: 1,
+    pageSize: 25,
+  });
 
   const handleSelect = async (athleteId) => {
     try {
@@ -36,26 +55,40 @@ export default function PairAthleteDialog({ onClose }) {
           </div>
         </div>
 
-        {isLoading && <p>Hledám...</p>}
-
-        {searchResults?.items && searchResults.items.length > 0 && (
-          <ul className="athlete-list">
-            {searchResults.items.map((athlete) => (
-              <li key={athlete._id} onClick={() => handleSelect(athlete._id)}>
-                <strong>
-                  {athlete.first_name} {athlete.last_name}
-                </strong>
-                <span className="athlete-meta">
-                  {athlete.birth_year} • {athlete.team} • {athlete.fscode}
-                </span>
-              </li>
-            ))}
-          </ul>
+        {debouncedQuery && (
+          <p className="athletes-search-count">
+            {isFetching ? "Hledám..." : ""}
+          </p>
         )}
 
-        {query.length >= 2 && searchResults?.items?.length === 0 && (
-          <p className="empty-state">Žádný atlet nenalezen</p>
-        )}
+        {!isFetching &&
+          searchResults?.items &&
+          searchResults.items.length > 0 && (
+            <ul className="athlete-list">
+              {searchResults.items.map((athlete) => (
+                <li key={athlete._id} onClick={() => handleSelect(athlete._id)}>
+                  <strong>
+                    {athlete.first_name} {athlete.last_name}
+                  </strong>
+                  <span className="athlete-meta">
+                    {[
+                      athlete.birth_year,
+                      athlete.teams?.length ? athlete.teams.join(", ") : null,
+                      athlete.fscode,
+                    ]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+        {!isFetching &&
+          debouncedQuery.length >= 2 &&
+          searchResults?.items?.length === 0 && (
+            <p className="empty-state">Žádný atlet nenalezen</p>
+          )}
 
         <div className="button-center">
           <PrimaryButton

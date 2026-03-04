@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 2000;
 }
 
 .dialog-content {
@@ -58,7 +58,9 @@
     border-radius: variables.$border-radius-base;
     outline: none;
     color: variables.$color-text;
-    transition: box-shadow 0.2s ease, border 0.2s ease;
+    transition:
+      box-shadow 0.2s ease,
+      border 0.2s ease;
     &:focus {
       border-color: variables.$color-primary;
       box-shadow: 0 0 2px 1px variables.$color-accent;

@@ -1,28 +1,10 @@
 @use "../abstracts/variables";
+@use "../abstracts/mixins";
+@use "../base/tables";
 
 .competition-detail-page {
-  padding: 0 1rem;
-  background: variables.$color-background;
-  min-height: 100vh;
-  margin: 0 auto;
-
-  h1 {
-    font-size: variables.$font-size-l;
-    margin-bottom: 1rem;
-    color: variables.$color-text;
-  }
-
-  h2 {
-    font-size: variables.$font-size-m;
-    margin-bottom: 1rem;
-    color: variables.$color-text;
-  }
-
-  p {
-    font-size: variables.$font-size-s;
-    color: variables.$color-text;
-    margin-bottom: 1rem;
-  }
+  @include mixins.page-layout;
+  @include mixins.page-typography;
 
   .competition-detail-table-wrapper {
     @extend .table-wrapper;
