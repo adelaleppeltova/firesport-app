@@ -10,6 +10,7 @@ import {
   Legend,
 } from "recharts";
 import Card from "../components/Card";
+import PrimaryButton from "../components/PrimaryButton";
 import { useMe, useAthleteAnomalies } from "../hooks/useApi";
 
 // --- helpers ---
@@ -247,61 +248,67 @@ function TableCard({ items }) {
         <p className="empty-state">Žádné neobvyklé výkony nebyly nalezeny.</p>
       ) : (
         <>
-          <div className="anomaly-table-wrapper">
-            <table className="anomaly-table">
-              <thead>
-                <tr>
-                  <th>Datum</th>
-                  <th>Čas (s)</th>
-                  <th>Závod</th>
-                  <th>Vzdálenost od očekávaného výkonu</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pageItems.map((it) => {
-                  const deviation =
-                    it.score >= 0
-                      ? `+${it.score.toFixed(2)} s`
-                      : `${it.score.toFixed(2)} s`;
-                  return (
-                    <tr key={it.result_id}>
-                      <td>{formatDate(it.competition_date)}</td>
-                      <td>{formatTime(it.final_time)}</td>
-                      <td>{it.competition_name || "—"}</td>
-                      <td>
-                        <div className="anomaly-table__deviation">
-                          <span>{deviation}</span>
-                          <span className="anomaly-table__badge">
-                            Mimo interval očekávání
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          <div className="anomaly-pagination">
-            <button
-              className="anomaly-pagination__btn"
+          <table className="anomaly-table">
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Čas (s)</th>
+                <th>Závod</th>
+                <th>Vzdálenost od očekávaného výkonu</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pageItems.map((it) => {
+                const deviation =
+                  it.score >= 0
+                    ? `+${it.score.toFixed(2)} s`
+                    : `${it.score.toFixed(2)} s`;
+                return (
+                  <tr key={it.result_id}>
+                    <td>{formatDate(it.competition_date)}</td>
+                    <td>{formatTime(it.final_time)}</td>
+                    <td>{it.competition_name || "—"}</td>
+                    <td>
+                      <div className="anomaly-table__deviation">
+                        <span>{deviation}</span>
+                        <span className="anomaly-table__badge">
+                          Mimo interval očekávání
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <div className="pagination">
+            <PrimaryButton
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
+              style={{
+                marginRight: 8,
+                width: "min(180px, 100%)",
+                fontSize: "1.2rem",
+              }}
             >
-              ‹
-            </button>
-            <span className="anomaly-pagination__info">
+              Předchozí
+            </PrimaryButton>
+            <span>
               {(page - 1) * PAGE_SIZE + 1}–
               {Math.min(page * PAGE_SIZE, anomalyItems.length)} z{" "}
               {anomalyItems.length}
             </span>
-            <button
-              className="anomaly-pagination__btn"
+            <PrimaryButton
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
+              style={{
+                marginLeft: 8,
+                width: "min(180px, 100%)",
+                fontSize: "1.2rem",
+              }}
             >
-              ›
-            </button>
+              Další
+            </PrimaryButton>
           </div>
         </>
       )}

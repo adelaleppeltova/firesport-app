@@ -1,4 +1,5 @@
 @use "../abstracts/variables";
+@use "../abstracts/mixins";
 @use "../base/tables";
 
 .statistics-page {
@@ -22,7 +23,7 @@
 
   &__desc {
     font-size: variables.$font-size-s;
-    color: variables.$gray-medium;
+    color: variables.$color-text;
     line-height: 1.5;
     margin: 0;
   }
@@ -50,19 +51,19 @@
   }
 
   &__label {
-    font-size: variables.$font-size-sm;
-    color: variables.$gray-medium;
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
     flex: 1;
   }
 
   &__value {
-    font-size: variables.$font-size-sm;
+    font-size: variables.$font-size-s;
     font-weight: variables.$font-weight-medium;
     color: variables.$color-text;
     text-align: right;
 
     &--highlight {
-      font-size: variables.$font-size-m;
+      font-size: variables.$font-size-s;
       font-weight: variables.$font-weight-bold;
       color: variables.$color-secondary;
     }
@@ -79,18 +80,8 @@
   }
 
   &__season-select {
-    font-size: variables.$font-size-sm;
-    border: 1px solid variables.$border-color-base;
-    border-radius: variables.$border-radius-base;
-    padding: 5px 10px;
-    background: white;
-    color: variables.$color-text;
+    @include mixins.field-input;
     cursor: pointer;
-    outline: none;
-
-    &:focus {
-      border-color: variables.$color-accent;
-    }
   }
 
   &__tooltip {
@@ -136,10 +127,15 @@
   }
 }
 
+.recharts-legend-item-text {
+  font-size: variables.$font-size-s !important;
+  color: variables.$color-text !important;
+}
+
 // --- Table Card ---
 
 .anomaly-table-wrapper {
-  overflow-x: auto;
+  @extend .table-wrapper;
   margin-bottom: 12px;
 }
 
@@ -147,19 +143,22 @@
   @extend .table;
   width: 100%;
   border-collapse: collapse;
-  font-size: variables.$font-size-sm;
+  font-size: variables.$font-size-s;
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
 
   th {
-    text-align: left;
     font-weight: variables.$font-weight-semibold;
-    color: variables.$gray-medium;
-    padding: 8px 10px;
-    border-bottom: 2px solid variables.$gray-light;
+    color: variables.$color-text;
+    border-bottom: 2px solid variables.$color-background-dark;
     white-space: nowrap;
   }
 
   td {
-    padding: 10px 10px;
     border-bottom: 1px solid variables.$gray-light;
     color: variables.$color-text;
     vertical-align: middle;
@@ -169,8 +168,12 @@
     border-bottom: none;
   }
 
-  tr:hover td {
-    background: variables.$gray-light;
+  tbody tr {
+    transition: background 0.15s;
+
+    &:hover td {
+      background: variables.$hover-color-light;
+    }
   }
 
   &__deviation {
@@ -189,42 +192,6 @@
     border-radius: 4px;
     padding: 2px 8px;
     white-space: nowrap;
-  }
-}
-
-// --- Pagination ---
-
-.anomaly-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-
-  &__btn {
-    background: white;
-    border: 1px solid variables.$border-color-base;
-    border-radius: 6px;
-    width: 32px;
-    height: 32px;
-    font-size: 1.8rem;
-    line-height: 1;
-    cursor: pointer;
-    color: variables.$color-text;
-    transition: background variables.$default-transition;
-
-    &:hover:not(:disabled) {
-      background: variables.$gray-light;
-    }
-
-    &:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-    }
-  }
-
-  &__info {
-    font-size: variables.$font-size-sm;
-    color: variables.$gray-medium;
   }
 }
 

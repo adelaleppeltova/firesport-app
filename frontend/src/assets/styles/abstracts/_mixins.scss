@@ -132,6 +132,25 @@
   }
 }
 
+/// Sdílený styl pro vstupní pole (input, select) – searchbar vzhled
+@mixin field-input {
+  padding: 0.75rem 1rem;
+  font-size: variables.$font-size-s;
+  border: 1px solid black;
+  border-radius: variables.$border-radius-base;
+  outline: none;
+  color: variables.$color-text;
+  background: white;
+  transition:
+    box-shadow 0.2s ease,
+    border 0.2s ease;
+
+  &:focus {
+    border-color: variables.$color-primary;
+    box-shadow: 0 0 2px 1px variables.$color-accent;
+  }
+}
+
 /// Chybová hláška formuláře
 @mixin form-error($min-width: null) {
   color: #cf222e;
