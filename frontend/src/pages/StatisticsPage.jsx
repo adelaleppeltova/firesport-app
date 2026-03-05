@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   ResponsiveContainer,
   ScatterChart,
@@ -11,7 +12,12 @@ import {
 } from "recharts";
 import Card from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
-import { useMe, useAthleteAnomalies, useMlWindows } from "../hooks/useApi";
+import {
+  useAthleteAnomalies,
+  useAthleteDetail,
+  useAthletes,
+  useMlWindows,
+} from "../hooks/useApi";
 
 // --- helpers ---
 
@@ -36,11 +42,6 @@ function formatMonthYear(dateStr) {
   if (!dateStr) return "—";
   const d = new Date(dateStr);
   return d.toLocaleDateString("cs-CZ", { month: "long", year: "numeric" });
-}
-
-function getYear(dateStr) {
-  if (!dateStr) return null;
-  return new Date(dateStr).getFullYear();
 }
 
 // Custom tooltip for scatter chart
@@ -156,20 +157,8 @@ function SummaryCard({ run }) {
 // --- chart card ---
 
 function ChartCard({ items }) {
-  const years = useMemo(() => {
-    const s = new Set(
-      items.map((it) => getYear(it.competition_date)).filter(Boolean),
-    );
-    return Array.from(s).sort((a, b) => b - a);
-  }, [items]);
-
-  const [selectedYear, setSelectedYear] = useState(null);
-
   const filtered = useMemo(() => {
-    const src = selectedYear
-      ? items.filter((it) => getYear(it.competition_date) === selectedYear)
-      : items;
-    return src.map((it) => ({
+    return items.map((it) => ({
       x: new Date(it.competition_date).getTime(),
       y: it.final_time,
       rawDate: it.competition_date,
@@ -178,7 +167,7 @@ function ChartCard({ items }) {
       score: it.score,
       competition: it.competition_name || null,
     }));
-  }, [items, selectedYear]);
+  }, [items]);
 
   const normal = filtered.filter((d) => !d.isAnomaly);
   const anomalies = filtered.filter((d) => d.isAnomaly);
@@ -341,11 +330,94 @@ function TableCard({ items }) {
   );
 }
 
+function AthleteSearchCard({
+  search,
+  onSearchChange,
+  selectedAthlete,
+  selectedAthleteId,
+  searchResults,
+  isSearching,
+  onSelectAthlete,
+}) {
+  return (
+    <Card title="Vyhledání závodníka">
+      <div className="statistics-athlete-search">
+        <p className="statistics-athlete-search__desc">
+          Vyhledejte závodníka pro zobrazení neobvyklých výkonů.
+        </p>
+
+        <div className="statistics-athlete-search__bar-wrapper">
+          <div className="statistics-athlete-search__bar-iconwrap">
+            <input
+              id="statistics-athlete-search"
+              name="statisticsAthleteSearch"
+              className="statistics-athlete-search__bar"
+              type="text"
+              placeholder="Hledat jméno, rok nebo sbor..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+            <i className="fa-solid fa-magnifying-glass statistics-athlete-search__icon" />
+          </div>
+        </div>
+
+        {search.trim() && (
+          <div className="statistics-athlete-search__results">
+            {isSearching ? (
+              <p className="statistics-athlete-search__meta">Hledám...</p>
+            ) : searchResults.length ? (
+              <ul className="statistics-athlete-search__list">
+                {searchResults.map((athlete) => (
+                  <li key={athlete._id}>
+                    <button
+                      type="button"
+                      className="statistics-athlete-search__item"
+                      onClick={() => onSelectAthlete(athlete._id)}
+                    >
+                      <span className="statistics-athlete-search__name">
+                        {athlete.first_name} {athlete.last_name}
+                      </span>
+                      <span className="statistics-athlete-search__detail">
+                        {athlete.birth_year ?? "—"} •{" "}
+                        {athlete.teams.join(", ") || "—"}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="statistics-athlete-search__meta">
+                Pro zadaný dotaz nebyl nalezen žádný závodník.
+              </p>
+            )}
+          </div>
+        )}
+
+        {selectedAthleteId && (
+          <div className="statistics-athlete-search__selected">
+            <span className="statistics-athlete-search__selected-label">
+              Vybraný závodník:
+            </span>
+            <span className="statistics-athlete-search__selected-value">
+              {selectedAthlete
+                ? `${selectedAthlete.first_name} ${selectedAthlete.last_name}`
+                : "Načítání..."}
+            </span>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
 // --- main page ---
 
 export default function StatisticsPage() {
-  const { data: user, isLoading: userLoading } = useMe();
-  const athleteId = user?.athlete_id;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedAthleteId = searchParams.get("athlete_id") || null;
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debounceRef = useRef(null);
 
   // 1) Fetch available detection windows
   const {
@@ -362,71 +434,98 @@ export default function StatisticsPage() {
     }
   }, [windows, selectedRunId]);
 
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [search]);
+
+  const { data: athletesData, isFetching: isAthletesFetching } = useAthletes({
+    search: debouncedSearch,
+    page: 1,
+    pageSize: 10,
+    anomalyStatus: "processed",
+    runId: selectedRunId ?? undefined,
+  });
+
+  const { data: selectedAthleteDetail } = useAthleteDetail(selectedAthleteId);
+
+  const handleSelectAthlete = (athleteId) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("athlete_id", athleteId);
+    setSearchParams(next, { replace: true });
+    setSearch("");
+    setDebouncedSearch("");
+  };
+
   // 3) Fetch anomalies for selected run
   const { data, isLoading, isError } = useAthleteAnomalies(
-    athleteId,
+    selectedAthleteId,
     selectedRunId,
   );
 
-  if (userLoading || isLoading) {
-    return (
-      <div className="statistics-page">
-        <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
-        <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
-        <div className="skeleton" style={{ height: 200 }} />
-      </div>
-    );
-  }
-
-  if (!athleteId) {
-    return (
-      <div className="statistics-page">
-        <div className="anomaly-no-athlete">
-          <i className="fa-solid fa-user-slash" />
-          <p>
-            Váš účet není propojen se závodníkem. Přejděte na hlavní stránku a
-            propojte účet.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="statistics-page">
-        <p className="empty-state">
-          Nepodařilo se načíst data. Zkuste to prosím znovu.
-        </p>
-      </div>
-    );
-  }
-
   const run = data?.run ?? null;
   const items = data?.items ?? [];
+  const searchResults = athletesData?.items ?? [];
 
   return (
     <div className="statistics-page page">
       <div className="statistics-page__header">
         <h1 className="statistics-page__title">Detekce neobvyklých výkonů</h1>
         <p className="statistics-page__desc">
-          Analýza vašich výkonů pomocí metody Isolation Forest. Neobvyklé výkony
-          jsou výsledky výrazně odlišné od vašeho očekávaného pásma. Pro analýzu
-          je potřeba alespoň 10 výsledků.
+          Analýza výkonů pomocí metody Isolation Forest. Neobvyklé výkony jsou
+          výsledky výrazně odlišné od očekávaného pásma. Pro analýzu je potřeba
+          alespoň 10 výsledků.
         </p>
       </div>
 
-      <YearSelect
-        windows={windows}
-        value={selectedRunId}
-        onChange={setSelectedRunId}
-        isLoading={windowsLoading}
-        isError={windowsError}
+      <AthleteSearchCard
+        search={search}
+        onSearchChange={setSearch}
+        selectedAthlete={selectedAthleteDetail?.athlete}
+        selectedAthleteId={selectedAthleteId}
+        searchResults={searchResults}
+        isSearching={isAthletesFetching}
+        onSelectAthlete={handleSelectAthlete}
       />
 
-      <SummaryCard run={run} />
-      <ChartCard items={items} />
-      <TableCard items={items} />
+      {selectedAthleteId && (
+        <YearSelect
+          windows={windows}
+          value={selectedRunId}
+          onChange={setSelectedRunId}
+          isLoading={windowsLoading}
+          isError={windowsError}
+        />
+      )}
+
+      {!selectedAthleteId ? (
+        <div className="anomaly-no-athlete">
+          <i className="fa-solid fa-user-magnifying-glass" />
+          <p>
+            Vyhledejte a vyberte závodníka. Jeho ID se uloží do URL a zobrazí se
+            statistiky neobvyklých výkonů.
+          </p>
+        </div>
+      ) : isLoading ? (
+        <>
+          <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
+          <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
+          <div className="skeleton" style={{ height: 200 }} />
+        </>
+      ) : isError ? (
+        <p className="empty-state">
+          Nepodařilo se načíst data. Zkuste to prosím znovu.
+        </p>
+      ) : (
+        <>
+          <SummaryCard run={run} />
+          <ChartCard items={items} />
+          <TableCard items={items} />
+        </>
+      )}
     </div>
   );
 }

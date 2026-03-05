@@ -64,14 +64,30 @@ export function useAthleteOverview(athleteId) {
 }
 
 // GET /athletes (paginated + search)
-export function useAthletes({ search = "", page = 1, pageSize = 25 } = {}) {
+export function useAthletes({
+  search = "",
+  page = 1,
+  pageSize = 25,
+  anomalyStatus,
+  runId,
+} = {}) {
   return useQuery({
-    queryKey: ["athletes", "list", search, page, pageSize],
+    queryKey: [
+      "athletes",
+      "list",
+      search,
+      page,
+      pageSize,
+      anomalyStatus,
+      runId,
+    ],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.set("q", search);
       params.set("page", String(page));
       params.set("page_size", String(pageSize));
+      if (anomalyStatus) params.set("anomaly_status", anomalyStatus);
+      if (runId) params.set("run_id", runId);
       const { data } = await api.get(`/v1/athletes?${params.toString()}`);
       return data;
     },

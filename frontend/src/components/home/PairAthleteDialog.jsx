@@ -16,11 +16,7 @@ export default function PairAthleteDialog({ onClose }) {
     return () => clearTimeout(debounceRef.current);
   }, [query]);
 
-  const {
-    data: searchResults,
-    isLoading,
-    isFetching,
-  } = useAthletes({
+  const { data: searchResults, isFetching } = useAthletes({
     search: debouncedQuery,
     page: 1,
     pageSize: 25,

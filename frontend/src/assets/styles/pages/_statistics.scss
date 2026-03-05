@@ -29,6 +29,120 @@
   }
 }
 
+.statistics-athlete-search {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__desc {
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__bar-wrapper {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  &__bar-iconwrap {
+    position: relative;
+    width: 100%;
+  }
+
+  &__bar {
+    @include mixins.field-input;
+    width: 100%;
+    padding-right: 2.5rem;
+  }
+
+  &__icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: variables.$gray-dark;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  &__bar:focus + &__icon {
+    opacity: 0;
+  }
+
+  &__meta {
+    margin: 0;
+    font-size: variables.$font-size-s;
+    color: variables.$gray-medium;
+  }
+
+  &__results {
+    border: 1px solid variables.$border-color-base;
+    border-radius: variables.$border-radius-base;
+    padding: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+    border: 1px solid variables.$border-color-base;
+    border-radius: variables.$border-radius-base;
+    padding: 8px 10px;
+    background: variables.$color-primary;
+    cursor: pointer;
+
+    &:hover {
+      background: variables.$hover-color-light;
+    }
+  }
+
+  &__name {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$color-text;
+  }
+
+  &__detail {
+    font-size: variables.$font-size-xs;
+    color: variables.$gray-medium;
+  }
+
+  &__selected {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    border-top: 1px solid variables.$gray-light;
+    padding-top: 10px;
+  }
+
+  &__selected-label {
+    font-size: variables.$font-size-s;
+    color: variables.$gray-medium;
+  }
+
+  &__selected-value {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+    color: variables.$color-text;
+  }
+}
+
 // --- Window selector ---
 
 .window-select {

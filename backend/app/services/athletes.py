@@ -21,9 +21,47 @@ async def list_athletes_service(
     search: Optional[str] = None,
     page: int = 1,
     page_size: int = 25,
+    anomaly_status: Optional[str] = None,
+    run_id: Optional[str] = None,
 ) -> AthletesPage:
     """Vrátí stránkovaný seznam atletů s volitelným vyhledáváním."""
     query: Dict[str, Any] = {}
+
+    if anomaly_status == "processed":
+        run_query: Dict[str, Any]
+        if run_id:
+            run_query = {"run_id": run_id}
+        else:
+            run_query = {
+                "window_type": "yearly_3y",
+                "is_superseded": {"$ne": True},
+            }
+
+        if run_id:
+            run_doc = await db["anomaly_runs"].find_one(
+                run_query,
+                projection={"run_id": 1},
+            )
+        else:
+            run_doc = await db["anomaly_runs"].find_one(
+                run_query,
+                sort=[("created_at", -1)],
+                projection={"run_id": 1},
+            )
+
+        if not run_doc:
+            return AthletesPage(items=[], total=0, page=page, page_size=page_size)
+
+        processed_athlete_ids: List[ObjectId] = await db["anomaly_scores"].distinct(
+            "athlete_id",
+            {"run_id": run_doc["run_id"]},
+        )
+
+        if not processed_athlete_ids:
+            return AthletesPage(items=[], total=0, page=page, page_size=page_size)
+
+        query["_id"] = {"$in": processed_athlete_ids}
+
     if search and search.strip():
         raw = search.strip()
         # Rozděl na klíčová slova podle mezer, ale zachovej data (např. "2024-01-15") jako celek

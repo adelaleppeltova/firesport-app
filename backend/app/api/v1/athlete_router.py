@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Literal
 from fastapi import APIRouter, Query, HTTPException, Depends
 from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, PerformanceByYear, PerformanceInYear
 from app.models.models import AthleteDetailPage
@@ -29,8 +29,22 @@ async def list_athletes(
     q: Optional[str] = Query(None, description="Hledaný výraz (jméno, rok, sbor)"),
     page: int = Query(1, ge=1, description="Číslo stránky"),
     page_size: int = Query(25, ge=1, le=100, description="Počet záznamů na stránku"),
+    anomaly_status: Optional[Literal["processed"]] = Query(
+        None,
+        description="Volitelný filtr dle stavu anomálií. Podporováno: 'processed'.",
+    ),
+    run_id: Optional[str] = Query(
+        None,
+        description="Volitelné run_id v anomaly_runs pro filtr anomaly_status.",
+    ),
 ):
-    return await list_athletes_service(search=q, page=page, page_size=page_size)
+    return await list_athletes_service(
+        search=q,
+        page=page,
+        page_size=page_size,
+        anomaly_status=anomaly_status,
+        run_id=run_id,
+    )
 
 @router.get("/search", response_model=AthletesSearch)
 async def search_athletes(q: str):
