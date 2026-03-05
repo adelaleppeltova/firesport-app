@@ -152,13 +152,30 @@ export function useAthletePerformanceInYear(athleteId) {
 }
 
 // GET /athletes/:id/anomalies
-export function useAthleteAnomalies(athleteId) {
+export function useAthleteAnomalies(athleteId, runId) {
   return useQuery({
-    queryKey: ["athletes", athleteId, "anomalies"],
+    queryKey: ["athletes", athleteId, "anomalies", runId ?? null],
     queryFn: async () => {
-      const { data } = await api.get(`/v1/athletes/${athleteId}/anomalies`);
+      const params = runId ? `?run_id=${encodeURIComponent(runId)}` : "";
+      const { data } = await api.get(
+        `/v1/athletes/${athleteId}/anomalies${params}`,
+      );
       return data;
     },
     enabled: !!athleteId,
+  });
+}
+
+// GET /ml/windows?type=yearly_3y
+export function useMlWindows(type = "yearly_3y") {
+  return useQuery({
+    queryKey: ["ml", "windows", type],
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/v1/ml/windows?type=${encodeURIComponent(type)}`,
+      );
+      return data; // list of WindowListItem
+    },
+    staleTime: 5 * 60 * 1000, // 5 min – windows change rarely
   });
 }

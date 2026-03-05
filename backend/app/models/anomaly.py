@@ -1,9 +1,10 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Literal
 from datetime import datetime
 from enum import Enum
 
 from app.ml.anomaly_config import DEFAULT_CONFIG
+from app.models.result import QualityFlag
 
 
 class AnomalyDirection(str, Enum):
@@ -98,6 +99,7 @@ class AnomalyItem(BaseModel):
     direction: AnomalyDirection
     competition_name: Optional[str] = None
     competition_place: Optional[str] = None
+    quality_flag: QualityFlag = QualityFlag.ok
 
 
 class AnomalyRunInfo(BaseModel):
@@ -119,3 +121,69 @@ class AthleteAnomaliesResponse(BaseModel):
     athlete_id: str
     run: Optional[AnomalyRunInfo] = None
     items: list[AnomalyItem] = Field(default_factory=list)
+
+
+class WindowListItem(BaseModel):
+    """One distinct detection window returned by GET /ml/windows.
+
+    Represents a unique (window_start, window_end) combination that exists
+    in the ``anomaly_runs`` collection for a given *window_type*.
+
+    Recommended index on ``anomaly_runs``::
+
+        db.anomaly_runs.create_index(
+            [("window_type", 1), ("window.end_date", -1)]
+        )
+    """
+    run_id: str
+    anchor_date: str          # YYYY-MM-DD  (== window_end date, UTC)
+    window_start: datetime
+    window_end: datetime
+    label: str                # e.g. "Q1 2026 (2023-04-01\u20132026-03-31)"
+
+class ContaminationStats(BaseModel):
+    """Per-window min/median/max of per-athlete contamination values."""
+    min: float
+    median: float
+    max: float
+
+
+class WindowRecomputeSummary(BaseModel):
+    """Returned by ``recompute_for_window`` after a single-window ML run."""
+    run_id: str
+    window_type: str
+    anchor_date: str           # YYYY-MM-DD
+    window_start: datetime
+    window_end: datetime
+    contamination_base: str    # human-readable strategy description
+    contamination_stats: Optional[ContaminationStats] = None
+    processed: int
+    skipped: int
+    failed: int
+    scores_inserted: int
+    skip_reason_counts: SkipReasonCounts = Field(default_factory=SkipReasonCounts)
+
+
+class YearlyBatchItem(BaseModel):
+    """Result for one anchor in a yearly batch recompute."""
+    anchor_date: str           # YYYY-MM-DD
+    window_start: datetime
+    window_end: datetime
+    status: str                # "computed" | "skipped_existing" | "failed"
+    run_id: Optional[str] = None
+    processed: int = 0
+    skipped: int = 0
+    failed: int = 0
+    scores_inserted: int = 0
+    error: Optional[str] = None
+
+
+class YearlyBatchResponse(BaseModel):
+    """Response for POST /ml/recompute-yearly."""
+    date_min: str              # YYYY-MM-DD actually used
+    date_max: str              # YYYY-MM-DD actually used
+    total_anchors: int
+    computed: int
+    skipped_existing: int
+    failed: int
+    results: list[YearlyBatchItem]

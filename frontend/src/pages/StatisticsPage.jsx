@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ResponsiveContainer,
   ScatterChart,
@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import Card from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
-import { useMe, useAthleteAnomalies } from "../hooks/useApi";
+import { useMe, useAthleteAnomalies, useMlWindows } from "../hooks/useApi";
 
 // --- helpers ---
 
@@ -47,6 +47,15 @@ function getYear(dateStr) {
 function AnomalyTooltip({ active, payload }) {
   if (!active || !payload || payload.length === 0) return null;
   const p = payload[0].payload;
+
+  let anomalyLabel = null;
+  if (p.isAnomaly) {
+    anomalyLabel =
+      p.qualityFlag === "suspicious"
+        ? "neobvyklý výkon – vyžaduje ověření dat"
+        : "neobvyklý výkon (pravděpodobně výkonová odchylka)";
+  }
+
   return (
     <div className="anomaly-chart__tooltip">
       <div className="anomaly-chart__tooltip-date">{formatDate(p.rawDate)}</div>
@@ -58,9 +67,39 @@ function AnomalyTooltip({ active, payload }) {
           {p.competition}
         </div>
       )}
-      {p.isAnomaly && (
-        <div className="anomaly-chart__tooltip-badge">Neobvyklý výkon</div>
+      {anomalyLabel && (
+        <div className="anomaly-chart__tooltip-badge">{anomalyLabel}</div>
       )}
+    </div>
+  );
+}
+
+// --- year selector ---
+
+function YearSelect({ windows, value, onChange, isLoading, isError }) {
+  if (isLoading) {
+    return <div className="window-select__skeleton skeleton" />;
+  }
+  if (isError || !windows?.length) {
+    return null; // no windows yet – silently hidden
+  }
+  return (
+    <div className="window-select">
+      <label className="window-select__label" htmlFor="window-select">
+        Období:
+      </label>
+      <select
+        id="window-select"
+        className="window-select__input"
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value || null)}
+      >
+        {windows.map((w) => (
+          <option key={w.run_id} value={w.run_id}>
+            {w.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -135,6 +174,7 @@ function ChartCard({ items }) {
       y: it.final_time,
       rawDate: it.competition_date,
       isAnomaly: it.is_anomaly,
+      qualityFlag: it.quality_flag ?? "ok",
       score: it.score,
       competition: it.competition_name || null,
     }));
@@ -150,23 +190,6 @@ function ChartCard({ items }) {
 
   return (
     <Card title="Vývoj neobvyklých výkonů">
-      <div className="anomaly-chart__header">
-        <select
-          className="anomaly-chart__season-select"
-          value={selectedYear ?? ""}
-          onChange={(e) =>
-            setSelectedYear(e.target.value ? Number(e.target.value) : null)
-          }
-        >
-          <option value="">Všechny sezóny</option>
-          {years.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {filtered.length === 0 ? (
         <p className="empty-state">Žádná data pro vybranou sezónu.</p>
       ) : (
@@ -272,7 +295,9 @@ function TableCard({ items }) {
                       <div className="anomaly-table__deviation">
                         <span>{deviation}</span>
                         <span className="anomaly-table__badge">
-                          Mimo interval očekávání
+                          {it.quality_flag === "suspicious"
+                            ? "neobvyklý výkon – vyžaduje ověření dat"
+                            : "neobvyklý výkon (pravděpodobně výkonová odchylka)"}
                         </span>
                       </div>
                     </td>
@@ -321,7 +346,27 @@ function TableCard({ items }) {
 export default function StatisticsPage() {
   const { data: user, isLoading: userLoading } = useMe();
   const athleteId = user?.athlete_id;
-  const { data, isLoading, isError } = useAthleteAnomalies(athleteId);
+
+  // 1) Fetch available detection windows
+  const {
+    data: windows,
+    isLoading: windowsLoading,
+    isError: windowsError,
+  } = useMlWindows();
+
+  // 2) Track selected run_id; default to first (newest) window
+  const [selectedRunId, setSelectedRunId] = useState(null);
+  useEffect(() => {
+    if (windows?.length && selectedRunId === null) {
+      setSelectedRunId(windows[0].run_id);
+    }
+  }, [windows, selectedRunId]);
+
+  // 3) Fetch anomalies for selected run
+  const { data, isLoading, isError } = useAthleteAnomalies(
+    athleteId,
+    selectedRunId,
+  );
 
   if (userLoading || isLoading) {
     return (
@@ -367,9 +412,17 @@ export default function StatisticsPage() {
         <p className="statistics-page__desc">
           Analýza vašich výkonů pomocí metody Isolation Forest. Neobvyklé výkony
           jsou výsledky výrazně odlišné od vašeho očekávaného pásma. Pro analýzu
-          je potřeba alespoň 15 výsledků.
+          je potřeba alespoň 10 výsledků.
         </p>
       </div>
+
+      <YearSelect
+        windows={windows}
+        value={selectedRunId}
+        onChange={setSelectedRunId}
+        isLoading={windowsLoading}
+        isError={windowsError}
+      />
 
       <SummaryCard run={run} />
       <ChartCard items={items} />

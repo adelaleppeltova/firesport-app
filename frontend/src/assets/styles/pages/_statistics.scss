@@ -29,6 +29,31 @@
   }
 }
 
+// --- Window selector ---
+
+.window-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__label {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+    color: variables.$gray-medium;
+  }
+
+  &__input {
+    @include mixins.field-input;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  &__skeleton {
+    height: 40px;
+    border-radius: variables.$border-radius-base;
+  }
+}
+
 // --- Summary Card ---
 
 .anomaly-summary {

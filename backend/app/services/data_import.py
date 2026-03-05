@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 from bson import ObjectId
 from app.db.database import db
+from app.services.quality_flag_service import compute_bounds_for_recompute, compute_quality_flag
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ class DataImporter:
         self.athletes_cache: Dict[int, str] = {}  # fscode -> athlete_id
         self.categories_cache: Dict[str, str] = {}  # category_name -> category_id
         self.competitions_cache: Dict[str, str] = {}  # competition_key -> competition_id
+        self._bounds_cache: Optional[dict[ObjectId, tuple[float, float]]] = None  # {category_id: (low, high)} percentilové hranice
         self.stats = {
             "athletes_created": 0,
             "athletes_skipped": 0,
@@ -315,6 +317,16 @@ class DataImporter:
             })
             
             if not existing:
+                # Výpočet quality_flag
+                try:
+                    if self._bounds_cache is None:
+                        self._bounds_cache = await compute_bounds_for_recompute(db)
+                    flag = await compute_quality_flag(db, result_doc, bounds_cache=self._bounds_cache)
+                    result_doc["quality_flag"] = flag.value
+                except Exception as qf_err:
+                    logger.warning("Nepodařilo se vypočítat quality_flag: %s", qf_err)
+                    result_doc["quality_flag"] = "ok"
+
                 await results_collection.insert_one(result_doc)
                 self.stats["results_created"] += 1
             

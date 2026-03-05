@@ -69,7 +69,7 @@ export default function PerformanceByYear() {
 
     years.forEach((year) => {
       yearLines[year] = (data[year] || []).map((d) => {
-        const time = parseFloat(d.time.toFixed(1));
+        const time = parseFloat(d.time.toFixed(2));
         const x = dateToDayOfYear(d.date);
         allTimes.push(time);
         allX.push(x);
@@ -143,7 +143,7 @@ export default function PerformanceByYear() {
               fontSize: "15px",
             }}
           >
-            {point.time.toFixed(1)}s
+            {point.time.toFixed(2)}s
           </p>
           {point.place && (
             <p style={{ margin: "0 0 2px 0", fontSize: "13px" }}>
