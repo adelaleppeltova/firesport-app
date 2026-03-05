@@ -157,16 +157,45 @@ function SummaryCard({ run }) {
 // --- chart card ---
 
 function ChartCard({ items }) {
-  const filtered = useMemo(() => {
-    return items.map((it) => ({
+  const { filtered, xDomain, yDomain, xTicks } = useMemo(() => {
+    const mapped = items.map((it) => ({
       x: new Date(it.competition_date).getTime(),
       y: it.final_time,
       rawDate: it.competition_date,
       isAnomaly: it.is_anomaly,
       qualityFlag: it.quality_flag ?? "ok",
       score: it.score,
-      competition: it.competition_name || null,
+      competition: it.competition_place || null,
     }));
+
+    if (mapped.length === 0)
+      return {
+        filtered: mapped,
+        xDomain: ["auto", "auto"],
+        yDomain: ["auto", "auto"],
+        xTicks: [],
+      };
+
+    const allX = mapped.map((d) => d.x);
+    const allY = mapped.map((d) => d.y);
+    const minX = Math.min(...allX);
+    const maxX = Math.max(...allX);
+    const minY = Math.min(...allY);
+    const maxY = Math.max(...allY);
+    const xPad = Math.max(24 * 60 * 60 * 1000, (maxX - minX) * 0.04); // min 1 den
+    const yPad = Math.max(0.2, (maxY - minY) * 0.05);
+
+    const xTicks = [...new Set(allX)].sort((a, b) => a - b);
+
+    return {
+      filtered: mapped,
+      xDomain: [minX - xPad, maxX + xPad],
+      yDomain: [
+        parseFloat((minY - yPad).toFixed(1)),
+        parseFloat((maxY + yPad).toFixed(1)),
+      ],
+      xTicks,
+    };
   }, [items]);
 
   const normal = filtered.filter((d) => !d.isAnomaly);
@@ -174,7 +203,7 @@ function ChartCard({ items }) {
 
   const tickFormatter = (val) => {
     const d = new Date(val);
-    return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.`;
+    return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
   };
 
   return (
@@ -189,7 +218,8 @@ function ChartCard({ items }) {
               dataKey="x"
               type="number"
               scale="time"
-              domain={["auto", "auto"]}
+              domain={xDomain}
+              ticks={xTicks}
               tickFormatter={tickFormatter}
               tick={{ fontSize: 11 }}
               tickLine={false}
@@ -197,13 +227,14 @@ function ChartCard({ items }) {
             <YAxis
               dataKey="y"
               type="number"
-              domain={["auto", "auto"]}
+              reversed={true}
+              domain={yDomain}
               tickFormatter={(v) => `${v.toFixed(1)} s`}
               tick={{ fontSize: 11 }}
               tickLine={false}
               width={58}
             />
-            <Tooltip content={<AnomalyTooltip />} />
+            <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
             <Legend
               formatter={(value) =>
                 value === "normal" ? "Normální výkon" : "Neobvyklý výkon"
@@ -235,7 +266,7 @@ function ChartCard({ items }) {
 
 const PAGE_SIZE = 5;
 
-function TableCard({ items }) {
+function TableCard({ items, medianTime }) {
   const [page, setPage] = useState(1);
 
   const anomalyItems = useMemo(
@@ -259,72 +290,45 @@ function TableCard({ items }) {
       {anomalyItems.length === 0 ? (
         <p className="empty-state">Žádné neobvyklé výkony nebyly nalezeny.</p>
       ) : (
-        <>
-          <table className="anomaly-table">
-            <thead>
-              <tr>
-                <th>Datum</th>
-                <th>Čas (s)</th>
-                <th>Závod</th>
-                <th>Vzdálenost od očekávaného výkonu</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pageItems.map((it) => {
-                const deviation =
-                  it.score >= 0
-                    ? `+${it.score.toFixed(2)} s`
-                    : `${it.score.toFixed(2)} s`;
-                return (
-                  <tr key={it.result_id}>
-                    <td>{formatDate(it.competition_date)}</td>
-                    <td>{formatTime(it.final_time)}</td>
-                    <td>{it.competition_name || "—"}</td>
-                    <td>
-                      <div className="anomaly-table__deviation">
-                        <span>{deviation}</span>
-                        <span className="anomaly-table__badge">
-                          {it.quality_flag === "suspicious"
-                            ? "neobvyklý výkon – vyžaduje ověření dat"
-                            : "neobvyklý výkon (pravděpodobně výkonová odchylka)"}
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <div className="pagination">
-            <PrimaryButton
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              style={{
-                marginRight: 8,
-                width: "min(180px, 100%)",
-                fontSize: "1.2rem",
-              }}
-            >
-              Předchozí
-            </PrimaryButton>
-            <span>
-              {(page - 1) * PAGE_SIZE + 1}–
-              {Math.min(page * PAGE_SIZE, anomalyItems.length)} z{" "}
-              {anomalyItems.length}
-            </span>
-            <PrimaryButton
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              style={{
-                marginLeft: 8,
-                width: "min(180px, 100%)",
-                fontSize: "1.2rem",
-              }}
-            >
-              Další
-            </PrimaryButton>
-          </div>
-        </>
+        <table className="anomaly-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Čas (s)</th>
+              <th>Závod</th>
+              <th>Vzdálenost od očekávaného výkonu</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pageItems.map((it) => {
+              const diff =
+                medianTime != null ? it.final_time - medianTime : null;
+              const deviation =
+                diff == null
+                  ? "—"
+                  : diff >= 0
+                    ? `+${diff.toFixed(2)} s`
+                    : `${diff.toFixed(2)} s`;
+              return (
+                <tr key={it.result_id}>
+                  <td>{formatDate(it.competition_date)}</td>
+                  <td>{formatTime(it.final_time)}</td>
+                  <td>{it.competition_name || "—"}</td>
+                  <td>
+                    <div className="anomaly-table__deviation">
+                      <span>{deviation}</span>
+                      <span className="anomaly-table__badge">
+                        {it.quality_flag === "suspicious"
+                          ? "neobvyklý výkon – vyžaduje ověření dat"
+                          : "neobvyklý výkon (pravděpodobně výkonová odchylka)"}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       )}
     </Card>
   );
@@ -523,7 +527,7 @@ export default function StatisticsPage() {
         <>
           <SummaryCard run={run} />
           <ChartCard items={items} />
-          <TableCard items={items} />
+          <TableCard items={items} medianTime={run?.median_time ?? null} />
         </>
       )}
     </div>

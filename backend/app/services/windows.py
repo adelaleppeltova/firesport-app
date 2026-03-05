@@ -195,10 +195,15 @@ def list_year_anchors(
     date_min_utc = date_min.astimezone(timezone.utc)
     date_max_utc = date_max.astimezone(timezone.utc)
 
+    # Always include the year-end anchor for the last year that has any data
+    # (i.e. the year of date_max), even if date_max falls before Dec 31.
+    year_end_of_max = datetime(date_max_utc.year, _YEAR_END_MONTH, _YEAR_END_DAY, tzinfo=timezone.utc)
+    effective_date_max_utc = max(date_max_utc, year_end_of_max)
+
     anchors: list[datetime] = []
-    for year in range(date_min_utc.year, date_max_utc.year + 1):
+    for year in range(date_min_utc.year, effective_date_max_utc.year + 1):
         anchor = datetime(year, _YEAR_END_MONTH, _YEAR_END_DAY, tzinfo=timezone.utc)
-        if date_min_utc <= anchor <= date_max_utc:
+        if date_min_utc <= anchor <= effective_date_max_utc:
             anchors.append(anchor)
 
     return anchors

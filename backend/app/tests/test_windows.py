@@ -111,14 +111,14 @@ def test_list_year_anchors_values():
 
 
 def test_list_year_anchors_range_cuts_correctly():
-    """date_max před 31.12 vyřadí anchor pro ten rok."""
+    """date_max před 31.12 stále zahrne anchor pro daný rok (effective_date_max = 31.12)."""
     date_min = utc(2022, 1, 1)
     date_max = utc(2024, 6, 30)  # před 31.12.2024
 
     result = list_year_anchors(date_min, date_max)
 
-    # Pouze 2022 a 2023, 2024-12-31 je až po date_max
-    assert result == [utc(2022, 12, 31), utc(2023, 12, 31)]
+    # effective_date_max = 2024-12-31 → anchor 2024-12-31 je zahrnut
+    assert result == [utc(2022, 12, 31), utc(2023, 12, 31), utc(2024, 12, 31)]
 
 
 def test_list_year_anchors_single_year():
@@ -128,12 +128,37 @@ def test_list_year_anchors_single_year():
     assert result == [utc(2025, 12, 31)]
 
 
-def test_list_year_anchors_empty_when_no_year_end_in_range():
-    """Rozsah bez 31.12 vrátí prázdný seznam."""
+def test_list_year_anchors_includes_year_end_when_date_max_before_dec31():
+    """Rozsah s date_max před 31.12 stále vrátí anchor 31.12 daného roku."""
     date_min = utc(2025, 1, 1)
     date_max = utc(2025, 12, 30)  # jeden den před year-end
     result = list_year_anchors(date_min, date_max)
-    assert result == []
+    # effective_date_max = 2025-12-31 → anchor 2025-12-31 je zahrnut
+    assert result == [utc(2025, 12, 31)]
+
+
+def test_list_year_anchors_partial_year_2025():
+    """date_max=2025-09-06 => effective_date_max=2025-12-31 => anchor 2025-12-31 je zahrnut."""
+    date_min = utc(2019, 7, 5)
+    date_max = utc(2025, 9, 6)
+
+    result = list_year_anchors(date_min, date_max)
+
+    assert utc(2025, 12, 31) in result, "Anchor 2025-12-31 musí být zahrnut"
+    # Ověř, že jsou zahrnuty i předchozí roky
+    for year in range(2019, 2026):
+        assert utc(year, 12, 31) in result, f"Chybí anchor {year}-12-31"
+
+
+def test_list_year_anchors_exact_dec31_unchanged():
+    """date_max=2024-12-31 => přidá 2024-12-31, ale ne 2025-12-31."""
+    date_min = utc(2022, 1, 1)
+    date_max = utc(2024, 12, 31)
+
+    result = list_year_anchors(date_min, date_max)
+
+    assert result == [utc(2022, 12, 31), utc(2023, 12, 31), utc(2024, 12, 31)]
+    assert utc(2025, 12, 31) not in result, "Anchor 2025-12-31 nesmí být zahrnut"
 
 
 def test_list_year_anchors_raises_on_naive_datetime():
