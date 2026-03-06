@@ -6,7 +6,7 @@ class CompetitionBase(BaseModel):
     name: str
     place: Optional[str] = None
     date: datetime
-    league: Optional[str] = None
+    league: Optional[List[str]] = None
 
 class CompetitionCreate(CompetitionBase):
     pass   
