@@ -184,12 +184,21 @@ class DataImporter:
                 logger.info(f"Soutěž '{comp_data.get('name')}' již existuje")
                 return comp_id
             
+            # Normalizace league na pole stringu
+            raw_league = comp_data.get("league", [])
+            if isinstance(raw_league, str):
+                league = [raw_league] if raw_league else []
+            elif isinstance(raw_league, list):
+                league = [str(item) for item in raw_league if item]
+            else:
+                league = []
+
             # Vytvoření nové soutěže
             new_comp = {
                 "name": comp_data.get("name", ""),
                 "place": comp_data.get("place", ""),
                 "date": comp_date,
-                "league": comp_data.get("league", ""),
+                "league": league,
                 "created_at": datetime.now()
             }
             

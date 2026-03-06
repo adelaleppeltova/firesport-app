@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAthletes } from "../hooks/useApi";
 import PrimaryButton from "../components/PrimaryButton";
@@ -10,65 +10,47 @@ export default function AthletesPage() {
   const navigate = useNavigate();
   const debounceRef = useRef(null);
 
-  // Inicializace stavu z URL
-  const initialSearch = searchParams.get("q") || "";
-  const initialPage = Number(searchParams.get("page")) || 1;
+  // URL je jediný zdroj pravdy pro q a page.
+  // inputValue je lokální stav pouze pro ovládací prvek inputu (debounce).
+  const committedSearch = searchParams.get("q") || "";
+  const page = Number(searchParams.get("page")) || 1;
 
-  const [search, setSearch] = useState(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
-  const [page, setPage] = useState(initialPage);
+  const [inputValue, setInputValue] = useState(committedSearch);
 
-  // sync state from URL params on mount and whenever they change
+  // Pokud se URL změní zvenčí (např. tlačítko Zpět), synchronizuj input
+  const prevCommittedRef = useRef(committedSearch);
   useEffect(() => {
-    // debugger;
-    const p = Number(searchParams.get("page")) || 1;
-    const q = searchParams.get("q") || "";
-    if (p !== page) setPage(p);
-    if (q !== search) {
-      setSearch(q);
-      setDebouncedSearch(q);
+    if (committedSearch !== prevCommittedRef.current) {
+      setInputValue(committedSearch);
+      prevCommittedRef.current = committedSearch;
     }
-  }, [searchParams, page, search]);
+  }, [committedSearch]);
 
-  // Sync stavu do URL (přes ref, aby nezpůsoboval refire efektů)
-  const updateUrl = useCallback(
-    (q, p) => {
-      const params = new URLSearchParams();
-      if (q) params.set("q", q);
-      if (p > 1) params.set("page", String(p));
-      setSearchParams(params, { replace: true });
-    },
-    [setSearchParams],
-  );
+  const setPage = (p) => {
+    const params = new URLSearchParams(searchParams);
+    if (p > 1) {
+      params.set("page", String(p));
+    } else {
+      params.delete("page");
+    }
+    setSearchParams(params, { replace: true });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  const updateUrlRef = useRef(updateUrl);
-  useEffect(() => {
-    updateUrlRef.current = updateUrl;
-  }, [updateUrl]);
-
-  // Debounce vyhledávání – 300 ms po posledním stisku klávesy
+  // Debounce: po 300 ms zapíše hodnotu z inputu do URL (a resetuje stránku)
   useEffect(() => {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setDebouncedSearch(search);
-      const pageParam = searchParams.get("page");
-      if (!pageParam) {
-        setPage(1);
-      }
-      const p = pageParam ? Number(pageParam) : page;
-      updateUrlRef.current(search, p);
+      const params = new URLSearchParams();
+      if (inputValue) params.set("q", inputValue);
+      // při nové query vždy reset na str. 1
+      setSearchParams(params, { replace: true });
     }, 300);
     return () => clearTimeout(debounceRef.current);
-  }, [search, searchParams, page]);
-
-  // Sync page do URL při změně stránky + scroll nahoru
-  useEffect(() => {
-    updateUrlRef.current(debouncedSearch, page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page, debouncedSearch]);
+  }, [inputValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data, isLoading, error, isFetching } = useAthletes({
-    search: debouncedSearch,
+    search: committedSearch,
     page,
     pageSize: PAGE_SIZE,
   });
@@ -86,13 +68,13 @@ export default function AthletesPage() {
             className="athletes-searchbar"
             type="text"
             placeholder="Hledat jméno, rok nebo sbor..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
           />
           <i className="fa-solid fa-magnifying-glass athletes-searchbar-icon" />
         </div>
       </div>
-      {debouncedSearch && (
+      {committedSearch && (
         <p className="athletes-search-count">
           {isFetching ? "Hledám..." : `Nalezeno: ${total} závodníků`}
         </p>
@@ -139,7 +121,7 @@ export default function AthletesPage() {
           {pageCount > 1 && (
             <div className="pagination">
               <PrimaryButton
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1 || isFetching}
                 style={{
                   marginRight: 8,
@@ -153,7 +135,7 @@ export default function AthletesPage() {
                 Strana {page} / {pageCount}
               </span>
               <PrimaryButton
-                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                onClick={() => setPage(Math.min(pageCount, page + 1))}
                 disabled={page === pageCount || isFetching}
                 style={{
                   marginLeft: 8,
