@@ -836,7 +836,7 @@
     "Layout detected: single-page fixed-width text table with header line + dashed separator; columns interpreted as rank (Poř), start number (Sč), FSC, name, birth year (Roč.), team (Družstvo), time try 1 (Čas 1.k), time try 2 (Čas 2.k), final (Celkem).",
     "Metadata extracted from the first line in format '<place> - <event> kategorie: <category>' and from 'Výsledková listina <date>, <time>'.",
     "Discipline inferred from event name containing 'stovka' => mapped to '100m'.",
-    "Category text 'Dorostenci střední' normalized to allowed category name 'Střední dorostenci'.",
+    "Category text 'Střední dorostenci' normalized to allowed category name 'Střední dorostenci'.",
     "Time normalization: 'mm:ss' style in PDF treated as seconds with decimal separator ':' -> '.', e.g., '16:48' => 16.48; trailing '-' marked as invalid while retaining numeric time when within range."
   ],
   "warnings": [

@@ -163,7 +163,7 @@ export default function PerformanceByYear() {
     <div className="performance-by-year">
       <div className="performance-by-year__container">
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+          <LineChart margin={{ top: 20, right: 30, left: 10, bottom: 40 }}>
             <CartesianGrid
               strokeDasharray="4,4"
               stroke="#797979"
@@ -176,6 +176,12 @@ export default function PerformanceByYear() {
               tickFormatter={dayOfYearToLabel}
               stroke="#666"
               style={{ fontSize: "15px" }}
+              label={{
+                value: "Datum",
+                position: "insideBottom",
+                offset: -20,
+                fontSize: 14,
+              }}
             />
             <YAxis
               reversed={true}
@@ -184,9 +190,17 @@ export default function PerformanceByYear() {
               stroke="#333"
               style={{ fontSize: "15px" }}
               width={55}
+              label={{
+                value: "Čas (s)",
+                angle: -90,
+                position: "insideLeft",
+                offset: 0,
+                fontSize: 14,
+              }}
             />
             <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
             <Legend
+              wrapperStyle={{ bottom: 15 }}
               content={({ payload }) => (
                 <div
                   style={{

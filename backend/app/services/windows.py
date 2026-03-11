@@ -218,7 +218,7 @@ def year_label(
 
     Format::
 
-        "Rok {year} ({window_start_date}–{window_end_date})"
+        "{end_year}–{start_year}"
 
     Example::
 
@@ -227,7 +227,7 @@ def year_label(
         >>> ws = datetime(2023, 1, 1,  tzinfo=timezone.utc)
         >>> we = datetime(2025, 12, 31, tzinfo=timezone.utc)
         >>> year_label(a, ws, we)
-        'Rok 2025 (2023-01-01–2025-12-31)'
+        '2025–2023'
 
     Parameters
     ----------
@@ -266,6 +266,5 @@ def year_label(
         return d
 
     anchor_dt = _to_date(anchor)
-    start_str = _to_date(window_start).isoformat()
-    end_str = _to_date(window_end).isoformat()
-    return f"Rok {anchor_dt.year} ({start_str}–{end_str})"
+    start_year = _to_date(window_start).year
+    return f"{anchor_dt.year}–{start_year}"

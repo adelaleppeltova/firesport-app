@@ -28,34 +28,18 @@ async def list_athletes_service(
     query: Dict[str, Any] = {}
 
     if anomaly_status == "processed":
-        run_query: Dict[str, Any]
         if run_id:
-            run_query = {"run_id": run_id}
-        else:
-            run_query = {
-                "window_type": "yearly_3y",
-                "is_superseded": {"$ne": True},
-            }
-
-        if run_id:
-            run_doc = await db["anomaly_runs"].find_one(
-                run_query,
-                projection={"run_id": 1},
+            # Filtrujeme podle konkrétního runu
+            processed_athlete_ids: List[ObjectId] = await db["anomaly_scores"].distinct(
+                "athlete_id",
+                {"run_id": run_id},
             )
         else:
-            run_doc = await db["anomaly_runs"].find_one(
-                run_query,
-                sort=[("created_at", -1)],
-                projection={"run_id": 1},
+            # Vyhledáváme přes VŠECHNY anomaly runy – bez omezení na jeden run
+            processed_athlete_ids = await db["anomaly_scores"].distinct(
+                "athlete_id",
+                {},
             )
-
-        if not run_doc:
-            return AthletesPage(items=[], total=0, page=page, page_size=page_size)
-
-        processed_athlete_ids: List[ObjectId] = await db["anomaly_scores"].distinct(
-            "athlete_id",
-            {"run_id": run_doc["run_id"]},
-        )
 
         if not processed_athlete_ids:
             return AthletesPage(items=[], total=0, page=page, page_size=page_size)

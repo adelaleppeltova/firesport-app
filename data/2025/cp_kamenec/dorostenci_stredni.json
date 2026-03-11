@@ -8,7 +8,7 @@
     "league": "Český pohár",
     "categories": [
       {
-        "name": "Dorostenci střední",
+        "name": "Střední dorostenci",
         "results": [
           {
             "start_number": "34",
@@ -1287,7 +1287,7 @@
     ]
   },
   "parsing_notes": [
-    "Detected single-event results list with header 'Večerní stovka Kamenec u Poličky kategorie: Dorostenci střední'.",
+    "Detected single-event results list with header 'Večerní stovka Kamenec u Poličky kategorie: Střední dorostenci'.",
     "Column layout inferred from header line 'PořSč FSC Jméno Roč. Družstvo Čas 1.k Čas 2.kCelkem'. Parsing by tokenizing lines, identifying birth year (4-digit) to split name/team, first numeric column as rank, second numeric column as start number, third as FSC.",
     "Discipline inferred as 100m from the phrase 'Večerní stovka' -> mapped to 100m.",
     "Times parsed by converting ':' to '.' (e.g., 16:29 -> 16.29). Trailing '-' marks invalid attempt and time set to null.",
@@ -1296,7 +1296,7 @@
   "warnings": [
     "competition.league not present in document (left empty).",
     "No 'district/okres' column present; 'district' left empty for all results.",
-    "Category name 'Dorostenci střední' may not match canonical category naming (e.g., 'Střední dorostenci'); category names preserved as in document.",
+    "Category name 'Střední dorostenci' may not match canonical category naming (e.g., 'Střední dorostenci'); category names preserved as in document.",
     "Name ordering assumed as 'surname given-names' (first token = last_name, remaining = first_name) based on majority of entries; some entries (e.g., 'Petr Adam') may be ambiguous."
   ]
 }

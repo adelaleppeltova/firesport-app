@@ -11,6 +11,63 @@ for Isolation Forest on small univariate time series.
 from pydantic import BaseModel, ConfigDict, Field
 
 
+# ------------------------------------------------------------------
+# Skupiny porovnatelných kategorií
+# ------------------------------------------------------------------
+
+# Klíč: normalizovaný název kategorie (lowercase, strip)
+# Hodnota: identifikátor skupiny
+#
+# Logika seskupení dle uživatelské definice:
+#   muz              → muži + starší dorostenci + muži a starší dorostenci
+#   zena             → ženy + mladší dorostenky + střední dorostenky +
+#                      starší dorostenky + ženy a starší dorostenky
+#   mladsi_dorostenci → mladší dorostenci + střední dorostenci
+
+CATEGORY_GROUP_MAP: dict[str, str] = {
+    # muži skupinka
+    "muži": "muz",
+    "dorostenci": "muz",
+    "starší dorostenci": "muz",
+    "muži a starší dorostenci": "muz",
+    "muži hzs": "muz",
+    # ženy skupinka
+    "ženy": "zena",
+    "dorostenky": "zena",
+    "mladší dorostenky": "zena",
+    "střední dorostenky": "zena",
+    "starší dorostenky": "zena",
+    "ženy a starší dorostenky": "zena",
+    # mladší/střední dorostenci skupinka
+    "mladší dorostenci": "mladsi_dorostenci",
+    "střední dorostenci": "mladsi_dorostenci",
+    "dorostenci střední": "mladsi_dorostenci",
+}
+
+
+def get_category_group(category_name: str) -> str:
+    """Vrátí identifikátor skupiny porovnatelných kategorií.
+
+    Porovnání je case-insensitive a ignoruje okolní bílé znaky.
+    Pokud kategorie neodpovídá žádné definované skupině, vrátí
+    normalizovaný název kategorie (každá neznámá kategorie je sama
+    sobě skupinou – výsledky se nemíchají s jinými).
+
+    Parameters
+    ----------
+    category_name:
+        Název kategorie z databáze (např. "Muži", "Ženy", ...).
+
+    Returns
+    -------
+    str
+        Identifikátor skupiny, např. ``"muz"``, ``"zena"``,
+        ``"mladsi_dorostenci"``, nebo normalizovaný název kategorie.
+    """
+    normalized = category_name.strip().lower()
+    return CATEGORY_GROUP_MAP.get(normalized, normalized)
+
+
 class AnomalyConfig(BaseModel):
     """Immutable configuration for one anomaly-detection run.
 

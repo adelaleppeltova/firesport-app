@@ -1,5 +1,15 @@
 @use "../abstracts/variables.scss";
 
+.footer {
+  &.sidebar {
+    padding-left: variables.$sidebar-width;
+
+    @media (min-width: variables.$breakpoint-l) {
+      padding-left: variables.$sidebar-width-l;
+    }
+  }
+}
+
 .main {
   padding-top: variables.$header-height + 20px;
   min-height: 77vh;

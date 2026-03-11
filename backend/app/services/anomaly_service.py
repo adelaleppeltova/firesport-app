@@ -23,7 +23,7 @@ from app.models.anomaly import (
     SkipReasonCounts,
     WindowRecomputeSummary,
 )
-from app.ml.anomaly_config import AnomalyConfig, DEFAULT_CONFIG
+from app.ml.anomaly_config import AnomalyConfig, DEFAULT_CONFIG, get_category_group
 from app.ml.isolation_forest import compute_iforest_anomalies
 from app.services.quality_flag_service import recompute_quality_flags
 from app.services.windows import (
@@ -117,6 +117,7 @@ async def compute_for_athlete(
     window_end: datetime,
     *,
     config: AnomalyConfig | None = None,
+    use_adaptive_contamination: bool = False,
 ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """Compute anomalies for a single athlete within a time window.
 
@@ -191,6 +192,19 @@ async def compute_for_athlete(
                                AnomalyRunStatus.skipped.value, summary),
                 [],
             )
+
+        # --- adaptive contamination override (optional) ------------------
+        if use_adaptive_contamination:
+            c = adaptive_contamination(n_valid_results)
+            cfg = AnomalyConfig(
+                min_results=cfg.min_results,
+                n_estimators=cfg.n_estimators,
+                eps_std=cfg.eps_std,
+                random_state=cfg.random_state,
+                contamination=c,
+            )
+            # rebuild model doc with updated contamination
+            model = _build_model(cfg)
 
         # --- run ML ------------------------------------------------------
         times = [r["final_time"] for r in results]
@@ -289,11 +303,17 @@ async def recompute_for_all_athletes(
     window_end: datetime,
     *,
     config: AnomalyConfig | None = None,
+    use_adaptive_contamination: bool = True,
 ) -> Dict[str, Any]:
     """Recompute anomalies for every athlete in the database.
 
     Returns a dict with counters **and** structured skip-reason counts
     for full observability.
+
+    When *use_adaptive_contamination* is ``True`` (default), each athlete
+    gets ``contamination = clamp(1/n, 0.02, 0.10)`` instead of the fixed
+    value from *config*.  This mirrors the behaviour of
+    :func:`recompute_for_window`.
     """
     cfg = config or DEFAULT_CONFIG
 
@@ -323,6 +343,7 @@ async def recompute_for_all_athletes(
 
             run_doc, score_docs = await compute_for_athlete(
                 db, athlete_id, window_start, window_end, config=cfg,
+                use_adaptive_contamination=use_adaptive_contamination,
             )
 
             # persist run doc
@@ -412,6 +433,10 @@ async def list_detection_windows(
             "$match": {
                 "window_type": window_type,
                 "is_superseded": {"$ne": True},
+                # Vyloučit per-athlete runy z recompute_for_all_athletes,
+                # které mají pole "summary" místo "stats".
+                # Okno-level runy z recompute_for_window mají vždy "stats".
+                "stats": {"$exists": True},
             }
         },
         {
@@ -420,9 +445,12 @@ async def list_detection_windows(
                     "window_start": "$window.start_date",
                     "window_end": "$window.end_date",
                 },
-                "run_id": {"$first": "$run_id"},
-                "processed": {"$first": "$stats.processed"},
-                "scores_inserted": {"$first": "$stats.scores_inserted"},
+                # Vybíráme $last (nejnovější) místo $first, aby se při více
+                # non-superseded runech pro stejné okno (edge-case) vrátil
+                # ten nejčerstvější.
+                "run_id": {"$last": "$run_id"},
+                "processed": {"$last": "$stats.processed"},
+                "scores_inserted": {"$last": "$stats.scores_inserted"},
             }
         },
         {
@@ -461,13 +489,17 @@ async def list_detection_windows(
             )
             continue
 
-        # Filter 4 (soft): skip runs that produced zero results, but only
-        # when the stats field is present (legacy runs without it are kept).
-        processed = row.get("processed")
-        scores = row.get("scores_inserted")
-        if processed is not None and scores is not None:
-            if processed == 0 and scores == 0:
-                continue
+        # Filter 4 (strict): skip window runs with zero results.
+        # Díky filtru "stats exists" v pipeline jsou zde pouze window-level
+        # runy, které stats mají vždy.
+        processed = row.get("processed") or 0
+        scores = row.get("scores_inserted") or 0
+        if processed == 0 and scores == 0:
+            logger.debug(
+                "Skipping empty window run %s (0 processed, 0 scores)",
+                row.get("run_id"),
+            )
+            continue
 
         result.append(row)
 
@@ -532,6 +564,8 @@ async def _supersede_existing_window_run(
             "window_type": window_type,
             "window.end_date": anchor_dt,
             "is_superseded": {"$ne": True},
+            # Supersedujeme pouze window-level runy, ne per-athlete legacy runy.
+            "stats": {"$exists": True},
         }
     )
     if existing is None:
@@ -687,26 +721,37 @@ async def recompute_for_window(
         # 2) Idempotence: supersede previous run for this window if any
         await _supersede_existing_window_run(db, window_type, anchor_dt)
 
-        # 3) Load all valid results in window (one DB round-trip)
+        # 3) Načti mapu kategorie_id → skupina (jedno DB volání před smyčkou)
+        category_group_map: Dict[str, str] = {}
+        async for cat_doc in db["categories"].find({}, projection={"_id": 1, "name": 1}):
+            cat_name = cat_doc.get("name") or ""
+            category_group_map[str(cat_doc["_id"])] = get_category_group(cat_name)
+
+        # 4) Load all valid results in window (one DB round-trip)
         raw_results = await db["results"].find(
             {
                 "final_time_status": "valid",
                 "final_time": {"$ne": None},
                 "date": {"$gte": window_start, "$lte": window_end},
             },
-            projection={"_id": 1, "athlete": 1, "final_time": 1, "date": 1},
+            projection={"_id": 1, "athlete": 1, "category": 1, "final_time": 1, "date": 1},
         ).sort("date", 1).to_list(None)
 
-        # 4) Group by athlete_id
-        athlete_results: Dict[str, List[Dict[str, Any]]] = {}
+        # 5) Group by (athlete_id, category_group)
+        #    Výsledky ze srovnatelných kategorií se počítají dohromady;
+        #    nesrovnatelné kategorie jsou izolovány vlastní skupinou.
+        athlete_group_results: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
         for r in raw_results:
             aid = str(r["athlete"])
-            athlete_results.setdefault(aid, []).append(r)
+            cat_oid = r.get("category")
+            cg = category_group_map.get(str(cat_oid), str(cat_oid)) if cat_oid is not None else "unknown"
+            key = (aid, cg)
+            athlete_group_results.setdefault(key, []).append(r)
 
         all_score_docs: List[Dict[str, Any]] = []
 
-        # 5) Per-athlete processing
-        for athlete_id, results in athlete_results.items():
+        # 6) Per-athlete + category-group processing
+        for (athlete_id, category_group), results in athlete_group_results.items():
             n = len(results)
             sr = counters["skip_reason_counts"]
 
@@ -776,6 +821,7 @@ async def recompute_for_window(
                         else AnomalyDirection.none.value
                     ),
                     "contamination_used": c,
+                    "category_group": category_group,
                 })
             counters["processed"] += 1
 
@@ -958,12 +1004,15 @@ async def recompute_yearly_batch(
     logger.info("Found %d yearly anchors in range", len(anchors))
 
     # 3) Pre-load existing non-superseded runs for skip logic (force=False)
+    # Filtrujeme pouze window-level runy (mají "stats"), aby legacy per-athlete
+    # runy z recompute_for_all_athletes neblokují přepočet.
     existing_anchor_dates: set[str] = set()
     if not force:
         cursor = db["anomaly_runs"].find(
             {
                 "window_type": window_type,
                 "is_superseded": {"$ne": True},
+                "stats": {"$exists": True},
             },
             projection={"window.end_date": 1},
         )

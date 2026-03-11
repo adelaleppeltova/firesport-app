@@ -11,7 +11,6 @@ import {
   Legend,
 } from "recharts";
 import Card from "../components/Card";
-import PrimaryButton from "../components/PrimaryButton";
 import {
   useAthleteAnomalies,
   useAthleteDetail,
@@ -75,6 +74,43 @@ function AnomalyTooltip({ active, payload }) {
   );
 }
 
+// --- category group select ---
+
+const CATEGORY_GROUP_LABELS = {
+  muz: "Muži / Dorostenci družstva / Starší dorostenci",
+  zena: "Ženy / Dorostenky",
+  mladsi_dorostenci: "Mladší / Střední dorostenci",
+};
+
+function formatCategoryGroup(group) {
+  return CATEGORY_GROUP_LABELS[group] ?? group;
+}
+
+function CategoryGroupSelect({ groups, value, onChange }) {
+  if (!groups || groups.length === 0) return null;
+  const isDisabled = groups.length === 1;
+  return (
+    <div className="window-select">
+      <label className="window-select__label" htmlFor="category-group-select">
+        Kategorie:
+      </label>
+      <select
+        id="category-group-select"
+        className="window-select__input"
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value || null)}
+        disabled={isDisabled}
+      >
+        {groups.map((g) => (
+          <option key={g} value={g}>
+            {formatCategoryGroup(g)}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 // --- year selector ---
 
 function YearSelect({ windows, value, onChange, isLoading, isError }) {
@@ -107,7 +143,7 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
 
 // --- summary card ---
 
-function SummaryCard({ run }) {
+function SummaryCard({ run, items }) {
   if (!run) {
     return (
       <Card title="Přehled anomálií">
@@ -119,6 +155,10 @@ function SummaryCard({ run }) {
   }
 
   const period = `${formatMonthYear(run.window_start)} – ${formatMonthYear(run.window_end)}`;
+  const nAnomalies =
+    items != null
+      ? items.filter((it) => it.is_anomaly).length
+      : run.n_anomalies;
 
   return (
     <Card title="Přehled anomálií">
@@ -128,7 +168,7 @@ function SummaryCard({ run }) {
             Celkový počet neobvyklých výkonů
           </span>
           <span className="anomaly-summary__value anomaly-summary__value--highlight">
-            {run.n_anomalies}
+            {nAnomalies}
           </span>
         </div>
         <div className="anomaly-summary__item">
@@ -138,7 +178,20 @@ function SummaryCard({ run }) {
         <div className="anomaly-summary__item">
           <span className="anomaly-summary__label">Závody celkem</span>
           <span className="anomaly-summary__value">
+            {run.n_valid_results_in_window +
+              (run.n_invalid_results_in_window ?? 0)}
+          </span>
+        </div>
+        <div className="anomaly-summary__item">
+          <span className="anomaly-summary__label">z toho validní</span>
+          <span className="anomaly-summary__value">
             {run.n_valid_results_in_window}
+          </span>
+        </div>
+        <div className="anomaly-summary__item">
+          <span className="anomaly-summary__label">z toho nevalidní</span>
+          <span className="anomaly-summary__value">
+            {run.n_invalid_results_in_window ?? 0}
           </span>
         </div>
         {run.median_time != null && (
@@ -212,7 +265,7 @@ function ChartCard({ items }) {
         <p className="empty-state">Žádná data pro vybranou sezónu.</p>
       ) : (
         <ResponsiveContainer width="100%" height={280}>
-          <ScatterChart margin={{ top: 10, right: 16, bottom: 10, left: 0 }}>
+          <ScatterChart margin={{ top: 10, right: 16, bottom: 30, left: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
             <XAxis
               dataKey="x"
@@ -223,6 +276,12 @@ function ChartCard({ items }) {
               tickFormatter={tickFormatter}
               tick={{ fontSize: 11 }}
               tickLine={false}
+              label={{
+                value: "Datum",
+                position: "insideBottom",
+                offset: -15,
+                fontSize: 14,
+              }}
             />
             <YAxis
               dataKey="y"
@@ -233,6 +292,13 @@ function ChartCard({ items }) {
               tick={{ fontSize: 11 }}
               tickLine={false}
               width={58}
+              label={{
+                value: "Čas (s)",
+                angle: -90,
+                position: "insideLeft",
+                offset: 0,
+                fontSize: 14,
+              }}
             />
             <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
             <Legend
@@ -240,6 +306,7 @@ function ChartCard({ items }) {
                 value === "normal" ? "Normální výkon" : "Neobvyklý výkon"
               }
               iconType="circle"
+              wrapperStyle={{ bottom: -10 }}
             />
             <Scatter
               name="normal"
@@ -267,7 +334,7 @@ function ChartCard({ items }) {
 const PAGE_SIZE = 5;
 
 function TableCard({ items, medianTime }) {
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
 
   const anomalyItems = useMemo(
     () =>
@@ -279,7 +346,6 @@ function TableCard({ items, medianTime }) {
     [items],
   );
 
-  const totalPages = Math.max(1, Math.ceil(anomalyItems.length / PAGE_SIZE));
   const pageItems = anomalyItems.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE,
@@ -423,12 +489,12 @@ export default function StatisticsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const debounceRef = useRef(null);
 
-  // 1) Fetch available detection windows
+  // 1) Fetch available detection windows – filtrujeme jen okna pro tohoto závodníka
   const {
     data: windows,
     isLoading: windowsLoading,
     isError: windowsError,
-  } = useMlWindows();
+  } = useMlWindows("yearly_3y", selectedAthleteId);
 
   // 2) Track selected run_id; default to first (newest) window
   const [selectedRunId, setSelectedRunId] = useState(null);
@@ -437,6 +503,21 @@ export default function StatisticsPage() {
       setSelectedRunId(windows[0].run_id);
     }
   }, [windows, selectedRunId]);
+
+  // 3) Track selected category group (reset when athlete or period changes)
+  const [selectedCategoryGroup, setSelectedCategoryGroup] = useState(null);
+  const prevAthleteRef = useRef(selectedAthleteId);
+  const prevRunIdRef = useRef(selectedRunId);
+  useEffect(() => {
+    if (
+      prevAthleteRef.current !== selectedAthleteId ||
+      prevRunIdRef.current !== selectedRunId
+    ) {
+      setSelectedCategoryGroup(null);
+      prevAthleteRef.current = selectedAthleteId;
+      prevRunIdRef.current = selectedRunId;
+    }
+  }, [selectedAthleteId, selectedRunId]);
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -451,7 +532,6 @@ export default function StatisticsPage() {
     page: 1,
     pageSize: 10,
     anomalyStatus: "processed",
-    runId: selectedRunId ?? undefined,
   });
 
   const { data: selectedAthleteDetail } = useAthleteDetail(selectedAthleteId);
@@ -462,16 +542,43 @@ export default function StatisticsPage() {
     setSearchParams(next, { replace: true });
     setSearch("");
     setDebouncedSearch("");
+    setSelectedRunId(null); // reset → useEffect předvolí nejnovější okno
   };
 
-  // 3) Fetch anomalies for selected run
+  // 4) Fetch anomalies for selected run – teprve po výběru run_id
   const { data, isLoading, isError } = useAthleteAnomalies(
     selectedAthleteId,
     selectedRunId,
   );
 
   const run = data?.run ?? null;
-  const items = data?.items ?? [];
+  const allItems = useMemo(() => data?.items ?? [], [data]);
+
+  // Derive available category groups from fetched items
+  const availableCategoryGroups = useMemo(() => {
+    const groups = [
+      ...new Set(allItems.map((it) => it.category_group).filter(Boolean)),
+    ];
+    return groups.sort();
+  }, [allItems]);
+
+  // Auto-select first group whenever available groups change
+  // (covers initial load and athlete/period switch after reset to null)
+  useEffect(() => {
+    if (
+      availableCategoryGroups.length > 0 &&
+      !availableCategoryGroups.includes(selectedCategoryGroup)
+    ) {
+      setSelectedCategoryGroup(availableCategoryGroups[0]);
+    }
+  }, [availableCategoryGroups, selectedCategoryGroup]);
+
+  // Filter items by selected category group
+  const items = useMemo(() => {
+    if (!selectedCategoryGroup) return allItems;
+    return allItems.filter((it) => it.category_group === selectedCategoryGroup);
+  }, [allItems, selectedCategoryGroup]);
+
   const searchResults = athletesData?.items ?? [];
 
   return (
@@ -505,6 +612,14 @@ export default function StatisticsPage() {
         />
       )}
 
+      {selectedAthleteId && !isLoading && !isError && (
+        <CategoryGroupSelect
+          groups={availableCategoryGroups}
+          value={selectedCategoryGroup}
+          onChange={setSelectedCategoryGroup}
+        />
+      )}
+
       {!selectedAthleteId ? (
         <div className="anomaly-no-athlete">
           <i className="fa-solid fa-user-magnifying-glass" />
@@ -513,7 +628,22 @@ export default function StatisticsPage() {
             statistiky neobvyklých výkonů.
           </p>
         </div>
-      ) : isLoading ? (
+      ) : windowsLoading ? (
+        <>
+          <div className="skeleton" style={{ height: 40, marginBottom: 16 }} />
+          <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
+          <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
+          <div className="skeleton" style={{ height: 200 }} />
+        </>
+      ) : !windowsError && windows?.length === 0 ? (
+        <div className="anomaly-no-athlete">
+          <i className="fa-solid fa-chart-line" />
+          <p>
+            Pro tohoto závodníka není k dispozici žádná detekce neobvyklých
+            výkonů. Pro analýzu je potřeba alespoň 10 výsledků v daném období.
+          </p>
+        </div>
+      ) : isLoading || !selectedRunId ? (
         <>
           <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
@@ -525,7 +655,7 @@ export default function StatisticsPage() {
         </p>
       ) : (
         <>
-          <SummaryCard run={run} />
+          <SummaryCard run={run} items={items} />
           <ChartCard items={items} />
           <TableCard items={items} medianTime={run?.median_time ?? null} />
         </>

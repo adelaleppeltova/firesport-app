@@ -11,14 +11,14 @@ export default function HomePage() {
   const { data: user, isLoading } = useMe();
 
   if (isLoading) {
-    return <div className="home-page">Načítání...</div>;
+    return <div className="home-page page">Načítání...</div>;
   }
 
   const isPaired = user?.athlete_id;
 
   if (!isPaired) {
     return (
-      <div className="home-page">
+      <div className="home-page page">
         <PairAthleteCard />
       </div>
     );

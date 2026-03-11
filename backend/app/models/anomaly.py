@@ -100,6 +100,7 @@ class AnomalyItem(BaseModel):
     competition_name: Optional[str] = None
     competition_place: Optional[str] = None
     quality_flag: QualityFlag = QualityFlag.ok
+    category_group: Optional[str] = None
 
 
 class AnomalyRunInfo(BaseModel):
@@ -109,6 +110,7 @@ class AnomalyRunInfo(BaseModel):
     window_start: datetime
     window_end: datetime
     n_valid_results_in_window: int
+    n_invalid_results_in_window: int = 0
     n_anomalies: int
     threshold_score: Optional[float] = None
     median_time: Optional[float] = None

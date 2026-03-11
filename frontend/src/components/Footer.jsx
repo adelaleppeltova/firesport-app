@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="footer sidebar">
       <p className="footer__text">
         Aplikace byla vytvořena v rámci diplomové práce
       </p>

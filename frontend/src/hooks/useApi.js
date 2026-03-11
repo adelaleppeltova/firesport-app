@@ -178,20 +178,21 @@ export function useAthleteAnomalies(athleteId, runId) {
       );
       return data;
     },
-    enabled: !!athleteId,
+    enabled: !!athleteId && !!runId,
   });
 }
 
-// GET /ml/windows?type=yearly_3y
-export function useMlWindows(type = "yearly_3y") {
+// GET /ml/windows?type=yearly_3y[&athlete_id=...]
+export function useMlWindows(type = "yearly_3y", athleteId = null) {
   return useQuery({
-    queryKey: ["ml", "windows", type],
+    queryKey: ["ml", "windows", type, athleteId ?? null],
     queryFn: async () => {
-      const { data } = await api.get(
-        `/v1/ml/windows?type=${encodeURIComponent(type)}`,
-      );
+      const params = new URLSearchParams({ type });
+      if (athleteId) params.set("athlete_id", athleteId);
+      const { data } = await api.get(`/v1/ml/windows?${params.toString()}`);
       return data; // list of WindowListItem
     },
-    staleTime: 5 * 60 * 1000, // 5 min – windows change rarely
+    enabled: !!athleteId, // načteme teprve po výběru závodníka
+    staleTime: 2 * 60 * 1000,
   });
 }

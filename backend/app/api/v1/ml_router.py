@@ -68,6 +68,14 @@ async def recompute_anomalies(db=Depends(get_db)):
 
 @router.get("/windows", response_model=list[WindowListItem])
 async def get_detection_windows(
+    athlete_id: Optional[str] = Query(
+        default=None,
+        description=(
+            "Volitelné athlete_id (ObjectId jako string). "
+            "Pokud je zadáno, vrátí pouze okna, pro která závodník skutečně "
+            "má anomaly skóre (tj. byl zařazen do detekce)."
+        ),
+    ),
     db=Depends(get_db),
 ):
     """Return distinct detection windows stored in anomaly_runs.
@@ -75,6 +83,8 @@ async def get_detection_windows(
     Each item represents a unique (window_start, window_end) pair
     with at least one completed yearly run (window_type=yearly_3y).
     Results are sorted by ``window_end`` descending (newest year first).
+    When ``athlete_id`` is provided, only windows with scores for that
+    athlete are returned.
 
     Recommended MongoDB index for performance::
 
@@ -83,6 +93,23 @@ async def get_detection_windows(
         )
     """
     raw_windows = await list_detection_windows(db, window_type="yearly_3y")
+
+    # Filter to windows where the athlete actually has scores
+    if athlete_id:
+        try:
+            from bson import ObjectId
+            athlete_oid = ObjectId(athlete_id)
+        except Exception:
+            athlete_oid = None
+
+        if athlete_oid is not None:
+            athlete_run_ids: set = set(
+                await db["anomaly_scores"].distinct(
+                    "run_id",
+                    {"athlete_id": athlete_oid},
+                )
+            )
+            raw_windows = [w for w in raw_windows if w["run_id"] in athlete_run_ids]
 
     items: list[WindowListItem] = []
     for row in raw_windows:
