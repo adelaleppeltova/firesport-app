@@ -19,7 +19,7 @@ class PerformanceIndicator(BaseModel):
     new_value: Optional[float] = None
     old_value: Optional[float] = None
     average_time: Optional[float] = None
-    recent_results: List[RecentResult] = Field(default_factory=list)
+    recent_results: Optional[List[RecentResult]] = Field(default_factory=list)
 
 class BestPerformance(BaseModel):
     """Nejlepší výkon - čas, soutěž a místo"""
@@ -54,7 +54,7 @@ class AthleteOverview(AthleteInDB):
     total_competitions: int = 0
     best_time: Optional[float] = None
     average_time: Optional[float] = None
-    performance_indicator: PerformanceIndicator = Field(
+    performance_indicator: Optional[PerformanceIndicator] = Field(
         default_factory=PerformanceIndicator
     )
     performance_variability: Optional[float] = None  # Rozsah (max - min) poslednich platnych casu
@@ -114,3 +114,14 @@ class PerformanceInYear(BaseModel):
     best_time: Optional[float]
     competitions: int
     races: List[RaceInYear]
+
+
+class CategoryRaceStats(BaseModel):
+    """Statistiky závodů v jedné skupině kategorií (bez ohledu na okno detekce)."""
+    total_races: int
+    best_time: Optional[float] = None
+
+
+class AthleteCategoryStatsResponse(BaseModel):
+    """Mapa category_group → statistiky ze všech závodů v DB."""
+    stats: dict[str, CategoryRaceStats] = Field(default_factory=dict)

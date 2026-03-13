@@ -1,6 +1,6 @@
 from typing import List, Optional, Literal
 from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, PerformanceByYear, PerformanceInYear
+from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, PerformanceByYear, PerformanceInYear, AthleteCategoryStatsResponse
 from app.models.models import AthleteDetailPage
 from app.dependencies import get_current_user
 from bson import ObjectId
@@ -16,7 +16,8 @@ from app.services.athletes import (
     get_athlete_overview_service,
     get_athlete_detail_service,
     list_athletes_service,
-    get_athlete_performance_by_year_service
+    get_athlete_performance_by_year_service,
+    get_athlete_category_stats_service,
 )
 
 
@@ -80,5 +81,17 @@ async def get_athlete_performance_in_year(athlete_id: str, user=Depends(get_curr
     """Vrátí data vývoje výkonu atleta po jednotlivých sezónách pro graf."""
     try:
         return await get_athlete_year_summary_service(athlete_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/{athlete_id}/category-stats", response_model=AthleteCategoryStatsResponse)
+async def get_athlete_category_stats(athlete_id: str):
+    """Vrátí celkový počet závodů a nejlepší čas pro každou skupinu kategorií.
+
+    Zahrnuje všechny záznamy v DB (validní i nevalidní), bez omezení na okno detekce.
+    """
+    try:
+        return await get_athlete_category_stats_service(athlete_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

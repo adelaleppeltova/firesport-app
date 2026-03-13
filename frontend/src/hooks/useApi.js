@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useQueries,
+} from "@tanstack/react-query";
+import { useMemo } from "react";
 import api from "../api/axios";
 export { useResultsByCategory } from "./useResultsByCategory";
 
@@ -182,6 +188,54 @@ export function useAthleteAnomalies(athleteId, runId) {
   });
 }
 
+// Fetch items from ALL windows for an athlete, deduplicated by result_id.
+// Returns { items, runIdsByCategory } where runIdsByCategory is a
+// Map<category_group, Set<run_id>> used to filter windows by category.
+export function useAllAthleteAnomalyItems(athleteId, windows) {
+  const windowList = windows ?? [];
+
+  const queries = useQueries({
+    queries: windowList.map((w) => ({
+      queryKey: ["athletes", athleteId, "anomalies", w.run_id],
+      queryFn: async () => {
+        const { data } = await api.get(
+          `/v1/athletes/${athleteId}/anomalies?run_id=${encodeURIComponent(w.run_id)}`,
+        );
+        return data;
+      },
+      enabled: !!athleteId && !!w.run_id,
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+
+  return useMemo(() => {
+    const seen = new Set();
+    const combined = [];
+    // Map<category_group, Set<run_id>>
+    const runIdsByCategory = new Map();
+
+    for (let i = 0; i < queries.length; i++) {
+      const runId = windowList[i]?.run_id;
+      for (const item of queries[i].data?.items ?? []) {
+        // Build category → run_id mapping (before dedup so all windows counted)
+        if (item.category_group && runId) {
+          if (!runIdsByCategory.has(item.category_group)) {
+            runIdsByCategory.set(item.category_group, new Set());
+          }
+          runIdsByCategory.get(item.category_group).add(runId);
+        }
+        // Deduplicate items by result_id
+        if (!seen.has(item.result_id)) {
+          seen.add(item.result_id);
+          combined.push(item);
+        }
+      }
+    }
+    return { items: combined, runIdsByCategory };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queries]);
+}
+
 // GET /ml/windows?type=yearly_3y[&athlete_id=...]
 export function useMlWindows(type = "yearly_3y", athleteId = null) {
   return useQuery({
@@ -194,5 +248,18 @@ export function useMlWindows(type = "yearly_3y", athleteId = null) {
     },
     enabled: !!athleteId, // načteme teprve po výběru závodníka
     staleTime: 2 * 60 * 1000,
+  });
+}
+
+// GET /athletes/:id/category-stats
+export function useAthleteCategoryStats(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "category-stats"],
+    queryFn: async () => {
+      const { data } = await api.get(`/v1/athletes/${athleteId}/category-stats`);
+      return data; // { stats: { [category_group]: { total_races, best_time } } }
+    },
+    enabled: !!athleteId,
+    staleTime: 5 * 60 * 1000,
   });
 }

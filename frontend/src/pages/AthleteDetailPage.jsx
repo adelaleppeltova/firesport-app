@@ -1,5 +1,9 @@
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { useAthleteDetail } from "../hooks/useApi";
+import { useAthleteDetail, useAthleteCategoryStats } from "../hooks/useApi";
+import CategorySummaryCard, {
+  CategoryGroupSelect,
+} from "../components/athlete/CategorySummaryCard";
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -10,12 +14,32 @@ const formatDate = (dateString) => {
 export default function AthleteDetailPage() {
   const { id } = useParams();
   const { data, isLoading, error } = useAthleteDetail(id);
+  const { data: categoryStatsData } = useAthleteCategoryStats(id);
+
+  const [selectedCategoryGroup, setSelectedCategoryGroup] = useState(null);
+
+  const availableCategoryGroups = useMemo(() => {
+    if (!categoryStatsData?.stats) return [];
+    return Object.keys(categoryStatsData.stats).sort();
+  }, [categoryStatsData]);
+
+  useEffect(() => {
+    if (
+      availableCategoryGroups.length > 0 &&
+      !availableCategoryGroups.includes(selectedCategoryGroup)
+    ) {
+      setSelectedCategoryGroup(availableCategoryGroups[0]);
+    }
+  }, [availableCategoryGroups, selectedCategoryGroup]);
 
   if (isLoading) return <div className="athlete-detail-page">Načítání...</div>;
   if (error || !data)
     return <div className="athlete-detail-page">Chyba při načítání dat.</div>;
 
   const { athlete, best_time, results } = data;
+  const categoryStat = selectedCategoryGroup
+    ? (categoryStatsData?.stats?.[selectedCategoryGroup] ?? null)
+    : null;
 
   return (
     <div className="athlete-detail-page page">
@@ -56,6 +80,23 @@ export default function AthleteDetailPage() {
           </tbody>
         </table>
       </div>
+
+      {availableCategoryGroups.length > 0 && (
+        <CategoryGroupSelect
+          groups={availableCategoryGroups}
+          value={selectedCategoryGroup}
+          onChange={setSelectedCategoryGroup}
+        />
+      )}
+
+      {selectedCategoryGroup && (
+        <CategorySummaryCard
+          totalRaces={categoryStat?.total_races ?? null}
+          bestTime={categoryStat?.best_time ?? null}
+          categoryGroup={selectedCategoryGroup}
+        />
+      )}
+
       <hr className="athlete-detail-divider" />
       <h2>Výsledky</h2>
       <div className="athletes-table-wrapper">
@@ -74,7 +115,9 @@ export default function AthleteDetailPage() {
             {results && results.length > 0 ? (
               results.map((r, idx) => (
                 <tr
-                  onClick={() => window.location.href = `/zavody/${r.competition._id}/vysledky/${r.category._id}#${athlete._id}`}
+                  onClick={() =>
+                    (window.location.href = `/zavody/${r.competition._id}/vysledky/${r.category._id}#${athlete._id}`)
+                  }
                   className="athlete-results-card-row"
                   key={idx}
                 >

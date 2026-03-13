@@ -1,11 +1,12 @@
 from bson import ObjectId
 from app.db.database import db
-from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail, BestPerformance
+from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail, BestPerformance, AthleteCategoryStatsResponse, CategoryRaceStats
 from app.models.result import ResultAthleteDetail
 from datetime import datetime
 from typing import List, Dict, Optional, Any, Set
 
 from app.models.models import AthleteDetailPage
+from app.ml.anomaly_config import get_category_group
 from app.services.performance_indicator import calculate_performance_indicator
 from app.services.performance_stability_service import evaluate_performance_stability
 
@@ -620,3 +621,45 @@ async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] 
         "competitions": competitions_count,
         "races": races,
     }
+
+
+async def get_athlete_category_stats_service(athlete_id: str) -> AthleteCategoryStatsResponse:
+    """Vrátí celkový počet závodů a nejlepší čas pro každou skupinu kategorií.
+
+    Zahrnuje všechny záznamy v DB (validní i nevalidní, bez omezení na okno detekce).
+    """
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+
+    # 1) Sestav mapu category_id (str) → category_group
+    category_group_map: Dict[str, str] = {}
+    async for cat_doc in categories_collection.find({}, projection={"_id": 1, "name": 1}):
+        cat_name = cat_doc.get("name") or ""
+        category_group_map[str(cat_doc["_id"])] = get_category_group(cat_name)
+
+    # 2) Načti všechny výsledky závodníka (bez jakéhokoliv filtru)
+    raw_results = await results_collection.find(
+        {"athlete": athlete_oid},
+        projection={"_id": 0, "category": 1, "final_time": 1},
+    ).to_list(None)
+
+    # 3) Agreguj po skupinách
+    totals: Dict[str, int] = {}
+    best_times: Dict[str, Optional[float]] = {}
+
+    for r in raw_results:
+        cat_oid = r.get("category")
+        cg = category_group_map.get(str(cat_oid), str(cat_oid)) if cat_oid is not None else "unknown"
+        totals[cg] = totals.get(cg, 0) + 1
+        ft = r.get("final_time")
+        if ft is not None:
+            if best_times.get(cg) is None or ft < best_times[cg]:
+                best_times[cg] = ft
+
+    stats = {
+        cg: CategoryRaceStats(total_races=totals[cg], best_time=best_times.get(cg))
+        for cg in totals
+    }
+    return AthleteCategoryStatsResponse(stats=stats)

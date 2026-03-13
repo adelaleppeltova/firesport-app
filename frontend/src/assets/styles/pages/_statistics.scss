@@ -27,6 +27,21 @@
     line-height: 1.5;
     margin: 0;
   }
+
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: variables.$breakpoint-l) {
+      flex-direction: row;
+      align-items: flex-end;
+
+      > * {
+        flex: 1;
+      }
+    }
+  }
 }
 
 .statistics-athlete-search {
@@ -153,13 +168,19 @@
   &__label {
     font-size: variables.$font-size-s;
     font-weight: variables.$font-weight-medium;
-    color: variables.$gray-medium;
+    color: variables.$color-text;
   }
 
   &__input {
     @include mixins.field-input;
     cursor: pointer;
     width: 100%;
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.5rem;
   }
 
   &__skeleton {
@@ -221,6 +242,12 @@
   &__season-select {
     @include mixins.field-input;
     cursor: pointer;
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
   }
 
   &__tooltip {

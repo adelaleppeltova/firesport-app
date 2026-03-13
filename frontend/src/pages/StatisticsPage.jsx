@@ -9,12 +9,15 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ReferenceLine,
 } from "recharts";
 import Card from "../components/Card";
+import { CategoryGroupSelect } from "../components/athlete/CategorySummaryCard";
 import {
   useAthleteAnomalies,
   useAthleteDetail,
   useAthletes,
+  useAllAthleteAnomalyItems,
   useMlWindows,
 } from "../hooks/useApi";
 
@@ -74,44 +77,15 @@ function AnomalyTooltip({ active, payload }) {
   );
 }
 
-// --- category group select ---
-
-const CATEGORY_GROUP_LABELS = {
-  muz: "Muži / Dorostenci družstva / Starší dorostenci",
-  zena: "Ženy / Dorostenky",
-  mladsi_dorostenci: "Mladší / Střední dorostenci",
-};
-
-function formatCategoryGroup(group) {
-  return CATEGORY_GROUP_LABELS[group] ?? group;
-}
-
-function CategoryGroupSelect({ groups, value, onChange }) {
-  if (!groups || groups.length === 0) return null;
-  const isDisabled = groups.length === 1;
-  return (
-    <div className="window-select">
-      <label className="window-select__label" htmlFor="category-group-select">
-        Kategorie:
-      </label>
-      <select
-        id="category-group-select"
-        className="window-select__input"
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value || null)}
-        disabled={isDisabled}
-      >
-        {groups.map((g) => (
-          <option key={g} value={g}>
-            {formatCategoryGroup(g)}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
 // --- year selector ---
+
+function formatWindowLabel(window_start, window_end) {
+  const fmt = (dateStr) =>
+    new Date(dateStr).toLocaleDateString("cs-CZ", {
+      year: "numeric",
+    });
+  return `${fmt(window_start)} – ${fmt(window_end)}`;
+}
 
 function YearSelect({ windows, value, onChange, isLoading, isError }) {
   if (isLoading) {
@@ -120,6 +94,7 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
   if (isError || !windows?.length) {
     return null; // no windows yet – silently hidden
   }
+  const isDisabled = windows.length === 1;
   return (
     <div className="window-select">
       <label className="window-select__label" htmlFor="window-select">
@@ -130,10 +105,11 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
         className="window-select__input"
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
+        disabled={isDisabled}
       >
         {windows.map((w) => (
           <option key={w.run_id} value={w.run_id}>
-            {w.label}
+            {formatWindowLabel(w.window_start, w.window_end)}
           </option>
         ))}
       </select>
@@ -209,7 +185,7 @@ function SummaryCard({ run, items }) {
 
 // --- chart card ---
 
-function ChartCard({ items }) {
+function ChartCard({ items, medianTime }) {
   const { filtered, xDomain, yDomain, xTicks } = useMemo(() => {
     const mapped = items.map((it) => ({
       x: new Date(it.competition_date).getTime(),
@@ -286,7 +262,6 @@ function ChartCard({ items }) {
             <YAxis
               dataKey="y"
               type="number"
-              reversed={true}
               domain={yDomain}
               tickFormatter={(v) => `${v.toFixed(1)} s`}
               tick={{ fontSize: 11 }}
@@ -302,12 +277,61 @@ function ChartCard({ items }) {
             />
             <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
             <Legend
-              formatter={(value) =>
-                value === "normal" ? "Normální výkon" : "Neobvyklý výkon"
-              }
-              iconType="circle"
               wrapperStyle={{ bottom: -10 }}
+              content={() => (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 20,
+                    fontSize: 16,
+                  }}
+                >
+                  <span
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <svg width="10" height="10">
+                      <circle cx="5" cy="5" r="5" fill="#cf362e" />
+                    </svg>
+                    Neobvyklý výkon
+                  </span>
+                  <span
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <svg width="10" height="10">
+                      <circle cx="5" cy="5" r="5" fill="#0f4d92" />
+                    </svg>
+                    Normální výkon
+                  </span>
+                  {medianTime != null && (
+                    <span
+                      style={{ display: "flex", alignItems: "center", gap: 6 }}
+                    >
+                      <svg width="18" height="10">
+                        <line
+                          x1="0"
+                          y1="5"
+                          x2="18"
+                          y2="5"
+                          stroke="#f5a623"
+                          strokeWidth="2"
+                          strokeDasharray="5 2"
+                        />
+                      </svg>
+                      Medián
+                    </span>
+                  )}
+                </div>
+              )}
             />
+            {medianTime != null && (
+              <ReferenceLine
+                y={medianTime}
+                stroke="#f5a623"
+                strokeWidth={2}
+                strokeDasharray="6 3"
+              />
+            )}
             <Scatter
               name="normal"
               data={normal}
@@ -489,35 +513,61 @@ export default function StatisticsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const debounceRef = useRef(null);
 
-  // 1) Fetch available detection windows – filtrujeme jen okna pro tohoto závodníka
+  // 1) Fetch ALL detection windows for the athlete
   const {
     data: windows,
     isLoading: windowsLoading,
     isError: windowsError,
   } = useMlWindows("yearly_3y", selectedAthleteId);
 
-  // 2) Track selected run_id; default to first (newest) window
-  const [selectedRunId, setSelectedRunId] = useState(null);
-  useEffect(() => {
-    if (windows?.length && selectedRunId === null) {
-      setSelectedRunId(windows[0].run_id);
-    }
-  }, [windows, selectedRunId]);
+  // 2) Fetch items from ALL windows to build category list and all-time stats
+  const { items: allWindowsItems, runIdsByCategory } =
+    useAllAthleteAnomalyItems(selectedAthleteId, windows);
 
-  // 3) Track selected category group (reset when athlete or period changes)
+  // 3) Available categories derived from all windows
+  const availableCategoryGroups = useMemo(
+    () => [...runIdsByCategory.keys()].sort(),
+    [runIdsByCategory],
+  );
+
+  // 4) Selected category – reset only when athlete changes
   const [selectedCategoryGroup, setSelectedCategoryGroup] = useState(null);
   const prevAthleteRef = useRef(selectedAthleteId);
-  const prevRunIdRef = useRef(selectedRunId);
   useEffect(() => {
-    if (
-      prevAthleteRef.current !== selectedAthleteId ||
-      prevRunIdRef.current !== selectedRunId
-    ) {
+    if (prevAthleteRef.current !== selectedAthleteId) {
       setSelectedCategoryGroup(null);
       prevAthleteRef.current = selectedAthleteId;
-      prevRunIdRef.current = selectedRunId;
     }
-  }, [selectedAthleteId, selectedRunId]);
+  }, [selectedAthleteId]);
+
+  // Auto-select first category when list first becomes available
+  useEffect(() => {
+    if (
+      availableCategoryGroups.length > 0 &&
+      !availableCategoryGroups.includes(selectedCategoryGroup)
+    ) {
+      setSelectedCategoryGroup(availableCategoryGroups[0]);
+    }
+  }, [availableCategoryGroups, selectedCategoryGroup]);
+
+  // 5) Windows filtered to selected category
+  const windowsForCategory = useMemo(() => {
+    if (!selectedCategoryGroup || !windows) return windows ?? [];
+    const runIds = runIdsByCategory.get(selectedCategoryGroup) ?? new Set();
+    return windows.filter((w) => runIds.has(w.run_id));
+  }, [windows, selectedCategoryGroup, runIdsByCategory]);
+
+  // 6) Selected run_id – auto-adjust when not in filtered windows
+  const [selectedRunId, setSelectedRunId] = useState(null);
+  useEffect(() => {
+    if (windowsForCategory.length === 0) return;
+    const stillValid = windowsForCategory.some(
+      (w) => w.run_id === selectedRunId,
+    );
+    if (!stillValid) {
+      setSelectedRunId(windowsForCategory[0].run_id);
+    }
+  }, [windowsForCategory, selectedRunId]);
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -542,10 +592,10 @@ export default function StatisticsPage() {
     setSearchParams(next, { replace: true });
     setSearch("");
     setDebouncedSearch("");
-    setSelectedRunId(null); // reset → useEffect předvolí nejnovější okno
+    setSelectedRunId(null);
   };
 
-  // 4) Fetch anomalies for selected run – teprve po výběru run_id
+  // 7) Fetch anomalies for selected run
   const { data, isLoading, isError } = useAthleteAnomalies(
     selectedAthleteId,
     selectedRunId,
@@ -554,30 +604,19 @@ export default function StatisticsPage() {
   const run = data?.run ?? null;
   const allItems = useMemo(() => data?.items ?? [], [data]);
 
-  // Derive available category groups from fetched items
-  const availableCategoryGroups = useMemo(() => {
-    const groups = [
-      ...new Set(allItems.map((it) => it.category_group).filter(Boolean)),
-    ];
-    return groups.sort();
-  }, [allItems]);
-
-  // Auto-select first group whenever available groups change
-  // (covers initial load and athlete/period switch after reset to null)
-  useEffect(() => {
-    if (
-      availableCategoryGroups.length > 0 &&
-      !availableCategoryGroups.includes(selectedCategoryGroup)
-    ) {
-      setSelectedCategoryGroup(availableCategoryGroups[0]);
-    }
-  }, [availableCategoryGroups, selectedCategoryGroup]);
-
-  // Filter items by selected category group
+  // Items for current window filtered by category
   const items = useMemo(() => {
     if (!selectedCategoryGroup) return allItems;
     return allItems.filter((it) => it.category_group === selectedCategoryGroup);
   }, [allItems, selectedCategoryGroup]);
+
+  // Whether categories are still loading (windows loaded but items not yet in)
+  const categoriesLoading =
+    windowsLoading ||
+    (!!selectedAthleteId &&
+      !windowsError &&
+      !!windows?.length &&
+      availableCategoryGroups.length === 0);
 
   const searchResults = athletesData?.items ?? [];
 
@@ -602,22 +641,29 @@ export default function StatisticsPage() {
         onSelectAthlete={handleSelectAthlete}
       />
 
+      {/* Select kategorie + Select období – jeden wrapper pro responzivní layout */}
       {selectedAthleteId && (
-        <YearSelect
-          windows={windows}
-          value={selectedRunId}
-          onChange={setSelectedRunId}
-          isLoading={windowsLoading}
-          isError={windowsError}
-        />
-      )}
+        <div className="statistics-page__filters">
+          {categoriesLoading ? (
+            <div className="window-select__skeleton skeleton" />
+          ) : availableCategoryGroups.length > 0 ? (
+            <CategoryGroupSelect
+              groups={availableCategoryGroups}
+              value={selectedCategoryGroup}
+              onChange={setSelectedCategoryGroup}
+            />
+          ) : null}
 
-      {selectedAthleteId && !isLoading && !isError && (
-        <CategoryGroupSelect
-          groups={availableCategoryGroups}
-          value={selectedCategoryGroup}
-          onChange={setSelectedCategoryGroup}
-        />
+          {selectedCategoryGroup && (
+            <YearSelect
+              windows={windowsForCategory}
+              value={selectedRunId}
+              onChange={setSelectedRunId}
+              isLoading={windowsLoading}
+              isError={windowsError}
+            />
+          )}
+        </div>
       )}
 
       {!selectedAthleteId ? (
@@ -630,7 +676,6 @@ export default function StatisticsPage() {
         </div>
       ) : windowsLoading ? (
         <>
-          <div className="skeleton" style={{ height: 40, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 200 }} />
@@ -643,7 +688,13 @@ export default function StatisticsPage() {
             výkonů. Pro analýzu je potřeba alespoň 10 výsledků v daném období.
           </p>
         </div>
-      ) : isLoading || !selectedRunId ? (
+      ) : !selectedCategoryGroup || !selectedRunId ? (
+        <>
+          <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
+          <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
+          <div className="skeleton" style={{ height: 200 }} />
+        </>
+      ) : isLoading ? (
         <>
           <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
@@ -656,7 +707,7 @@ export default function StatisticsPage() {
       ) : (
         <>
           <SummaryCard run={run} items={items} />
-          <ChartCard items={items} />
+          <ChartCard items={items} medianTime={run?.median_time ?? null} />
           <TableCard items={items} medianTime={run?.median_time ?? null} />
         </>
       )}
