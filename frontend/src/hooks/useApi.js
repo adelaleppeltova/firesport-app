@@ -69,6 +69,46 @@ export function useAthleteOverview(athleteId) {
   });
 }
 
+// GET /athletes/:id/profile – základní profil pro MyProfile
+export function useAthleteProfile(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "profile"],
+    queryFn: async () => {
+      const { data } = await api.get(`/v1/athletes/${athleteId}/profile`);
+      return data;
+    },
+    enabled: !!athleteId,
+  });
+}
+
+// GET /athletes/:id/performance-history – trend výkonnosti pro History
+export function useAthletePerformanceHistory(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "performance-history"],
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/v1/athletes/${athleteId}/performance-history`,
+      );
+      return data;
+    },
+    enabled: !!athleteId,
+  });
+}
+
+// GET /athletes/:id/performance-stability – stabilita výkonu pro PerformanceStability
+export function useAthletePerformanceStability(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "performance-stability"],
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/v1/athletes/${athleteId}/performance-stability`,
+      );
+      return data;
+    },
+    enabled: !!athleteId,
+  });
+}
+
 // GET /athletes (paginated + search)
 export function useAthletes({
   search = "",

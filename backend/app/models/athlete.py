@@ -61,6 +61,39 @@ class AthleteOverview(AthleteInDB):
     stability_rating: str = "Nedostatek dat"  # Slovní hodnocení stability
     best_performance: BestPerformance = Field(default_factory=BestPerformance)  # Nejlepší výkon s detaily soutěže
 
+class AthleteProfile(BaseModel):
+    """
+    Základní profil atleta pro MyProfile komponentu.
+    """
+    id: str = Field(..., alias="_id")
+    first_name: str
+    last_name: str
+    birth_year: Optional[int] = None
+    team: Optional[str] = None
+    best_time: Optional[float] = None
+    total_competitions: int = 0
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class AthletePerformanceHistoryResponse(BaseModel):
+    """
+    Performance indicator data pro History komponentu.
+    """
+    performance_indicator: PerformanceIndicator = Field(
+        default_factory=PerformanceIndicator
+    )
+
+
+class AthletePerformanceStabilityResponse(BaseModel):
+    """
+    Data o stabilitě výkonu pro PerformanceStability komponentu.
+    """
+    stability_rating: str = "Nedostatek dat"
+    performance_variability: Optional[float] = None
+    average_time_in_year: Optional[float] = None
+
+
 class AthleteDetail(AthleteInDB):
     """
     Detail athleta pro stránku atleta.

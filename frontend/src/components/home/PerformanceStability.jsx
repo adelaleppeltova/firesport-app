@@ -1,29 +1,15 @@
-import {
-  useMe,
-  useAthleteOverview,
-  useAthletePerformanceInYear,
-} from "../../hooks/useApi";
+import { useAthletePerformanceStability as useStabilityData } from "../../hooks/useApi";
 
-export default function PerformanceStability() {
-  const { data: me, isLoading: meLoading, error: meError } = useMe();
-  const {
-    data: overview,
-    isLoading: overviewLoading,
-    error: overviewError,
-  } = useAthleteOverview(me?.athlete_id);
+export default function PerformanceStability({ athleteId }) {
+  const { data, isLoading, error } = useStabilityData(athleteId);
 
-  const { data: performanceInYear } = useAthletePerformanceInYear(
-    me?.athlete_id,
-  );
-
-  if (meLoading || overviewLoading) return <div className="skeleton" />;
-  if (meError || overviewError)
-    return <p className="empty-state">Chyba načítání</p>;
-  if (!overview)
+  if (isLoading) return <div className="skeleton" />;
+  if (error) return <p className="empty-state">Chyba načítání</p>;
+  if (!data)
     return <p className="empty-state">Žádná data o stabilitě výkonu</p>;
 
-  const { stability_rating, performance_variability, performance_indicator } =
-    overview;
+  const { stability_rating, performance_variability, average_time_in_year } =
+    data;
 
   // Mapování stability na ikonu a barvu
   const getStabilityIcon = (rating = "") => {
@@ -77,7 +63,7 @@ export default function PerformanceStability() {
               Průměrný čas v sezóně:
             </span>
             <span className="performance-stability__stat-value">
-              {performanceInYear?.average_time?.toFixed(2) || "-"} s
+              {average_time_in_year?.toFixed(2) || "-"} s
             </span>
           </div>
         </div>

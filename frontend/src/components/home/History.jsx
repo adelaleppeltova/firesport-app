@@ -1,14 +1,11 @@
-import { useMe, useAthleteOverview } from "../../hooks/useApi";
+import { useAthletePerformanceHistory } from "../../hooks/useApi";
 
-export default function History() {
-  const { data: me, isLoading: meLoading } = useMe();
-  const { data: overview, isLoading: overviewLoading } = useAthleteOverview(
-    me?.athlete_id,
-  );
+export default function History({ athleteId }) {
+  const { data, isLoading, error } = useAthletePerformanceHistory(athleteId);
 
-  if (meLoading || overviewLoading) return <div className="skeleton" />;
-  if (!overview) return <p className="empty-state">Žádná data</p>;
-  const { performance_indicator } = overview;
+  if (isLoading) return <div className="skeleton" />;
+  if (error || !data) return <p className="empty-state">Žádná data</p>;
+  const { performance_indicator } = data;
   const { recent_results } = performance_indicator;
 
   const formatSeconds = (value) => {

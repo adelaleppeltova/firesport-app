@@ -1,6 +1,10 @@
 from bson import ObjectId
 from app.db.database import db
-from app.models.athlete import AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail, BestPerformance, AthleteCategoryStatsResponse, CategoryRaceStats
+from app.models.athlete import (
+    AthleteCategoryStatsResponse, AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail,
+    BestPerformance, AthleteProfile, AthletePerformanceHistoryResponse,
+    AthletePerformanceStabilityResponse,
+)
 from app.models.result import ResultAthleteDetail
 from datetime import datetime
 from typing import List, Dict, Optional, Any, Set
@@ -663,3 +667,137 @@ async def get_athlete_category_stats_service(athlete_id: str) -> AthleteCategory
         for cg in totals
     }
     return AthleteCategoryStatsResponse(stats=stats)
+
+
+async def get_athlete_profile_service(athlete_id: str) -> AthleteProfile:
+    """Vrátí základní profil atleta (jméno, tým, nejlepší čas, počet závodů)."""
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+
+    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    if not athlete:
+        raise ValueError("Athlete not found")
+
+    results = await results_collection.find({"athlete": athlete_oid}).to_list(length=None)
+
+    times = [r.get("final_time") for r in results if r.get("final_time") is not None]
+    best_time = min(times) if times else None
+
+    total_competitions = await get_athlete_competition_count(athlete_oid)
+
+    teams = athlete.get("teams", [])
+    team = teams[0] if teams else None
+
+    return AthleteProfile(
+        _id=str(athlete["_id"]),
+        first_name=athlete.get("first_name", ""),
+        last_name=athlete.get("last_name", ""),
+        birth_year=athlete.get("birth_year"),
+        team=team,
+        best_time=best_time,
+        total_competitions=total_competitions,
+    )
+
+
+async def get_athlete_performance_history_service(athlete_id: str) -> AthletePerformanceHistoryResponse:
+    """Vrátí indikátor výkonnosti (trend) pro atleta."""
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+
+    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    if not athlete:
+        raise ValueError("Athlete not found")
+
+    results = await results_collection.find({"athlete": athlete_oid}).to_list(length=None)
+    if not results:
+        return AthletePerformanceHistoryResponse()
+
+    # Získej data soutěží pro seřazení podle data
+    competition_ids = {r.get("competition") for r in results if r.get("competition")}
+    competition_dates = {}
+    if competition_ids:
+        competitions = await competitions_collection.find(
+            {"_id": {"$in": list(competition_ids)}}
+        ).to_list(length=None)
+        competition_dates = {
+            c["_id"]: c.get("date")
+            for c in competitions
+            if c.get("date") is not None
+        }
+
+    indicator_entries = []
+    for r in results:
+        comp_id = r.get("competition")
+        comp_date = competition_dates.get(comp_id) if comp_id else None
+        if comp_date is None:
+            continue
+        indicator_entries.append({
+            "competition_date": comp_date,
+            "final_time": r.get("final_time"),
+            "final_time_status": r.get("final_time_status"),
+            "rank": r.get("rank"),
+        })
+
+    performance_indicator = calculate_performance_indicator(indicator_entries)
+
+    return AthletePerformanceHistoryResponse(
+        performance_indicator=performance_indicator,
+    )
+
+
+async def get_athlete_performance_stability_service(athlete_id: str) -> AthletePerformanceStabilityResponse:
+    """Vrátí data o stabilitě výkonu atleta + průměrný čas v aktuální sezóně."""
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+
+    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    if not athlete:
+        raise ValueError("Athlete not found")
+
+    results = await results_collection.find({"athlete": athlete_oid}).to_list(length=None)
+    if not results:
+        return AthletePerformanceStabilityResponse()
+
+    # Stability data
+    competition_ids = {r.get("competition") for r in results if r.get("competition")}
+    competition_dates = {}
+    if competition_ids:
+        competitions = await competitions_collection.find(
+            {"_id": {"$in": list(competition_ids)}}
+        ).to_list(length=None)
+        competition_dates = {
+            c["_id"]: c.get("date")
+            for c in competitions
+            if c.get("date") is not None
+        }
+
+    indicator_entries = []
+    for r in results:
+        comp_id = r.get("competition")
+        comp_date = competition_dates.get(comp_id) if comp_id else None
+        if comp_date is None:
+            continue
+        indicator_entries.append({
+            "competition_date": comp_date,
+            "final_time": r.get("final_time"),
+            "final_time_status": r.get("final_time_status"),
+            "rank": r.get("rank"),
+        })
+
+    stability_info = evaluate_performance_stability(indicator_entries)
+
+    # Průměrný čas v aktuální sezóně
+    year_summary = await get_athlete_year_summary_service(athlete_id)
+    average_time_in_year = year_summary.get("average_time") if isinstance(year_summary, dict) else None
+
+    return AthletePerformanceStabilityResponse(
+        stability_rating=stability_info["stability_rating"],
+        performance_variability=stability_info["performance_variability"],
+        average_time_in_year=average_time_in_year,
+    )

@@ -1,17 +1,14 @@
-import { useMe, useAthletePerformanceInYear } from "../../hooks/useApi";
+import { useAthletePerformanceInYear } from "../../hooks/useApi";
 
-export default function Season() {
-  const { data: me, isLoading: meLoading, error: meError } = useMe();
-
+export default function Season({ athleteId }) {
   const {
     data: performanceInYear,
-    isLoading: overviewLoading,
-    error: overviewError,
-  } = useAthletePerformanceInYear(me?.athlete_id);
+    isLoading,
+    error,
+  } = useAthletePerformanceInYear(athleteId);
 
-  if (meLoading || overviewLoading) return <div className="skeleton" />;
-  if (meError || overviewError)
-    return <p className="empty-state">Chyba načítání</p>;
+  if (isLoading) return <div className="skeleton" />;
+  if (error) return <p className="empty-state">Chyba načítání</p>;
   if (!performanceInYear)
     return <p className="empty-state">Žádná data o sezóně</p>;
 

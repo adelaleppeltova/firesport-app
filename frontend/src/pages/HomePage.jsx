@@ -24,22 +24,24 @@ export default function HomePage() {
     );
   }
 
+  const athleteId = user.athlete_id;
+
   return (
     <div className="home-page page">
       <Card title="Můj profil">
-        <MyProfile />
+        <MyProfile athleteId={athleteId} />
       </Card>
       <Card title="Aktuální sezóna">
-        <Season />
+        <Season athleteId={athleteId} />
       </Card>
       <Card title="Historie výkonu">
-        <History />
+        <History athleteId={athleteId} />
       </Card>
       <Card title="Stabilita výkonu">
-        <PerformanceStability />
+        <PerformanceStability athleteId={athleteId} />
       </Card>
       <Card title="Vývoj výkonu za sezóny">
-        <PerformanceByYear />
+        <PerformanceByYear athleteId={athleteId} />
       </Card>
     </div>
   );
