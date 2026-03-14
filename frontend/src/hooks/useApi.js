@@ -305,3 +305,18 @@ export function useAthleteCategoryStats(athleteId) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
+// GET /athletes/:id/per-category-stats
+export function useAthletePerCategoryStats(athleteId) {
+  return useQuery({
+    queryKey: ["athletes", athleteId, "per-category-stats"],
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/v1/athletes/${athleteId}/per-category-stats`,
+      );
+      return data; // { categories: [{ category_id, category_name, total_races, best_time }] }
+    },
+    enabled: !!athleteId,
+    staleTime: 5 * 60 * 1000,
+  });
+}

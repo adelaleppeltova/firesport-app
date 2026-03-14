@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { useAthleteDetail, useAthleteCategoryStats } from "../hooks/useApi";
-import CategorySummaryCard, {
-  CategoryGroupSelect,
-} from "../components/athlete/CategorySummaryCard";
+import { useAthleteDetail, useAthletePerCategoryStats } from "../hooks/useApi";
+import AthleteDetailCategoryCard, {
+  CategorySelect,
+} from "../components/athlete/AthleteDetailCategoryCard";
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -14,31 +14,32 @@ const formatDate = (dateString) => {
 export default function AthleteDetailPage() {
   const { id } = useParams();
   const { data, isLoading, error } = useAthleteDetail(id);
-  const { data: categoryStatsData } = useAthleteCategoryStats(id);
+  const { data: perCategoryData } = useAthletePerCategoryStats(id);
 
-  const [selectedCategoryGroup, setSelectedCategoryGroup] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
-  const availableCategoryGroups = useMemo(() => {
-    if (!categoryStatsData?.stats) return [];
-    return Object.keys(categoryStatsData.stats).sort();
-  }, [categoryStatsData]);
+  const availableCategories = useMemo(() => {
+    if (!perCategoryData?.categories) return [];
+    return perCategoryData.categories;
+  }, [perCategoryData]);
 
   useEffect(() => {
     if (
-      availableCategoryGroups.length > 0 &&
-      !availableCategoryGroups.includes(selectedCategoryGroup)
+      availableCategories.length > 0 &&
+      !availableCategories.find((c) => c.category_id === selectedCategoryId)
     ) {
-      setSelectedCategoryGroup(availableCategoryGroups[0]);
+      setSelectedCategoryId(availableCategories[0].category_id);
     }
-  }, [availableCategoryGroups, selectedCategoryGroup]);
+  }, [availableCategories, selectedCategoryId]);
 
   if (isLoading) return <div className="athlete-detail-page">Načítání...</div>;
   if (error || !data)
     return <div className="athlete-detail-page">Chyba při načítání dat.</div>;
 
   const { athlete, best_time, results } = data;
-  const categoryStat = selectedCategoryGroup
-    ? (categoryStatsData?.stats?.[selectedCategoryGroup] ?? null)
+  const selectedCategory = selectedCategoryId
+    ? (availableCategories.find((c) => c.category_id === selectedCategoryId) ??
+      null)
     : null;
 
   return (
@@ -81,19 +82,19 @@ export default function AthleteDetailPage() {
         </table>
       </div>
 
-      {availableCategoryGroups.length > 0 && (
-        <CategoryGroupSelect
-          groups={availableCategoryGroups}
-          value={selectedCategoryGroup}
-          onChange={setSelectedCategoryGroup}
+      {availableCategories.length > 0 && (
+        <CategorySelect
+          categories={availableCategories}
+          value={selectedCategoryId}
+          onChange={setSelectedCategoryId}
         />
       )}
 
-      {selectedCategoryGroup && (
-        <CategorySummaryCard
-          totalRaces={categoryStat?.total_races ?? null}
-          bestTime={categoryStat?.best_time ?? null}
-          categoryGroup={selectedCategoryGroup}
+      {selectedCategory && (
+        <AthleteDetailCategoryCard
+          totalRaces={selectedCategory.total_races ?? null}
+          bestTime={selectedCategory.best_time ?? null}
+          categoryName={selectedCategory.category_name}
         />
       )}
 

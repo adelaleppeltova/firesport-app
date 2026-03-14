@@ -6,7 +6,7 @@
   border-radius: variables.$border-radius-base;
   box-shadow: variables.$box-shadow;
   overflow-x: auto;
-  padding: 1rem;
+  padding: 0.5rem;
   width: 100%;
 }
 
@@ -39,7 +39,7 @@ table,
   th,
   td {
     font-size: variables.$font-size-s;
-    padding: 0.3rem 0.5rem;
+    padding: 0.3rem;
     border-bottom: 1px solid variables.$gray-light;
   }
 
@@ -59,7 +59,7 @@ table,
 
   th,
   td {
-    padding: 0.7rem 1rem;
+    padding: 0.4rem;
   }
 
   th {
@@ -86,7 +86,7 @@ table,
 
   th,
   td {
-    padding: 0.5rem 0.8rem;
+    padding: 0.4rem;
   }
 
   th {

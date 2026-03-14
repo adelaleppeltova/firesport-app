@@ -5,6 +5,11 @@
 .athlete-detail-page {
   @include mixins.page-layout;
   @include mixins.page-typography;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  margin: 0 auto;
 
   .athletes-table-wrapper {
     @extend .table-wrapper;

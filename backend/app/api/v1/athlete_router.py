@@ -4,7 +4,7 @@ from app.models.athlete import (
     AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview,
     PerformanceByYear, PerformanceInYear, AthleteProfile,
     AthletePerformanceHistoryResponse, AthletePerformanceStabilityResponse,
- AthleteCategoryStatsResponse)
+ AthleteCategoryStatsResponse, AthletePerCategoryStatsResponse)
 from app.models.models import AthleteDetailPage
 from app.dependencies import get_current_user
 from bson import ObjectId
@@ -25,6 +25,7 @@ from app.services.athletes import (
     get_athlete_performance_history_service,
     get_athlete_performance_stability_service,
     get_athlete_category_stats_service,
+    get_athlete_per_category_stats_service,
 )
 
 
@@ -124,5 +125,17 @@ async def get_athlete_category_stats(athlete_id: str):
     """
     try:
         return await get_athlete_category_stats_service(athlete_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/{athlete_id}/per-category-stats", response_model=AthletePerCategoryStatsResponse)
+async def get_athlete_per_category_stats(athlete_id: str):
+    """Vrátí počet závodů a nejlepší čas pro každou konkrétní kategorii z DB.
+
+    Na rozdíl od category-stats nepoužívá groupby.
+    """
+    try:
+        return await get_athlete_per_category_stats_service(athlete_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

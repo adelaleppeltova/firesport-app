@@ -4,6 +4,7 @@ from app.models.athlete import (
     AthleteCategoryStatsResponse, AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail,
     BestPerformance, AthleteProfile, AthletePerformanceHistoryResponse,
     AthletePerformanceStabilityResponse, CategoryRaceStats,
+    AthletePerCategoryStats, AthletePerCategoryStatsResponse,
 )
 from app.models.result import ResultAthleteDetail
 from datetime import datetime
@@ -667,6 +668,58 @@ async def get_athlete_category_stats_service(athlete_id: str) -> AthleteCategory
         for cg in totals
     }
     return AthleteCategoryStatsResponse(stats=stats)
+
+
+async def get_athlete_per_category_stats_service(athlete_id: str) -> AthletePerCategoryStatsResponse:
+    """Vrátí počet závodů a nejlepší čas pro každou konkrétní kategorii z DB.
+
+    Na rozdíl od category-stats nepoužívá groupby, ale vrací statistiky
+    per jednotlivá kategorie (např. 'Střední dorostenci', 'Muži' atd.).
+    """
+    try:
+        athlete_oid = ObjectId(athlete_id)
+    except Exception:
+        raise ValueError("Invalid athlete_id")
+
+    # 1) Mapa category_id → category_name
+    category_name_map: Dict[str, str] = {}
+    async for cat_doc in categories_collection.find({}, projection={"_id": 1, "name": 1}):
+        category_name_map[str(cat_doc["_id"])] = cat_doc.get("name") or str(cat_doc["_id"])
+
+    # 2) Načti všechny výsledky závodníka
+    raw_results = await results_collection.find(
+        {"athlete": athlete_oid},
+        projection={"_id": 0, "category": 1, "final_time": 1},
+    ).to_list(None)
+
+    # 3) Agreguj po konkrétní kategorii
+    totals: Dict[str, int] = {}
+    best_times: Dict[str, Optional[float]] = {}
+
+    for r in raw_results:
+        cat_oid = r.get("category")
+        if cat_oid is None:
+            continue
+        cat_id = str(cat_oid)
+        totals[cat_id] = totals.get(cat_id, 0) + 1
+        ft = r.get("final_time")
+        if ft is not None:
+            if best_times.get(cat_id) is None or ft < best_times[cat_id]:
+                best_times[cat_id] = ft
+
+    categories = [
+        AthletePerCategoryStats(
+            category_id=cat_id,
+            category_name=category_name_map.get(cat_id, cat_id),
+            total_races=totals[cat_id],
+            best_time=best_times.get(cat_id),
+        )
+        for cat_id in totals
+    ]
+    # Seřadit abecedně podle jména kategorie
+    categories.sort(key=lambda c: c.category_name)
+
+    return AthletePerCategoryStatsResponse(categories=categories)
 
 
 async def get_athlete_profile_service(athlete_id: str) -> AthleteProfile:

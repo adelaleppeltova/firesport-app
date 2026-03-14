@@ -158,3 +158,16 @@ class CategoryRaceStats(BaseModel):
 class AthleteCategoryStatsResponse(BaseModel):
     """Mapa category_group → statistiky ze všech závodů v DB."""
     stats: dict[str, CategoryRaceStats] = Field(default_factory=dict)
+
+
+class AthletePerCategoryStats(BaseModel):
+    """Statistiky závodů v jedné konkrétní kategorii z DB."""
+    category_id: str
+    category_name: str
+    total_races: int
+    best_time: Optional[float] = None
+
+
+class AthletePerCategoryStatsResponse(BaseModel):
+    """Seznam statistik per kategorie (ne groupby) ze všech závodů v DB."""
+    categories: list[AthletePerCategoryStats] = Field(default_factory=list)

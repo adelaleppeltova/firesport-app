@@ -2,8 +2,6 @@
 
 .footer {
   &.sidebar {
-    padding-left: variables.$sidebar-width;
-
     @media (min-width: variables.$breakpoint-l) {
       padding-left: variables.$sidebar-width-l;
     }
