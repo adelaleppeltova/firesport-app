@@ -372,7 +372,7 @@
 }
 
 .anomaly-table-wrapper {
-  @extend .table-wrapper;
+  overflow-x: auto;
   margin-bottom: 12px;
 }
 

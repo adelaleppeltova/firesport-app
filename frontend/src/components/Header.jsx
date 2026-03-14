@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 
 function Header() {
   const navigate = useNavigate();
-  const { isAuthenticated, loading, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();

@@ -250,8 +250,8 @@ function ChartCard({ items, medianTime }) {
       {filtered.length === 0 ? (
         <p className="empty-state">Žádná data pro vybrané okno analýzy.</p>
       ) : (
-        <ResponsiveContainer width="100%" height={280}>
-          <ScatterChart margin={{ top: 10, right: 16, bottom: 30, left: 10 }}>
+        <ResponsiveContainer width="100%" height={320}>
+          <ScatterChart margin={{ top: 10, right: 16, bottom: 50, left: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
             <XAxis
               dataKey="x"
@@ -260,13 +260,14 @@ function ChartCard({ items, medianTime }) {
               domain={xDomain}
               ticks={xTicks}
               tickFormatter={tickFormatter}
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 10, angle: -30, textAnchor: "end" }}
               tickLine={false}
+              height={50}
               label={{
                 value: "Datum",
                 position: "insideBottom",
-                offset: -15,
-                fontSize: 14,
+                offset: -5,
+                fontSize: 13,
               }}
             />
             <YAxis
@@ -274,15 +275,15 @@ function ChartCard({ items, medianTime }) {
               type="number"
               domain={yDomain}
               tickFormatter={(v) => `${v.toFixed(1)} s`}
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 10 }}
               tickLine={false}
-              width={58}
+              width={50}
               label={{
                 value: "Čas (s)",
                 angle: -90,
                 position: "insideLeft",
-                offset: 0,
-                fontSize: 14,
+                offset: 4,
+                fontSize: 13,
               }}
             />
             <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
@@ -293,8 +294,9 @@ function ChartCard({ items, medianTime }) {
                   style={{
                     display: "flex",
                     justifyContent: "center",
-                    gap: 20,
-                    fontSize: 16,
+                    flexWrap: "wrap",
+                    gap: "6px 16px",
+                    fontSize: 13,
                   }}
                 >
                   <span
@@ -381,49 +383,51 @@ function TableCard({ items, medianTime }) {
       {anomalyItems.length === 0 ? (
         <p className="empty-state">Žádné označené výkony nebyly nalezeny.</p>
       ) : (
-        <table className="anomaly-table">
-          <thead>
-            <tr>
-              <th>Datum</th>
-              <th>Čas (s)</th>
-              <th>Závod</th>
-              <th>
-                Rozdíl vůči mediánu
-                <InfoTooltip text="Rozdíl času vůči mediánu v daném období. Slouží pouze k určení směru (rychlejší/pomalejší)." />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {anomalyItems.map((it) => {
-              const diff =
-                medianTime != null ? it.final_time - medianTime : null;
-              const deviation =
-                diff == null
-                  ? "—"
-                  : diff >= 0
-                    ? `+${diff.toFixed(2)} s (pomalejší)`
-                    : `${diff.toFixed(2)} s (rychlejší)`;
-              return (
-                <tr key={it.result_id}>
-                  <td>{formatDate(it.competition_date)}</td>
-                  <td>{formatTime(it.final_time)}</td>
-                  <td>{it.competition_name || "—"}</td>
-                  <td>
-                    <div className="anomaly-table__deviation">
-                      <span>{deviation}</span>
-                      {it.quality_flag === "suspicious" && (
-                        <span className="anomaly-table__badge anomaly-table__badge--warning">
-                          Doporučeno ověřit záznam
-                          <InfoTooltip text="Záznam je mimo běžné hranice kategorie nebo obsahuje nezvykle velký skok oproti historii sportovce." />
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="anomaly-table-wrapper">
+          <table className="anomaly-table">
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Čas (s)</th>
+                <th>Závod</th>
+                <th>
+                  Rozdíl vůči mediánu
+                  <InfoTooltip text="Rozdíl času vůči mediánu v daném období. Slouží pouze k určení směru (rychlejší/pomalejší)." />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {anomalyItems.map((it) => {
+                const diff =
+                  medianTime != null ? it.final_time - medianTime : null;
+                const deviation =
+                  diff == null
+                    ? "—"
+                    : diff >= 0
+                      ? `+${diff.toFixed(2)} s (pomalejší)`
+                      : `${diff.toFixed(2)} s (rychlejší)`;
+                return (
+                  <tr key={it.result_id}>
+                    <td>{formatDate(it.competition_date)}</td>
+                    <td>{formatTime(it.final_time)}</td>
+                    <td>{it.competition_name || "—"}</td>
+                    <td>
+                      <div className="anomaly-table__deviation">
+                        <span>{deviation}</span>
+                        {it.quality_flag === "suspicious" && (
+                          <span className="anomaly-table__badge anomaly-table__badge--warning">
+                            Doporučeno ověřit záznam
+                            <InfoTooltip text="Záznam je mimo běžné hranice kategorie nebo obsahuje nezvykle velký skok oproti historii sportovce." />
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </Card>
   );
@@ -635,10 +639,8 @@ export default function StatisticsPage() {
       <div className="statistics-page__header">
         <h1 className="statistics-page__title">Detekce neobvyklých výkonů</h1>
         <p className="statistics-page__desc">
-          Analýza výkonů pomocí metody Isolation Forest. Model přiřadí každému
-          výsledku skóre atypičnosti a jako neobvyklé označí výkony s nejvyšším
-          skóre. Pro výpočet je potřeba alespoň 10 validních výsledků v daném
-          období.
+          Analýza výkonů pomocí metody Isolation Forest. Pro výpočet je potřeba
+          alespoň 10 validních výsledků v daném období.
         </p>
       </div>
 

@@ -13,6 +13,7 @@ class PairAthleteRequest(BaseModel):
     athlete_id: str
 
 @router.get("")
+@router.get("/")
 def get_me(user=Depends(get_current_user)):
     """Vrátí údaje o aktuálně přihlášeném uživateli"""
     users_collection = sync_db["users"]

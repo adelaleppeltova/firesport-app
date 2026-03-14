@@ -48,6 +48,7 @@ export default function CompetitionsPage() {
       updateUrlRef.current(search, 1, sortKey, sortDir);
     }, 300);
     return () => clearTimeout(debounceRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   // Sync page/sort do URL při změně + scroll nahoru

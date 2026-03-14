@@ -25,7 +25,7 @@ export function useMe() {
   return useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data } = await api.get("/v1/me/");
+      const { data } = await api.get("/v1/me");
       return data;
     },
   });
@@ -296,7 +296,9 @@ export function useAthleteCategoryStats(athleteId) {
   return useQuery({
     queryKey: ["athletes", athleteId, "category-stats"],
     queryFn: async () => {
-      const { data } = await api.get(`/v1/athletes/${athleteId}/category-stats`);
+      const { data } = await api.get(
+        `/v1/athletes/${athleteId}/category-stats`,
+      );
       return data; // { stats: { [category_group]: { total_races, best_time } } }
     },
     enabled: !!athleteId,

@@ -24,6 +24,7 @@ from app.services.athletes import (
     get_athlete_profile_service,
     get_athlete_performance_history_service,
     get_athlete_performance_stability_service,
+    get_athlete_category_stats_service,
 )
 
 
@@ -31,7 +32,7 @@ router = APIRouter(prefix="/athletes", tags=["athletes"])
 
 logger = logging.getLogger("firesport.overview")
 
-@router.get("/", response_model=AthletesPage)
+@router.get("", response_model=AthletesPage)
 async def list_athletes(
     q: Optional[str] = Query(None, description="Hledaný výraz (jméno, rok, sbor)"),
     page: int = Query(1, ge=1, description="Číslo stránky"),

@@ -162,8 +162,8 @@ export default function PerformanceByYear() {
   return (
     <div className="performance-by-year">
       <div className="performance-by-year__container">
-        <ResponsiveContainer width="100%" height={400}>
-          <LineChart margin={{ top: 20, right: 30, left: 10, bottom: 40 }}>
+        <ResponsiveContainer width="100%" height={360}>
+          <LineChart margin={{ top: 10, right: 16, left: 0, bottom: 50 }}>
             <CartesianGrid
               strokeDasharray="4,4"
               stroke="#797979"
@@ -175,12 +175,13 @@ export default function PerformanceByYear() {
               domain={xDomain}
               tickFormatter={dayOfYearToLabel}
               stroke="#666"
-              style={{ fontSize: "15px" }}
+              tick={{ fontSize: 11, angle: -30, textAnchor: "end" }}
+              height={50}
               label={{
                 value: "Datum",
                 position: "insideBottom",
-                offset: -20,
-                fontSize: 14,
+                offset: -5,
+                fontSize: 13,
               }}
             />
             <YAxis
@@ -188,28 +189,28 @@ export default function PerformanceByYear() {
               domain={[minTime, maxTime]}
               tickFormatter={(v) => `${v.toFixed(1)}s`}
               stroke="#333"
-              style={{ fontSize: "15px" }}
-              width={55}
+              tick={{ fontSize: 11 }}
+              width={48}
               label={{
                 value: "Čas (s)",
                 angle: -90,
                 position: "insideLeft",
-                offset: 0,
-                fontSize: 14,
+                offset: 4,
+                fontSize: 13,
               }}
             />
             <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
             <Legend
-              wrapperStyle={{ bottom: 15 }}
+              wrapperStyle={{ bottom: -5 }}
               content={({ payload }) => (
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "center",
                     flexWrap: "wrap",
-                    gap: "1rem",
-                    paddingTop: "20px",
-                    fontSize: "1rem",
+                    gap: "6px 14px",
+                    paddingTop: "12px",
+                    fontSize: "13px",
                     cursor: "pointer",
                   }}
                 >

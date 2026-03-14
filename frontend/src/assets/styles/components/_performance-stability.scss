@@ -19,7 +19,7 @@
 
   &__rating {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: variables.$font-size-s;
     color: variables.$color-text;
     font-weight: 600;
   }
@@ -34,7 +34,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
-    padding: 1rem;
     border-radius: 0.5rem;
 
     @media (max-width: 600px) {
@@ -46,18 +45,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem;
-    padding-left: 0.8rem;
   }
 
   &__stat-label {
-    font-size: 0.9rem;
+    font-size: variables.$font-size-s;
     color: variables.$color-text;
     font-weight: 500;
   }
 
   &__stat-value {
-    font-size: 1.1rem;
+    font-size: variables.$font-size-s;
     font-weight: 600;
     color: variables.$color-text;
     min-width: 60px;
