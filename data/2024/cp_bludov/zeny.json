@@ -544,9 +544,9 @@
     ]
   },
   "parsing_notes": [
-    "Metadata (league/discipline/name/date/category) extracted from footer/header lines: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 20.7.2024', 'KATEGORIE: ŽENY'.",
+    "Metadata (league/discipline/name/date/category) extracted from footer/header lines: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 20.7.2024', 'KATEGORIE: ŽENY'.",
     "Results parsed as fixed-order row groups: start_number, fscode, surname+name, birth_year, team, then two attempt times and an official final time, followed by rank.",
-    "Discipline mapped from 'Běh na 100 m s překážkami' to discipline='100m' per rules."
+    "Discipline mapped from 'Běh na 100m s překážkami' to discipline='100m' per rules."
   ],
   "warnings": [
     "Competition place not found in provided text; left as null.",

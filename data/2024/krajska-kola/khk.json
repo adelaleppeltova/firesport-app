@@ -1240,7 +1240,7 @@
   "parsing_notes": [
     "PDF má 2 stránky; každá stránka obsahuje jednu tabulku výsledků (str. 1: MUŽI, str. 2: ŽENY). :contentReference[oaicite:0]{index=0}",
     "Metadata závodu byla převzata z hlavičky tabulek: „POŽÁRNÍ SPORT Hradec Králové 16.6.2024“ a „KK V POŽÁRNÍM SPORTU“. :contentReference[oaicite:1]{index=1}",
-    "Disciplína byla určena z textu „BĚH NA 100 m“ → discipline=100m pro obě kategorie. :contentReference[oaicite:2]{index=2}",
+    "Disciplína byla určena z textu „BĚH NA 100m“ → discipline=100m pro obě kategorie. :contentReference[oaicite:2]{index=2}",
     "Sloupce byly interpretovány podle hlavičky tabulky: startovní číslo, příjmení+jměno, SDH, pokus 1 (platnost + výsledný čas), pokus 2 (platnost + výsledný čas), úřední čas, pořadí. :contentReference[oaicite:3]{index=3}",
     "Formát času „m:ss,00“ byl převeden na číselnou hodnotu sekund (např. 0:19,72 → 19.72). :contentReference[oaicite:4]{index=4}",
     "Neplatné pokusy byly rozpoznány dle kombinace platnosti „N“ a zápisu „NP“; v takovém případě je time=null a status=invalid. :contentReference[oaicite:5]{index=5}",

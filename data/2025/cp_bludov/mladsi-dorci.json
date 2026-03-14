@@ -337,8 +337,8 @@
   },
   "parsing_notes": [
     "Zdroj obsahuje jednu výsledkovou tabulku pro kategorii „MLADŠÍ DOROSTENCI“ s hlavičkami: Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH, Čas 1. pokusu, Čas 2. pokusu, Výsledný čas, Pořadí.",
-    "Metadatové bloky byly detekovány v dolní části stránky: „ČESKÝ POHÁR“, „Běh na 100 m s překážkami“, „Bludovská stovka 26.7.2025“, „KATEGORIE: MLADŠÍ DOROSTENCI“.",
-    "Disciplína byla určena z výrazu „Běh na 100 m s překážkami“ → discipline = 100m.",
+    "Metadatové bloky byly detekovány v dolní části stránky: „ČESKÝ POHÁR“, „Běh na 100m s překážkami“, „Bludovská stovka 26.7.2025“, „KATEGORIE: MLADŠÍ DOROSTENCI“.",
+    "Disciplína byla určena z výrazu „Běh na 100m s překážkami“ → discipline = 100m.",
     "Časy byly normalizovány převodem desetinné čárky na tečku; hodnoty DNS/NP/999,00 byly mapovány jako invalid s time=null."
   ],
   "warnings": [

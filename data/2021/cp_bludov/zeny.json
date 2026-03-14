@@ -786,7 +786,7 @@
   "parsing_notes": [
     "Layout: jedna tabulka s hlavičkou (Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH) a na konci řádku 3 časové hodnoty (čas 1. pokusu, čas 2. pokusu, výsledný čas) + pořadí.",
     "Sloupce rozpoznány sekvenčně z textu řádku: start_number, fscode, last_name, first_name, birth_year, team; za týmem následují tři hodnoty času a rank.",
-    "Metadata: league z řádku „ČESKÝ POHÁR“, discipline z řádku „Běh na 100 m s překážkami“, název z řádku „Bludovská stovka 31.7.2021“ (datum odňato), místo odvozeno z přídavného jména „Bludovská“ -> „Bludov“."
+    "Metadata: league z řádku „ČESKÝ POHÁR“, discipline z řádku „Běh na 100m s překážkami“, název z řádku „Bludovská stovka 31.7.2021“ (datum odňato), místo odvozeno z přídavného jména „Bludovská“ -> „Bludov“."
   ],
   "warnings": [
     "V textu není sloupec okres/district; district je u všech výsledků null.",

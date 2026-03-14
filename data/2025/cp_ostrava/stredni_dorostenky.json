@@ -857,7 +857,7 @@
   "parsing_notes": [
     "Detected header lines and metadata from top of document.",
     "Competition name taken as 'OSTRAVSKÁ STVOKA' (year '2025' removed).",
-    "League taken from header line 'Český pohár v běhu na 100 m přes překážky'.",
+    "League taken from header line 'Český pohár v běhu na 100m přes překážky'.",
     "Place and date parsed from line '6.9.2025, Ostrava - Nová Ves'. Date normalized to YYYY-MM-DD.",
     "Category detected as 'Střední dorostenky' from heading.",
     "Result rows parsed from lines containing: start number, FS code, surname, name, birth year, team, country, I. rozběh, II. rozběh.",
@@ -869,7 +869,7 @@
   "warnings": [
     "Ambiguity: document contains both a series/league name and an event name; chosen event name 'OSTRAVSKÁ STVOKA' and league set from header.",
     "Category name normalized capitalization to match expected form 'Střední dorostenky'.",
-    "Discipline not stored per output schema; header indicates hurdles (100 m přes překážky) which would map to '100mPHP' but discipline field is not present in schema.",
+    "Discipline not stored per output schema; header indicates hurdles (100m přes překážky) which would map to '100m' but discipline field is not present in schema.",
     "Some times contained invalid markers (998, 999); per rules these are marked invalid and per-schema final_time set to 999.0 for fully invalid results.",
     "Two athletes share rank 34 (both with final time 999.00) as in source.",
     "Duplicate/extra rows present in source (additional listing of start list and a 'finálový běh' block) — ignored duplicates and final-blocks per rules."

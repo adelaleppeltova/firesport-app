@@ -706,8 +706,8 @@
   "parsing_notes": [
     "Detekován 1 blok výsledků (jedna tabulka) pro kategorii „KATEGORIE: STŘEDNÍ DOROSTENKY“.",
     "Rozpoznané sloupce: Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH, Čas 1. pokusu, Čas 2. pokusu, Výsledný čas, Pořadí.",
-    "Metadata (liga, disciplína, název akce, datum, kategorie) byla převzata z textového bloku pod tabulkou: „ČESKÝ POHÁR“, „Běh na 100 m s překážkami“, „Bludovská stovka 26.7.2025“.",
-    "Disciplína určena z výrazu „Běh na 100 m s překážkami“ → discipline = 100m.",
+    "Metadata (liga, disciplína, název akce, datum, kategorie) byla převzata z textového bloku pod tabulkou: „ČESKÝ POHÁR“, „Běh na 100m s překážkami“, „Bludovská stovka 26.7.2025“.",
+    "Disciplína určena z výrazu „Běh na 100m s překážkami“ → discipline = 100m.",
     "Časy normalizovány převodem desetinné čárky na tečku; hodnoty NP/DNS mapovány jako invalid s time=null."
   ],
   "warnings": [

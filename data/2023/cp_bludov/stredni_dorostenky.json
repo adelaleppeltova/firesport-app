@@ -1360,9 +1360,9 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from header block near bottom: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 29.7.2023', 'KATEGORIE: STŘEDNÍ DOROSTENKY'.",
+    "Metadata extracted from header block near bottom: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 29.7.2023', 'KATEGORIE: STŘEDNÍ DOROSTENKY'.",
     "Detected table columns by position/order in text stream: start_number, fscode, last_name, first_name, birth_year, team(SDH), time try1, time try2, final_time, rank.",
-    "Discipline determined from phrase 'Běh na 100 m s překážkami' -> mapped to '100mPHP'.",
+    "Discipline determined from phrase 'Běh na 100m s překážkami' -> mapped to '100m'.",
     "District column not present in provided text; district set to null for all results.",
     "Times parsed with decimal comma converted to decimal dot; NP mapped to invalid time with time=null."
   ],

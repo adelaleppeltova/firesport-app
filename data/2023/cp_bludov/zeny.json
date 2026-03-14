@@ -784,9 +784,9 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from footer block: league='ČESKÝ POHÁR', discipline text 'Běh na 100 m s překážkami', event title 'Bludovská stovka 29.7.2023', category header 'KATEGORIE: ŽENY'.",
+    "Metadata extracted from footer block: league='ČESKÝ POHÁR', discipline text 'Běh na 100m s překážkami', event title 'Bludovská stovka 29.7.2023', category header 'KATEGORIE: ŽENY'.",
     "Tabular layout parsed by repeating row pattern: start_number, fscode, last_name, first_name, birth_year, team, then two attempt times, final time, rank.",
-    "Discipline mapped to '100m' from phrase 'Běh na 100 m s překážkami' (mapped per rules to 100m).",
+    "Discipline mapped to '100m' from phrase 'Běh na 100m s překážkami' (mapped per rules to 100m).",
     "Decimal commas converted to dots; NP treated as invalid attempt with time=null."
   ],
   "warnings": [

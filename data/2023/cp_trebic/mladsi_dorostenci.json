@@ -378,7 +378,7 @@
   "parsing_notes": [
     "Metadata extracted from header lines: league/name from 'Český pohár 2023'; category from 'Výsledky 100m mladší dorostenci'; place+date from 'Třebíč, 07.05.2023'.",
     "Columns recognized in order: start_number, FScode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank.",
-    "Discipline set to '100mPHP' based on phrase 'v běhu na 100m s překážkami'.",
+    "Discipline set to '100m' based on phrase 'v běhu na 100m s překážkami'.",
     "Invalid times detected via marker values (e.g., 998,00; 999,00) and stored as time=null with status='invalid'."
   ],
   "warnings": [

@@ -2059,7 +2059,7 @@
     "Metadata extracted from header lines: 'Český pohár 2024' (league), 'Třebíč, 4. května 2024' (place/date).",
     "Competition name treated as generic series name and augmented with place: 'Český pohár 2024 – Třebíč'.",
     "Category detected from table header 'Výsledky 100m stred. dorostenky' and normalized to allowed category name 'Střední dorostenky'.",
-    "Discipline inferred from phrase 'v běhu na 100m s překážkami' => mapped to '100mPHP'.",
+    "Discipline inferred from phrase 'v běhu na 100m s překážkami' => mapped to '100m'.",
     "Columns parsed in order: start_number, FScode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank; repeated header on page 2 ignored."
   ],
   "warnings": [

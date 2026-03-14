@@ -1410,8 +1410,8 @@
   "parsing_notes": [
     "Dvoustránkový tabulkový layout; první strana obsahuje hlavičku závodu a první část výsledků, druhá strana pokračování stejné tabulky bez nové hlavičky.",
     "Sloupce rozpoznány jako: startovní číslo, fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadata extrahována z hlavičky na 1. straně: liga z textu 'ČESKÝ POHÁR', disciplína z textu 'Běh na 100 m s překážkami', název a datum z textu 'Bludovská stovka 25.7.2020', kategorie z textu 'KATEGORIE: ŽENY'.",
-    "Disciplína určena explicitně z textu 'Běh na 100 m s překážkami' a mapována na hodnotu '100m'.",
+    "Metadata extrahována z hlavičky na 1. straně: liga z textu 'ČESKÝ POHÁR', disciplína z textu 'Běh na 100m s překážkami', název a datum z textu 'Bludovská stovka 25.7.2020', kategorie z textu 'KATEGORIE: ŽENY'.",
+    "Disciplína určena explicitně z textu 'Běh na 100m s překážkami' a mapována na hodnotu '100m'.",
     "Druhá strana byla interpretována jako pokračování stejné kategorie Ženy."
   ],
   "warnings": [

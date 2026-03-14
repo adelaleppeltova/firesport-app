@@ -643,7 +643,7 @@
     "Metadata extracted from header lines: league from 'Český pohár 2021', place and date from 'Třebíč, 24.07.2021'.",
     "Competition name treated as generic series name; appended place because the title is generic and place is known.",
     "Category detected from 'Výsledky 100m stř. dorky' -> mapped to allowed category 'Střední dorostenky'.",
-    "Discipline inferred from phrase 'v běhu na 100m s překážkami' -> mapped to '100mPHP'.",
+    "Discipline inferred from phrase 'v běhu na 100m s překážkami' -> mapped to '100m'.",
     "Table columns parsed in order: start_number, fscode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank. Non-times like 'N/NP/DNS' treated as invalid."
   ],
   "warnings": [

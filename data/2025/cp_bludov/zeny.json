@@ -466,7 +466,7 @@
   "parsing_notes": [
     "Layout detected: text export with rows where start number, fscode and name fields are separated by line breaks; results parsed by grouping lines into competitor blocks.",
     "Columns recognized: start_number, fscode, last_name, first_name, birth_year, team, time1, time2, final_time, rank (extracted from trailing lines).",
-    "Discipline detected from header 'Běh na 100 m s překážkami' and mapped to '100m'.",
+    "Discipline detected from header 'Běh na 100m s překážkami' and mapped to '100m'.",
     "Category detected from 'KATEGORIE: ŽENY' and matched to allowed category 'ŽENY'.",
     "Invalid time markers ('NP') encoded as numeric sentinel null to satisfy schema while marking status 'invalid'."
   ],

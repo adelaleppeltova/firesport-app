@@ -957,6 +957,6 @@
     "Times parsed by converting decimal comma to dot; invalid tokens (e.g., 998,00) mapped to status=invalid and time=null; final_time taken from 'výsledný čas'."
   ],
   "warnings": [
-    "Discipline inferred as 100mPHP based on phrase '100m s překážkami'; header also contains 'Výsledky 100m muži' which is less specific."
+    "Discipline inferred as 100m based on phrase '100m s překážkami'; header also contains 'Výsledky 100m muži' which is less specific."
   ]
 }

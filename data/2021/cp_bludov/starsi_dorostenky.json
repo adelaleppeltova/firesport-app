@@ -713,8 +713,8 @@
   },
   "parsing_notes": [
     "Z textu byly rozpoznány hlavičky sloupců: Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadata závodu detekována z bloků: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 31.7.2021'.",
-    "Disciplína určena z textu 'Běh na 100 m s překážkami' mapováním na '100m'.",
+    "Metadata závodu detekována z bloků: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 31.7.2021'.",
+    "Disciplína určena z textu 'Běh na 100m s překážkami' mapováním na '100m'.",
     "Neplatné pokusy označené 'NP' a 'DNS' byly převedeny na time=null a status='invalid'."
   ],
   "warnings": [

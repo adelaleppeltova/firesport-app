@@ -871,9 +871,9 @@
   },
   "parsing_notes": [
     "Zdrojový PDF má 2 strany; každá strana obsahuje jednu výsledkovou tabulku pro jednu kategorii (MUŽI na straně 1, ŽENY na straně 2). :contentReference[oaicite:0]{index=0}",
-    "Metadata závodu byla převzata z hlavičky tabulek: „POŽÁRNÍ SPORT Náchod 1.6.2024“ a „BĚH NA 100 m“ + „OK POŽÁRNÍHO SPORTU“. :contentReference[oaicite:1]{index=1}",
+    "Metadata závodu byla převzata z hlavičky tabulek: „POŽÁRNÍ SPORT Náchod 1.6.2024“ a „BĚH NA 100m“ + „OK POŽÁRNÍHO SPORTU“. :contentReference[oaicite:1]{index=1}",
     "Sloupce byly interpretovány podle nadpisů tabulky: startovní číslo, příjmení+jméno, SDH, pokus 1 (platnost + výsledný čas), pokus 2 (platnost + výsledný čas), úřední čas, pořadí. :contentReference[oaicite:2]{index=2}",
-    "Disciplína byla určena z textu „BĚH NA 100 m“ → discipline=100m pro obě kategorie. :contentReference[oaicite:3]{index=3}",
+    "Disciplína byla určena z textu „BĚH NA 100m“ → discipline=100m pro obě kategorie. :contentReference[oaicite:3]{index=3}",
     "Formát času m:ss,00 byl převeden na číselnou hodnotu sekund s desetinnou tečkou (např. 0:20,31 → 20.31). :contentReference[oaicite:4]{index=4}",
     "Neplatné pokusy byly rozpoznány podle zápisu „NP“ a/nebo platnosti „N“; v takovém případě je time=null a status=invalid. :contentReference[oaicite:5]{index=5}",
     "Pokud druhý pokus v řádku chyběl (prázdné pole), byl označen jako status=missing a time=null. :contentReference[oaicite:6]{index=6}",

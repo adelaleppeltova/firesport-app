@@ -497,8 +497,8 @@
   },
   "parsing_notes": [
     "Tabulkový layout: sloupce Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH; následně řádky s časy 1. pokusu, 2. pokusu, výsledný čas a pořadí.",
-    "Metadata závodu extrahována z bloků: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 31.7.2021'.",
-    "Disciplína určena z textu 'Běh na 100 m s překážkami' => 100m."
+    "Metadata závodu extrahována z bloků: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 31.7.2021'.",
+    "Disciplína určena z textu 'Běh na 100m s překážkami' => 100m."
   ],
   "warnings": [
     "Sloupec okres/district nebyl v dodaném textu nalezen; district je všude null.",

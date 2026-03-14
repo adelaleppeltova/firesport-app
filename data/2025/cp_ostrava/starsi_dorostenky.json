@@ -137,12 +137,12 @@
   "parsing_notes": [
     "Layout: single-page result list with header lines and two result blocks (heats/rozběhy and finálový běh).",
     "Column detection: header 'FS Code Příjmení Jméno SDH I. rozběh II. rozběh Výsledek' used to map fields: start number, FS code, surname, given name, birth year, team (SDH), I. rozběh, II. rozběh; final block provided final times.",
-    "Discipline detection: inferred from header text 'Český pohár v běhu na 100 m přes překážky' -> mapped to 100m hurdles (reported in warnings/notes).",
+    "Discipline detection: inferred from header text 'Český pohár v běhu na 100m přes překážky' -> mapped to 100m hurdles (reported in warnings/notes).",
     "Extraction: matched athletes between heat block and final block by FS code; where start number omitted in final block, used start number from heat block."
   ],
   "warnings": [
     "Competition name contained year '2025' which was removed from competition.name.",
-    "Discipline inferred as 100m hurdles (100mPHP) from header 'Český pohár v běhu na 100 m přes překážky'.",
+    "Discipline inferred as 100m hurdles (100m) from header 'Český pohár v běhu na 100m přes překážky'.",
     "Only final times were found for 5 athletes (FS Codes: 39582, 62892, 72602, 93812, 42982); other athletes listed in heat block have no final time in the text and were therefore not included in results.",
     "Intermediate time '998,00' (FS Code 39582) is an invalid value per rules and was set to null with status 'invalid'.",
     "Document lacks explicit 'okres' (district) column; the trailing token 'CZ' was taken as district for all extracted athletes.",

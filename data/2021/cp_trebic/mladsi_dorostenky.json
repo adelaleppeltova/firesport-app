@@ -597,7 +597,7 @@
     "Times normalized by replacing decimal comma with dot; 'N' interpreted as invalid attempt with missing time."
   ],
   "warnings": [
-    "Discipline inferred as 100mPHP from phrase '100m s překážkami' (mapped to 100mPHP).",
+    "Discipline inferred as 100m from phrase '100m s překážkami' (mapped to 100m).",
     "Invalid attempt values detected ('N') were stored as time=null with status=invalid."
   ]
 }

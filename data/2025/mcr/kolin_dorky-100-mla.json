@@ -356,7 +356,7 @@
     "Layout: pořadí (rank) na samostatném řádku, následně řádek se startovním číslem, jménem, SDH (tým), zkratkou kraje a dvěma časy + výsledný čas na dalším řádku.",
     "Sloupce rozpoznány sekvenčně: start_number, first_name+last_name, team, kraj (ignorováno), time1, time2; výsledný čas převzat z následujícího řádku.",
     "Metadata závodu extrahována z řádku: 'MČR dorostu SH ČMS v PS 28. - 30. 6. 2025, Kolín'.",
-    "Disciplína určena z nadpisu 'Běh na 100m s překážkami' => 100mPHP."
+    "Disciplína určena z nadpisu 'Běh na 100m s překážkami' => 100m."
   ],
   "warnings": [
     "V datech není uveden rok narození (birth_year) u závodnic; ponecháno null.",

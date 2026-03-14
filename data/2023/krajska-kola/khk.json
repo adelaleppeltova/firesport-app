@@ -1336,7 +1336,7 @@
   "parsing_notes": [
     "PDF má 2 stránky; každá stránka obsahuje jednu tabulku výsledků (str. 1: MUŽI, str. 2: ŽENY). :contentReference[oaicite:0]{index=0}",
     "Název soutěže a místo/datum byly převzaty z hlavičky: „POŽÁRNÍ SPORT Hradec Králové“ a „KK POŽÁRNÍHO SPORTU“ + datum „17.6.2023“. :contentReference[oaicite:1]{index=1}",
-    "Disciplína byla určena z textu „BĚH NA 100 m“ → discipline=100m pro obě kategorie. :contentReference[oaicite:2]{index=2}",
+    "Disciplína byla určena z textu „BĚH NA 100m“ → discipline=100m pro obě kategorie. :contentReference[oaicite:2]{index=2}",
     "Tabulky obsahují pro každý záznam dva pokusy s atributem platnosti (P/N) a časem; neplatné pokusy jsou uvedeny jako „NP“ a byly mapovány na time=null, status=invalid. :contentReference[oaicite:3]{index=3}",
     "Úřední čas (final_time) byl převzat ze sloupce „úřední čas“; na sekundy byl převeden formát m:ss,00 (např. 0:20,54 → 20.54) s převodem desetinné čárky na tečku. :contentReference[oaicite:4]{index=4}",
     "Startovní číslo je v tabulce vytištěno ve dvou částech; bylo uloženo jako řetězec ve tvaru „X-Y“ bez další interpretace. :contentReference[oaicite:5]{index=5}"

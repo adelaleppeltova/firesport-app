@@ -1651,7 +1651,7 @@
     "Metadata extracted from header lines: league/name 'Český pohár 2024', discipline phrase 'v běhu na 100m s překážkami', place+date line 'Třebíč, 4. května 2024'.",
     "Detected single category block 'Výsledky 100m střední dorci' mapped to allowed category name 'Střední dorostenci'.",
     "Columns parsed in order: start_number, FScode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank.",
-    "Discipline determined as 100mPHP based on '100m s překážkami' (100m hurdles) in header."
+    "Discipline determined as 100m based on '100m s překážkami' (100m hurdles) in header."
   ],
   "warnings": [
     "Some team/district strings appear concatenated without separators in source text (e.g., 'Praha-Dolní MěcholupyPraha', 'Rokytnice nad RokytnouTřebíč', 'Choustníkovo Hradiště', 'Sp.N.VesSpišská Nová Ves(SK)'); split was inferred by treating the last token(s) before times as district."

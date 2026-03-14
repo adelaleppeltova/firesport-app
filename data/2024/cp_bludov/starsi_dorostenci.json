@@ -857,8 +857,8 @@
   },
   "parsing_notes": [
     "Text parsed as a single category block with repeated per-row pattern: start_number, fscode, last_name, first_name, birth_year, team, then three times (try1, try2, final) and rank on next line.",
-    "Competition metadata detected from footer/header lines: league 'ČESKÝ POHÁR', discipline phrase 'Běh na 100 m s překážkami', event name 'Bludovská stovka', and date '20.7.2024'. Place extracted as 'Bludov' from event name.",
-    "Discipline mapped from 'Běh na 100 m s překážkami' to discipline code '100m'.",
+    "Competition metadata detected from footer/header lines: league 'ČESKÝ POHÁR', discipline phrase 'Běh na 100m s překážkami', event name 'Bludovská stovka', and date '20.7.2024'. Place extracted as 'Bludov' from event name.",
+    "Discipline mapped from 'Běh na 100m s překážkami' to discipline code '100m'.",
     "Column 'district/okres' not present in provided text; stored as null."
   ],
   "warnings": [

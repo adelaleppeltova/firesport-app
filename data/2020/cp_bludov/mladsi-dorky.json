@@ -498,8 +498,8 @@
   "parsing_notes": [
     "Jednostránkový tabulkový layout s hlavičkou závodu nad výsledkovou tabulkou.",
     "Sloupce rozpoznány jako: startovní číslo, fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadata extrahována z hlavičky dokumentu: liga z textu 'ČESKÝ POHÁR', disciplína z textu 'Běh na 100 m s překážkami', název a datum z textu 'Bludovská stovka 25.7.2020', kategorie z textu 'KATEGORIE: MLADŠÍ DOROSTENKY'.",
-    "Disciplína určena explicitně z textu 'Běh na 100 m s překážkami' a mapována na hodnotu '100m'.",
+    "Metadata extrahována z hlavičky dokumentu: liga z textu 'ČESKÝ POHÁR', disciplína z textu 'Běh na 100m s překážkami', název a datum z textu 'Bludovská stovka 25.7.2020', kategorie z textu 'KATEGORIE: MLADŠÍ DOROSTENKY'.",
+    "Disciplína určena explicitně z textu 'Běh na 100m s překážkami' a mapována na hodnotu '100m'.",
     "Hodnoty 'NP' a 'DNS' interpretovány jako neplatný pokus: time null, status invalid."
   ],
   "warnings": [

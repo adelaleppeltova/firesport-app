@@ -353,7 +353,7 @@
   "parsing_notes": [
     "Layout detection: header lines parsed for title, date and place.",
     "Category detected from line 'mladší dorostenci' and normalized to 'Mladší dorostenci'.",
-    "Discipline detected from title '100 m přes překážky' -> mapped to '100mPHP'.",
+    "Discipline detected from title '100m přes překážky' -> mapped to '100m'.",
     "Result rows extracted by locating lines starting with start numbers; FS Code, surname, given name, birth year and team parsed by token positions.",
     "Final times were taken from the preceding 'UMÍSTĚNÍ' list (14 values) and mapped sequentially to extracted rows to assign ranks and official final_time."
   ],

@@ -1029,7 +1029,7 @@
     "Times parsed by converting decimal comma to dot; invalid markers (e.g., 998,00 / 999,00) mapped to status=invalid and time=null; final_time taken from 'výsledný čas'."
   ],
   "warnings": [
-    "Discipline interpreted as 100mPHP based on phrase '100m s překážkami' (mapped to 100mPHP).",
+    "Discipline interpreted as 100m based on phrase '100m s překážkami' (mapped to 100m).",
     "Row with final time '999,00' treated as invalid (final_time=null, final_status=invalid)."
   ]
 }

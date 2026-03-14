@@ -977,8 +977,8 @@
   },
   "parsing_notes": [
     "Tabulkový layout se sloupci: startovní číslo, fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadatové bloky detekovány v textu pod výsledky: league='ČESKÝ POHÁR', disciplína z řádku 'Běh na 100 m s překážkami', název 'Bludovská stovka', místo a datum z 'Bludovská stovka 30.7.2022' (place=Bludov, date=2022-07-30).",
-    "Disciplína mapována: 'Běh na 100 m s překážkami' -> '100mPHP'.",
+    "Metadatové bloky detekovány v textu pod výsledky: league='ČESKÝ POHÁR', disciplína z řádku 'Běh na 100m s překážkami', název 'Bludovská stovka', místo a datum z 'Bludovská stovka 30.7.2022' (place=Bludov, date=2022-07-30).",
+    "Disciplína mapována: 'Běh na 100m s překážkami' -> '100m'.",
     "Časy parsovány s převodem desetinné čárky na tečku; hodnoty NP/DNS interpretovány jako invalid."
   ],
   "warnings": [

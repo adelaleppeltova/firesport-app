@@ -1050,7 +1050,7 @@
   "parsing_notes": [
     "Metadata extracted from header lines: league 'Český pohár 2022', place/date from 'Třebíč, 07.05.2022'.",
     "Category detected from 'Výsledky 100m ženy' mapped to allowed category name 'Ženy'.",
-    "Discipline determined from 'v běhu na 100m s překážkami' -> mapped to '100mPHP'.",
+    "Discipline determined from 'v běhu na 100m s překážkami' -> mapped to '100m'.",
     "Columns parsed in order: start_number, FScode, last_name first_name, birth_year, team, district, time1, time2, final_time, rank.",
     "Decimal comma converted to dot; invalid time tokens (e.g., 998,00) set to null with status=invalid."
   ],

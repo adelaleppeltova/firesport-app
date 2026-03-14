@@ -954,8 +954,8 @@
   "parsing_notes": [
     "Layout detekován jako tabulka po řádcích: start_number, fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
     "Sloupce byly rozpoznány podle hlavičky (Startovní číslo, Fscode, Příjmení Jméno, Ročník, SDH) a opakující se struktury hodnot v každém záznamu.",
-    "Metadata závodu extrahována z bloku na konci textu: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 20.7.2024', 'KATEGORIE: STŘEDNÍ DOROSTENKY'.",
-    "Disciplína určena z textu 'Běh na 100 m s překážkami' -> mapování na '100mPHP'.",
+    "Metadata závodu extrahována z bloku na konci textu: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 20.7.2024', 'KATEGORIE: STŘEDNÍ DOROSTENKY'.",
+    "Disciplína určena z textu 'Běh na 100m s překážkami' -> mapování na '100m'.",
     "Hodnoty 'NP' interpretovány jako neplatný pokus (status=invalid, time=null). Desetinné čárky převedeny na tečky."
   ],
   "warnings": [

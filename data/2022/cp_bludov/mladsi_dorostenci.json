@@ -522,8 +522,8 @@
   "parsing_notes": [
     "Layout detekován jako tabulka se sloupci: startovní číslo, fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
     "Časy byly čteny z řádků pod každým závodníkem; desetinná čárka převedena na tečku.",
-    "Metadata závodu převzata z bloků: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 30.7.2022'.",
-    "Disciplína určena z textu 'Běh na 100 m s překážkami' => 100mPHP.",
+    "Metadata závodu převzata z bloků: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 30.7.2022'.",
+    "Disciplína určena z textu 'Běh na 100m s překážkami' => 100m.",
     "Kategorie určena z nadpisu 'KATEGORIE: MLADŠÍ DOROSTENCI' => 'Mladší dorostenci'."
   ],
   "warnings": [

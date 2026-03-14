@@ -222,7 +222,8 @@ class DataImporter:
         try:
             raw_name = category_data.get("name") or ""
             category_name = self._normalize_category_name(raw_name)
-            category_id = await self._import_category(category_name)
+            discipline = category_data.get("discipline") or None
+            category_id = await self._import_category(category_name, discipline=discipline)
             
             if not category_id:
                 logger.warning(f"Nepodařilo se importovat kategorii '{category_name}'")
@@ -240,7 +241,7 @@ class DataImporter:
             self.stats["errors"].append(f"Kategorie: {str(e)}")
 
 
-    async def _import_category(self, name: str) -> Optional[str]:
+    async def _import_category(self, name: str, *, discipline: Optional[str] = None) -> Optional[str]:
         """Importuje nebo najde existující kategorii."""
         try:
             if not name:
@@ -249,6 +250,12 @@ class DataImporter:
 
             # Kontrola cache
             if name in self.categories_cache:
+                # Doplnit discipline do existující kategorie, pokud chybí
+                if discipline:
+                    await categories_collection.update_one(
+                        {"name": name, "discipline": {"$exists": False}},
+                        {"$set": {"discipline": discipline}},
+                    )
                 return self.categories_cache[name]
             
             # Kontrola v DB
@@ -256,10 +263,18 @@ class DataImporter:
             if existing:
                 cat_id = str(existing["_id"])
                 self.categories_cache[name] = cat_id
+                # Doplnit discipline, pokud v dokumentu chybí
+                if discipline and not existing.get("discipline"):
+                    await categories_collection.update_one(
+                        {"_id": existing["_id"]},
+                        {"$set": {"discipline": discipline}},
+                    )
                 return cat_id
             
             # Vytvoření nové kategorie
             new_cat = {"name": name, "created_at": datetime.now()}
+            if discipline:
+                new_cat["discipline"] = discipline
             result = await categories_collection.insert_one(new_cat)
             cat_id = str(result.inserted_id)
             self.categories_cache[name] = cat_id

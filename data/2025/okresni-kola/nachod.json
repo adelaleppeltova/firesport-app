@@ -903,7 +903,7 @@
   },
   "parsing_notes": [
     "PDF má 2 strany; každá strana obsahuje jednu výsledkovou tabulku (kategorie MUŽI na straně 1, kategorie ŽENY na straně 2).",
-    "Metadata (místo, datum, název akce) byla převzata z hlavičky: „POŽÁRNÍ SPORT Náchod - Hamra“ a datum „31.5.2025“; disciplína z titulku „BĚH NA 100 m“.",
+    "Metadata (místo, datum, název akce) byla převzata z hlavičky: „POŽÁRNÍ SPORT Náchod - Hamra“ a datum „31.5.2025“; disciplína z titulku „BĚH NA 100m“.",
     "Tabulka obsahuje dva pokusy; pro každý pokus je uveden čas a platnost (P/N) a výsledný čas pokusu. Jako time pro pokus je použit uvedený čas; při neplatnosti (N/NP) je time nastaveno na null dle pravidel pro neplatné pokusy.",
     "V levé části tabulky se vyskytují dvě úzké číselné kolony (pravděpodobně dráha + startovní číslo). Do pole start_number bylo uloženo číslo bezprostředně před jménem závodníka (interpretované jako startovní číslo).",
     "Sloupce FSCode, rok narození a okres se v této listině nevyskytují."

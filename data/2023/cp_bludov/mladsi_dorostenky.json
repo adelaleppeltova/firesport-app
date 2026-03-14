@@ -929,8 +929,8 @@
   },
   "parsing_notes": [
     "Zdrojový text obsahuje hlavičku se sloupci: Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadata závodu byla vyčtena z řádků v dolní části: „ČESKÝ POHÁR“, „Běh na 100 m s překážkami“, „Bludovská stovka 29.7.2023“, „KATEGORIE: MLADŠÍ DOROSTENKY“.",
-    "Disciplína nastavena na 100m podle textu „Běh na 100 m s překážkami“ (mapování na 100m).",
+    "Metadata závodu byla vyčtena z řádků v dolní části: „ČESKÝ POHÁR“, „Běh na 100m s překážkami“, „Bludovská stovka 29.7.2023“, „KATEGORIE: MLADŠÍ DOROSTENKY“.",
+    "Disciplína nastavena na 100m podle textu „Běh na 100m s překážkami“ (mapování na 100m).",
     "Časy byly parsovány s převodem desetinné čárky na tečku; hodnoty „NP“ a „DNS“ byly označeny jako invalid (time=null)."
   ],
   "warnings": [

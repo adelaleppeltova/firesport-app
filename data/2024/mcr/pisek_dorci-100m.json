@@ -2466,7 +2466,7 @@
   "parsing_notes": [
     "Zdrojový text obsahuje tabulku s pořadím (rank), startovním číslem, jménem, týmem a časy I. a II. pokusu + výsledný čas; opakované bloky hlavičky 'Běh na 100m s překážkami' byly ignorovány.",
     "Sloupce rozpoznány pozičně z opakujícího se vzoru: <rank> <start_number> <first_name> <last_name> <team> <try1> <try2> <final>.",
-    "Disciplína určena z hlavičky 'Běh na 100m s překážkami' => 100mPHP.",
+    "Disciplína určena z hlavičky 'Běh na 100m s překážkami' => 100m.",
     "Metadatové řádky 'MČR dorostu SH ČMS v PS 29. 6. - 1. 7. 2024, Písek' použity pro league a place; rozsah dat nebyl převeden na jedno datum závodu."
   ],
   "warnings": [

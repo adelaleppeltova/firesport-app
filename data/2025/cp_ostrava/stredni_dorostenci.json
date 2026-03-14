@@ -161,7 +161,7 @@
   "parsing_notes": [
     "Layout detected as two-block PDF with preliminary result (I./II. rozběh) table and separate finálový běh block.",
     "Recognized columns from first block: start number, FS Code, last name, first name, birth year, team (SDH), country/code, I. rozběh, II. rozběh (used as two attempts), Výsledek treated as official final_time when present.",
-    "Discipline inferred from header 'Český pohár v běhu na 100 m přes překážky' => interpreted as 100m hurdles (mapped to internal '100mPHP' during detection).",
+    "Discipline inferred from header 'Český pohár v běhu na 100m přes překážky' => interpreted as 100m hurdles (mapped to internal '100m' during detection).",
     "Dates parsed from '6.9.2025, Ostrava - Nová Ves' -> 2025-09-06.",
     "FS Code parsed as numeric when >3 digits; district column not present (country code 'CZ' present in same field as team) => district left empty string.",
     "Invalid attempt values (e.g. 998.00) parsed as invalid attempts with time=null, status='invalid', final_time retains the numeric official value from PDF where given."

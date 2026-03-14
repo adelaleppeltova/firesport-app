@@ -474,8 +474,8 @@
   "parsing_notes": [
     "Layout: tabulka se sloupci Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
     "Časy a pořadí byly brány po řádcích závodnic; hodnoty NP byly mapovány jako invalid (time=null).",
-    "Metadata závodu extrahována z patičky: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 29.7.2023'.",
-    "Discipline určena z textu 'Běh na 100 m s překážkami' -> 100m."
+    "Metadata závodu extrahována z patičky: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 29.7.2023'.",
+    "Discipline určena z textu 'Běh na 100m s překážkami' -> 100m."
   ],
   "warnings": [
     "V PDF nebyl nalezen sloupec okres/district; district je u všech výsledků null.",

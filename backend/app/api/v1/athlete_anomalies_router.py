@@ -175,6 +175,7 @@ async def get_athlete_anomalies(
             "threshold_score": 1,
             "median_time": 1,
             "category_group": 1,
+            "contamination_used": 1,
         },
     ).sort("competition_date", -1)
 
@@ -213,6 +214,49 @@ async def get_athlete_anomalies(
         # Fallback when window dates are not available
         n_valid = summary.get("n_valid_results_in_window", len(score_docs))
 
+    model_doc = run.get("model") or {}
+    model_params = model_doc.get("params") or {}
+    run_stats = run.get("stats") or {}
+
+    # Resolve discipline from the athlete's categories within the window
+    discipline_val: Optional[str] = None
+    if window_start and window_end:
+        cat_ids = await db["results"].distinct(
+            "category",
+            {
+                "athlete": athlete_oid,
+                "date": {"$gte": window_start, "$lte": window_end},
+            },
+        )
+        if cat_ids:
+            cat_doc = await db["categories"].find_one(
+                {"_id": {"$in": cat_ids}, "discipline": {"$exists": True, "$ne": None}},
+                projection={"discipline": 1},
+            )
+            if cat_doc:
+                discipline_val = cat_doc.get("discipline")
+
+    # contamination: prefer per-athlete value from scores;
+    # fall back to global fixed value stored on old per-athlete runs
+    contamination_val: Optional[float] = (
+        score_docs[0].get("contamination_used")
+        if score_docs
+        else model_params.get("contamination")
+    )
+    # contamination_base strategy string (window-level runs only)
+    contamination_base: Optional[str] = model_params.get("contamination_base")
+    # contamination_stats: min/median/max across all athletes in this window run
+    c_stats_raw = run_stats.get("contamination")
+    contamination_stats_val = (
+        {
+            "min": c_stats_raw.get("min"),
+            "median": c_stats_raw.get("median"),
+            "max": c_stats_raw.get("max"),
+        }
+        if c_stats_raw
+        else None
+    )
+
     run_info = AnomalyRunInfo(
         run_id=resolved_run_id,
         created_at=run["created_at"],
@@ -225,6 +269,16 @@ async def get_athlete_anomalies(
         median_time=median_time,
         status=AnomalyRunStatus(run.get("status", "success")),
         reason=summary.get("reason"),
+        # Model parameters
+        model_name=model_doc.get("name"),
+        contamination=contamination_val,
+        contamination_base=contamination_base,
+        contamination_stats=contamination_stats_val,
+        n_estimators=model_params.get("n_estimators"),
+        random_state=model_params.get("random_state"),
+        max_samples=str(model_params.get("max_samples", "auto")),
+        eps_std=model_params.get("eps_std"),
+        discipline=discipline_val,
     )
 
     # No scores → return empty items list (run exists but athlete was skipped)

@@ -378,7 +378,7 @@
   "parsing_notes": [
     "Metadata extracted from header lines: league from 'Český pohár 2024', place/date from 'Třebíč, 4. května 2024'.",
     "Category inferred from heading 'Výsledky 100m mladší dorci' mapped to allowed name 'Mladší dorostenci'.",
-    "Discipline set to 100mPHP based on text 'v běhu na 100m s překážkami'.",
+    "Discipline set to 100m based on text 'v běhu na 100m s překážkami'.",
     "Columns detected in fixed order: start_number, FScode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank.",
     "Invalid times detected by sentinel values 998,00 / 999,00 and stored as null with status 'invalid'."
   ],

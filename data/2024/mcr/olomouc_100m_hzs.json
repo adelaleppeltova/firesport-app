@@ -258,7 +258,7 @@
   "parsing_notes": [
     "Metadata extracted from header lines: competition name from first line, place+date from 'Olomouc 23. - 25. srpna 2024'.",
     "Date normalized using first day of multi-day event range (2024-08-23).",
-    "Discipline determined from line 'Běh jednotlivců na 100m překážek' -> 100mPHP.",
+    "Discipline determined from line 'Běh jednotlivců na 100m překážek' -> 100m.",
     "Results parsed by fixed columns in row text: rank, (other ordering columns ignored), start_number (st.č.), first_name, last_name, team, try1, try2, final."
   ],
   "warnings": [

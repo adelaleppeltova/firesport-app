@@ -59,7 +59,7 @@ def _build_window(
 def _build_model(cfg: AnomalyConfig) -> Dict[str, Any]:
     """Build model sub-document with the *actually used* parameters."""
     return {
-        "name": "IsolationForest",
+        "name": "Isolation Forest",
         "params": {
             "n_estimators": cfg.n_estimators,
             "contamination": cfg.contamination,
@@ -612,7 +612,7 @@ def _build_window_run_doc(
             "min_results": min_results_used,
         },
         "model": {
-            "name": "IsolationForest",
+            "name": "Isolation Forest",
             "params": {
                 "n_estimators": cfg.n_estimators,
                 "contamination_base": contamination_base,

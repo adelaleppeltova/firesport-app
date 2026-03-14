@@ -546,8 +546,8 @@
   "parsing_notes": [
     "Tabulkový layout rozpoznán ze sloupců: Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH, Čas 1. pokusu, Čas 2. pokusu, Výsledný čas, Pořadí.",
     "Časy parsovány s převodem desetinné čárky na tečku; NP a DNS mapováno jako invalid (time=null).",
-    "Metadata závodu extrahována z bloku textu: 'ČESKÝ POHÁR', 'Bludovská stovka 20.7.2024', 'Běh na 100 m s překážkami'.",
-    "Discipline určena z textu 'Běh na 100 m s překážkami' → 100mPHP."
+    "Metadata závodu extrahována z bloku textu: 'ČESKÝ POHÁR', 'Bludovská stovka 20.7.2024', 'Běh na 100m s překážkami'.",
+    "Discipline určena z textu 'Běh na 100m s překážkami' → 100m."
   ],
   "warnings": [
     "Místo konání nebylo v poskytnutém textu jednoznačně uvedeno (Bludovská stovka může implikovat Bludov, ale není explicitně uvedeno); place=null.",

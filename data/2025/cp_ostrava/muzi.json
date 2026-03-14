@@ -400,8 +400,8 @@
   },
   "parsing_notes": [
     "Layout: detected header lines with columns: FS Code, Příjmení, Jméno, SDH, I. rozběh, II. rozběh (Výsledek).",
-    "Metadata extraction: competition place and date parsed from '6.9.2025, Ostrava - Nová Ves'. Competition name chosen as 'OSTRAVSKÁ STOVKA' (year removed). League taken from the first header line 'Český pohár v běhu na 100 m přes překážky'.",
-    "Discipline detection: determined from title 'Český pohár v běhu na 100 m přes překážky' -> 100m hurdles (mapped internally to 100mPHP).",
+    "Metadata extraction: competition place and date parsed from '6.9.2025, Ostrava - Nová Ves'. Competition name chosen as 'OSTRAVSKÁ STOVKA' (year removed). League taken from the first header line 'Český pohár v běhu na 100m přes překážky'.",
+    "Discipline detection: determined from title 'Český pohár v běhu na 100m přes překážky' -> 100m hurdles (mapped internally to 100m).",
     "Results extraction: for each line parsed FS code, surname, given name, birth year, team, then two time columns (I. rozběh, II. rozběh). The second time column was used as the official 'final_time' where present in the row.",
     "Time parsing: decimal comma/point normalized to dot. Values equal to 998.00 treated as invalid in per-try times (stored as null in per-try), but final_time retained as numeric 998.0 to preserve the official reported value."
   ],

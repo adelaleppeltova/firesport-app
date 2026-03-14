@@ -355,7 +355,7 @@
   "parsing_notes": [
     "Text parsing: results extracted from simple row list preceding the repeated header; columns interpreted as rank, start_number, first_name+last_name, team, region code, try1 time, try2 time, final time (on next line).",
     "Competition metadata extracted from footer line: 'MČR dorostu SH ČMS v PS 28. - 30. 6. 2025, Kolín' (name, date range, place). Date normalized by taking first day of range.",
-    "Discipline detected from header 'Běh na 100m s překážkami' mapped to discipline '100mPHP'.",
+    "Discipline detected from header 'Běh na 100m s překážkami' mapped to discipline '100m'.",
     "No district/okr. column detected; region abbreviations (JČ, ZL, StČ, ...) were not stored as district."
   ],
   "warnings": [

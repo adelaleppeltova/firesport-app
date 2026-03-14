@@ -809,8 +809,8 @@
   },
   "parsing_notes": [
     "Extrahováno z textu tabulky: sloupce Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH, časy 1. a 2. pokusu, výsledný čas, pořadí.",
-    "Metadata závodu detekována z hlavičky: „ČESKÝ POHÁR“, „Běh na 100 m s překážkami“, „Bludovská stovka 20.7.2024“, „KATEGORIE: MLADŠÍ DOROSTENKY“.",
-    "Disciplína určena z textu „Běh na 100 m s překážkami“ -> 100m.",
+    "Metadata závodu detekována z hlavičky: „ČESKÝ POHÁR“, „Běh na 100m s překážkami“, „Bludovská stovka 20.7.2024“, „KATEGORIE: MLADŠÍ DOROSTENKY“.",
+    "Disciplína určena z textu „Běh na 100m s překážkami“ -> 100m.",
     "NP interpretováno jako neplatný pokus (invalid) s time=null; výsledný čas převzat z řádku pod pokusy."
   ],
   "warnings": [

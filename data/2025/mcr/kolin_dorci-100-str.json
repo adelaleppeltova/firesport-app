@@ -356,7 +356,7 @@
     "Metadata extracted from footer line: 'MČR dorostu SH ČMS v PS 28. - 30. 6. 2025, Kolín' (competition name, date range, place).",
     "Event date normalized by taking the first day of the stated date range (28.6.2025 -> 2025-06-28).",
     "Category identified from heading 'Střední dorostenci'.",
-    "Discipline inferred from heading 'Běh na 100m s překážkami' and filename containing '100' -> mapped to '100mPHP'.",
+    "Discipline inferred from heading 'Běh na 100m s překážkami' and filename containing '100' -> mapped to '100m'.",
     "Results parsed as: rank, start number, first name, last name, team, region code (ignored), try1 time, try2 time, final time on next line."
   ],
   "warnings": [

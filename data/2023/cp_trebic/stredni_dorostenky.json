@@ -1507,7 +1507,7 @@
     "Metadata extracted from header lines: 'Český pohár 2023' (league), 'Třebíč, 07.05.2023' (place+date), and category header 'Výsledky 100m střední dorky'.",
     "Competition name treated as generic ('Český pohár') and expanded with place to 'Český pohár – Třebíč'.",
     "Single table layout with columns parsed in order: start_number, fscode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank; some rows had line breaks within name/team fields that were joined.",
-    "Discipline inferred from 'v běhu na 100m s překážkami' => mapped to '100mPHP'.",
+    "Discipline inferred from 'v běhu na 100m s překážkami' => mapped to '100m'.",
     "Invalid times detected by sentinel values 998,00 / 999,00 and stored as null with status 'invalid'. Final time taken from 'výsledný čas' column without recomputation."
   ],
   "warnings": [

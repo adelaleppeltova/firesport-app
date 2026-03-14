@@ -355,7 +355,7 @@
     "Layout detekován jako tabulka jednotlivců s řádky ve tvaru: pořadí / startovní číslo / jméno / příjmení / tým / kraj / čas I / čas II / výsledný čas.",
     "Sloupce byly rozpoznány sekvenčně z řádků výsledků; kód kraje (např. ZL, MS, StČ) byl ignorován jako district, protože jde o kraj.",
     "Datum a místo převzato z řádku: 'MČR dorostu SH ČMS v PS 1. - 3. 7. 2023, Domažlice' (použit první den jako datum závodu).",
-    "Disciplína určena z textu 'Běh na 100m s překážkami' mapováno na 100mPHP."
+    "Disciplína určena z textu 'Běh na 100m s překážkami' mapováno na 100m."
   ],
   "warnings": [
     "V dodaném textu chybí rok narození; birth_year byl vyplněn hodnotou 0, což není spolehlivý údaj.",

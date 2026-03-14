@@ -872,7 +872,7 @@
   "parsing_notes": [
     "PDF má 2 stránky; na každé stránce je jedna tabulka výsledků (str. 1: MUŽI, str. 2: ŽENY). :contentReference[oaicite:0]{index=0}",
     "Metadata závodu byla převzata z hlaviček tabulek: „POŽÁRNÍ SPORT Náchod 3.6.2023“ a „OK POŽÁRNÍHO SPORTU“. :contentReference[oaicite:1]{index=1}",
-    "Disciplína byla určena z textu „BĚH NA 100 m“ → discipline=100m u obou kategorií. :contentReference[oaicite:2]{index=2}",
+    "Disciplína byla určena z textu „BĚH NA 100m“ → discipline=100m u obou kategorií. :contentReference[oaicite:2]{index=2}",
     "Sloupce byly rozpoznány dle struktury tabulky: startovní číslo (dvě hodnoty), příjmení+jméno, SDH, pokus 1 (platnost + výsledný čas), pokus 2 (platnost + výsledný čas), úřední čas, pořadí. :contentReference[oaicite:3]{index=3}",
     "Časy ve formátu m:ss,00 byly převedeny na sekundy (např. 0:18,31 → 18.31); desetinná čárka byla převedena na tečku. :contentReference[oaicite:4]{index=4}",
     "Neplatné pokusy byly mapovány podle zápisu „NP“ (a/nebo platnosti „N“) → time=null, status=invalid. :contentReference[oaicite:5]{index=5}"

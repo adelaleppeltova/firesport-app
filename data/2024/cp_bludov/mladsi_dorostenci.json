@@ -377,8 +377,8 @@
   },
   "parsing_notes": [
     "Tabulkový layout rozpoznán podle hlaviček: Startovní číslo, Fscode, Příjmení Jméno, Ročník, SDH + sloupce pro časy (1. pokus, 2. pokus, výsledný čas, pořadí).",
-    "Metadata závodu převzata z bloků na konci textu: liga 'ČESKÝ POHÁR', disciplína 'Běh na 100 m s překážkami', název 'Bludovská stovka', datum '20.7.2024'.",
-    "Disciplína mapována z textu 'Běh na 100 m s překážkami' -> '100mPHP'.",
+    "Metadata závodu převzata z bloků na konci textu: liga 'ČESKÝ POHÁR', disciplína 'Běh na 100m s překážkami', název 'Bludovská stovka', datum '20.7.2024'.",
+    "Disciplína mapována z textu 'Běh na 100m s překážkami' -> '100m'.",
     "Časy parsovány jako dvě hodnoty na závodníka; 'NP' a '998,00' interpretovány jako neplatný pokus (invalid). Výsledný čas převzat z řádku s výsledným časem před pořadím."
   ],
   "warnings": [

@@ -688,7 +688,7 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from footer/header lines: league from 'ČESKÝ POHÁR', discipline from 'Běh na 100 m s překážkami', competition name+date from 'Bludovská stovka 31.7.2021'.",
+    "Metadata extracted from footer/header lines: league from 'ČESKÝ POHÁR', discipline from 'Běh na 100m s překážkami', competition name+date from 'Bludovská stovka 31.7.2021'.",
     "Category detected from line 'KATEGORIE: STŘEDNÍ DOROSTENKY' and normalized to allowed name 'Střední dorostenky'.",
     "Results parsed as table-like rows with columns: start_number, fscode, last_name, first_name, birth_year, team, then two try times, final time, rank."
   ],

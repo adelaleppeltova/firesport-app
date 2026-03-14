@@ -835,7 +835,7 @@
     "Metadata extracted from header lines: league from 'Český pohár 2024', place+date from 'Třebíč, 4. května 2024'.",
     "Competition name treated as generic ('Český pohár') and augmented with place because place is known.",
     "Single category detected from heading 'Výsledky 100m mladší dorostenky'.",
-    "Discipline inferred from phrase 'v běhu na 100m s překážkami' => mapped to 100mPHP.",
+    "Discipline inferred from phrase 'v běhu na 100m s překážkami' => mapped to 100m.",
     "Columns parsed as: start_number, FScode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank; decimal commas converted to dots.",
     "Invalid time tokens '998,00' and '999,00' mapped to time=null,status=invalid."
   ],

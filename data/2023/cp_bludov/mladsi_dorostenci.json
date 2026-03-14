@@ -544,9 +544,9 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from footer/header block: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 29.7.2023', 'KATEGORIE: MLADŠÍ DOROSTENCI'.",
+    "Metadata extracted from footer/header block: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 29.7.2023', 'KATEGORIE: MLADŠÍ DOROSTENCI'.",
     "Results parsed as fixed-order columns: start_number, fscode, last_name, first_name, birth_year, team, then two attempt times, final time, rank.",
-    "Discipline inferred from phrase 'Běh na 100 m s překážkami' mapped to '100mPHP'.",
+    "Discipline inferred from phrase 'Běh na 100m s překážkami' mapped to '100m'.",
     "Times converted from comma decimal to dot decimal; 'NP' mapped to invalid with null time."
   ],
   "warnings": [

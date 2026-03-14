@@ -694,7 +694,7 @@
   ],
   "warnings": [
     "Some rows have 'okres' equal to team text (e.g., HZS entries); kept as-is because it appears in the district column in the source.",
-    "Discipline inferred as 100mPHP based on phrase '100m s překážkami' (not explicitly labeled as PHP).",
+    "Discipline inferred as 100m based on phrase '100m s překážkami' (not explicitly labeled as PHP).",
     "Row with start_number '1' has missing space before first time in source; parsed as time1=17.08."
   ]
 }

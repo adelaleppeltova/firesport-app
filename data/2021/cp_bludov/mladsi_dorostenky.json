@@ -953,8 +953,8 @@
   },
   "parsing_notes": [
     "Tabulkový layout: sloupce startovní číslo, fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadata závodu extrahována z bloku textu: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 31.7.2021'.",
-    "Disciplína určena z textu 'Běh na 100 m s překážkami' -> 100m.",
+    "Metadata závodu extrahována z bloku textu: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 31.7.2021'.",
+    "Disciplína určena z textu 'Běh na 100m s překážkami' -> 100m.",
     "Neplatné časy rozpoznány dle tokenu 'NP' -> time:null, status:'invalid'."
   ],
   "warnings": [

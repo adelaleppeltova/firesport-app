@@ -1265,8 +1265,8 @@
   },
   "parsing_notes": [
     "Layout: jedna tabulka pro kategorii; sloupce čteny sekvenčně: startovní číslo, FSCode, příjmení, jméno, ročník, SDH (tým), čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadata: liga 'ČESKÝ POHÁR', disciplína z hlavičky 'Běh na 100 m s překážkami', název akce 'Bludovská stovka', místo 'Bludov', datum '29.7.2023' normalizováno na 2023-07-29.",
-    "Discipline mapping: '100 m s překážkami' -> 100mPHP.",
+    "Metadata: liga 'ČESKÝ POHÁR', disciplína z hlavičky 'Běh na 100m s překážkami', název akce 'Bludovská stovka', místo 'Bludov', datum '29.7.2023' normalizováno na 2023-07-29.",
+    "Discipline mapping: '100m s překážkami' -> 100m.",
     "Časy: desetinná čárka převedena na tečku; 'NP' interpretováno jako invalid (time=null)."
   ],
   "warnings": [

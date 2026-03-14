@@ -352,13 +352,13 @@
   },
   "parsing_notes": [
     "Layout: header lines with event title and location, followed by a tabular block with columns: start number, FS Code, Příjmení, Jméno, rok nar., team (SDH), I. rozběh, II. rozběh, Výsledek.",
-    "Metadata extraction: date and place parsed from line '6.9.2025, Ostrava - Nová Ves'; competition name chosen from prominent header 'OSTRAVSKÁ STVOKA 2025' with year removed; league detected as 'Český pohár' from header 'Český pohár v běhu na 100 m přes překážky'.",
-    "Discipline inference: phrase 'běhu na 100 m přes překážky' mapped to discipline 100m (hurdles) — used for diagnostics only.",
+    "Metadata extraction: date and place parsed from line '6.9.2025, Ostrava - Nová Ves'; competition name chosen from prominent header 'OSTRAVSKÁ STVOKA 2025' with year removed; league detected as 'Český pohár' from header 'Český pohár v běhu na 100m přes překážky'.",
+    "Discipline inference: phrase 'běhu na 100m přes překážky' mapped to discipline 100m (hurdles) — used for diagnostics only.",
     "Results parsing: lines tokenized and mapped as: start_number, fscode, last_name, first_name, birth_year, team, country, time1, time2. Country token ('CZ') treated as not a district; no separate 'okres' column found.",
     "Time parsing: decimal comma converted to dot; invalid time codes (999, 998) recognized and set to null for individual attempts with status 'invalid'; final_time taken from official result column when available (kept numeric even if an invalid code like 999.00)."
   ],
   "warnings": [
-    "Ambiguous competition name: both 'Český pohár v běhu na 100 m přes překážky' and 'OSTRAVSKÁ STVOKA 2025' present; chose 'OSTRAVSKÁ STVOKA' and removed year.",
+    "Ambiguous competition name: both 'Český pohár v běhu na 100m přes překážky' and 'OSTRAVSKÁ STVOKA 2025' present; chose 'OSTRAVSKÁ STVOKA' and removed year.",
     "No district/okres column detected in source; 'district' set to empty string for all results.",
     "Several attempt times use invalid codes (998, 999); those attempt times set to null with status 'invalid'.",
     "Final official time for one athlete is 999.00 (invalid code); final_time preserved as numeric 999.0 and final_status set to 'invalid'.",

@@ -808,9 +808,9 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from footer block: league line 'ČESKÝ POHÁR', discipline line 'Běh na 100 m s překážkami', event title 'Bludovská stovka 20.7.2024', category header 'KATEGORIE: MUŽI'.",
+    "Metadata extracted from footer block: league line 'ČESKÝ POHÁR', discipline line 'Běh na 100m s překážkami', event title 'Bludovská stovka 20.7.2024', category header 'KATEGORIE: MUŽI'.",
     "Results parsed as fixed-column table: start_number, fscode, surname+name, birth_year, team, then two attempt times, then final_time and rank on following lines.",
-    "Discipline mapped: 'Běh na 100 m s překážkami' -> 100m (mapping rule for 100m / 100m s překážkami).",
+    "Discipline mapped: 'Běh na 100m s překážkami' -> 100m (mapping rule for 100m / 100m s překážkami).",
     "Times normalized by replacing comma with dot; NP treated as invalid time."
   ],
   "warnings": [

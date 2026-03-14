@@ -667,12 +667,12 @@
     "Column detection: start_number, fscode, last_name, first_name, birth_year, team, country/district, I. rozběh, II. rozběh.",
     "Team extracted as tokens between birth year and country code () to preserve multiword team names.",
     "Final times: for athletes present in the 'finálový běh' block (start numbers 83,84,77,75,79) final_time was overridden from that block; otherwise final_time taken from II. rozběh column.",
-    "Discipline detected from title '100 m přes překážky' => 100mPHP (used for internal parsing decisions)."
+    "Discipline detected from title '100m přes překážky' => 100m (used for internal parsing decisions)."
   ],
   "warnings": [
     "District/okres column not present; country code '' used in district field for all athletes (may not be actual district).",
     "Several heat times flagged invalid (values 998.00 or 999.00) and kept as numeric in final_time with final_status 'invalid' to preserve original invalid values.",
     "Competition name contains the league name 'Český pohár'; league set to 'Český pohár' and competition.name left as full title.",
-    "Discipline inferred as 100mPHP from text '100 m přes překážky' (if incorrect, adjust manually)."
+    "Discipline inferred as 100m from text '100m přes překážky' (if incorrect, adjust manually)."
   ]
 }

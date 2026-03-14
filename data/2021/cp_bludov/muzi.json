@@ -690,8 +690,8 @@
   "parsing_notes": [
     "Layout: jedna tabulka s hlavičkou sloupců (Startovní číslo, Fscode, Příjmení, Jméno, Ročník, SDH) a za každým řádkem dvojice časů (1. a 2. pokus), následovaná výsledným časem a pořadím.",
     "Sloupce rozpoznány pozičně podle pořadí hodnot v řádku; časy parsovány jako desetinná čísla (čárka->tečka).",
-    "Metadata převzata z textu pod tabulkou: league 'ČESKÝ POHÁR', disciplína z řádku 'Běh na 100 m s překážkami', název 'Bludovská stovka', datum '31.7.2021', místo 'Bludov'.",
-    "Discipline mapování: 'Běh na 100 m s překážkami' -> '100mPHP'."
+    "Metadata převzata z textu pod tabulkou: league 'ČESKÝ POHÁR', disciplína z řádku 'Běh na 100m s překážkami', název 'Bludovská stovka', datum '31.7.2021', místo 'Bludov'.",
+    "Discipline mapování: 'Běh na 100m s překážkami' -> '100m'."
   ],
   "warnings": [
     "Chybí sloupec okres (district) v dodaném textu; u všech výsledků je district=null.",

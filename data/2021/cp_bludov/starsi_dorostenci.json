@@ -617,7 +617,7 @@
   },
   "parsing_notes": [
     "Tabulkový layout identifikován podle hlaviček: Startovní číslo, Fscode, Příjmení Jméno, Ročník, SDH a následných tří časových sloupců (čas 1. pokusu, čas 2. pokusu, výsledný čas) + pořadí.",
-    "Disciplína určena z textu 'Běh na 100 m s překážkami' a mapována na '100m'.",
+    "Disciplína určena z textu 'Běh na 100m s překážkami' a mapována na '100m'.",
     "Kategorie převzata z nadpisu 'KATEGORIE: STARŚÍ DOROSTENCI' a normalizována na povolený název 'Starší dorostenci'.",
     "Neplatné pokusy 'NP' interpretovány jako invalid (time=null)."
   ],

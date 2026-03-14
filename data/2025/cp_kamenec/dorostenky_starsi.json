@@ -835,7 +835,7 @@
     "Name parsing: first token of name block taken as last_name; remaining name tokens combined as first_name.",
     "Times parsing: three time tokens per row interpreted as try1, try2, final (in that order). Decimal separator ':' converted to '.'.",
     "Invalid time markers: values ending with '-' treated as invalid and converted to null for attempts. final_time set to 0 for invalid finals to satisfy schema numeric requirement.",
-    "Discipline detection: header '100 m s překážkami' mapped to 100m (hurdles) based on keyword matching."
+    "Discipline detection: header '100m s překážkami' mapped to 100m (hurdles) based on keyword matching."
   ],
   "warnings": [
     "competition.league not found in document; left empty.",

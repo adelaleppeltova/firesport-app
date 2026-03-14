@@ -27,7 +27,7 @@ class AnomalyRunWindow(BaseModel):
 
 
 class AnomalyRunModel(BaseModel):
-    name: str = "IsolationForest"
+    name: str = "Isolation Forest"
     params: Dict[str, Any] = Field(
         default_factory=lambda: {
             "n_estimators": DEFAULT_CONFIG.n_estimators,
@@ -116,6 +116,19 @@ class AnomalyRunInfo(BaseModel):
     median_time: Optional[float] = None
     status: AnomalyRunStatus
     reason: Optional[str] = None
+    # Model parameters (populated from run document)
+    model_name: Optional[str] = None
+    # contamination: fixed float (per-athlete run) OR adaptive per-athlete value (window run)
+    contamination: Optional[float] = None
+    # contamination_base: strategy string (only on window-level runs)
+    contamination_base: Optional[str] = None
+    # contamination_stats: min/median/max across athletes (only on window-level runs)
+    contamination_stats: Optional[Dict[str, float]] = None
+    n_estimators: Optional[int] = None
+    random_state: Optional[int] = None
+    max_samples: Optional[str] = None
+    eps_std: Optional[float] = None
+    discipline: Optional[str] = None
 
 
 class AthleteAnomaliesResponse(BaseModel):

@@ -1475,7 +1475,7 @@
   },
   "parsing_notes": [
     "Metadata extracted from repeated header blocks: 'VÝSLEDKOVÁ LISTINA', 'Náchod - Hamra', '4/6/2023', 'BĚH NA 100m S PŘEKÁŽKAMI', 'Běloveský Kilo', and 'POHÁR STAROSTY MĚSTA NÁCHODA'.",
-    "Detected discipline from header text 'BĚH NA 100m S PŘEKÁŽKAMI' mapped to '100mPHP'.",
+    "Detected discipline from header text 'BĚH NA 100m S PŘEKÁŽKAMI' mapped to '100m'.",
     "Results parsed from table-like rows: start number, name, team, attempt times with P/N markers; 'NP' treated as invalid attempt.",
     "No district/okres column present in provided text; district set to null.",
     "Finále blocks ('malé finále', 'velké finále', 'semifinále') present; per instruction, ignored as separate result blocks."

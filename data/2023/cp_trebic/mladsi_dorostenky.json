@@ -595,7 +595,7 @@
     "Metadata extracted from header lines: league/title 'Český pohár 2023', discipline phrase 'v běhu na 100m s překážkami', place+date line 'Třebíč, 07.05.2023'.",
     "Columns detected from header: st.č. (start_number), FScode, příjmení jméno, ročník, družstvo, okres, čas1, čas2, výsledný čas, pořadí.",
     "Some rows had team name on the next line in the text dump; merged to form a single record before parsing times.",
-    "Discipline determined as 100mPHP based on '100m s překážkami' and 'Výsledky 100m ...'.",
+    "Discipline determined as 100m based on '100m s překážkami' and 'Výsledky 100m ...'.",
     "Invalid times mapped using rules: 998,00 / 999,00 treated as invalid; invalid try time stored as null with status 'invalid'."
   ],
   "warnings": [

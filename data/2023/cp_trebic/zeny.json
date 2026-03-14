@@ -9,7 +9,7 @@
     "categories": [
       {
         "name": "Ženy",
-        "discipline": "100ms",
+        "discipline": "100m",
         "results": [
           {
             "start_number": "82",
@@ -1098,7 +1098,7 @@
   "parsing_notes": [
     "Metadata extracted from header lines: league/name from 'Český pohár 2023', discipline from 'v běhu na 100m s překážkami', category from 'Výsledky 100m ženy', place/date from 'Třebíč, 07.05.2023'.",
     "Columns recognized from header: st.č. (start_number), FScode, příjmení jméno, ročník, družstvo, okres, čas1, čas2, výsledný čas, pořadí.",
-    "Discipline mapping: '100m s překážkami' -> '100mPHP'.",
+    "Discipline mapping: '100m s překážkami' -> '100m'.",
     "Some team+district values were concatenated without space (e.g., 'Praha-Dolní MěcholupyPraha'); split into team='Praha-Dolní Měcholupy', district='Praha'."
   ],
   "warnings": ["FScode 2202 is shorter than 4 digits -> set to null per rule."]

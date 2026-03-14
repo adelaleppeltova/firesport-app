@@ -762,7 +762,7 @@
   "parsing_notes": [
     "Metadata extracted from the first line: '<place> - <name> kategorie: ...' and from header line containing discipline and date/time.",
     "Columns detected from header: Por=rank, Sč=start_number, FSC=fscode, Jméno+Roč.=name+birth_year, Družstvo=team, Čas 1.k / Čas 2.k=two tries, Celkem=final time.",
-    "Discipline determined from '100 m s překážkami' -> mapped to '100mPHP'.",
+    "Discipline determined from '100m s překážkami' -> mapped to '100m'.",
     "Times parsed by replacing ':' with '.' (e.g., 19:06 -> 19.06) and ',' with '.' when present; trailing '-' marked as invalid while keeping numeric part when within range."
   ],
   "warnings": [

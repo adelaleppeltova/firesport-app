@@ -571,7 +571,7 @@
     "Metadata extracted from header lines: 'Český pohár 2021' (league), 'Třebíč, 24.07.2021' (place+date).",
     "Competition.name treated as generic ('Český pohár') and augmented with place because place was available.",
     "Single category detected from 'Výsledky 100m ženy' -> category 'Ženy'.",
-    "Discipline determined from 'v běhu na 100m s překážkami' -> mapped to '100mPHP'.",
+    "Discipline determined from 'v běhu na 100m s překážkami' -> mapped to '100m'.",
     "Columns parsed as: start_number, FScode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank."
   ],
   "warnings": [

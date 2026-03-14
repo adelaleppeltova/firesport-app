@@ -1097,8 +1097,8 @@
   },
   "parsing_notes": [
     "Sloupce detekovány z hlavičky tabulky: startovní číslo, Fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
-    "Metadata závodu převzata z textu: 'ČESKÝ POHÁR', 'Běh na 100 m s překážkami', 'Bludovská stovka 29.7.2023', 'KATEGORIE: MUŽI'.",
-    "Disciplína určena z řádku 'Běh na 100 m s překážkami' → mapováno na '100m'.",
+    "Metadata závodu převzata z textu: 'ČESKÝ POHÁR', 'Běh na 100m s překážkami', 'Bludovská stovka 29.7.2023', 'KATEGORIE: MUŽI'.",
+    "Disciplína určena z řádku 'Běh na 100m s překážkami' → mapováno na '100m'.",
     "Neplatné hodnoty pokusů (NP/DNS) mapovány na time=null, status='invalid'; výsledný čas převzat z uvedeného 'výsledný čas'."
   ],
   "warnings": [

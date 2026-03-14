@@ -760,10 +760,10 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from footer block containing league line 'ČESKÝ POHÁR', discipline text 'Běh na 100 m s překážkami', and event name+date 'Bludovská stovka 29.7.2023'.",
+    "Metadata extracted from footer block containing league line 'ČESKÝ POHÁR', discipline text 'Běh na 100m s překážkami', and event name+date 'Bludovská stovka 29.7.2023'.",
     "Category identified from header 'KATEGORIE: STARŠÍ DOROSTENCI' and mapped to allowed name 'Starší dorostenci'.",
     "Columns inferred from repeated row pattern: start_number, fscode, last_name, first_name, birth_year, team, then try1/try2/final_time and rank on following line.",
-    "Discipline set to '100m' based on 'Běh na 100 m s překážkami' mapping to 100m."
+    "Discipline set to '100m' based on 'Běh na 100m s překážkami' mapping to 100m."
   ],
   "warnings": [
     "Competition place not found explicitly in provided text.",

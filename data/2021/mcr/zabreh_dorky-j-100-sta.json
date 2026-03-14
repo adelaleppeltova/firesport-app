@@ -354,7 +354,7 @@
   "parsing_notes": [
     "Zdrojová data jsou extrahovaný text bez kompletní tabulkové struktury; sloupce odvozeny z opakujícího se pořadí: rank, start_number, jméno+příjmení, tým, kraj, čas I, čas II, výsledný čas.",
     "Metadata závodu převzata z řádku: 'MČR dorostu v PS 3. - 5. 7. 2021, Zábřeh' (datum normalizováno na první den uvedeného rozmezí).",
-    "Disciplína určena z hlavičky: 'Běh na 100m s přek.' => 100mPHP.",
+    "Disciplína určena z hlavičky: 'Běh na 100m s přek.' => 100m.",
     "Okres/district nebyl v dodaném textu jako samostatný sloupec; hodnoty jako OL, VY, ÚS apod. interpretovány jako kraj a neukládány do district."
   ],
   "warnings": [

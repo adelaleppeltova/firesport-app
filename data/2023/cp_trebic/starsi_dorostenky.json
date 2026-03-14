@@ -1050,7 +1050,7 @@
   "parsing_notes": [
     "Metadata extracted from header lines: league/name 'Český pohár 2023', discipline phrase 'v běhu na 100m s překážkami', location+date line 'Třebíč, 07.05.2023'.",
     "Single results table parsed by fixed column order: start_number, fscode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank.",
-    "Discipline mapped: '100m s překážkami' -> '100mPHP'.",
+    "Discipline mapped: '100m s překážkami' -> '100m'.",
     "Invalid times recognized by sentinel values (e.g., 998,00) and stored as null with status 'invalid'."
   ],
   "warnings": [

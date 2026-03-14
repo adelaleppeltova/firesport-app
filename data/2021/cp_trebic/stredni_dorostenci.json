@@ -762,7 +762,7 @@
   "parsing_notes": [
     "Metadata extracted from header lines: 'Český pohár 2021' (league) and 'Třebíč, 24.07.2021' (place/date).",
     "Category inferred from header 'Výsledky 100m střední dorci' mapped to allowed category name 'Střední dorostenci'.",
-    "Discipline determined from phrase 'v běhu na 100m s překážkami' => mapped to '100mPHP'.",
+    "Discipline determined from phrase 'v běhu na 100m s překážkami' => mapped to '100m'.",
     "Columns parsed as: start_number, FScode, last_name, first_name, birth_year, team, district, time1, time2, final_time, rank.",
     "Times normalized by replacing comma with dot; invalid markers '998,00' and '999,00' set to time=null with status=invalid; final_time taken from 'výsledný čas'."
   ],

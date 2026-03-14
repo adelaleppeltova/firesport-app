@@ -904,10 +904,10 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from footer/header block: league 'ČESKÝ POHÁR', discipline text 'Běh na 100 m s překážkami', event title 'Bludovská stovka 30.7.2022'.",
+    "Metadata extracted from footer/header block: league 'ČESKÝ POHÁR', discipline text 'Běh na 100m s překážkami', event title 'Bludovská stovka 30.7.2022'.",
     "Category detected from heading 'KATEGORIE: STŘEDNÍ DOROSTENCI' and normalized to allowed name 'Střední dorostenci'.",
     "Columns inferred from repeating row pattern: start_number, fscode, last_name, first_name, birth_year, team, then try1, try2, final_time, rank.",
-    "Discipline mapped by keyword '100 m s překážkami' to '100m' per provided mapping."
+    "Discipline mapped by keyword '100m s překážkami' to '100m' per provided mapping."
   ],
   "warnings": [
     "District/okres column not present in provided text; district set to null for all results.",

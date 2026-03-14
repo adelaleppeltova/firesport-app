@@ -858,7 +858,7 @@
     "Layout: single table with columns parsed by tokenizing each line.",
     "Column detection: assumed order = rank, start_number, last_name, first_name, birth_year, team (tokens until first time), attempt1, attempt2, final_time.",
     "Time parsing: times use ':' as decimal separator -> converted to dot (e.g., 16:48 -> 16.48). Trailing '-' marks an invalid attempt.",
-    "Discipline detected from header '100 m s překážkami' -> mapped to type '100 m s překážkami' (discipline interpreted as 100m).",
+    "Discipline detected from header '100m s překážkami' -> mapped to type '100m s překážkami' (discipline interpreted as 100m).",
     "FScode column not present in source; fscode field populated with start_number as numeric fallback to satisfy output schema."
   ],
   "warnings": [

@@ -330,14 +330,14 @@
     "Layout: header indicates 'I. rozběh', 'II. rozběh' and 'Výsledek' columns; parsed athlete rows accordingly.",
     "Columns detected by position: start number, FS code, surname, given name, birth year, team (plus country), then two time columns.",
     "Place and date extracted from line '6.9.2025, Ostrava - Nová Ves'. Date normalized to YYYY-MM-DD.",
-    "League detected from title 'Český pohár v běhu na 100 m přes překážky'.",
-    "Discipline inferred as 100m with hurdles (100mPHP) from title, but discipline field not present in target schema so not stored per schema constraints."
+    "League detected from title 'Český pohár v běhu na 100m přes překážky'.",
+    "Discipline inferred as 100m with hurdles (100m) from title, but discipline field not present in target schema so not stored per schema constraints."
   ],
   "warnings": [
     "Category heading in source was lowercase 'ženy'; normalized to 'Ženy'.",
     "District/okres column not present in source; 'district' saved as empty string for all competitors.",
     "Multiple time tokens like 998.00 and 999.00 treated as invalid (status='invalid'); corresponding times stored as null in 'times' entries but final_time retains numeric value as present in source summary (999 kept for final invalid).",
     "Some rows duplicated or presented in multiple blocks (heats and final); final times taken from the UMÍSTĚNÍ summary mapping in the source text.",
-    "Discipline inference (100mPHP) was unambiguous from title but is not included in output due to schema property restrictions."
+    "Discipline inference (100m) was unambiguous from title but is not included in output due to schema property restrictions."
   ]
 }

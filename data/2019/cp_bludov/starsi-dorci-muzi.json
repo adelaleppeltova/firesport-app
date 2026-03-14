@@ -993,9 +993,9 @@
   },
   "parsing_notes": [
     "Soubor obsahuje 2 strany s jedním souvislým výsledkovým blokem pokračujícím na druhé straně.",
-    "Metadata byla určena z textu ve spodní části první strany: „ČESKÝ POHÁR“, „Běh na 100 m s překážkami“, „Bludovská stovka 27.7.2019“ a „KATEGORIE: MUŽI A STARŠÍ DOROSTENCI“.",
+    "Metadata byla určena z textu ve spodní části první strany: „ČESKÝ POHÁR“, „Běh na 100m s překážkami“, „Bludovská stovka 27.7.2019“ a „KATEGORIE: MUŽI A STARŠÍ DOROSTENCI“.",
     "Kategorie v PDF je uvedena jako společný blok „MUŽI A STARŠÍ DOROSTENCI“, který neodpovídá přesně žádné povolené kategorii, proto je name = null.",
-    "Disciplína byla určena jako 100m podle textu „Běh na 100 m s překážkami“.",
+    "Disciplína byla určena jako 100m podle textu „Běh na 100m s překážkami“.",
     "Rozpoznané sloupce tabulky: startovní číslo, Fscode, příjmení, jméno, ročník, SDH, čas 1. pokusu, čas 2. pokusu, výsledný čas, pořadí.",
     "Sloupec okres/district v dokumentu není přítomen, proto je district u všech záznamů null."
   ],

@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../abstracts/variables";
 @use "../abstracts/mixins";
 @use "../base/tables";
@@ -88,7 +89,7 @@
 
   &__meta {
     margin: 0;
-    font-size: variables.$font-size-s;
+    font-size: variables.$font-size-xs;
     color: variables.$gray-medium;
   }
 
@@ -228,6 +229,11 @@
       color: variables.$color-secondary;
     }
   }
+  &__info {
+    font-size: variables.$font-size-xs;
+    color: variables.$gray-medium;
+    margin-top: 4px;
+  }
 }
 
 // --- Chart Card ---
@@ -290,6 +296,11 @@
     border-radius: 4px;
     padding: 2px 6px;
     margin-top: 2px;
+
+    &--warning {
+      background: #fdf4e1;
+      color: #8a6d3b;
+    }
   }
 }
 
@@ -300,6 +311,66 @@
 
 // --- Table Card ---
 
+// --- Info Tooltip ---
+
+.info-tooltip {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 4px;
+
+  &__icon {
+    font-size: 0.8em;
+    color: variables.$gray-medium;
+    cursor: default;
+
+    &:hover {
+      color: variables.$color-primary;
+    }
+  }
+
+  &__text {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: variables.$color-text;
+    color: #fff;
+    font-size: variables.$font-size-xs;
+    font-weight: variables.$font-weight-medium;
+    white-space: normal;
+    width: 220px;
+    padding: 6px 10px;
+    border-radius: variables.$border-radius-base;
+    line-height: 1.4;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+
+    // small arrow
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-bottom-color: variables.$color-text;
+    }
+  }
+
+  &:hover &__text,
+  &:active &__text,
+  &:focus &__text,
+  &:focus-within &__text {
+    display: block;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
 .anomaly-table-wrapper {
   @extend .table-wrapper;
   margin-bottom: 12px;
@@ -309,7 +380,6 @@
   @extend .table;
   width: 100%;
   border-collapse: collapse;
-  font-size: variables.$font-size-s;
 
   th,
   td {
@@ -322,12 +392,14 @@
     color: variables.$color-text;
     border-bottom: 2px solid variables.$color-background-dark;
     white-space: nowrap;
+    font-size: variables.$font-size-s;
   }
 
   td {
     border-bottom: 1px solid variables.$gray-light;
     color: variables.$color-text;
     vertical-align: middle;
+    font-size: variables.$font-size-s;
   }
 
   tr:last-child td {
@@ -358,6 +430,12 @@
     border-radius: 4px;
     padding: 2px 8px;
     white-space: nowrap;
+
+    &--warning {
+      background: #fdf4e1;
+      color: #8a6d3b;
+      border: 1px solid #f0e0b8;
+    }
   }
 }
 
@@ -379,5 +457,150 @@
   p {
     font-size: variables.$font-size-sm;
     max-width: 280px;
+  }
+}
+
+// --- Model Info Card ---
+
+.model-info-card {
+  display: flex;
+  flex-direction: column;
+
+  &__visible {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 9px 0;
+    border-bottom: 1px solid variables.$gray-light;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__label {
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+
+    flex-shrink: 0;
+    max-width: 55%;
+  }
+
+  &__value {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+    color: variables.$color-text;
+    text-align: right;
+    word-break: break-word;
+    max-width: 60%;
+  }
+
+  &__value-note {
+    display: block;
+    font-size: variables.$font-size-xs;
+    font-weight: variables.$font-weight-regular;
+    color: variables.$gray-medium;
+    margin-top: 2px;
+  }
+
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$color-accent;
+    transition: color variables.$default-transition;
+
+    &:hover {
+      color: color.adjust(#0f4d92, $lightness: -10%);
+      text-decoration: underline;
+    }
+  }
+
+  &__toggle-icon {
+    font-size: variables.$font-size-xs;
+  }
+
+  &__details {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 16px;
+  }
+
+  &__section-title {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$color-text;
+    margin: 16px 0 4px;
+    border-bottom: 1px solid #000000;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: variables.$border-radius-base;
+
+    &--notes {
+      gap: 6px;
+    }
+
+    .model-info-card__row {
+      border-bottom-color: rgba(0, 0, 0, 0.07);
+    }
+  }
+
+  &__limits-list {
+    margin: 0;
+    padding: 0 0 0 18px;
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    li {
+      font-size: variables.$font-size-s;
+      color: variables.$gray-dark;
+      line-height: 1.55;
+    }
+  }
+
+  &__note {
+    font-size: variables.$font-size-s;
+    color: variables.$gray-dark;
+    line-height: 1.55;
+    margin: 0;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    &--muted {
+      color: variables.$gray-medium;
+      border-bottom: none;
+      padding-top: 6px;
+    }
   }
 }

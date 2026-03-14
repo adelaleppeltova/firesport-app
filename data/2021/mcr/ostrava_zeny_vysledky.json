@@ -2,7 +2,7 @@
   "source_file": "ostrava_zeny_vysledky.pdf",
   "generated_at": "2026-02-19T00:00:00Z",
   "competition": {
-    "name": "Mistrovství ČR v běhu na 100 m s překážkami",
+    "name": "Mistrovství ČR v běhu na 100m s překážkami",
     "place": "Ostrava",
     "date": "2021-08-21",
     "league": "Mistrovství ČR",
@@ -2344,9 +2344,9 @@
     ]
   },
   "parsing_notes": [
-    "Metadata extracted from header lines: title 'Mistrovství ČR v běhu na 100 m s překážkami' and line 'Ostrava 21. srpna 2021' (place+date split).",
+    "Metadata extracted from header lines: title 'Mistrovství ČR v běhu na 100m s překážkami' and line 'Ostrava 21. srpna 2021' (place+date split).",
     "Category heading detected as 'ženy' -> mapped to allowed category name 'Ženy'.",
-    "Discipline inferred from title text 'běhu na 100 m s překážkami' -> mapped to '100m'.",
+    "Discipline inferred from title text 'běhu na 100m s překážkami' -> mapped to '100m'.",
     "Results table columns interpreted as: rank, start_number (st.č.), athlete (first+last), team (družstvo), try1, try2, final.",
     "Blocks labeled 'semifinále a finále' including 'Finálový běh' were ignored per instruction."
   ],

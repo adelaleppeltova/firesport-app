@@ -12,6 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import Card from "../components/Card";
+import ModelInfoCard from "../components/statistics/ModelInfoCard";
 import { CategoryGroupSelect } from "../components/athlete/CategorySummaryCard";
 import {
   useAthleteAnomalies,
@@ -22,6 +23,20 @@ import {
 } from "../hooks/useApi";
 
 // --- helpers ---
+
+function InfoTooltip({ text }) {
+  return (
+    <span className="info-tooltip" tabIndex={0} aria-label={text}>
+      <i
+        className="fa-solid fa-circle-info info-tooltip__icon"
+        aria-hidden="true"
+      />
+      <span className="info-tooltip__text" role="tooltip">
+        {text}
+      </span>
+    </span>
+  );
+}
 
 function formatTime(seconds) {
   if (seconds == null) return "—";
@@ -51,14 +66,6 @@ function AnomalyTooltip({ active, payload }) {
   if (!active || !payload || payload.length === 0) return null;
   const p = payload[0].payload;
 
-  let anomalyLabel = null;
-  if (p.isAnomaly) {
-    anomalyLabel =
-      p.qualityFlag === "suspicious"
-        ? "neobvyklý výkon – vyžaduje ověření dat"
-        : "neobvyklý výkon (pravděpodobně výkonová odchylka)";
-  }
-
   return (
     <div className="anomaly-chart__tooltip">
       <div className="anomaly-chart__tooltip-date">{formatDate(p.rawDate)}</div>
@@ -70,8 +77,10 @@ function AnomalyTooltip({ active, payload }) {
           {p.competition}
         </div>
       )}
-      {anomalyLabel && (
-        <div className="anomaly-chart__tooltip-badge">{anomalyLabel}</div>
+      {p.isAnomaly && p.qualityFlag === "suspicious" && (
+        <div className="anomaly-chart__tooltip-badge anomaly-chart__tooltip-badge--warning">
+          Doporučeno ověřit záznam
+        </div>
       )}
     </div>
   );
@@ -98,7 +107,7 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
   return (
     <div className="window-select">
       <label className="window-select__label" htmlFor="window-select">
-        Období:
+        Okno analýzy:
       </label>
       <select
         id="window-select"
@@ -119,29 +128,27 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
 
 // --- summary card ---
 
-function SummaryCard({ run, items }) {
+function SummaryCard({ run }) {
   if (!run) {
     return (
-      <Card title="Přehled anomálií">
+      <Card title="Přehled detekce">
         <p className="empty-state">
-          Pro tohoto závodníka zatím nebyla provedena analýza anomálií.
+          Pro tohoto závodníka zatím nebyla provedena analýza neobvyklých výkonů
+          v zadané kategorii a období.
         </p>
       </Card>
     );
   }
 
   const period = `${formatMonthYear(run.window_start)} – ${formatMonthYear(run.window_end)}`;
-  const nAnomalies =
-    items != null
-      ? items.filter((it) => it.is_anomaly).length
-      : run.n_anomalies;
+  const nAnomalies = run.n_anomalies;
 
   return (
-    <Card title="Přehled anomálií">
+    <Card title="Přehled detekce">
       <div className="anomaly-summary">
         <div className="anomaly-summary__item">
           <span className="anomaly-summary__label">
-            Celkový počet neobvyklých výkonů
+            Označeno jako neobvyklé
           </span>
           <span className="anomaly-summary__value anomaly-summary__value--highlight">
             {nAnomalies}
@@ -152,27 +159,30 @@ function SummaryCard({ run, items }) {
           <span className="anomaly-summary__value">{period}</span>
         </div>
         <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">Závody celkem</span>
+          <span className="anomaly-summary__label">Výsledky celkem</span>
           <span className="anomaly-summary__value">
             {run.n_valid_results_in_window +
               (run.n_invalid_results_in_window ?? 0)}
           </span>
         </div>
         <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">z toho validní</span>
+          <span className="anomaly-summary__label">Validní výsledky</span>
           <span className="anomaly-summary__value">
             {run.n_valid_results_in_window}
           </span>
         </div>
         <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">z toho nevalidní</span>
+          <span className="anomaly-summary__label">Vyřazené výsledky</span>
           <span className="anomaly-summary__value">
             {run.n_invalid_results_in_window ?? 0}
           </span>
         </div>
         {run.median_time != null && (
           <div className="anomaly-summary__item">
-            <span className="anomaly-summary__label">Medián výkonu</span>
+            <span className="anomaly-summary__label">
+              Referenční medián{" "}
+              <InfoTooltip text="Medián slouží pouze jako referenční bod pro určení směru (rychlejší/pomalejší). Neovlivňuje detekci." />
+            </span>
             <span className="anomaly-summary__value">
               {formatTime(run.median_time)}
             </span>
@@ -236,9 +246,9 @@ function ChartCard({ items, medianTime }) {
   };
 
   return (
-    <Card title="Vývoj neobvyklých výkonů">
+    <Card title="Výsledky v čase">
       {filtered.length === 0 ? (
-        <p className="empty-state">Žádná data pro vybranou sezónu.</p>
+        <p className="empty-state">Žádná data pro vybrané okno analýzy.</p>
       ) : (
         <ResponsiveContainer width="100%" height={280}>
           <ScatterChart margin={{ top: 10, right: 16, bottom: 30, left: 10 }}>
@@ -293,7 +303,7 @@ function ChartCard({ items, medianTime }) {
                     <svg width="10" height="10">
                       <circle cx="5" cy="5" r="5" fill="#cf362e" />
                     </svg>
-                    Neobvyklý výkon
+                    Označeno jako neobvyklé
                   </span>
                   <span
                     style={{ display: "flex", alignItems: "center", gap: 6 }}
@@ -318,7 +328,7 @@ function ChartCard({ items, medianTime }) {
                           strokeDasharray="5 2"
                         />
                       </svg>
-                      Medián
+                      Referenční medián
                     </span>
                   )}
                 </div>
@@ -355,11 +365,7 @@ function ChartCard({ items, medianTime }) {
 
 // --- table card ---
 
-const PAGE_SIZE = 5;
-
 function TableCard({ items, medianTime }) {
-  const [page] = useState(1);
-
   const anomalyItems = useMemo(
     () =>
       items
@@ -370,15 +376,10 @@ function TableCard({ items, medianTime }) {
     [items],
   );
 
-  const pageItems = anomalyItems.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE,
-  );
-
   return (
-    <Card title="Seznam neobvyklých výkonů">
+    <Card title="Seznam označených výkonů">
       {anomalyItems.length === 0 ? (
-        <p className="empty-state">Žádné neobvyklé výkony nebyly nalezeny.</p>
+        <p className="empty-state">Žádné označené výkony nebyly nalezeny.</p>
       ) : (
         <table className="anomaly-table">
           <thead>
@@ -386,19 +387,22 @@ function TableCard({ items, medianTime }) {
               <th>Datum</th>
               <th>Čas (s)</th>
               <th>Závod</th>
-              <th>Vzdálenost od očekávaného výkonu</th>
+              <th>
+                Rozdíl vůči mediánu
+                <InfoTooltip text="Rozdíl času vůči mediánu v daném období. Slouží pouze k určení směru (rychlejší/pomalejší)." />
+              </th>
             </tr>
           </thead>
           <tbody>
-            {pageItems.map((it) => {
+            {anomalyItems.map((it) => {
               const diff =
                 medianTime != null ? it.final_time - medianTime : null;
               const deviation =
                 diff == null
                   ? "—"
                   : diff >= 0
-                    ? `+${diff.toFixed(2)} s`
-                    : `${diff.toFixed(2)} s`;
+                    ? `+${diff.toFixed(2)} s (pomalejší)`
+                    : `${diff.toFixed(2)} s (rychlejší)`;
               return (
                 <tr key={it.result_id}>
                   <td>{formatDate(it.competition_date)}</td>
@@ -407,11 +411,12 @@ function TableCard({ items, medianTime }) {
                   <td>
                     <div className="anomaly-table__deviation">
                       <span>{deviation}</span>
-                      <span className="anomaly-table__badge">
-                        {it.quality_flag === "suspicious"
-                          ? "neobvyklý výkon – vyžaduje ověření dat"
-                          : "neobvyklý výkon (pravděpodobně výkonová odchylka)"}
-                      </span>
+                      {it.quality_flag === "suspicious" && (
+                        <span className="anomaly-table__badge anomaly-table__badge--warning">
+                          Doporučeno ověřit záznam
+                          <InfoTooltip text="Záznam je mimo běžné hranice kategorie nebo obsahuje nezvykle velký skok oproti historii sportovce." />
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -481,7 +486,10 @@ function AthleteSearchCard({
               </ul>
             ) : (
               <p className="statistics-athlete-search__meta">
-                Pro zadaný dotaz nebyl nalezen žádný závodník.
+                Pro tohoto závodníka zatím není k dispozici detekce neobvyklých
+                výkonů. <br />
+                Pro výpočet je potřeba alespoň 10 validních výsledků v dané
+                kategorii a období.
               </p>
             )}
           </div>
@@ -521,8 +529,10 @@ export default function StatisticsPage() {
   } = useMlWindows("yearly_3y", selectedAthleteId);
 
   // 2) Fetch items from ALL windows to build category list and all-time stats
-  const { items: allWindowsItems, runIdsByCategory } =
-    useAllAthleteAnomalyItems(selectedAthleteId, windows);
+  const { runIdsByCategory } = useAllAthleteAnomalyItems(
+    selectedAthleteId,
+    windows,
+  );
 
   // 3) Available categories derived from all windows
   const availableCategoryGroups = useMemo(
@@ -625,9 +635,10 @@ export default function StatisticsPage() {
       <div className="statistics-page__header">
         <h1 className="statistics-page__title">Detekce neobvyklých výkonů</h1>
         <p className="statistics-page__desc">
-          Analýza výkonů pomocí metody Isolation Forest. Neobvyklé výkony jsou
-          výsledky výrazně odlišné od očekávaného pásma. Pro analýzu je potřeba
-          alespoň 10 výsledků.
+          Analýza výkonů pomocí metody Isolation Forest. Model přiřadí každému
+          výsledku skóre atypičnosti a jako neobvyklé označí výkony s nejvyšším
+          skóre. Pro výpočet je potřeba alespoň 10 validních výsledků v daném
+          období.
         </p>
       </div>
 
@@ -670,8 +681,8 @@ export default function StatisticsPage() {
         <div className="anomaly-no-athlete">
           <i className="fa-solid fa-user-magnifying-glass" />
           <p>
-            Vyhledejte a vyberte závodníka. Jeho ID se uloží do URL a zobrazí se
-            statistiky neobvyklých výkonů.
+            Vyhledejte a vyberte závodníka. Zobrazí se přehled neobvyklých
+            výkonů včetně detailů analýzy.
           </p>
         </div>
       ) : windowsLoading ? (
@@ -706,9 +717,14 @@ export default function StatisticsPage() {
         </p>
       ) : (
         <>
-          <SummaryCard run={run} items={items} />
+          <SummaryCard run={run} />
           <ChartCard items={items} medianTime={run?.median_time ?? null} />
           <TableCard items={items} medianTime={run?.median_time ?? null} />
+          <ModelInfoCard
+            run={run}
+            athlete={selectedAthleteDetail?.athlete}
+            categoryGroup={selectedCategoryGroup}
+          />
         </>
       )}
     </div>

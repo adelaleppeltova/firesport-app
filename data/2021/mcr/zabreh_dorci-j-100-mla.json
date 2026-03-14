@@ -331,7 +331,7 @@
     "Metadata extracted from line: 'MČR dorostu v PS 3. - 5. 7. 2021, Zábřeh' (name/league/place/date).",
     "Date normalized from multi-day range '3. - 5. 7. 2021' -> used start date 2021-07-03 as competition date.",
     "Category detected from heading 'Mladší dorostenci'.",
-    "Discipline detected from heading 'Běh na 100m s přek.' -> mapped to 100mPHP.",
+    "Discipline detected from heading 'Běh na 100m s přek.' -> mapped to 100m.",
     "Results parsed from repeated row pattern: rank, start_number, name, team, region code, try1, try2, final (final shown on separate line).",
     "Region codes (e.g., PA, VY) present but treated as non-district field; district column not present."
   ],
