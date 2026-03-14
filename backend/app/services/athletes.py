@@ -3,7 +3,7 @@ from app.db.database import db
 from app.models.athlete import (
     AthleteCategoryStatsResponse, AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail,
     BestPerformance, AthleteProfile, AthletePerformanceHistoryResponse,
-    AthletePerformanceStabilityResponse,
+    AthletePerformanceStabilityResponse, CategoryRaceStats,
 )
 from app.models.result import ResultAthleteDetail
 from datetime import datetime
