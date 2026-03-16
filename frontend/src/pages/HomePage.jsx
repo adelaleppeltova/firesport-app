@@ -6,6 +6,7 @@ import PerformanceStability from "../components/home/PerformanceStability";
 import PerformanceByYear from "../components/home/PerformanceByYear";
 import PairAthleteCard from "../components/home/PairAthleteCard";
 import HomeQuickActions from "../components/home/HomeQuickActions";
+import UnpairAthleteCard from "../components/home/UnpairAthleteCard";
 import {
   useAthletePerformanceHistory,
   useAthletePerformanceStability,
@@ -84,6 +85,7 @@ export default function HomePage() {
           </Card>
         </div>
       </div>
+      <UnpairAthleteCard />
     </div>
   );
 }

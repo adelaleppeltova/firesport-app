@@ -69,6 +69,7 @@ export default function CompetitionsPage() {
   const competitions = data?.items || [];
   const total = data?.total || 0;
   const pageCount = Math.ceil(total / PAGE_SIZE);
+  const showInitialLoading = isLoading && !data;
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -97,21 +98,30 @@ export default function CompetitionsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <i className="fa-solid fa-magnifying-glass competitions-searchbar-icon" />
+          <i
+            className={`fa-solid ${
+              isFetching
+                ? "fa-spinner competitions-searchbar-icon competitions-searchbar-icon--spinning"
+                : "fa-magnifying-glass competitions-searchbar-icon"
+            }`}
+          />
         </div>
       </div>
-      {debouncedSearch && (
-        <p className="competitions-search-count">
-          {isFetching ? "Hledám..." : `Nalezeno: ${total} závodů`}
-        </p>
-      )}
+      <p className="competitions-search-status" aria-live="polite">
+        {debouncedSearch ? `Nalezeno: ${total} závodů` : "\u00A0"}
+      </p>
       {error ? (
         <p className="competitions-error">Chyba při načítání dat.</p>
-      ) : isLoading ? (
+      ) : showInitialLoading ? (
         <p className="competitions-loading">Načítání...</p>
       ) : (
         <>
-          <div className="competitions-table-wrapper">
+          <div
+            className={`competitions-table-wrapper${
+              isFetching ? " competitions-table-wrapper--fetching" : ""
+            }`}
+            aria-busy={isFetching}
+          >
             <table className="competitions-table">
               <thead>
                 <tr>

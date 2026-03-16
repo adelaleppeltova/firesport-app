@@ -67,6 +67,7 @@ export default function AthletesPage() {
   const athletes = data?.items || [];
   const total = data?.total || 0;
   const pageCount = Math.ceil(total / PAGE_SIZE);
+  const showInitialLoading = isLoading && !data;
 
   return (
     <div className="athletes-page page">
@@ -80,21 +81,30 @@ export default function AthletesPage() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           />
-          <i className="fa-solid fa-magnifying-glass athletes-searchbar-icon" />
+          <i
+            className={`fa-solid ${
+              isFetching
+                ? "fa-spinner athletes-searchbar-icon athletes-searchbar-icon--spinning"
+                : "fa-magnifying-glass athletes-searchbar-icon"
+            }`}
+          />
         </div>
       </div>
-      {committedSearch && (
-        <p className="athletes-search-count">
-          {isFetching ? "Hledám..." : `Nalezeno: ${total} závodníků`}
-        </p>
-      )}
+      <p className="athletes-search-status" aria-live="polite">
+        {committedSearch ? `Nalezeno: ${total} závodníků` : "\u00A0"}
+      </p>
       {error ? (
         <p className="athletes-error">Chyba při načítání dat.</p>
-      ) : isLoading ? (
+      ) : showInitialLoading ? (
         <p className="athletes-loading">Načítání...</p>
       ) : (
         <>
-          <div className="athletes-table-wrapper">
+          <div
+            className={`athletes-table-wrapper${
+              isFetching ? " athletes-table-wrapper--fetching" : ""
+            }`}
+            aria-busy={isFetching}
+          >
             <table className="athletes-table">
               <thead>
                 <tr>

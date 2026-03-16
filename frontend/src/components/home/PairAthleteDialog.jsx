@@ -65,7 +65,7 @@ export default function PairAthleteDialog({ onClose }) {
               ref={inputRef}
               className="athletes-searchbar"
               type="text"
-              placeholder="Jméno, příjmení nebo FS kód..."
+              placeholder="Jméno, příjmení nebo sbor..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               disabled={isPairing}
@@ -78,49 +78,45 @@ export default function PairAthleteDialog({ onClose }) {
           </div>
         </div>
 
-        {debouncedQuery && (
-          <p className="athletes-search-count" aria-live="polite">
-            {isFetching ? "Hledám..." : ""}
-          </p>
-        )}
-
         {isPairing && (
           <p className="athletes-search-count" aria-live="polite">
             Přiřazuji závodníka…
           </p>
         )}
 
-        {!isFetching &&
-          searchResults?.items &&
-          searchResults.items.length > 0 && (
-            <ul className="athlete-list" aria-label="Výsledky hledání">
-              {searchResults.items.map((athlete) => (
-                <li key={athlete._id}>
-                  <button
-                    type="button"
-                    onClick={() => handleSelect(athlete._id)}
-                    className={`athlete-list__button${
-                      isPairing ? " athlete-list__item--disabled" : ""
-                    }`}
-                    disabled={isPairing}
-                  >
-                    <strong>
-                      {athlete.first_name} {athlete.last_name}
-                    </strong>
-                    <span className="athlete-meta">
-                      {[
-                        athlete.birth_year,
-                        athlete.teams?.length ? athlete.teams.join(", ") : null,
-                        athlete.fscode,
-                      ]
-                        .filter(Boolean)
-                        .join(" • ")}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+        {searchResults?.items && searchResults.items.length > 0 && (
+          <ul
+            className={`athlete-list${isFetching ? " athlete-list--fetching" : ""}`}
+            aria-label="Výsledky hledání"
+            aria-busy={isFetching}
+          >
+            {searchResults.items.map((athlete) => (
+              <li key={athlete._id}>
+                <button
+                  type="button"
+                  onClick={() => handleSelect(athlete._id)}
+                  className={`athlete-list__button${
+                    isPairing ? " athlete-list__item--disabled" : ""
+                  }`}
+                  disabled={isPairing}
+                >
+                  <strong>
+                    {athlete.first_name} {athlete.last_name}
+                  </strong>
+                  <span className="athlete-meta">
+                    {[
+                      athlete.birth_year,
+                      athlete.teams?.length ? athlete.teams.join(", ") : null,
+                      athlete.fscode,
+                    ]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         {!isFetching &&
           debouncedQuery.length >= 2 &&
@@ -133,7 +129,6 @@ export default function PairAthleteDialog({ onClose }) {
             className="btn-secondary"
             onClick={onClose}
             disabled={isPairing}
-            style={{ width: "min(200px,100%)", fontSize: "1.2rem" }}
           >
             Zavřít
           </PrimaryButton>

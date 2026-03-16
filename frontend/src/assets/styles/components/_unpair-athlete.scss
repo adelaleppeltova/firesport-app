@@ -1,0 +1,30 @@
+@use "../abstracts/variables";
+
+.unpair-athlete {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__text {
+    margin: 0;
+    font-size: variables.$font-size-s;
+    color: variables.$color-text;
+  }
+
+  &__error {
+    margin: 0;
+    font-size: variables.$font-size-xs;
+    color: variables.$color-secondary;
+  }
+
+  &__button.btn {
+    background: transparent;
+    border: 1px solid variables.$color-secondary;
+    color: variables.$color-secondary;
+    max-width: 320px;
+
+    &:hover {
+      background: rgba(207, 54, 46, 0.08);
+    }
+  }
+}

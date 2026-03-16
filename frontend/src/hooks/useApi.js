@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   useQuery,
   useMutation,
   useQueryClient,
@@ -44,6 +45,19 @@ export function usePairAthlete() {
   });
 }
 
+export function useUnpairAthlete() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await api.delete("/v1/me/pair-athlete");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["me"]);
+    },
+  });
+}
+
 export function useSearchAthletes(query) {
   return useQuery({
     queryKey: ["athletes", "search", query],
@@ -55,6 +69,7 @@ export function useSearchAthletes(query) {
       return data;
     },
     enabled: query.length >= 2,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -137,7 +152,7 @@ export function useAthletes({
       const { data } = await api.get(`/v1/athletes?${params.toString()}`);
       return data;
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -181,7 +196,7 @@ export function useCompetitions({
       const { data } = await api.get(`/v1/competitions?${params.toString()}`);
       return data;
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 }
 

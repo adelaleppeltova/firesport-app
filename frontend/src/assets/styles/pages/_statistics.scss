@@ -91,6 +91,10 @@
     margin: 0;
     font-size: variables.$font-size-xs;
     color: variables.$gray-medium;
+
+    &--loading {
+      padding-top: 8px;
+    }
   }
 
   &__results {
@@ -99,6 +103,11 @@
     padding: 8px;
     max-height: 260px;
     overflow-y: auto;
+    transition: opacity 0.2s ease;
+  }
+
+  &__results--fetching {
+    opacity: 0.72;
   }
 
   &__list {

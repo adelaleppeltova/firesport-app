@@ -3,6 +3,7 @@ from bson import ObjectId
 from app.db.database import db
 from app.models.competition import CompetitionInDB, CompetitionDetail, CompetitionCategorySummary, CompetitionsPage
 from app.models.result import ResultInDB
+from app.services.search_utils import build_diacritic_fuzzy_regex
 import re
 from datetime import datetime, timedelta
 
@@ -80,10 +81,11 @@ async def get_competitions_service(
 
 		def _token_conditions(token: str) -> dict:
 			"""Vytvoří OR podmínky pro jeden token, včetně rozpoznání roku a data."""
+			token_regex = build_diacritic_fuzzy_regex(token)
 			or_cond: list = [
-				{"name": {"$regex": token, "$options": "i"}},
-				{"place": {"$regex": token, "$options": "i"}},
-				{"league": {"$regex": token, "$options": "i"}},
+				{"name": {"$regex": token_regex, "$options": "i"}},
+				{"place": {"$regex": token_regex, "$options": "i"}},
+				{"league": {"$regex": token_regex, "$options": "i"}},
 			]
 			# 4ciferný rok → hledat i v date rozsahu celého roku
 			if re.fullmatch(r'\d{4}', token):

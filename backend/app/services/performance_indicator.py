@@ -56,7 +56,7 @@ def _center_value(values: Iterable[float]) -> Optional[float]:
     return median_value if median_value is not None else _mean(values)
 
 
-def calculate_performance_indicator(entries: list[dict]) -> tuple[PerformanceIndicator]:
+def calculate_performance_indicator(entries: list[dict]) -> PerformanceIndicator:
     """
     Compute trend from last 6 valid results by competition date (newer 3 vs older 3).
     """
@@ -84,21 +84,18 @@ def calculate_performance_indicator(entries: list[dict]) -> tuple[PerformanceInd
 
     sample = valid_entries[:6]
     if len(sample) < 6:
-        return (
-            PerformanceIndicator(
-                trend=PerformanceIndicatorTrend.insufficient,
-            ),
-            recent_results,
+        return PerformanceIndicator(
+            trend=PerformanceIndicatorTrend.insufficient,
+            recent_results=recent_results,
         )
 
     # Method note: split last 6 into two groups of 3 and compare their medians.
     new_value = _center_value([item["time"] for item in sample[:3]])
     old_value = _center_value([item["time"] for item in sample[3:6]])
     if new_value is None or old_value is None:
-        return (
-            PerformanceIndicator(
-                trend=PerformanceIndicatorTrend.insufficient,
-            )
+        return PerformanceIndicator(
+            trend=PerformanceIndicatorTrend.insufficient,
+            recent_results=recent_results,
         )
 
     delta = old_value - new_value
@@ -113,13 +110,11 @@ def calculate_performance_indicator(entries: list[dict]) -> tuple[PerformanceInd
 
     average_time = _mean([item["time"] for item in sample])
 
-    return (
-        PerformanceIndicator(
-            trend=trend,
-            delta_seconds=delta,
-            new_value=new_value,
-            old_value=old_value,
-            average_time = average_time,
-            recent_results=recent_results
-        )
+    return PerformanceIndicator(
+        trend=trend,
+        delta_seconds=delta,
+        new_value=new_value,
+        old_value=old_value,
+        average_time=average_time,
+        recent_results=recent_results,
     )

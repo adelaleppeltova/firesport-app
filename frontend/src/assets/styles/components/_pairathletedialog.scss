@@ -22,7 +22,7 @@
 .dialog-content {
   background: white;
   border-radius: 0.5rem;
-  padding: 2rem;
+  padding: 1rem;
   max-width: 500px;
   width: 90%;
   max-height: 80vh;
@@ -34,7 +34,7 @@
     color: variables.$color-text;
   }
   p {
-    font-size: variables.$font-size-s;
+    font-size: variables.$font-size-xs;
     color: variables.$color-text;
     margin-bottom: 1rem;
   }
@@ -88,6 +88,11 @@
   margin: 1rem 0;
   max-height: 250px;
   overflow-y: auto;
+  transition: opacity 0.2s ease;
+}
+
+.athlete-list--fetching {
+  opacity: 0.72;
 }
 
 .athlete-list li {
@@ -131,7 +136,7 @@
 
 .pairathlete-card {
   h1 {
-    font-size: variables.$font-size-l;
+    font-size: variables.$font-size-m;
     margin-bottom: 1rem;
     color: variables.$color-text;
   }
@@ -141,4 +146,11 @@
     color: variables.$color-text;
     margin-bottom: 1rem;
   }
+}
+
+.athletes-search-status {
+  min-height: 1.5rem;
+  margin: -0.75rem 0 1rem;
+  font-size: variables.$font-size-xs;
+  color: variables.$gray-medium;
 }

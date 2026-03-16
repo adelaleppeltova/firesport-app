@@ -14,6 +14,7 @@ from app.models.models import AthleteDetailPage
 from app.ml.anomaly_config import get_category_group
 from app.services.performance_indicator import calculate_performance_indicator
 from app.services.performance_stability_service import evaluate_performance_stability
+from app.services.search_utils import build_diacritic_fuzzy_regex
 
 
 
@@ -62,10 +63,18 @@ async def list_athletes_service(
             # Víc klíčových slov → každé musí matchnout alespoň jedno pole (AND logika)
             and_conditions = []
             for token in tokens:
+                token_regex = build_diacritic_fuzzy_regex(token)
                 or_cond: list = [
-                    {"first_name": {"$regex": token, "$options": "i"}},
-                    {"last_name": {"$regex": token, "$options": "i"}},
-                    {"teams": {"$elemMatch": {"$regex": token, "$options": "i"}}},
+                    {"first_name": {"$regex": token_regex, "$options": "i"}},
+                    {"last_name": {"$regex": token_regex, "$options": "i"}},
+                    {
+                        "teams": {
+                            "$elemMatch": {
+                                "$regex": token_regex,
+                                "$options": "i",
+                            }
+                        }
+                    },
                 ]
                 if token.isdigit():
                     or_cond.append({"birth_year": int(token)})
@@ -74,10 +83,11 @@ async def list_athletes_service(
         else:
             # Jedno klíčové slovo → původní OR logika
             q = tokens[0]
+            q_regex = build_diacritic_fuzzy_regex(q)
             or_conditions: list = [
-                {"first_name": {"$regex": q, "$options": "i"}},
-                {"last_name": {"$regex": q, "$options": "i"}},
-                {"teams": {"$elemMatch": {"$regex": q, "$options": "i"}}},
+                {"first_name": {"$regex": q_regex, "$options": "i"}},
+                {"last_name": {"$regex": q_regex, "$options": "i"}},
+                {"teams": {"$elemMatch": {"$regex": q_regex, "$options": "i"}}},
             ]
             if q.isdigit():
                 or_conditions.append({"birth_year": int(q)})
@@ -325,11 +335,12 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
 
 
 async def search_athletes_service(q: str) -> AthletesSearch:
+    q_regex = build_diacritic_fuzzy_regex(q)
     query = {
         "$or": [
-            {"first_name": {"$regex": q, "$options": "i"}},
-            {"last_name": {"$regex": q, "$options": "i"}},
-            {"fscode": {"$regex": q, "$options": "i"}}
+            {"first_name": {"$regex": q_regex, "$options": "i"}},
+            {"last_name": {"$regex": q_regex, "$options": "i"}},
+            {"fscode": {"$regex": q_regex, "$options": "i"}}
         ]
     }
     athletes = await athletes_collection.find(query).to_list(length=20)
@@ -504,14 +515,13 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
 
 async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] = None) -> Dict[str, Any]:
     """
-    Vrátí souhrn pro daný rok (nebo poslední dostupný rok):
+    Vrátí souhrn pro daný rok (nebo aktuální kalendářní rok):
     - average_time: průměrný platný final_time v roce
     - best_time: nejlepší platný final_time v roce
     - competitions: počet unikátních závodů v roce
     - races: detailní přehled závodů v roce (datum, soutěž, kategorie, časy)
 
-    Pokud `year` není zadán, použije se rok posledního zaznamenaného závodu
-    (sezóna pokračuje, dokud není závod v dalším roce – aktuálně tedy 2025).
+    Pokud `year` není zadán, použije se aktuální kalendářní rok.
     """
 
     try:
@@ -534,10 +544,8 @@ async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] 
             "races": [],
         }
 
-    # Urči implicitní rok podle nejpozdějšího závodu (sezóna trvá do prvního závodu dalšího roku)
-    latest_date = max((r.get("date") for r in results if r.get("date") is not None), default=None)
-    latest_year = latest_date.year if latest_date else datetime.now().year
-    target_year = year if year is not None else latest_year
+    # Home karta Season má vždy ukazovat aktuální kalendářní rok.
+    target_year = year if year is not None else datetime.now().year
 
     # Filtrování výsledků na daný rok podle data soutěže
     filtered: List[Dict[str, Any]] = []

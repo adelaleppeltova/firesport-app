@@ -96,6 +96,13 @@ function formatWindowLabel(window_start, window_end) {
   return `${fmt(window_start)} – ${fmt(window_end)}`;
 }
 
+function getWindowSortTimestamp(window) {
+  return Math.max(
+    Date.parse(window?.window_end ?? "") || 0,
+    Date.parse(window?.window_start ?? "") || 0,
+  );
+}
+
 function YearSelect({ windows, value, onChange, isLoading, isError }) {
   if (isLoading) {
     return <div className="window-select__skeleton skeleton" />;
@@ -451,10 +458,13 @@ function AthleteSearchCard({
         </div>
 
         {search.trim() && (
-          <div className="statistics-athlete-search__results">
-            {isSearching ? (
-              <p className="statistics-athlete-search__meta">Hledám...</p>
-            ) : searchResults.length ? (
+          <div
+            className={`statistics-athlete-search__results${
+              isSearching ? " statistics-athlete-search__results--fetching" : ""
+            }`}
+            aria-busy={isSearching}
+          >
+            {searchResults.length ? (
               <ul className="statistics-athlete-search__list">
                 {searchResults.map((athlete) => (
                   <li key={athlete._id}>
@@ -474,12 +484,19 @@ function AthleteSearchCard({
                   </li>
                 ))}
               </ul>
+            ) : isSearching ? (
+              <p className="statistics-athlete-search__meta">Vyhledávám...</p>
             ) : (
               <p className="statistics-athlete-search__meta">
                 Pro tohoto závodníka zatím není k dispozici detekce neobvyklých
                 výkonů. <br />
                 Pro výpočet je potřeba alespoň 10 validních výsledků v dané
                 kategorii a období.
+              </p>
+            )}
+            {isSearching && searchResults.length > 0 && (
+              <p className="statistics-athlete-search__meta statistics-athlete-search__meta--loading">
+                Vyhledávám...
               </p>
             )}
           </div>
@@ -518,17 +535,42 @@ export default function StatisticsPage() {
     isError: windowsError,
   } = useMlWindows("yearly_3y", selectedAthleteId);
 
+  const sortedWindows = useMemo(
+    () =>
+      [...(windows ?? [])].sort(
+        (a, b) => getWindowSortTimestamp(b) - getWindowSortTimestamp(a),
+      ),
+    [windows],
+  );
+
   // 2) Fetch items from ALL windows to build category list and all-time stats
   const { runIdsByCategory } = useAllAthleteAnomalyItems(
     selectedAthleteId,
-    windows,
+    sortedWindows,
   );
 
   // 3) Available categories derived from all windows
-  const availableCategoryGroups = useMemo(
-    () => [...runIdsByCategory.keys()].sort(),
-    [runIdsByCategory],
-  );
+  const availableCategoryGroups = useMemo(() => {
+    const latestWindowByRunId = new Map(
+      sortedWindows.map((window) => [window.run_id, getWindowSortTimestamp(window)]),
+    );
+
+    return [...runIdsByCategory.keys()].sort((a, b) => {
+      const latestA = Math.max(
+        ...[...(runIdsByCategory.get(a) ?? new Set())].map(
+          (runId) => latestWindowByRunId.get(runId) ?? 0,
+        ),
+      );
+      const latestB = Math.max(
+        ...[...(runIdsByCategory.get(b) ?? new Set())].map(
+          (runId) => latestWindowByRunId.get(runId) ?? 0,
+        ),
+      );
+
+      if (latestA !== latestB) return latestB - latestA;
+      return a.localeCompare(b, "cs");
+    });
+  }, [runIdsByCategory, sortedWindows]);
 
   // 4) Selected category – reset only when athlete changes
   const [selectedCategoryGroup, setSelectedCategoryGroup] = useState(null);
@@ -552,10 +594,10 @@ export default function StatisticsPage() {
 
   // 5) Windows filtered to selected category
   const windowsForCategory = useMemo(() => {
-    if (!selectedCategoryGroup || !windows) return windows ?? [];
+    if (!selectedCategoryGroup) return sortedWindows;
     const runIds = runIdsByCategory.get(selectedCategoryGroup) ?? new Set();
-    return windows.filter((w) => runIds.has(w.run_id));
-  }, [windows, selectedCategoryGroup, runIdsByCategory]);
+    return sortedWindows.filter((w) => runIds.has(w.run_id));
+  }, [sortedWindows, selectedCategoryGroup, runIdsByCategory]);
 
   // 6) Selected run_id – auto-adjust when not in filtered windows
   const [selectedRunId, setSelectedRunId] = useState(null);

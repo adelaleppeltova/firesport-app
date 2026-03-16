@@ -74,3 +74,22 @@ def pair_athlete(body: PairAthleteRequest, user=Depends(get_current_user)):
     logger.info(f"Matched: {result.matched_count}, Modified: {result.modified_count}")
     
     return {"ok": True, "athlete_id": body.athlete_id}
+
+@router.delete("/pair-athlete")
+def unpair_athlete(user=Depends(get_current_user)):
+    """Zruší propojení uživatele s atletem"""
+    users_collection = sync_db["users"]
+
+    result = users_collection.update_one(
+        {"_id": ObjectId(user["id"])},
+        {"$unset": {"athlete_id": ""}},
+    )
+
+    logger.info(
+        "Unpaired user %s from athlete, matched=%s modified=%s",
+        user["id"],
+        result.matched_count,
+        result.modified_count,
+    )
+
+    return {"ok": True, "athlete_id": None}
