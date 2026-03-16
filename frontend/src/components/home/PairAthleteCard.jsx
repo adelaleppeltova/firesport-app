@@ -8,7 +8,7 @@ export default function PairAthleteCard() {
 
   return (
     <>
-      <Card title="Propoj účet se závodníkem">
+      <Card title="Propoj účet se závodníkem" className="card--home-account">
         <div className="pair-athlete">
           <p className="pair-athlete__text">
             Pro zobrazení vlastních výsledků a statistik propoj svůj účet se

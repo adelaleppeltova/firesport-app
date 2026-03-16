@@ -26,7 +26,10 @@ export default function UnpairAthleteCard() {
   };
 
   return (
-    <Card title="Propojení účtu" className="home-page__footer-card">
+    <Card
+      title="Propojení účtu"
+      className="home-page__footer-card card--home-account"
+    >
       <div className="unpair-athlete">
         <p className="unpair-athlete__text">
           Pokud chceš svůj účet propojit s jiným závodníkem, nejdřív zruš

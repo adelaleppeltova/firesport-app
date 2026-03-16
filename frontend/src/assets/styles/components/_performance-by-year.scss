@@ -5,7 +5,6 @@
   flex-direction: column;
   gap: 0.5rem;
 
-  // Přepínač Aktuální sezóna / Poslední roky
   &__toggle {
     display: flex;
     gap: 0.5rem;
@@ -35,7 +34,6 @@
     }
   }
 
-  // Legenda – zobrazuje se jen u více let
   &__legend {
     display: flex;
     justify-content: center;
@@ -59,9 +57,24 @@
     border-radius: 50%;
     display: inline-block;
     flex-shrink: 0;
+
+    &--accent {
+      background: #0f4d92;
+    }
+
+    &--danger {
+      background: #cf362e;
+    }
+
+    &--positive {
+      background: #2e7d32;
+    }
+
+    &--warning {
+      background: #b26a1f;
+    }
   }
 
-  // Tooltip
   &__tooltip {
     padding: 8px 12px;
     border-radius: 6px;
@@ -69,6 +82,22 @@
     font-family: variables.$font-family-base;
     color: #fff;
     pointer-events: none;
+
+    &--accent {
+      background: #0f4d92;
+    }
+
+    &--danger {
+      background: #cf362e;
+    }
+
+    &--positive {
+      background: #2e7d32;
+    }
+
+    &--warning {
+      background: #b26a1f;
+    }
   }
 
   &__tooltip-time {
@@ -82,7 +111,6 @@
     font-size: 13px;
   }
 
-  // Mobilní optimalizace
   @media (max-width: 768px) {
     &__toggle-btn {
       font-size: variables.$font-size-xs;

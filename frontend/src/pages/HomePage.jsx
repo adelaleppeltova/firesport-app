@@ -59,28 +59,29 @@ export default function HomePage() {
     <div className="home-page page">
       <HomeQuickActions athleteId={athleteId} />
       <div className="dashboard">
-        {/* Levý sloupec: profil, sezóna, stabilita */}
         <div className="dashboard__col">
-          <Card title="Můj profil">
+          <Card title="Můj profil" className="card--home-profile">
             <MyProfile athleteId={athleteId} />
           </Card>
-          <Card title="Aktuální sezóna">
+          <Card title="Aktuální sezóna" className="card--home-season">
             <Season athleteId={athleteId} />
           </Card>
           <Card
             title="Stabilita výkonu"
-            className={`card--stability-${stabilityTrend}`}
+            className={`card--home-analytics card--state-${stabilityTrend}`}
           >
             <PerformanceStability athleteId={athleteId} />
           </Card>
         </div>
 
-        {/* Pravý sloupec: historie, vývoj za sezóny */}
         <div className="dashboard__col">
-          <Card title="Trend výkonu" className={`card--trend-${historyTrend}`}>
+          <Card
+            title="Trend výkonu"
+            className={`card--home-analytics card--state-${historyTrend}`}
+          >
             <History athleteId={athleteId} />
           </Card>
-          <Card title="Výkon po sezónách">
+          <Card title="Výkon po sezónách" className="card--home-chart">
             <PerformanceByYear athleteId={athleteId} />
           </Card>
         </div>

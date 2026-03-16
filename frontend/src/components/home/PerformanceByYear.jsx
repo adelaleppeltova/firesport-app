@@ -11,8 +11,12 @@ import {
 import { useAthletePerformanceByYear } from "../../hooks/useApi";
 import CardState from "./CardState";
 
-// Paleta pro zobrazení až 4 posledních let
-const YEAR_COLORS = ["#2196F3", "#FF6B6B", "#4CAF50", "#FF9800"];
+const YEAR_STYLES = [
+  { color: "#0f4d92", tone: "accent" },
+  { color: "#cf362e", tone: "danger" },
+  { color: "#2e7d32", tone: "positive" },
+  { color: "#b26a1f", tone: "warning" },
+];
 
 export default function PerformanceByYear({ athleteId }) {
   const {
@@ -71,7 +75,11 @@ export default function PerformanceByYear({ athleteId }) {
 
     const yearColors = {};
     selectedYears.forEach((year, idx) => {
-      yearColors[year] = YEAR_COLORS[idx % YEAR_COLORS.length];
+      yearColors[year] = YEAR_STYLES[idx % YEAR_STYLES.length];
+      yearLines[year] = yearLines[year].map((point) => ({
+        ...point,
+        tone: yearColors[year].tone,
+      }));
     });
 
     return {
@@ -115,8 +123,7 @@ export default function PerformanceByYear({ athleteId }) {
     const point = payload[0].payload;
     return (
       <div
-        className="performance-by-year__tooltip"
-        style={{ backgroundColor: payload[0].color }}
+        className={`performance-by-year__tooltip performance-by-year__tooltip--${point.tone ?? "accent"}`}
       >
         <p className="performance-by-year__tooltip-time">
           {point.time.toFixed(2)}s
@@ -191,9 +198,9 @@ export default function PerformanceByYear({ athleteId }) {
               type="linear"
               dataKey="time"
               name={String(year)}
-              stroke={colors[year]}
+              stroke={colors[year].color}
               strokeWidth={2}
-              dot={{ r: 3, fill: colors[year] }}
+              dot={{ r: 3, fill: colors[year].color }}
               activeDot={{ r: 5 }}
               isAnimationActive={false}
             />
@@ -206,8 +213,7 @@ export default function PerformanceByYear({ athleteId }) {
           {years.map((year) => (
             <span key={year} className="performance-by-year__legend-item">
               <span
-                className="performance-by-year__legend-dot"
-                style={{ backgroundColor: colors[year] }}
+                className={`performance-by-year__legend-dot performance-by-year__legend-dot--${colors[year].tone}`}
               />
               {year}
             </span>

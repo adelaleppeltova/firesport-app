@@ -18,23 +18,27 @@
   &__stat {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.5rem 0.75rem;
-    background-color: variables.$gray-light;
-    border-radius: 0.5rem;
+    gap: 0.35rem;
+    justify-content: space-between;
+    min-height: 6rem;
+    padding: 1rem;
+    border-radius: calc(variables.$border-radius-base - 2px);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(27, 27, 27, 0.06);
   }
 
   &__stat-label {
-    font-size: variables.$font-size-xs;
-    color: variables.$gray-medium;
+    font-size: 0.8rem;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$gray-dark;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
 
   &__stat-value {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-semibold;
+    font-size: 1.45rem;
+    line-height: 1.1;
+    font-weight: variables.$font-weight-bold;
     color: variables.$color-text;
-    line-height: 1.2;
   }
 }

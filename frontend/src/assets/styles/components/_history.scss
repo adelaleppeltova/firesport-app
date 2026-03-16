@@ -1,49 +1,10 @@
 @use "../abstracts/variables.scss";
 
-// Trend color tokens
-$trend-up: #2e7d32;
-$trend-down: #c62828;
-$trend-stable: #e65100;
-$trend-neutral: #757575;
-
 .history {
-  background: white;
-  border-radius: variables.$border-radius-base;
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
 
-  // ── Trend modifiers ─────────────────────────────
-  &--up {
-    border-left-color: $trend-up;
-    .history__icon,
-    .history__label {
-      color: $trend-up;
-    }
-  }
-  &--down {
-    border-left-color: $trend-down;
-    .history__icon,
-    .history__label {
-      color: $trend-down;
-    }
-  }
-  &--stable {
-    border-left-color: $trend-stable;
-    .history__icon,
-    .history__label {
-      color: $trend-stable;
-    }
-  }
-  &--neutral {
-    border-left-color: $trend-neutral;
-    .history__icon,
-    .history__label {
-      color: $trend-neutral;
-    }
-  }
-
-  // ── 1. Hlavní stav ──────────────────────────────
   &__status {
     display: flex;
     align-items: center;
@@ -55,26 +16,27 @@ $trend-neutral: #757575;
     flex-shrink: 0;
     width: 1.75rem;
     text-align: center;
+    color: var(--card-state-accent);
   }
 
   &__label {
     font-size: variables.$font-size-m;
     font-weight: variables.$font-weight-bold;
     line-height: 1.2;
+    color: var(--card-state-text);
   }
 
-  // ── 2. Stručné vysvětlení ────────────────────────
   &__delta {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
-    padding-left: 2.5rem; // zarovnání pod label (šířka ikony + gap)
+    padding-left: 2.5rem;
   }
 
   &__delta-value {
     font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-medium;
-    color: variables.$color-text;
+    font-weight: variables.$font-weight-semibold;
+    color: var(--card-state-text);
   }
 
   &__delta-detail {
@@ -82,7 +44,6 @@ $trend-neutral: #757575;
     color: variables.$gray-medium;
   }
 
-  // ── 3. Poslední výsledky ─────────────────────────
   &__recent {
     display: flex;
     flex-direction: column;
@@ -115,7 +76,7 @@ $trend-neutral: #757575;
     transition: background variables.$default-transition ease;
 
     &:hover {
-      background: variables.$hover-color-light;
+      background: rgba(27, 27, 27, 0.08);
     }
   }
 }

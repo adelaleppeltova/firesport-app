@@ -1,5 +1,10 @@
 @use "../abstracts/variables";
 
+$state-positive: #2e7d32;
+$state-warning: #b26a1f;
+$state-negative: #c62828;
+$state-neutral: #607080;
+
 body {
   font-family: variables.$font-family-base;
   font-size: variables.$font-size-base;
@@ -11,33 +16,198 @@ body {
   box-sizing: border-box;
 }
 
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  margin: 0 auto;
+  padding-bottom: variables.$header-height-l;
+
+  .card {
+    --card-state-accent: #{$state-neutral};
+    --card-state-text: #42505c;
+    --card-state-bg: rgba(96, 112, 128, 0.04);
+    background: white;
+    border: 1px solid rgba(27, 27, 27, 0.06);
+    border-radius: variables.$border-radius-base;
+    padding: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    transition:
+      box-shadow variables.$default-transition ease,
+      border-color variables.$default-transition ease,
+      background variables.$default-transition ease;
+
+    &:hover {
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    &__title {
+      margin: 0 0 16px;
+      font-size: variables.$font-size-sm;
+      font-weight: variables.$font-weight-semibold;
+      letter-spacing: 0.01em;
+    }
+
+    &--home-profile {
+      border-color: rgba(15, 77, 146, 0.12);
+      background:
+        linear-gradient(135deg, rgba(15, 77, 146, 0.08), rgba(207, 54, 46, 0.08)),
+        white;
+    }
+
+    &--home-season {
+      border-color: rgba(15, 77, 146, 0.1);
+      background:
+        linear-gradient(135deg, rgba(15, 77, 146, 0.08), rgba(207, 54, 46, 0.08)),
+        white;
+    }
+
+    &--home-chart {
+      border-color: rgba(15, 77, 146, 0.1);
+      background:
+        linear-gradient(135deg, rgba(15, 77, 146, 0.08), rgba(207, 54, 46, 0.08)),
+        white;
+    }
+
+    &--home-account {
+      border-color: rgba(15, 77, 146, 0.09);
+      background:
+        linear-gradient(135deg, rgba(15, 77, 146, 0.08), rgba(207, 54, 46, 0.08)),
+        white;
+    }
+
+    &--home-analytics {
+      border-left: 4px solid var(--card-state-accent);
+      background:
+        linear-gradient(180deg, var(--card-state-bg), rgba(255, 255, 255, 0.98)),
+        white;
+    }
+
+    &--state-positive {
+      --card-state-accent: #{$state-positive};
+      --card-state-text: #245f28;
+      --card-state-bg: rgba(46, 125, 50, 0.045);
+    }
+
+    &--state-warning {
+      --card-state-accent: #{$state-warning};
+      --card-state-text: #8f5416;
+      --card-state-bg: rgba(178, 106, 31, 0.05);
+    }
+
+    &--state-negative {
+      --card-state-accent: #{$state-negative};
+      --card-state-text: #962620;
+      --card-state-bg: rgba(198, 40, 40, 0.045);
+    }
+
+    &--state-neutral {
+      --card-state-accent: #{$state-neutral};
+      --card-state-text: #42505c;
+      --card-state-bg: rgba(96, 112, 128, 0.045);
+    }
+  }
+}
+
 .home-page__footer-card {
   margin-top: 20px;
 }
 
-// ── Dashboard layout ────────────────────────────────────────────────────────
-
 .dashboard {
-  // Mobil: jeden sloupec
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
 
-  // Desktop: levý sloupec (profil, sezóna, stabilita) + pravý (historie, grafy)
   @media (min-width: variables.$breakpoint-l) {
     grid-template-columns: 2fr 3fr;
     align-items: start;
   }
 
-  // Sloupec – flex kontejner pro karty v rámci jednoho sloupce
   &__col {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
+}
 
-  // Zvýrazněná karta (Stabilita výkonu) – levý barevný pruh
-  &__priority-card {
-    border-left: 3px solid variables.$color-secondary;
+.skeleton {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+  height: 120px;
+
+  &--sm {
+    height: 110px;
+  }
+
+  &--md {
+    height: 150px;
+  }
+
+  &--lg {
+    height: 180px;
+  }
+
+  &--chart {
+    height: 340px;
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+
+  &__icon {
+    font-size: 1.4rem;
+    opacity: 0.6;
+  }
+
+  &__text {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  &--error {
+    color: #b91c1c;
+
+    .empty-state__icon {
+      color: #ef4444;
+      opacity: 0.8;
+    }
+  }
+
+  &--no-data {
+    color: #9ca3af;
+
+    .empty-state__icon {
+      color: #d1d5db;
+      opacity: 1;
+    }
+  }
+
+  &--insufficient {
+    color: #9ca3af;
+
+    .empty-state__icon {
+      color: #9ca3af;
+      opacity: 0.7;
+    }
   }
 }

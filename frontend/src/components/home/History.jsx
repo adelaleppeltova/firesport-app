@@ -1,36 +1,16 @@
 import { useEffect } from "react";
 import { useAthletePerformanceHistory } from "../../hooks/useApi";
 import CardState from "./CardState";
-import { getHistoryTrendModifier } from "./cardModifiers";
+import {
+  getHistoryTrendConfig,
+  getHistoryTrendModifier,
+} from "./cardModifiers";
 
 export default function History({ athleteId, onTrendChange }) {
   const { data, isLoading, error } = useAthletePerformanceHistory(athleteId);
 
-  const getTrendIcon = (trend) => {
-    switch (trend) {
-      case "up":
-        return { icon: "fa-arrow-up", label: "Zlepšení", modifier: "up" };
-      case "down":
-        return { icon: "fa-arrow-down", label: "Zhoršení", modifier: "down" };
-      case "stable":
-        return { icon: "fa-minus", label: "Beze změny", modifier: "stable" };
-      case "insufficient":
-        return {
-          icon: "fa-circle-question",
-          label: "Málo výsledků",
-          modifier: "neutral",
-        };
-      default:
-        return {
-          icon: "fa-minus",
-          label: "Bez hodnocení",
-          modifier: "neutral",
-        };
-    }
-  };
-
   const trendKey = data?.performance_indicator?.trend;
-  const trend = getTrendIcon(trendKey);
+  const trend = getHistoryTrendConfig(trendKey);
 
   useEffect(() => {
     onTrendChange?.(getHistoryTrendModifier(trendKey));
@@ -69,14 +49,12 @@ export default function History({ athleteId, onTrendChange }) {
   };
 
   return (
-    <div className={`history history--${trend.modifier}`}>
-      {/* 1. Hlavní stav */}
+    <div className={`history history--state-${trend.state}`}>
       <div className="history__status">
         <i className={`fa-solid ${trend.icon} history__icon`} />
         <span className="history__label">{trend.label}</span>
       </div>
 
-      {/* 2. Stručné vysvětlení změny */}
       {hasDetails && (
         <div className="history__delta">
           <span className="history__delta-value">{getDeltaLabel()}</span>
@@ -88,7 +66,6 @@ export default function History({ athleteId, onTrendChange }) {
         </div>
       )}
 
-      {/* 3. Poslední výsledky jako podpůrný důkaz */}
       {recent_results && recent_results.length > 0 && (
         <div className="history__recent">
           <span className="history__recent-label">Poslední časy</span>
