@@ -8,15 +8,15 @@ export default function PairAthleteCard() {
 
   return (
     <>
-      <Card title="Spáruj svůj účet s atletem">
+      <Card title="Propoj účet se závodníkem">
         <div className="pair-athlete">
           <p className="pair-athlete__text">
-            Spáruj svůj uživatelský účet s atletem, aby sis mohl prohlížet své
-            výsledky a statistiky.
+            Pro zobrazení vlastních výsledků a statistik propoj svůj účet se
+            závodním profilem.
           </p>
           <div className="button-center">
             <PrimaryButton onClick={() => setShowPairDialog(true)}>
-              Spárovat atleta
+              Vybrat závodníka
             </PrimaryButton>
           </div>
         </div>

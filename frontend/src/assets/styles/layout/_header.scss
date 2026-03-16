@@ -81,5 +81,16 @@
     span {
       font-size: 0.75rem;
     }
+
+    &--button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.75;
+      }
+    }
   }
 }

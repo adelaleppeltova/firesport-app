@@ -10,3 +10,30 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
+
+// ── Dashboard layout ────────────────────────────────────────────────────────
+
+.dashboard {
+  // Mobil: jeden sloupec
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+
+  // Desktop: levý sloupec (profil, sezóna, stabilita) + pravý (historie, grafy)
+  @media (min-width: variables.$breakpoint-l) {
+    grid-template-columns: 2fr 3fr;
+    align-items: start;
+  }
+
+  // Sloupec – flex kontejner pro karty v rámci jednoho sloupce
+  &__col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  // Zvýrazněná karta (Stabilita výkonu) – levý barevný pruh
+  &__priority-card {
+    border-left: 3px solid variables.$color-secondary;
+  }
+}

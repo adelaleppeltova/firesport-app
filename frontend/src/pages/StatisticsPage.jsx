@@ -251,7 +251,7 @@ function ChartCard({ items, medianTime }) {
         <p className="empty-state">Žádná data pro vybrané okno analýzy.</p>
       ) : (
         <ResponsiveContainer width="100%" height={320}>
-          <ScatterChart margin={{ top: 10, right: 16, bottom: 50, left: 10 }}>
+          <ScatterChart margin={{ top: 10, right: 20, bottom: 34, left: 12 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
             <XAxis
               dataKey="x"
@@ -260,13 +260,13 @@ function ChartCard({ items, medianTime }) {
               domain={xDomain}
               ticks={xTicks}
               tickFormatter={tickFormatter}
-              tick={{ fontSize: 10, angle: -30, textAnchor: "end" }}
-              tickLine={false}
-              height={50}
+              stroke="#636363"
+              tick={{ fontSize: 10, angle: 0, textAnchor: "middle" }}
+              height={42}
               label={{
                 value: "Datum",
-                position: "insideBottom",
-                offset: -5,
+                position: "bottom",
+                offset: 8,
                 fontSize: 13,
               }}
             />
@@ -275,50 +275,36 @@ function ChartCard({ items, medianTime }) {
               type="number"
               domain={yDomain}
               tickFormatter={(v) => `${v.toFixed(1)} s`}
+              stroke="#636363"
               tick={{ fontSize: 10 }}
-              tickLine={false}
-              width={50}
+              width={58}
               label={{
                 value: "Čas (s)",
                 angle: -90,
-                position: "insideLeft",
-                offset: 4,
+                position: "left",
+                offset: 0,
                 fontSize: 13,
               }}
             />
             <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
             <Legend
-              wrapperStyle={{ bottom: -10 }}
+              wrapperStyle={{ bottom: -2 }}
               content={() => (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    flexWrap: "wrap",
-                    gap: "6px 16px",
-                    fontSize: 13,
-                  }}
-                >
-                  <span
-                    style={{ display: "flex", alignItems: "center", gap: 6 }}
-                  >
+                <div className="anomaly-chart__legend">
+                  <span className="anomaly-chart__legend-item">
                     <svg width="10" height="10">
                       <circle cx="5" cy="5" r="5" fill="#cf362e" />
                     </svg>
                     Označeno jako neobvyklé
                   </span>
-                  <span
-                    style={{ display: "flex", alignItems: "center", gap: 6 }}
-                  >
+                  <span className="anomaly-chart__legend-item">
                     <svg width="10" height="10">
                       <circle cx="5" cy="5" r="5" fill="#0f4d92" />
                     </svg>
                     Normální výkon
                   </span>
                   {medianTime != null && (
-                    <span
-                      style={{ display: "flex", alignItems: "center", gap: 6 }}
-                    >
+                    <span className="anomaly-chart__legend-item">
                       <svg width="18" height="10">
                         <line
                           x1="0"

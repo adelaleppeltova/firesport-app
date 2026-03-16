@@ -90,14 +90,31 @@
 }
 
 .athlete-list li {
-  padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.athlete-list__button {
+  width: 100%;
+  padding: 0.75rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-.athlete-list li:hover {
+.athlete-list__button:hover {
   background: #f9fafb;
+
+  &.athlete-list__item--disabled {
+    background: none;
+  }
+}
+
+.athlete-list__item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .athlete-list strong {

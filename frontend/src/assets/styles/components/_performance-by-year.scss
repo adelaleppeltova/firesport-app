@@ -1,107 +1,97 @@
 @use "../abstracts/variables.scss";
 
 .performance-by-year {
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
-  &__container {
+  // Přepínač Aktuální sezóna / Poslední roky
+  &__toggle {
     display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    width: 100%;
-    height: 100%;
+    gap: 0.5rem;
+    justify-content: center;
   }
 
-  &__chart {
-    width: 100%;
-    max-width: 800px;
-    aspect-ratio: 2 / 1;
-    min-height: 300px;
-    margin: 0 auto;
-  }
+  &__toggle-btn {
+    padding: 0.35rem 1rem;
+    border: 1.5px solid variables.$color-background-dark;
+    border-radius: 20px;
+    background: transparent;
+    color: variables.$color-text;
+    font-size: variables.$font-size-xs;
+    font-weight: variables.$font-weight-medium;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
 
-  &__custom-tooltip {
-    font-family: variables.$font-family-base;
-    pointer-events: none;
+    &--active {
+      background: variables.$color-background-dark;
+      color: #fff;
+    }
 
-    p {
-      margin: 0;
+    &:hover:not(&--active) {
+      background: rgba(variables.$color-background-dark, 0.08);
     }
   }
 
+  // Legenda – zobrazuje se jen u více let
   &__legend {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: 1rem;
     flex-wrap: wrap;
-    padding: 1rem;
-    border-radius: 0.5rem;
+    font-size: variables.$font-size-xs;
+    margin-top: -0.1rem;
   }
 
   &__legend-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    cursor: default;
-  }
-
-  &__legend-color {
-    width: 16px;
-    height: 16px;
-    border-radius: 2px;
-    display: inline-block;
-  }
-
-  &__legend-text {
-    font-size: 0.95rem;
+    gap: 0.4rem;
     color: variables.$color-text;
     font-weight: variables.$font-weight-medium;
   }
 
-  &__info {
-    text-align: center;
-    padding: 0.5rem 1rem;
-    background-color: #f0f8ff;
-    border-radius: 0.5rem;
+  &__legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
   }
 
-  &__info-text {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #0066cc;
+  // Tooltip
+  &__tooltip {
+    padding: 8px 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-family: variables.$font-family-base;
+    color: #fff;
+    pointer-events: none;
   }
 
+  &__tooltip-time {
+    margin: 0 0 2px;
+    font-weight: bold;
+    font-size: 15px;
+  }
+
+  &__tooltip-detail {
+    margin: 0 0 1px;
+    font-size: 13px;
+  }
+
+  // Mobilní optimalizace
   @media (max-width: 768px) {
+    &__toggle-btn {
+      font-size: variables.$font-size-xs;
+      padding: 0.3rem 0.75rem;
+    }
+
     &__legend {
-      gap: 1rem;
-      padding: 0.75rem;
-    }
-
-    &__chart {
-      min-height: 250px;
-    }
-  }
-
-  &__info {
-    text-align: center;
-    padding: 0.5rem 1rem;
-    background-color: #f0f8ff;
-    border-radius: 0.5rem;
-  }
-
-  &__info-text {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #0066cc;
-  }
-
-  @media (max-width: 768px) {
-    &__legend {
-      gap: 1rem;
-      padding: 0.75rem;
-    }
-
-    &__chart {
-      min-height: 250px;
+      gap: 0.75rem;
+      font-size: variables.$font-size-xs;
     }
   }
 }

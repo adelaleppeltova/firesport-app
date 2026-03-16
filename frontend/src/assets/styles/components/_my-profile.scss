@@ -1,43 +1,65 @@
 @use "../abstracts/variables.scss";
 
 .my-profile {
-  &__athlete {
-    color: variables.$color-text;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
   }
 
   &__name {
-    font-size: variables.$font-size-s;
+    font-size: variables.$font-size-m;
     font-weight: variables.$font-weight-semibold;
+    color: variables.$color-text;
+    margin: 0;
+  }
+
+  &__birth-year {
+    font-weight: variables.$font-weight-regular;
+    color: variables.$gray-medium;
+    font-size: variables.$font-size-s;
   }
 
   &__team {
     font-size: variables.$font-size-s;
     color: variables.$gray-medium;
+    margin: 0;
   }
 
-  &__time,
-  &__competitions {
-    font-size: variables.$font-size-s;
-    font-weight: variables.$font-weight-medium;
+  &__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+
+    @media (max-width: variables.$breakpoint-s) {
+      grid-template-columns: 1fr;
+    }
   }
 
-  &__best-performance {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background-color: #f5f5f5;
-    border-radius: 0.4rem;
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.5rem 0.75rem;
+    background-color: variables.$gray-light;
+    border-radius: 0.5rem;
   }
 
-  &__best-performance-label {
+  &__stat-label {
+    font-size: variables.$font-size-xs;
+    color: variables.$gray-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__stat-value {
     font-size: variables.$font-size-s;
     font-weight: variables.$font-weight-semibold;
-    margin: 0 0 0.5rem 0;
     color: variables.$color-text;
-  }
-
-  &__best-performance-detail {
-    font-size: 0.9rem;
-    margin: 0.25rem 0;
-    color: variables.$gray-medium;
+    line-height: 1.2;
   }
 }

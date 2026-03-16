@@ -1,10 +1,45 @@
+import { useEffect } from "react";
 import { useAthletePerformanceHistory } from "../../hooks/useApi";
+import CardState from "./CardState";
+import { getHistoryTrendModifier } from "./cardModifiers";
 
-export default function History({ athleteId }) {
+export default function History({ athleteId, onTrendChange }) {
   const { data, isLoading, error } = useAthletePerformanceHistory(athleteId);
 
-  if (isLoading) return <div className="skeleton" />;
-  if (error || !data) return <p className="empty-state">Žádná data</p>;
+  const getTrendIcon = (trend) => {
+    switch (trend) {
+      case "up":
+        return { icon: "fa-arrow-up", label: "Zlepšení", modifier: "up" };
+      case "down":
+        return { icon: "fa-arrow-down", label: "Zhoršení", modifier: "down" };
+      case "stable":
+        return { icon: "fa-minus", label: "Beze změny", modifier: "stable" };
+      case "insufficient":
+        return {
+          icon: "fa-circle-question",
+          label: "Málo výsledků",
+          modifier: "neutral",
+        };
+      default:
+        return {
+          icon: "fa-minus",
+          label: "Bez hodnocení",
+          modifier: "neutral",
+        };
+    }
+  };
+
+  const trendKey = data?.performance_indicator?.trend;
+  const trend = getTrendIcon(trendKey);
+
+  useEffect(() => {
+    onTrendChange?.(getHistoryTrendModifier(trendKey));
+  }, [onTrendChange, trendKey]);
+
+  if (isLoading) return <div className="skeleton skeleton--lg" />;
+  if (error) return <CardState type="error" />;
+  if (!data) return <CardState type="no-data" text="Zatím žádné výsledky." />;
+
   const { performance_indicator } = data;
   const { recent_results } = performance_indicator;
 
@@ -15,83 +50,62 @@ export default function History({ athleteId }) {
     return numericValue.toFixed(2);
   };
 
-  // Trend is based on last 6 valid results (newer 3 vs older 3, median).
-  const getTrendIcon = (trend) => {
-    switch (trend) {
-      case "up":
-        return { icon: "fa-arrow-up", label: "Zlepšení", color: "#4caf50" };
-      case "down":
-        return { icon: "fa-arrow-down", label: "Zhoršení", color: "#f44336" };
-      case "stable":
-        return { icon: "fa-minus", label: "Stabilní", color: "#ff9800" };
-      case "insufficient":
-        return { icon: "fa-minus", label: "Nedostatek dat", color: "#999" };
-      default:
-        return { icon: "fa-minus", label: "Bez dat", color: "#999" };
-    }
-  };
-
   const indicator = performance_indicator ?? {};
   const {
-    trend: trendKey,
     delta_seconds: deltaSeconds,
     new_value: newValue,
     old_value: oldValue,
   } = indicator;
 
-  const trend = getTrendIcon(trendKey);
-  const deltaText =
-    deltaSeconds == null
-      ? "-"
-      : `${deltaSeconds > 0 ? "+" : ""}${formatSeconds(deltaSeconds)} s`;
   const hasDetails =
     trendKey && trendKey !== "insufficient" && deltaSeconds != null;
 
+  const getDeltaLabel = () => {
+    if (!hasDetails) return null;
+    const abs = Math.abs(Number(deltaSeconds)).toFixed(2);
+    if (trendKey === "up") return `o ${abs}\u202fs rychleji`;
+    if (trendKey === "down") return `o ${abs}\u202fs pomaleji`;
+    return `rozdíl ${formatSeconds(deltaSeconds)}\u202fs`;
+  };
+
   return (
-    <div className="history">
-      <div className="history__info">
-        <div className="history__trend">
-          <i
-            className={`fa-solid ${trend.icon}`}
-            style={{
-              color: trend.color,
-              fontSize: "2rem",
-              marginRight: "1rem",
-            }}
-          />
-          <div>
-            <p className="history__text">
-              <strong>{trend.label}</strong> - Výkonnost podle posledních závodů
-            </p>
-            {hasDetails && (
-              <p className="history__subtext">
-                Změna: {deltaText} (starší 3: {formatSeconds(oldValue)} s,
-                novější 3: {formatSeconds(newValue)} s)
-              </p>
-            )}
-            {recent_results && recent_results.length > 0 && (
-              <div className="history__recent">
-                <p className="history__subtext">
-                  Posledních {recent_results.length} výsledků:
-                </p>
-                <div className="history__results">
-                  {recent_results.map((result, idx) => (
-                    <span
-                      key={idx}
-                      className="history__result-badge"
-                      title={`Čas: ${formatSeconds(result.final_time)} s${
-                        result.rank ? `, Pořadí: ${result.rank}` : ""
-                      }`}
-                    >
-                      {formatSeconds(result.final_time)} s
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+    <div className={`history history--${trend.modifier}`}>
+      {/* 1. Hlavní stav */}
+      <div className="history__status">
+        <i className={`fa-solid ${trend.icon} history__icon`} />
+        <span className="history__label">{trend.label}</span>
+      </div>
+
+      {/* 2. Stručné vysvětlení změny */}
+      {hasDetails && (
+        <div className="history__delta">
+          <span className="history__delta-value">{getDeltaLabel()}</span>
+          <span className="history__delta-detail">
+            průměr: {formatSeconds(oldValue)}
+            {" "}s → {formatSeconds(newValue)}
+            {" "}s
+          </span>
+        </div>
+      )}
+
+      {/* 3. Poslední výsledky jako podpůrný důkaz */}
+      {recent_results && recent_results.length > 0 && (
+        <div className="history__recent">
+          <span className="history__recent-label">Poslední časy</span>
+          <div className="history__results">
+            {recent_results.map((result, idx) => (
+              <span
+                key={idx}
+                className="history__result-badge"
+                title={result.rank ? `Pořadí: ${result.rank}` : undefined}
+              >
+                {formatSeconds(result.final_time)}
+                {" "}s
+              </span>
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,30 +1,61 @@
+import { useEffect } from "react";
 import { useAthletePerformanceStability as useStabilityData } from "../../hooks/useApi";
+import CardState from "./CardState";
+import { getStabilityModifier } from "./cardModifiers";
 
-export default function PerformanceStability({ athleteId }) {
+const STABILITY_CONFIG = {
+  stable: {
+    match: (r) => r.includes("stabilní"),
+    icon: "fa-check-circle",
+    modifier: "stable",
+    description: "Výsledky jsou stabilní a pravidelné.",
+  },
+  variable: {
+    match: (r) => r.includes("kolísavé"),
+    icon: "fa-circle-half-stroke",
+    modifier: "variable",
+    description: "Výkony se mezi závody výrazněji liší.",
+  },
+  unknown: {
+    match: () => true,
+    icon: "fa-circle-question",
+    modifier: "unknown",
+    description: "Pro hodnocení zatím není dost výsledků.",
+  },
+};
+
+function getStabilityConfig(rating = "") {
+  const normalized = rating.toLowerCase();
+  return (
+    Object.values(STABILITY_CONFIG).find((c) => c.match(normalized)) ??
+    STABILITY_CONFIG.unknown
+  );
+}
+
+export default function PerformanceStability({ athleteId, onStabilityChange }) {
   const { data, isLoading, error } = useStabilityData(athleteId);
+  const ratingText = data?.stability_rating || "Nedostatek dat";
+  const config = data ? getStabilityConfig(ratingText) : STABILITY_CONFIG.unknown;
 
-  if (isLoading) return <div className="skeleton" />;
-  if (error) return <p className="empty-state">Chyba načítání</p>;
+  useEffect(() => {
+    onStabilityChange?.("unknown");
+  }, [athleteId, onStabilityChange]);
+
+  useEffect(() => {
+    onStabilityChange?.(getStabilityModifier(ratingText));
+  }, [onStabilityChange, ratingText]);
+
+  if (isLoading) return <div className="skeleton skeleton--lg" />;
+  if (error) return <CardState type="error" />;
   if (!data)
-    return <p className="empty-state">Žádná data o stabilitě výkonu</p>;
+    return (
+      <CardState
+        type="insufficient"
+        text="Pro hodnocení je potřeba více výsledků."
+      />
+    );
 
-  const { stability_rating, performance_variability, average_time_in_year } =
-    data;
-
-  // Mapování stability na ikonu a barvu
-  const getStabilityIcon = (rating = "") => {
-    const normalized = rating.toLowerCase();
-    if (normalized.includes("stabilní")) {
-      return { icon: "fa-check-circle", color: "#4caf50" }; // Zelená
-    }
-    if (normalized.includes("kolísavé")) {
-      return { icon: "fa-exclamation-circle", color: "#ff9800" }; // Oranžová
-    }
-    return { icon: "fa-question-circle", color: "#999" }; // Šedá
-  };
-
-  const ratingText = stability_rating || "Nedostatek dat";
-  const stability = getStabilityIcon(ratingText);
+  const { performance_variability, average_time_in_year } = data;
 
   const variabilityDisplay =
     performance_variability == null ? "-" : performance_variability.toFixed(2);
@@ -34,25 +65,21 @@ export default function PerformanceStability({ athleteId }) {
       <div className="performance-stability__info">
         <div className="performance-stability__header">
           <i
-            className={`fa-solid ${stability.icon}`}
-            style={{
-              color: stability.color,
-              fontSize: "2rem",
-              marginRight: "1rem",
-            }}
+            className={`fa-solid ${config.icon} performance-stability__icon performance-stability__icon--${config.modifier}`}
           />
           <div>
             <p className="performance-stability__rating">
               <strong>{ratingText}</strong>
+            </p>
+            <p className="performance-stability__description">
+              {config.description}
             </p>
           </div>
         </div>
 
         <div className="performance-stability__stats">
           <div className="performance-stability__stat">
-            <span className="performance-stability__stat-label">
-              Rozsah časů:
-            </span>
+            <span className="performance-stability__stat-label">Rozptyl:</span>
             <span className="performance-stability__stat-value">
               {variabilityDisplay} s
             </span>
@@ -60,7 +87,7 @@ export default function PerformanceStability({ athleteId }) {
 
           <div className="performance-stability__stat">
             <span className="performance-stability__stat-label">
-              Průměrný čas v sezóně:
+              Průměr v sezóně:
             </span>
             <span className="performance-stability__stat-value">
               {average_time_in_year?.toFixed(2) || "-"} s

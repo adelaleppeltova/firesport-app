@@ -1,0 +1,50 @@
+@use "../abstracts/variables";
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 1rem;
+    background: variables.$color-background;
+    border: 1px solid variables.$border-color-base;
+    border-radius: variables.$border-radius-base;
+    text-decoration: none;
+    color: variables.$color-text;
+    font-size: variables.$font-size-xs;
+    font-weight: variables.$font-weight-medium;
+    transition:
+      background variables.$default-transition,
+      border-color variables.$default-transition;
+
+    &:hover {
+      background: variables.$hover-color-light;
+      border-color: #bbb;
+    }
+  }
+
+  &__icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  &__label {
+    white-space: nowrap;
+  }
+
+  // Na mobilu roztáhni položky rovnoměrně
+  @media (max-width: variables.$breakpoint-s) {
+    & {
+      justify-content: stretch;
+    }
+
+    &__item {
+      flex: 1 1 calc(50% - 10px);
+      justify-content: center;
+    }
+  }
+}

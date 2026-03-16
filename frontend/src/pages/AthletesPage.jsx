@@ -37,13 +37,21 @@ export default function AthletesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Debounce: po 300 ms zapíše hodnotu z inputu do URL (a resetuje stránku)
+  // Debounce: po 300 ms zapíše hodnotu z inputu do URL (a resetuje stránku).
+  // Pokud se inputValue rovná committedSearch (např. při prvním renderu),
+  // URL se vůbec nedotkneme – zachováme ostatní params jako ?page=.
   useEffect(() => {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams();
-      if (inputValue) params.set("q", inputValue);
+      if (inputValue === committedSearch) return;
+      const params = new URLSearchParams(searchParams);
+      if (inputValue) {
+        params.set("q", inputValue);
+      } else {
+        params.delete("q");
+      }
       // při nové query vždy reset na str. 1
+      params.delete("page");
       setSearchParams(params, { replace: true });
     }, 300);
     return () => clearTimeout(debounceRef.current);
