@@ -169,3 +169,46 @@ class TestDataImporterQualityFlag:
 
         assert len(inserted_docs) == 1
         assert inserted_docs[0].get("quality_flag") == QualityFlag.suspicious.value
+
+
+def test_normalize_category_name_uses_sentence_case_with_hzs():
+    from app.services.data_import import DataImporter
+
+    assert (
+        DataImporter._normalize_category_name("MLADŠÍ DOROSTENKY")
+        == "Mladší dorostenky"
+    )
+    assert (
+        DataImporter._normalize_category_name("MUŽI A STARŠÍ DOROSTENCI")
+        == "Muži a starší dorostenci"
+    )
+    assert DataImporter._normalize_category_name("MUŽI HZS") == "Muži HZS"
+
+
+def test_import_category_reuses_existing_case_variant():
+    from app.services.data_import import DataImporter
+
+    importer = DataImporter()
+    existing_id = ObjectId()
+    exact_find = AsyncMock(return_value=None)
+    case_insensitive_find = AsyncMock(
+        return_value={"_id": existing_id, "name": "Mladší Dorostenky"}
+    )
+    update_one = AsyncMock()
+    insert_one = AsyncMock()
+
+    with patch("app.services.data_import.categories_collection") as mock_categories:
+        mock_categories.find_one = AsyncMock(
+            side_effect=[exact_find.return_value, case_insensitive_find.return_value]
+        )
+        mock_categories.update_one = update_one
+        mock_categories.insert_one = insert_one
+
+        category_id = asyncio.run(importer._import_category("Mladší dorostenky"))
+
+    assert category_id == str(existing_id)
+    update_one.assert_awaited_once_with(
+        {"_id": existing_id},
+        {"$set": {"name": "Mladší dorostenky"}},
+    )
+    insert_one.assert_not_awaited()

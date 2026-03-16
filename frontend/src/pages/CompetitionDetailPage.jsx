@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useCompetitionDetail } from "../hooks/useApi";
 import Card from "../components/Card";
+import formatCategoryName from "../utils/formatCategoryName";
 
 export default function CompetitionDetailPage() {
   const { id, categoryId } = useParams();
@@ -45,7 +46,9 @@ export default function CompetitionDetailPage() {
               <th>Kategorie</th>
               <td>
                 {categories && categories.length > 0
-                  ? categories.map((cat) => cat.name).join(", ")
+                  ? categories
+                      .map((cat) => formatCategoryName(cat.name))
+                      .join(", ")
                   : "-"}
               </td>
             </tr>
@@ -64,7 +67,7 @@ export default function CompetitionDetailPage() {
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <Card className="competition-detail-results-card-row">
-                {cat.name}
+                {formatCategoryName(cat.name)}
                 <span style={{ float: "right" }}>&#8250;</span>
               </Card>
             </Link>

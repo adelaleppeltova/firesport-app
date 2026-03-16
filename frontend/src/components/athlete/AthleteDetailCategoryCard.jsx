@@ -1,4 +1,5 @@
 import Card from "../Card";
+import formatCategoryName from "../../utils/formatCategoryName";
 
 function formatTime(seconds) {
   if (seconds == null) return "—";
@@ -12,7 +13,6 @@ function formatTime(seconds) {
  */
 export function CategorySelect({ categories, value, onChange }) {
   if (!categories || categories.length === 0) return null;
-  const isDisabled = categories.length === 1;
   return (
     <div className="window-select">
       <label className="window-select__label" htmlFor="category-select">
@@ -22,12 +22,12 @@ export function CategorySelect({ categories, value, onChange }) {
         id="category-select"
         className="window-select__input"
         value={value ?? ""}
-        onChange={(e) => onChange(e.target.value || null)}
-        disabled={isDisabled}
+        onChange={(e) => onChange(e.target.value)}
       >
+        <option value="">Všechny kategorie</option>
         {categories.map((cat) => (
           <option key={cat.category_id} value={cat.category_id}>
-            {cat.category_name}
+            {formatCategoryName(cat.category_name)}
           </option>
         ))}
       </select>
@@ -39,25 +39,57 @@ export function CategorySelect({ categories, value, onChange }) {
  * Karta přehledu v konkrétní kategorii (ne groupby).
  */
 export default function AthleteDetailCategoryCard({
-  totalRaces,
+  totalResults,
   bestTime,
-  categoryName,
+  titleLabel,
+  averageValidTime,
+  invalidResultsCount,
+  lastCompetition,
 }) {
+  const stats = [
+    {
+      label: "Počet výsledků",
+      value: totalResults != null ? totalResults : "—",
+    },
+    {
+      label: "Nejlepší čas",
+      value: bestTime != null ? formatTime(bestTime) : "—",
+    },
+    {
+      label: "Průměr validních časů",
+      value: averageValidTime != null ? formatTime(averageValidTime) : "—",
+    },
+    {
+      label: "Neplatné výsledky",
+      value: invalidResultsCount != null ? invalidResultsCount : "—",
+    },
+  ];
+
   return (
-    <Card title={`Přehled v kategorii ${categoryName ?? "—"}`}>
-      <div className="anomaly-summary">
-        <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">Celkový počet závodů</span>
-          <span className="anomaly-summary__value">
-            {totalRaces != null ? totalRaces : "—"}
-          </span>
-        </div>
-        <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">Nejlepší čas</span>
-          <span className="anomaly-summary__value">
-            {bestTime != null ? formatTime(bestTime) : "—"}
-          </span>
-        </div>
+    <Card
+      title={`Přehled pro kategorii: ${formatCategoryName(titleLabel) ?? "—"}`}
+      className="athlete-category-overview-card"
+    >
+      <div className="athlete-category-overview-card__stats">
+        {stats.map((stat) => (
+          <div className="athlete-category-overview-card__stat" key={stat.label}>
+            <span className="athlete-category-overview-card__label">
+              {stat.label}
+            </span>
+            <strong className="athlete-category-overview-card__value">
+              {stat.value}
+            </strong>
+          </div>
+        ))}
+      </div>
+
+      <div className="athlete-category-overview-card__footer">
+        <span className="athlete-category-overview-card__footer-label">
+          Poslední závod
+        </span>
+        <strong className="athlete-category-overview-card__footer-value">
+          {lastCompetition || "—"}
+        </strong>
       </div>
     </Card>
   );

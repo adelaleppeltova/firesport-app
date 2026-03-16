@@ -10,21 +10,58 @@
     @extend .table-wrapper;
   }
 
+  .athletes-feedback,
+  .athletes-results-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    width: 100%;
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid variables.$gray-light;
+    border-radius: calc(variables.$border-radius-base - 2px);
+    background: rgba(variables.$color-background, 0.65);
+    font-size: variables.$font-size-xs;
+    color: variables.$gray-dark;
+    line-height: 1.45;
+  }
+
+  .athletes-feedback--error {
+    color: variables.$color-danger;
+    border-color: rgba(variables.$color-danger, 0.18);
+    background: rgba(variables.$color-danger, 0.06);
+  }
+
   .athletes-table {
     @extend .table;
     width: 100%;
     border-collapse: collapse;
     font-size: variables.$font-size-s;
+    table-layout: fixed;
+
+    .athletes-table__col--name {
+      width: 38%;
+    }
+
+    .athletes-table__col--year {
+      width: 5.5rem;
+    }
+
+    .athletes-table__col--teams {
+      width: auto;
+    }
 
     th,
     td {
       padding: 0.4rem;
       text-align: left;
+      vertical-align: top;
     }
 
     th {
       font-weight: variables.$font-weight-semibold;
       border-bottom: 2px solid variables.$color-background-dark;
+      white-space: nowrap;
     }
 
     td {
@@ -33,18 +70,52 @@
 
     tbody tr {
       transition: background 0.15s;
-      cursor: pointer;
 
       @media (hover: hover) and (pointer: fine) {
         &:hover td {
           background: variables.$hover-color-light;
         }
       }
+
+      &:focus-within td {
+        background: variables.$hover-color-light;
+      }
     }
   }
 
+  .athlete-row__link {
+    display: inline-block;
+    color: inherit;
+    font-weight: variables.$font-weight-semibold;
+    text-decoration: none;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 2px solid variables.$color-background-dark;
+      outline-offset: 2px;
+      border-radius: 0.2rem;
+    }
+  }
+
+  .athlete-row__year,
+  .athletes-table__year-heading {
+    white-space: nowrap;
+  }
+
+  .athlete-row__teams {
+    max-width: 24rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+
   .athletes-searchbar-wrapper {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     display: flex;
     justify-content: flex-start;
   }
@@ -78,19 +149,167 @@
     animation: athletes-search-spin 0.8s linear infinite;
   }
 
-  .athletes-search-status {
-    min-height: 1.5rem;
-    margin: -0.75rem 0 1rem;
-    font-size: variables.$font-size-xs;
-    color: variables.$gray-medium;
-  }
-
   .athletes-table-wrapper {
+    position: relative;
     transition: opacity 0.2s ease;
   }
 
   .athletes-table-wrapper--fetching {
     opacity: 0.72;
+  }
+
+  .athletes-results-status--loading {
+    color: variables.$gray-medium;
+  }
+
+  .athletes-results-status__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: variables.$color-accent;
+    opacity: 0.7;
+    animation: athletes-loading-pulse 1.2s ease-in-out infinite;
+  }
+
+  .athletes-empty-state {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+
+  .athletes-empty-state__message {
+    margin: 0;
+    max-width: 32rem;
+    color: variables.$gray-dark;
+    line-height: 1.45;
+  }
+
+  .athletes-empty-state__action {
+    appearance: none;
+    border: 0;
+    background: none;
+    padding: 0;
+    color: variables.$color-accent;
+    font: inherit;
+    font-weight: variables.$font-weight-semibold;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+
+    &:hover {
+      color: variables.$color-background-dark;
+    }
+
+    &:focus-visible {
+      outline: 2px solid variables.$color-background-dark;
+      outline-offset: 2px;
+      border-radius: 0.2rem;
+    }
+  }
+
+  .athletes-pagination {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .athletes-pagination__button {
+    width: min(180px, 100%);
+    font-size: 1.2rem;
+  }
+
+  .athletes-pagination__button--previous {
+    justify-self: start;
+  }
+
+  .athletes-pagination__button--next {
+    justify-self: end;
+  }
+
+  .athletes-pagination__status {
+    min-width: 8.5rem;
+    text-align: center;
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$gray-dark;
+    white-space: nowrap;
+  }
+
+  @media (max-width: variables.$breakpoint-s) {
+    .athletes-table-wrapper {
+      padding: 0.3rem;
+      border-radius: calc(variables.$border-radius-base - 2px);
+    }
+
+    .athletes-table {
+      font-size: 0.94rem;
+
+      .athletes-table__col--name {
+        width: 43%;
+      }
+
+      .athletes-table__col--year {
+        width: 4.4rem;
+      }
+
+      th,
+      td {
+        padding: 0.45rem 0.35rem;
+      }
+
+      th {
+        font-size: 0.82rem;
+        letter-spacing: 0.01em;
+      }
+    }
+
+    .athlete-row__name {
+      padding-right: 0.5rem;
+    }
+
+    .athlete-row__link {
+      line-height: 1.3;
+    }
+
+    .athlete-row__year {
+      color: variables.$gray-medium;
+    }
+
+    .athlete-row__teams {
+      max-width: none;
+      color: variables.$gray-dark;
+      line-height: 1.32;
+    }
+
+    .athletes-empty-state {
+      padding: 1.5rem 0.75rem;
+    }
+
+    .athletes-pagination {
+      grid-template-columns: 1fr 1fr;
+      margin-top: 1.25rem;
+    }
+
+    .athletes-pagination__status {
+      grid-column: 1 / -1;
+      order: -1;
+      min-width: 0;
+      padding: 0.15rem 0;
+    }
+
+    .athletes-pagination__button {
+      width: 100%;
+      font-size: 1.05rem;
+    }
+
+    .athletes-pagination__button--previous,
+    .athletes-pagination__button--next {
+      justify-self: stretch;
+    }
   }
 }
 
@@ -101,5 +320,16 @@
 
   to {
     transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+@keyframes athletes-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.9;
   }
 }

@@ -12,8 +12,8 @@
 }
 
 /// Společné styly pro stránkové wrappery
-@mixin page-layout($max-width: null) {
-  padding: 0 1rem;
+@mixin page-layout($max-width: variables.$page-max-width) {
+  padding-inline: clamp(1rem, 2.5vw, 2.25rem);
   background: variables.$color-background;
   min-height: 100vh;
   margin: 0 auto;

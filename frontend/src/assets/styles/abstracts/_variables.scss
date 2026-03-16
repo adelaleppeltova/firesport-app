@@ -4,12 +4,14 @@ $color-secondary: #cf362e;
 $color-accent: #0f4d92;
 $color-background: #f5f5f5;
 $color-background-dark: #1b1b1b;
+
 $color-text: #1b1b1b;
 $gray-light: #efefef;
 $gray-dark: #3d3d3d;
 $gray-medium: #656565;
 $hover-color-dark: #333333;
 $hover-color-light: #e0e0e0;
+$color-danger: #cf362e;
 
 // typography
 $font-family-base: "Inter", sans-serif;
@@ -58,3 +60,6 @@ $header-height-xl: 80px;
 
 $sidebar-width: 0;
 $sidebar-width-l: 200px;
+
+// shared page layout
+$page-max-width: 1120px;

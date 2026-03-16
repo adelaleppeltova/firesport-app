@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { useResultsByCategory, useCompetitionDetail } from "../hooks/useApi";
+import PageContextNav from "../components/PageContextNav";
+import formatCategoryName from "../utils/formatCategoryName";
 
 // Pomocná funkce pro zobrazení času
 function renderTime(time, status) {
@@ -18,7 +20,6 @@ function getAttempt(times, attemptNum) {
 export default function ResultsPage() {
   const { id, categoryId } = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
   const {
     data: results,
     isLoading,
@@ -42,12 +43,33 @@ export default function ResultsPage() {
 
   // compute highlight id to apply class in render
   const highlightedId = location.hash ? location.hash.replace("#", "") : null;
+  const categoryName =
+    formatCategoryName(
+      competition?.categories?.find(
+        (cat) => String(cat.id) === String(categoryId),
+      )?.name,
+    ) || "Název kategorie neznámý";
 
   if (isLoading || isCompLoading) return <div>Načítání...</div>;
   if (error) return <div>Chyba při načítání výsledků.</div>;
 
   return (
     <div className="results-page page">
+      <PageContextNav
+        items={[
+          { label: "Závody", to: "/zavody" },
+          {
+            label: competition?.name || "Detail závodu",
+            to: id ? `/zavody/${id}` : "/zavody",
+          },
+          { label: categoryName },
+        ]}
+        action={{
+          label: "Zpět na detail závodu",
+          to: id ? `/zavody/${id}` : "/zavody",
+        }}
+      />
+
       <h1>Výsledky</h1>
       <h2>
         {competition?.name || "Název soutěže neznámý"},{" "}
@@ -55,25 +77,33 @@ export default function ResultsPage() {
           ? new Date(competition.date).toLocaleDateString("cs-CZ")
           : "Datum neznámé"}
       </h2>
-      <p>
-        {competition?.categories?.find(
-          (cat) => String(cat.id) === String(categoryId),
-        )?.name || "Název kategorie neznámý"}
-      </p>
+      <p>{categoryName}</p>
       <div className="results-table-wrapper">
         <table className="results-table">
+          <colgroup>
+            <col className="results-table__col results-table__col--start-number" />
+            <col className="results-table__col results-table__col--first-name" />
+            <col className="results-table__col results-table__col--last-name" />
+            <col className="results-table__col results-table__col--birth-year" />
+            <col className="results-table__col results-table__col--fscode" />
+            <col className="results-table__col results-table__col--team" />
+            <col className="results-table__col results-table__col--attempt" />
+            <col className="results-table__col results-table__col--attempt" />
+            <col className="results-table__col results-table__col--final-time" />
+            <col className="results-table__col results-table__col--rank" />
+          </colgroup>
           <thead>
             <tr>
-              <th>Startovní číslo</th>
+              <th className="results-table__start-number-heading">Startovní číslo</th>
               <th>Jméno</th>
               <th>Příjmení</th>
-              <th>Rok narození</th>
-              <th>FSCode</th>
+              <th className="results-table__birth-year-heading">Rok narození</th>
+              <th className="results-table__fscode-heading">FSCode</th>
               <th>Sbor</th>
-              <th>Čas 1</th>
-              <th>Čas 2</th>
-              <th>Výsledný čas</th>
-              <th>Pořadí</th>
+              <th className="results-table__attempt-heading">Čas 1</th>
+              <th className="results-table__attempt-heading">Čas 2</th>
+              <th className="results-table__final-time-heading">Výsledný čas</th>
+              <th className="results-table__rank-heading">Pořadí</th>
             </tr>
           </thead>
           <tbody>
@@ -85,18 +115,43 @@ export default function ResultsPage() {
                   className={
                     highlightedId === String(r.athlete._id) ? "highlight" : ""
                   }
-                  onClick={() => navigate(`/zavodnici/${r.athlete._id}`)}
                 >
-                  <td>{r.start_number ?? ""}</td>
-                  <td>{r.athlete.first_name}</td>
-                  <td>{r.athlete.last_name}</td>
-                  <td>{r.athlete.birth_year}</td>
-                  <td>{r.athlete.fscode}</td>
-                  <td>{r.team}</td>
-                  <td>{getAttempt(r.times, 1)}</td>
-                  <td>{getAttempt(r.times, 2)}</td>
-                  <td>{renderTime(r.final_time, r.final_time_status)}</td>
-                  <td>{r.rank}</td>
+                  <td className="results-table__start-number">
+                    {r.start_number ?? ""}
+                  </td>
+                  <td className="results-table__first-name">
+                    <Link
+                      className="results-row__link"
+                      to={`/zavodnici/${r.athlete._id}`}
+                      aria-label={`Otevřít profil závodníka ${r.athlete.first_name} ${r.athlete.last_name}`}
+                    >
+                      {r.athlete.first_name}
+                    </Link>
+                  </td>
+                  <td className="results-table__last-name">
+                    <Link
+                      className="results-row__link"
+                      to={`/zavodnici/${r.athlete._id}`}
+                      aria-label={`Otevřít profil závodníka ${r.athlete.first_name} ${r.athlete.last_name}`}
+                    >
+                      {r.athlete.last_name}
+                    </Link>
+                  </td>
+                  <td className="results-table__birth-year">
+                    {r.athlete.birth_year}
+                  </td>
+                  <td className="results-table__fscode">{r.athlete.fscode}</td>
+                  <td className="results-table__team">{r.team}</td>
+                  <td className="results-table__attempt">
+                    {getAttempt(r.times, 1)}
+                  </td>
+                  <td className="results-table__attempt">
+                    {getAttempt(r.times, 2)}
+                  </td>
+                  <td className="results-table__final-time">
+                    {renderTime(r.final_time, r.final_time_status)}
+                  </td>
+                  <td className="results-table__rank">{r.rank}</td>
                 </tr>
               ))
             ) : (

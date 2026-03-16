@@ -108,17 +108,53 @@ table,
 
 // Sortable header styling
 .sortable-th {
-  cursor: pointer;
   user-select: none;
   white-space: nowrap;
 
-  i {
-    margin-left: 0.4rem;
-    font-size: 0.85em;
-    opacity: 0.5;
+  .sortable-th__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: inherit;
+    text-align: left;
+    cursor: pointer;
   }
 
-  &:hover i {
+  i {
+    font-size: 0.85em;
+    opacity: 0.35;
+    transition:
+      opacity 0.15s ease,
+      color 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .sortable-th__button:hover i,
+  .sortable-th__button:focus-visible i {
     opacity: 1;
+  }
+
+  .sortable-th__button:focus-visible {
+    outline: 2px solid variables.$color-background-dark;
+    outline-offset: 2px;
+    border-radius: 0.2rem;
+  }
+}
+
+.sortable-th--active {
+  .sortable-th__label {
+    color: variables.$color-background-dark;
+  }
+
+  i {
+    opacity: 1;
+    color: variables.$color-background-dark;
+    transform: scale(1.05);
   }
 }

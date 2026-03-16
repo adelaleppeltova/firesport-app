@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useCompetitions } from "../hooks/useApi";
 import PrimaryButton from "../components/PrimaryButton";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -8,7 +8,6 @@ const PAGE_SIZE = 25;
 
 export default function CompetitionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const debounceRef = useRef(null);
 
   // Inicializace stavu z URL
@@ -70,6 +69,20 @@ export default function CompetitionsPage() {
   const total = data?.total || 0;
   const pageCount = Math.ceil(total / PAGE_SIZE);
   const showInitialLoading = isLoading && !data;
+  const hasActiveSearch = debouncedSearch.trim().length > 0;
+  const resultsStatusMessage = isFetching
+    ? "Aktualizuji výsledky..."
+    : hasActiveSearch
+      ? `Nalezeno ${total} závodů.`
+      : "";
+  const showResultsStatus = Boolean(resultsStatusMessage) && !error && !showInitialLoading;
+
+  const clearSearch = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
+    updateUrlRef.current("", 1, sortKey, sortDir);
+  };
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -86,122 +99,219 @@ export default function CompetitionsPage() {
     return sortDir === "asc" ? "fa-solid fa-sort-up" : "fa-solid fa-sort-down";
   };
 
+  const getAriaSort = (key) => {
+    if (sortKey !== key) return "none";
+    return sortDir === "asc" ? "ascending" : "descending";
+  };
+
+  const getSortButtonLabel = (label, key) => {
+    if (sortKey !== key) {
+      return `Seřadit podle sloupce ${label} vzestupně`;
+    }
+
+    return sortDir === "asc"
+      ? `${label}, aktuálně vzestupně. Aktivací změníte řazení na sestupné`
+      : `${label}, aktuálně sestupně. Aktivací změníte řazení na vzestupné`;
+  };
+
   return (
     <div className="competitions-page page">
-      <h1>Závody</h1>
-      <div className="competitions-searchbar-wrapper">
-        <div className="competitions-searchbar-iconwrap">
-          <input
-            className="competitions-searchbar"
-            type="text"
-            placeholder="Hledat název, místo nebo datum..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <i
-            className={`fa-solid ${
-              isFetching
-                ? "fa-spinner competitions-searchbar-icon competitions-searchbar-icon--spinning"
-                : "fa-magnifying-glass competitions-searchbar-icon"
-            }`}
-          />
+      <div className="competitions-page__header">
+        <h1>Závody</h1>
+        <div className="competitions-page__toolbar">
+          <div className="competitions-searchbar-wrapper">
+            <div className="competitions-searchbar-iconwrap">
+              <input
+                className="competitions-searchbar"
+                type="text"
+                placeholder="Hledat název, místo nebo datum..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                aria-describedby={
+                  showResultsStatus ? "competitions-results-status" : undefined
+                }
+              />
+              <i
+                className={`fa-solid ${
+                  isFetching
+                    ? "fa-spinner competitions-searchbar-icon competitions-searchbar-icon--spinning"
+                    : "fa-magnifying-glass competitions-searchbar-icon"
+                }`}
+              />
+            </div>
+          </div>
         </div>
       </div>
-      <p className="competitions-search-status" aria-live="polite">
-        {debouncedSearch ? `Nalezeno: ${total} závodů` : "\u00A0"}
-      </p>
       {error ? (
-        <p className="competitions-error">Chyba při načítání dat.</p>
+        <p className="competitions-feedback competitions-feedback--error">
+          Nepodařilo se načíst seznam závodů.
+        </p>
       ) : showInitialLoading ? (
-        <p className="competitions-loading">Načítání...</p>
+        <p className="competitions-feedback" aria-live="polite">
+          Načítám seznam závodů...
+        </p>
       ) : (
-        <>
+        <div className="competitions-page__content">
+          {showResultsStatus && (
+            <div
+              id="competitions-results-status"
+              className={`competitions-results-status${
+                isFetching ? " competitions-results-status--loading" : ""
+              }`}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {isFetching && (
+                <span
+                  className="competitions-results-status__dot"
+                  aria-hidden="true"
+                />
+              )}
+              <span>{resultsStatusMessage}</span>
+            </div>
+          )}
           <div
             className={`competitions-table-wrapper${
               isFetching ? " competitions-table-wrapper--fetching" : ""
             }`}
             aria-busy={isFetching}
           >
-            <table className="competitions-table">
-              <thead>
-                <tr>
-                  <th
-                    className="sortable-th"
-                    onClick={() => handleSort("name")}
-                  >
-                    Název <i className={sortIcon("name")} />
-                  </th>
-                  <th
-                    className="sortable-th"
-                    onClick={() => handleSort("date")}
-                  >
-                    Datum <i className={sortIcon("date")} />
-                  </th>
-                  <th
-                    className="sortable-th"
-                    onClick={() => handleSort("place")}
-                  >
-                    Místo <i className={sortIcon("place")} />
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {competitions.length > 0 ? (
-                  competitions.map((comp) => (
-                    <tr
-                      key={comp._id}
-                      className="competition-row"
-                      onClick={() => navigate(`/zavody/${comp._id}`)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <td>{comp.name}</td>
-                      <td>
-                        {comp.date
-                          ? new Date(comp.date).toLocaleDateString("cs-CZ")
-                          : "-"}
-                      </td>
-                      <td>{comp.place}</td>
-                    </tr>
-                  ))
-                ) : (
+            {competitions.length > 0 ? (
+              <table className="competitions-table">
+                <colgroup>
+                  <col className="competitions-table__col competitions-table__col--name" />
+                  <col className="competitions-table__col competitions-table__col--date" />
+                  <col className="competitions-table__col competitions-table__col--place" />
+                </colgroup>
+                <thead>
                   <tr>
-                    <td colSpan={3}>Žádné závody</td>
+                    <th
+                      className={`sortable-th competitions-table__name-heading${
+                        sortKey === "name" ? " sortable-th--active" : ""
+                      }`}
+                      aria-sort={getAriaSort("name")}
+                    >
+                      <button
+                        type="button"
+                        className="sortable-th__button"
+                        onClick={() => handleSort("name")}
+                        aria-label={getSortButtonLabel("Název", "name")}
+                      >
+                        <span className="sortable-th__label">Název</span>
+                        <i className={sortIcon("name")} aria-hidden="true" />
+                      </button>
+                    </th>
+                    <th
+                      className={`sortable-th competitions-table__date-heading${
+                        sortKey === "date" ? " sortable-th--active" : ""
+                      }`}
+                      aria-sort={getAriaSort("date")}
+                    >
+                      <button
+                        type="button"
+                        className="sortable-th__button"
+                        onClick={() => handleSort("date")}
+                        aria-label={getSortButtonLabel("Datum", "date")}
+                      >
+                        <span className="sortable-th__label">Datum</span>
+                        <i className={sortIcon("date")} aria-hidden="true" />
+                      </button>
+                    </th>
+                    <th
+                      className={`sortable-th competitions-table__place-heading${
+                        sortKey === "place" ? " sortable-th--active" : ""
+                      }`}
+                      aria-sort={getAriaSort("place")}
+                    >
+                      <button
+                        type="button"
+                        className="sortable-th__button"
+                        onClick={() => handleSort("place")}
+                        aria-label={getSortButtonLabel("Místo", "place")}
+                      >
+                        <span className="sortable-th__label">Místo</span>
+                        <i className={sortIcon("place")} aria-hidden="true" />
+                      </button>
+                    </th>
                   </tr>
+                </thead>
+                <tbody>
+                  {competitions.map((comp) => {
+                    const formattedDate = comp.date
+                      ? new Date(comp.date).toLocaleDateString("cs-CZ")
+                      : "-";
+
+                    return (
+                      <tr key={comp._id} className="competition-row">
+                        <td className="competition-row__name" data-label="Název">
+                          <Link
+                            className="competition-row__link"
+                            to={`/zavody/${comp._id}`}
+                            aria-label={`Otevřít detail závodu ${comp.name}`}
+                          >
+                            {comp.name}
+                          </Link>
+                        </td>
+                        <td className="competition-row__date" data-label="Datum">
+                          {formattedDate}
+                        </td>
+                        <td className="competition-row__place" data-label="Místo">
+                          {comp.place}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <div className="competitions-empty-state" role="status">
+                {hasActiveSearch ? (
+                  <>
+                    <p className="competitions-empty-state__message">
+                      Pro zadané vyhledávání nebyl nalezen žádný závod.
+                    </p>
+                    <button
+                      type="button"
+                      className="competitions-empty-state__action"
+                      onClick={clearSearch}
+                    >
+                      Vymazat filtr
+                    </button>
+                  </>
+                ) : (
+                  <p className="competitions-empty-state__message">
+                    Aktuálně nejsou dostupné žádné závody.
+                  </p>
                 )}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
           {/* PAGINACE */}
           {pageCount > 1 && (
-            <div className="pagination">
+            <div
+              className="competitions-pagination"
+              aria-label="Stránkování závodů"
+            >
               <PrimaryButton
+                className="competitions-pagination__button competitions-pagination__button--previous"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1 || isFetching}
-                style={{
-                  marginRight: 8,
-                  width: "min(180px, 100%)",
-                  fontSize: "1.2rem",
-                }}
               >
                 Předchozí
               </PrimaryButton>
-              <span>
+              <span className="competitions-pagination__status" aria-live="polite">
                 Strana {page} / {pageCount}
               </span>
               <PrimaryButton
+                className="competitions-pagination__button competitions-pagination__button--next"
                 onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
                 disabled={page === pageCount || isFetching}
-                style={{
-                  marginLeft: 8,
-                  width: "min(180px, 100%)",
-                  fontSize: "1.2rem",
-                }}
               >
                 Další
               </PrimaryButton>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

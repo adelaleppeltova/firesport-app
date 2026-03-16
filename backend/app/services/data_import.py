@@ -4,6 +4,7 @@ Podporuje import z externího zdroje a automatické vytváření entit.
 """
 import logging
 import json
+import re
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from bson import ObjectId
@@ -41,17 +42,32 @@ class DataImporter:
 
     @staticmethod
     def _normalize_category_name(value: str) -> str:
-        """Převede název kategorie tak, aby každé slovo mělo první písmeno velké a zbytek malý (např. 'ŽENY' -> 'Ženy').
-        Zkratka 'HZS' zůstává velkými písmeny (např. 'MUŽI HZS' -> 'Muži HZS')."""
-        KEEP_UPPER = {"hzs"}
+        """Převede název kategorie do prezentačního formátu pro ukládání do DB.
+
+        První slovo začíná velkým písmenem, další slova jsou malými písmeny.
+        Zkratka 'HZS' zůstává vždy velkými písmeny.
+
+        Příklady:
+        - 'MLADŠÍ DOROSTENKY' -> 'Mladší dorostenky'
+        - 'MUŽI A STARŠÍ DOROSTENCI' -> 'Muži a starší dorostenci'
+        - 'MUŽI HZS' -> 'Muži HZS'
+        """
+        keep_upper = {"hzs"}
         stripped = value.strip()
         if not stripped:
             return stripped
-        return " ".join(
-            word.upper() if word.lower() in KEEP_UPPER
-            else (word[0].upper() + word[1:].lower() if word else "")
-            for word in stripped.split()
-        )
+        normalized_words = []
+        for index, word in enumerate(stripped.split()):
+            lower_word = word.lower()
+            if lower_word in keep_upper:
+                normalized_words.append(lower_word.upper())
+            elif index == 0:
+                normalized_words.append(
+                    word[0].upper() + word[1:].lower() if word else ""
+                )
+            else:
+                normalized_words.append(lower_word)
+        return " ".join(normalized_words)
 
     @staticmethod
     def _normalize_team_name(value: str) -> str:
@@ -268,6 +284,27 @@ class DataImporter:
                     await categories_collection.update_one(
                         {"_id": existing["_id"]},
                         {"$set": {"discipline": discipline}},
+                    )
+                return cat_id
+
+            # Při změně kapitalizace znovu použij existující kategorii
+            existing_case_insensitive = await categories_collection.find_one(
+                {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}
+            )
+            if existing_case_insensitive:
+                cat_id = str(existing_case_insensitive["_id"])
+                self.categories_cache[name] = cat_id
+
+                update_fields = {}
+                if existing_case_insensitive.get("name") != name:
+                    update_fields["name"] = name
+                if discipline and not existing_case_insensitive.get("discipline"):
+                    update_fields["discipline"] = discipline
+
+                if update_fields:
+                    await categories_collection.update_one(
+                        {"_id": existing_case_insensitive["_id"]},
+                        {"$set": update_fields},
                     )
                 return cat_id
             

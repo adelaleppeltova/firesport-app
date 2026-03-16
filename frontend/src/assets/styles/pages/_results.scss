@@ -3,7 +3,7 @@
 @use "../base/tables";
 
 .results-page {
-  @include mixins.page-layout(1000px);
+  @include mixins.page-layout;
   @include mixins.page-typography;
 
   .results-table-wrapper {
@@ -51,6 +51,81 @@
   .results-table {
     @extend .table;
     @extend .table--compact;
+    width: 100%;
+    table-layout: fixed;
+
+    .results-table__col--start-number {
+      width: 6.25rem;
+    }
+
+    .results-table__col--first-name {
+      width: 11%;
+    }
+
+    .results-table__col--last-name {
+      width: 13%;
+    }
+
+    .results-table__col--birth-year {
+      width: 6rem;
+    }
+
+    .results-table__col--fscode {
+      width: 6.5rem;
+    }
+
+    .results-table__col--team {
+      width: 18%;
+    }
+
+    .results-table__col--attempt {
+      width: 5.5rem;
+    }
+
+    .results-table__col--final-time {
+      width: 6.5rem;
+    }
+
+    .results-table__col--rank {
+      width: 4.5rem;
+    }
+
+    th,
+    td {
+      vertical-align: top;
+    }
+
+    th {
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      &:focus-within td {
+        background: variables.$hover-color-light;
+      }
+    }
+  }
+
+  .results-table__first-name,
+  .results-table__last-name,
+  .results-table__team {
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+
+  .results-table__start-number,
+  .results-table__start-number-heading,
+  .results-table__birth-year,
+  .results-table__birth-year-heading,
+  .results-table__fscode,
+  .results-table__fscode-heading,
+  .results-table__attempt,
+  .results-table__attempt-heading,
+  .results-table__final-time,
+  .results-table__final-time-heading,
+  .results-table__rank,
+  .results-table__rank-heading {
+    white-space: nowrap;
   }
 
   tr.highlight td {
@@ -63,8 +138,85 @@
     }
   }
 
-  .results-table tbody tr {
-    cursor: pointer;
+  .results-row__link {
+    display: inline-block;
+    color: inherit;
+    font-weight: variables.$font-weight-semibold;
+    text-decoration: none;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 2px solid variables.$color-background-dark;
+      outline-offset: 2px;
+      border-radius: 0.2rem;
+    }
+  }
+
+  @media (max-width: variables.$breakpoint-s) {
+    .results-table-wrapper {
+      padding: 0.3rem;
+      border-radius: calc(variables.$border-radius-base - 2px);
+    }
+
+    .results-table {
+      font-size: 0.82rem;
+
+      .results-table__col--start-number {
+        width: 5.25rem;
+      }
+
+      .results-table__col--first-name {
+        width: 12%;
+      }
+
+      .results-table__col--last-name {
+        width: 14%;
+      }
+
+      .results-table__col--birth-year {
+        width: 5.2rem;
+      }
+
+      .results-table__col--fscode {
+        width: 5.8rem;
+      }
+
+      .results-table__col--team {
+        width: 17%;
+      }
+
+      .results-table__col--attempt {
+        width: 4.8rem;
+      }
+
+      .results-table__col--final-time {
+        width: 5.7rem;
+      }
+
+      .results-table__col--rank {
+        width: 4rem;
+      }
+
+      th,
+      td {
+        padding: 0.38rem 0.3rem;
+      }
+
+      th {
+        font-size: 0.76rem;
+        letter-spacing: 0.01em;
+      }
+    }
+
+    .results-table__team {
+      color: variables.$gray-dark;
+      line-height: 1.3;
+    }
   }
 }
 
