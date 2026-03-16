@@ -133,9 +133,17 @@
 }
 
 /// Sdílený styl pro vstupní pole (input, select) – searchbar vzhled
+@mixin mobile-safe-input-font {
+  font-size: variables.$font-size-xs;
+
+  @media (max-width: variables.$breakpoint-m) {
+    font-size: 16px;
+  }
+}
+
 @mixin field-input {
   padding: 0.75rem 1rem;
-  font-size: variables.$font-size-xs;
+  @include mobile-safe-input-font;
   border: 1px solid black;
   border-radius: variables.$border-radius-base;
   outline: none;

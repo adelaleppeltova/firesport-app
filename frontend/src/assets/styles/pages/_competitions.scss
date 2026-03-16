@@ -35,8 +35,10 @@
       transition: background 0.15s;
       cursor: pointer;
 
-      &:hover td {
-        background: variables.$hover-color-light;
+      @media (hover: hover) and (pointer: fine) {
+        &:hover td {
+          background: variables.$hover-color-light;
+        }
       }
     }
   }
@@ -57,7 +59,7 @@
 
     padding-right: 2.5rem;
     padding: 0.75rem 1rem;
-    font-size: variables.$font-size-xs;
+    @include mixins.mobile-safe-input-font;
     border: 1px solid black;
     border-radius: variables.$border-radius-base;
     outline: none;

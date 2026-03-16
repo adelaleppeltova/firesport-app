@@ -74,8 +74,10 @@ table,
     transition: background 0.15s;
     cursor: pointer;
 
-    &:hover td {
-      background: variables.$hover-color-light;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover td {
+        background: variables.$hover-color-light;
+      }
     }
   }
 }
@@ -97,8 +99,10 @@ table,
     border-bottom: 1px solid variables.$gray-light;
   }
 
-  tbody tr:hover td {
-    background: variables.$hover-color-light;
+  @media (hover: hover) and (pointer: fine) {
+    tbody tr:hover td {
+      background: variables.$hover-color-light;
+    }
   }
 }
 

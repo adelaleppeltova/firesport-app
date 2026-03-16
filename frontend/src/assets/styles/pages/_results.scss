@@ -57,8 +57,10 @@
     font-weight: bold;
   }
 
-  tr:hover td {
-    background: variables.$hover-color-light;
+  @media (hover: hover) and (pointer: fine) {
+    tr:hover td {
+      background: variables.$hover-color-light;
+    }
   }
 
   .results-table tbody tr {

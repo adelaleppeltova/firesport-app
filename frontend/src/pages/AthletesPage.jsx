@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAthletes } from "../hooks/useApi";
 import PrimaryButton from "../components/PrimaryButton";
+import { scrollPageToTop } from "../components/ScrollToTop";
 
 const PAGE_SIZE = 25;
 
@@ -34,7 +35,7 @@ export default function AthletesPage() {
       params.delete("page");
     }
     setSearchParams(params, { replace: true });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollPageToTop();
   };
 
   // Debounce: po 300 ms zapíše hodnotu z inputu do URL (a resetuje stránku).

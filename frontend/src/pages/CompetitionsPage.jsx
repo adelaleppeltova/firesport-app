@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCompetitions } from "../hooks/useApi";
 import PrimaryButton from "../components/PrimaryButton";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { scrollPageToTop } from "../components/ScrollToTop";
 
 const PAGE_SIZE = 25;
 
@@ -54,7 +55,7 @@ export default function CompetitionsPage() {
   // Sync page/sort do URL při změně + scroll nahoru
   useEffect(() => {
     updateUrlRef.current(debouncedSearch, page, sortKey, sortDir);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollPageToTop();
   }, [page, sortKey, sortDir, debouncedSearch]);
 
   const { data, isLoading, error, isFetching } = useCompetitions({
