@@ -114,7 +114,7 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
         {/* ── Viditelná část (vždy zobrazena) ── */}
         <div className="model-info-card__visible">
           <InfoRow label="Algoritmus" value={modelName} />
-          <InfoRow label="Rozsah dat (okno)" value={windowRangeFull} />
+          <InfoRow label="Období analýzy" value={windowRangeFull} />
 
           <InfoRow
             label="Výsledky (validní / vyřazené)"
@@ -214,6 +214,11 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
                   automatický důkaz chyby.
                 </li>
               </ul>
+              <p className="model-info-card__note model-info-card__note--muted">
+                Označení „Doporučeno ověřit záznam“ upozorňuje na výkon, který
+                je vhodné zkontrolovat v kontextu průběhu závodu nebo známých
+                okolností. Neznamená samo o sobě chybný výsledek.
+              </p>
             </div>
           </div>
         )}

@@ -8,7 +8,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ReferenceLine,
 } from "recharts";
 import Card from "../components/Card";
@@ -61,6 +60,64 @@ function formatMonthYear(dateStr) {
   return d.toLocaleDateString("cs-CZ", { month: "long", year: "numeric" });
 }
 
+function formatMonthYearShort(dateStr) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("cs-CZ", {
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+function pluralizePerformances(count) {
+  if (count === 1) return "neobvyklý výkon";
+  if (count >= 2 && count <= 4) return "neobvyklé výkony";
+  return "neobvyklých výkonů";
+}
+
+function formatAnomalySentence(nAnomalies, nValid, periodShort) {
+  const verb =
+    nAnomalies === 0
+      ? "bylo označeno"
+      : nAnomalies === 1
+        ? "byl označen"
+        : "byly označeny";
+  return `V analyzovaném období ${periodShort} ${verb} ${nAnomalies} z ${nValid} validních výsledků.`;
+}
+
+function buildTimeTicks(minX, maxX, count) {
+  if (!Number.isFinite(minX) || !Number.isFinite(maxX) || count <= 1) {
+    return [];
+  }
+  if (minX === maxX) return [minX];
+
+  const step = (maxX - minX) / (count - 1);
+  return Array.from({ length: count }, (_, index) =>
+    Math.round(minX + step * index),
+  );
+}
+
+function formatChartTick(value, useMonthYear) {
+  const date = new Date(value);
+  return useMonthYear
+    ? date.toLocaleDateString("cs-CZ", {
+        month: "2-digit",
+        year: "2-digit",
+      })
+    : date.toLocaleDateString("cs-CZ", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      });
+}
+
+function formatDeviation(diff) {
+  if (diff == null) return null;
+  return diff >= 0
+    ? `+${diff.toFixed(2)} s vůči mediánu`
+    : `${diff.toFixed(2)} s vůči mediánu`;
+}
+
 // Custom tooltip for scatter chart
 function AnomalyTooltip({ active, payload }) {
   if (!active || !payload || payload.length === 0) return null;
@@ -76,6 +133,9 @@ function AnomalyTooltip({ active, payload }) {
         <div className="anomaly-chart__tooltip-competition">
           {p.competition}
         </div>
+      )}
+      {p.deviationLabel && (
+        <div className="anomaly-chart__tooltip-deviation">{p.deviationLabel}</div>
       )}
       {p.isAnomaly && p.qualityFlag === "suspicious" && (
         <div className="anomaly-chart__tooltip-badge anomaly-chart__tooltip-badge--warning">
@@ -103,7 +163,14 @@ function getWindowSortTimestamp(window) {
   );
 }
 
-function YearSelect({ windows, value, onChange, isLoading, isError }) {
+function YearSelect({
+  windows,
+  value,
+  onChange,
+  isLoading,
+  isError,
+  helperText,
+}) {
   if (isLoading) {
     return <div className="window-select__skeleton skeleton" />;
   }
@@ -114,7 +181,7 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
   return (
     <div className="window-select">
       <label className="window-select__label" htmlFor="window-select">
-        Okno analýzy:
+        Období analýzy:
       </label>
       <select
         id="window-select"
@@ -129,6 +196,7 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
           </option>
         ))}
       </select>
+      {helperText ? <p className="window-select__helper">{helperText}</p> : null}
     </div>
   );
 }
@@ -138,10 +206,10 @@ function YearSelect({ windows, value, onChange, isLoading, isError }) {
 function SummaryCard({ run }) {
   if (!run) {
     return (
-      <Card title="Přehled detekce">
+      <Card title="Přehled detekce" className="anomaly-summary-card">
         <p className="empty-state">
-          Pro tohoto závodníka zatím nebyla provedena analýza neobvyklých výkonů
-          v zadané kategorii a období.
+          Pro vybraného závodníka zatím není v tomto období dostupný přehled
+          detekce.
         </p>
       </Card>
     );
@@ -149,52 +217,119 @@ function SummaryCard({ run }) {
 
   const period = `${formatMonthYear(run.window_start)} – ${formatMonthYear(run.window_end)}`;
   const nAnomalies = run.n_anomalies;
+  const nValid = run.n_valid_results_in_window ?? 0;
+  const nInvalid = run.n_invalid_results_in_window ?? 0;
+  const nTotal = nValid + nInvalid;
+  const anomalyShare =
+    nValid > 0 ? Math.round((nAnomalies / nValid) * 100) : null;
+  const periodShort = `${formatMonthYearShort(run.window_start)}–${formatMonthYearShort(run.window_end)}`;
+  const summaryTitle = pluralizePerformances(nAnomalies);
+  const summaryText = formatAnomalySentence(nAnomalies, nValid, periodShort);
 
   return (
-    <Card title="Přehled detekce">
+    <Card title="Přehled detekce" className="anomaly-summary-card">
       <div className="anomaly-summary">
-        <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">
-            Označeno jako neobvyklé
-          </span>
-          <span className="anomaly-summary__value anomaly-summary__value--highlight">
-            {nAnomalies}
-          </span>
-        </div>
-        <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">Období</span>
-          <span className="anomaly-summary__value">{period}</span>
-        </div>
-        <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">Výsledky celkem</span>
-          <span className="anomaly-summary__value">
-            {run.n_valid_results_in_window +
-              (run.n_invalid_results_in_window ?? 0)}
-          </span>
-        </div>
-        <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">Validní výsledky</span>
-          <span className="anomaly-summary__value">
-            {run.n_valid_results_in_window}
-          </span>
-        </div>
-        <div className="anomaly-summary__item">
-          <span className="anomaly-summary__label">Vyřazené výsledky</span>
-          <span className="anomaly-summary__value">
-            {run.n_invalid_results_in_window ?? 0}
-          </span>
-        </div>
-        {run.median_time != null && (
-          <div className="anomaly-summary__item">
-            <span className="anomaly-summary__label">
-              Referenční medián{" "}
-              <InfoTooltip text="Medián slouží pouze jako referenční bod pro určení směru (rychlejší/pomalejší). Neovlivňuje detekci." />
-            </span>
-            <span className="anomaly-summary__value">
-              {formatTime(run.median_time)}
-            </span>
+        <div className="anomaly-summary__hero">
+          <div className="anomaly-summary__primary">
+            <div className="anomaly-summary__count">{nAnomalies}</div>
+            <div className="anomaly-summary__headline">{summaryTitle}</div>
+            {anomalyShare != null && (
+              <div className="anomaly-summary__ratio">
+                {anomalyShare} % validních výsledků
+              </div>
+            )}
+            <p className="anomaly-summary__lead">{summaryText}</p>
           </div>
-        )}
+
+          <div className="anomaly-summary__metrics">
+            <div className="anomaly-summary__item anomaly-summary__item--compact">
+              <span className="anomaly-summary__label">Období</span>
+              <span className="anomaly-summary__value">{period}</span>
+            </div>
+            <div className="anomaly-summary__item anomaly-summary__item--compact">
+              <span className="anomaly-summary__label">Validní výsledky</span>
+              <span className="anomaly-summary__value">{nValid}</span>
+            </div>
+            <div className="anomaly-summary__item anomaly-summary__item--compact">
+              <span className="anomaly-summary__label">Vyřazené výsledky</span>
+              <span className="anomaly-summary__value">{nInvalid}</span>
+            </div>
+            <div className="anomaly-summary__item anomaly-summary__item--compact">
+              <span className="anomaly-summary__label">Výsledky celkem</span>
+              <span className="anomaly-summary__value">{nTotal}</span>
+            </div>
+            {run.median_time != null && (
+              <div className="anomaly-summary__item anomaly-summary__item--compact">
+                <span className="anomaly-summary__label">
+                  Medián
+                  <InfoTooltip text="Medián slouží pouze jako referenční bod pro určení směru (rychlejší/pomalejší). Neovlivňuje detekci." />
+                </span>
+                <span className="anomaly-summary__value">
+                  {formatTime(run.median_time)}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function InterpretationCard({ run, items }) {
+  if (!run) return null;
+
+  const anomalyItems = items.filter((item) => item.is_anomaly);
+  const nAnomalies = anomalyItems.length;
+  const suspiciousCount = anomalyItems.filter(
+    (item) => item.quality_flag === "suspicious",
+  ).length;
+
+  let directionSentence =
+    "Označené výkony nelze jednoznačně porovnat s referenčním mediánem.";
+
+  if (run.median_time != null && anomalyItems.length > 0) {
+    const slowerCount = anomalyItems.filter(
+      (item) => item.final_time > run.median_time,
+    ).length;
+    const fasterCount = anomalyItems.filter(
+      (item) => item.final_time < run.median_time,
+    ).length;
+
+    if (slowerCount === anomalyItems.length) {
+      directionSentence =
+        nAnomalies === 1
+          ? "Označený výkon byl pomalejší než referenční medián."
+          : "Všechny označené výkony byly pomalejší než referenční medián.";
+    } else if (fasterCount === anomalyItems.length) {
+      directionSentence =
+        nAnomalies === 1
+          ? "Označený výkon byl rychlejší než referenční medián."
+          : "Všechny označené výkony byly rychlejší než referenční medián.";
+    } else {
+      directionSentence =
+        "Označené výkony zahrnují rychlejší i pomalejší odchylky vůči referenčnímu mediánu.";
+    }
+  }
+
+  const recommendationSentence =
+    suspiciousCount > 0
+      ? "Záznam je doporučeno ověřit, pokud neodpovídá průběhu závodu nebo známým okolnostem."
+      : "Výsledek je vhodné interpretovat v kontextu průběhu sezony a konkrétního závodu.";
+
+  const overviewSentence =
+    nAnomalies === 0
+      ? "V tomto období nebyl označen žádný výkon jako neobvyklý."
+      : nAnomalies === 1
+        ? "V tomto období byl označen 1 výkon jako neobvyklý."
+        : `V tomto období byly označeny ${nAnomalies} výkony jako neobvyklé.`;
+
+  return (
+    <Card title="Stručná interpretace" className="anomaly-interpretation-card">
+      <div className="anomaly-interpretation">
+        <p>{overviewSentence}</p>
+        <p>{directionSentence}</p>
+        <p>{recommendationSentence}</p>
       </div>
     </Card>
   );
@@ -203,7 +338,22 @@ function SummaryCard({ run }) {
 // --- chart card ---
 
 function ChartCard({ items, medianTime }) {
-  const { filtered, xDomain, yDomain, xTicks } = useMemo(() => {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 640;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const { filtered, xDomain, yDomain, xTicks, useMonthYearTicks } = useMemo(() => {
     const mapped = items.map((it) => ({
       x: new Date(it.competition_date).getTime(),
       y: it.final_time,
@@ -211,7 +361,10 @@ function ChartCard({ items, medianTime }) {
       isAnomaly: it.is_anomaly,
       qualityFlag: it.quality_flag ?? "ok",
       score: it.score,
-      competition: it.competition_place || null,
+      competition: it.competition_name || it.competition_place || null,
+      deviationLabel: formatDeviation(
+        medianTime != null ? it.final_time - medianTime : null,
+      ),
     }));
 
     if (mapped.length === 0)
@@ -220,6 +373,7 @@ function ChartCard({ items, medianTime }) {
         xDomain: ["auto", "auto"],
         yDomain: ["auto", "auto"],
         xTicks: [],
+        useMonthYearTicks: false,
       };
 
     const allX = mapped.map((d) => d.x);
@@ -230,8 +384,9 @@ function ChartCard({ items, medianTime }) {
     const maxY = Math.max(...allY);
     const xPad = Math.max(24 * 60 * 60 * 1000, (maxX - minX) * 0.04); // min 1 den
     const yPad = Math.max(0.2, (maxY - minY) * 0.05);
-
-    const xTicks = [...new Set(allX)].sort((a, b) => a - b);
+    const tickCount = isMobile ? 4 : 6;
+    const xTicks = buildTimeTicks(minX, maxX, tickCount);
+    const useMonthYearTicks = maxX - minX > 366 * 24 * 60 * 60 * 1000;
 
     return {
       filtered: mapped,
@@ -241,118 +396,125 @@ function ChartCard({ items, medianTime }) {
         parseFloat((maxY + yPad).toFixed(1)),
       ],
       xTicks,
+      useMonthYearTicks,
     };
-  }, [items]);
+  }, [isMobile, items, medianTime]);
 
   const normal = filtered.filter((d) => !d.isAnomaly);
   const anomalies = filtered.filter((d) => d.isAnomaly);
 
-  const tickFormatter = (val) => {
-    const d = new Date(val);
-    return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
-  };
-
   return (
     <Card title="Výsledky v čase">
       {filtered.length === 0 ? (
-        <p className="empty-state">Žádná data pro vybrané okno analýzy.</p>
+        <p className="empty-state">
+          V tomto období nejsou k dispozici výsledky pro zobrazení v grafu.
+        </p>
       ) : (
-        <ResponsiveContainer width="100%" height={320}>
-          <ScatterChart margin={{ top: 10, right: 20, bottom: 34, left: 12 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-            <XAxis
-              dataKey="x"
-              type="number"
-              scale="time"
-              domain={xDomain}
-              ticks={xTicks}
-              tickFormatter={tickFormatter}
-              stroke="#636363"
-              tick={{ fontSize: 10, angle: 0, textAnchor: "middle" }}
-              height={42}
-              label={{
-                value: "Datum",
-                position: "bottom",
-                offset: 8,
-                fontSize: 13,
-              }}
-            />
-            <YAxis
-              dataKey="y"
-              type="number"
-              domain={yDomain}
-              tickFormatter={(v) => `${v.toFixed(1)} s`}
-              stroke="#636363"
-              tick={{ fontSize: 10 }}
-              width={58}
-              label={{
-                value: "Čas (s)",
-                angle: -90,
-                position: "left",
-                offset: 0,
-                fontSize: 13,
-              }}
-            />
-            <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
-            <Legend
-              wrapperStyle={{ bottom: -2 }}
-              content={() => (
-                <div className="anomaly-chart__legend">
-                  <span className="anomaly-chart__legend-item">
-                    <svg width="10" height="10">
-                      <circle cx="5" cy="5" r="5" fill="#cf362e" />
-                    </svg>
-                    Označeno jako neobvyklé
-                  </span>
-                  <span className="anomaly-chart__legend-item">
-                    <svg width="10" height="10">
-                      <circle cx="5" cy="5" r="5" fill="#0f4d92" />
-                    </svg>
-                    Normální výkon
-                  </span>
-                  {medianTime != null && (
-                    <span className="anomaly-chart__legend-item">
-                      <svg width="18" height="10">
-                        <line
-                          x1="0"
-                          y1="5"
-                          x2="18"
-                          y2="5"
-                          stroke="#f5a623"
-                          strokeWidth="2"
-                          strokeDasharray="5 2"
-                        />
-                      </svg>
-                      Referenční medián
-                    </span>
-                  )}
-                </div>
+        <>
+          <div className="anomaly-chart__header">
+            <div className="anomaly-chart__legend anomaly-chart__legend--header">
+              <span className="anomaly-chart__legend-item">
+                <svg width="10" height="10">
+                  <circle cx="5" cy="5" r="5" fill="#cf362e" />
+                </svg>
+                Neobvyklý výkon
+              </span>
+              <span className="anomaly-chart__legend-item">
+                <svg width="10" height="10">
+                  <circle cx="5" cy="5" r="5" fill="#0f4d92" />
+                </svg>
+                Běžný výkon
+              </span>
+              {medianTime != null && (
+                <span className="anomaly-chart__legend-item">
+                  <svg width="18" height="10">
+                    <line
+                      x1="0"
+                      y1="5"
+                      x2="18"
+                      y2="5"
+                      stroke="#f5a623"
+                      strokeWidth="2"
+                      strokeDasharray="5 2"
+                    />
+                  </svg>
+                  Medián
+                </span>
               )}
-            />
-            {medianTime != null && (
-              <ReferenceLine
-                y={medianTime}
-                stroke="#f5a623"
-                strokeWidth={2}
-                strokeDasharray="6 3"
-              />
-            )}
-            <Scatter
-              name="normal"
-              data={normal}
-              fill="#0f4d92"
-              opacity={0.85}
-              r={5}
-            />
-            <Scatter
-              name="anomaly"
-              data={anomalies}
-              fill="#cf362e"
-              opacity={0.9}
-              r={6}
-            />
-          </ScatterChart>
-        </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="anomaly-chart__canvas">
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 10, right: 20, bottom: 34, left: 12 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis
+                  dataKey="x"
+                  type="number"
+                  scale="time"
+                  domain={xDomain}
+                  ticks={xTicks}
+                  tickFormatter={(value) => formatChartTick(value, useMonthYearTicks)}
+                  stroke="#636363"
+                  tick={{
+                    fontSize: isMobile ? 10 : 11,
+                    angle: 0,
+                    textAnchor: "middle",
+                  }}
+                  height={42}
+                  label={{
+                    value: "Datum",
+                    position: "bottom",
+                    offset: 8,
+                    fontSize: 13,
+                  }}
+                />
+                <YAxis
+                  dataKey="y"
+                  type="number"
+                  domain={yDomain}
+                  tickFormatter={(v) => `${v.toFixed(1)} s`}
+                  stroke="#636363"
+                  tick={{ fontSize: 10 }}
+                  width={58}
+                  label={{
+                    value: "Čas (s)",
+                    angle: -90,
+                    position: "left",
+                    offset: 0,
+                    fontSize: 13,
+                  }}
+                />
+                <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
+                {medianTime != null && (
+                  <ReferenceLine
+                    y={medianTime}
+                    stroke="#f5a623"
+                    strokeWidth={2}
+                    strokeDasharray="6 3"
+                  />
+                )}
+                <Scatter
+                  name="normal"
+                  data={normal}
+                  fill="#0f4d92"
+                  opacity={0.85}
+                  r={5}
+                />
+                <Scatter
+                  name="anomaly"
+                  data={anomalies}
+                  fill="#cf362e"
+                  opacity={0.9}
+                  r={6}
+                />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="anomaly-chart__note">
+            Referenční medián slouží pouze k orientačnímu porovnání směru
+            odchylky. Neovlivňuje samotné označení neobvyklého výkonu.
+          </p>
+        </>
       )}
     </Card>
   );
@@ -371,56 +533,99 @@ function TableCard({ items, medianTime }) {
     [items],
   );
 
+  const getDeviationLabel = (item) => {
+    const diff = medianTime != null ? item.final_time - medianTime : null;
+    if (diff == null) return "—";
+    return diff >= 0
+      ? `+${diff.toFixed(2)} s (pomalejší)`
+      : `${diff.toFixed(2)} s (rychlejší)`;
+  };
+
+  const getCompetitionLabel = (item) =>
+    item.competition_name || item.competition_place || "—";
+
   return (
     <Card title="Seznam označených výkonů">
       {anomalyItems.length === 0 ? (
         <p className="empty-state">Žádné označené výkony nebyly nalezeny.</p>
       ) : (
-        <div className="anomaly-table-wrapper">
-          <table className="anomaly-table">
-            <thead>
-              <tr>
-                <th>Datum</th>
-                <th>Čas (s)</th>
-                <th>Závod</th>
-                <th>
-                  Rozdíl vůči mediánu
-                  <InfoTooltip text="Rozdíl času vůči mediánu v daném období. Slouží pouze k určení směru (rychlejší/pomalejší)." />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {anomalyItems.map((it) => {
-                const diff =
-                  medianTime != null ? it.final_time - medianTime : null;
-                const deviation =
-                  diff == null
-                    ? "—"
-                    : diff >= 0
-                      ? `+${diff.toFixed(2)} s (pomalejší)`
-                      : `${diff.toFixed(2)} s (rychlejší)`;
-                return (
-                  <tr key={it.result_id}>
-                    <td>{formatDate(it.competition_date)}</td>
-                    <td>{formatTime(it.final_time)}</td>
-                    <td>{it.competition_name || "—"}</td>
-                    <td>
-                      <div className="anomaly-table__deviation">
-                        <span>{deviation}</span>
-                        {it.quality_flag === "suspicious" && (
-                          <span className="anomaly-table__badge anomaly-table__badge--warning">
-                            Doporučeno ověřit záznam
-                            <InfoTooltip text="Záznam je mimo běžné hranice kategorie nebo obsahuje nezvykle velký skok oproti historii sportovce." />
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="anomaly-table-mobile">
+            {anomalyItems.map((it) => {
+              const deviation = getDeviationLabel(it);
+              return (
+                <article className="anomaly-result-card" key={it.result_id}>
+                  <div className="anomaly-result-card__date">
+                    {formatDate(it.competition_date)}
+                  </div>
+                  <div className="anomaly-result-card__row">
+                    <span className="anomaly-result-card__label">Čas</span>
+                    <span className="anomaly-result-card__value">
+                      {formatTime(it.final_time)}
+                    </span>
+                  </div>
+                  <div className="anomaly-result-card__row">
+                    <span className="anomaly-result-card__label">Závod</span>
+                    <span className="anomaly-result-card__value">
+                      {getCompetitionLabel(it)}
+                    </span>
+                  </div>
+                  <div className="anomaly-result-card__row">
+                    <span className="anomaly-result-card__label">Odchylka</span>
+                    <span className="anomaly-result-card__value">{deviation}</span>
+                  </div>
+                  {it.quality_flag === "suspicious" && (
+                    <div className="anomaly-result-card__footer">
+                      <span className="anomaly-table__badge anomaly-table__badge--warning">
+                        Doporučeno ověřit záznam
+                        <InfoTooltip text="Záznam je mimo běžné hranice kategorie nebo obsahuje nezvykle velký skok oproti historii sportovce." />
+                      </span>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="anomaly-table-wrapper">
+            <table className="anomaly-table">
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Čas (s)</th>
+                  <th>Závod</th>
+                  <th>
+                    Rozdíl vůči mediánu
+                    <InfoTooltip text="Rozdíl času vůči mediánu v daném období. Slouží pouze k určení směru (rychlejší/pomalejší)." />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {anomalyItems.map((it) => {
+                  const deviation = getDeviationLabel(it);
+                  return (
+                    <tr key={it.result_id}>
+                      <td>{formatDate(it.competition_date)}</td>
+                      <td>{formatTime(it.final_time)}</td>
+                      <td>{getCompetitionLabel(it)}</td>
+                      <td>
+                        <div className="anomaly-table__deviation">
+                          <span>{deviation}</span>
+                          {it.quality_flag === "suspicious" && (
+                            <span className="anomaly-table__badge anomaly-table__badge--warning">
+                              Doporučeno ověřit záznam
+                              <InfoTooltip text="Záznam je mimo běžné hranice kategorie nebo obsahuje nezvykle velký skok oproti historii sportovce." />
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </Card>
   );
@@ -435,11 +640,13 @@ function AthleteSearchCard({
   isSearching,
   onSelectAthlete,
 }) {
+  const selectedAthleteTeams = selectedAthlete?.teams?.join(", ") || "—";
+
   return (
     <Card title="Vyhledání závodníka">
       <div className="statistics-athlete-search">
         <p className="statistics-athlete-search__desc">
-          Vyhledejte závodníka pro zobrazení neobvyklých výkonů.
+          Vyhledejte závodníka pro zobrazení analýzy neobvyklých výkonů.
         </p>
 
         <div className="statistics-athlete-search__bar-wrapper">
@@ -488,10 +695,8 @@ function AthleteSearchCard({
               <p className="statistics-athlete-search__meta">Vyhledávám...</p>
             ) : (
               <p className="statistics-athlete-search__meta">
-                Pro tohoto závodníka zatím není k dispozici detekce neobvyklých
-                výkonů. <br />
-                Pro výpočet je potřeba alespoň 10 validních výsledků v dané
-                kategorii a období.
+                Pro tohoto závodníka zatím není dostupná analýza v tomto
+                období. Důvodem může být nedostatečný počet validních výsledků.
               </p>
             )}
             {isSearching && searchResults.length > 0 && (
@@ -503,15 +708,22 @@ function AthleteSearchCard({
         )}
 
         {selectedAthleteId && (
-          <div className="statistics-athlete-search__selected">
-            <span className="statistics-athlete-search__selected-label">
-              Vybraný závodník:
-            </span>
-            <span className="statistics-athlete-search__selected-value">
-              {selectedAthlete
-                ? `${selectedAthlete.first_name} ${selectedAthlete.last_name}`
-                : "Načítání..."}
-            </span>
+          <div className="statistics-athlete-search__selected-card">
+            <div className="statistics-athlete-search__selected-main">
+              <span className="statistics-athlete-search__selected-label">
+                Vybraný závodník
+              </span>
+              <strong className="statistics-athlete-search__selected-name">
+                {selectedAthlete
+                  ? `${selectedAthlete.first_name} ${selectedAthlete.last_name}`
+                  : "Načítání..."}
+              </strong>
+              <span className="statistics-athlete-search__selected-meta">
+                {selectedAthlete
+                  ? `${selectedAthlete.birth_year ?? "—"} • ${selectedAthleteTeams}`
+                  : "Načítám detail závodníka..."}
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -572,12 +784,25 @@ export default function StatisticsPage() {
     });
   }, [runIdsByCategory, sortedWindows]);
 
+  const latestWindow = sortedWindows[0] ?? null;
+  const latestWindowCategoryGroup = useMemo(() => {
+    if (!latestWindow) return null;
+
+    return (
+      availableCategoryGroups.find((group) =>
+        (runIdsByCategory.get(group) ?? new Set()).has(latestWindow.run_id),
+      ) ?? null
+    );
+  }, [availableCategoryGroups, latestWindow, runIdsByCategory]);
+
   // 4) Selected category – reset only when athlete changes
   const [selectedCategoryGroup, setSelectedCategoryGroup] = useState(null);
+  const [categoryWasAutoSelected, setCategoryWasAutoSelected] = useState(false);
   const prevAthleteRef = useRef(selectedAthleteId);
   useEffect(() => {
     if (prevAthleteRef.current !== selectedAthleteId) {
       setSelectedCategoryGroup(null);
+      setCategoryWasAutoSelected(false);
       prevAthleteRef.current = selectedAthleteId;
     }
   }, [selectedAthleteId]);
@@ -588,9 +813,16 @@ export default function StatisticsPage() {
       availableCategoryGroups.length > 0 &&
       !availableCategoryGroups.includes(selectedCategoryGroup)
     ) {
-      setSelectedCategoryGroup(availableCategoryGroups[0]);
+      setSelectedCategoryGroup(
+        latestWindowCategoryGroup ?? availableCategoryGroups[0],
+      );
+      setCategoryWasAutoSelected(true);
     }
-  }, [availableCategoryGroups, selectedCategoryGroup]);
+  }, [
+    availableCategoryGroups,
+    latestWindowCategoryGroup,
+    selectedCategoryGroup,
+  ]);
 
   // 5) Windows filtered to selected category
   const windowsForCategory = useMemo(() => {
@@ -601,6 +833,7 @@ export default function StatisticsPage() {
 
   // 6) Selected run_id – auto-adjust when not in filtered windows
   const [selectedRunId, setSelectedRunId] = useState(null);
+  const [runWasAutoSelected, setRunWasAutoSelected] = useState(false);
   useEffect(() => {
     if (windowsForCategory.length === 0) return;
     const stillValid = windowsForCategory.some(
@@ -608,6 +841,7 @@ export default function StatisticsPage() {
     );
     if (!stillValid) {
       setSelectedRunId(windowsForCategory[0].run_id);
+      setRunWasAutoSelected(true);
     }
   }, [windowsForCategory, selectedRunId]);
 
@@ -635,6 +869,8 @@ export default function StatisticsPage() {
     setSearch("");
     setDebouncedSearch("");
     setSelectedRunId(null);
+    setRunWasAutoSelected(false);
+    setCategoryWasAutoSelected(false);
   };
 
   // 7) Fetch anomalies for selected run
@@ -661,14 +897,22 @@ export default function StatisticsPage() {
       availableCategoryGroups.length === 0);
 
   const searchResults = athletesData?.items ?? [];
+  const categoryHelperText =
+    categoryWasAutoSelected && availableCategoryGroups.length > 1
+      ? "Automaticky vybrána kategorie z poslední dostupné analýzy."
+      : null;
+  const runHelperText =
+    runWasAutoSelected && windowsForCategory.length > 1
+      ? "Automaticky vybrána poslední dostupná analýza."
+      : null;
 
   return (
     <div className="statistics-page page">
       <div className="statistics-page__header">
         <h1 className="statistics-page__title">Detekce neobvyklých výkonů</h1>
         <p className="statistics-page__desc">
-          Analýza výkonů pomocí metody Isolation Forest. Pro výpočet je potřeba
-          alespoň 10 validních výsledků v daném období.
+          Analýza výkonů pomocí metody Isolation Forest v rámci vybraného
+          období a kategorie.
         </p>
       </div>
 
@@ -691,7 +935,11 @@ export default function StatisticsPage() {
             <CategoryGroupSelect
               groups={availableCategoryGroups}
               value={selectedCategoryGroup}
-              onChange={setSelectedCategoryGroup}
+              onChange={(value) => {
+                setSelectedCategoryGroup(value);
+                setCategoryWasAutoSelected(false);
+              }}
+              helperText={categoryHelperText}
             />
           ) : null}
 
@@ -699,9 +947,13 @@ export default function StatisticsPage() {
             <YearSelect
               windows={windowsForCategory}
               value={selectedRunId}
-              onChange={setSelectedRunId}
+              onChange={(value) => {
+                setSelectedRunId(value);
+                setRunWasAutoSelected(false);
+              }}
               isLoading={windowsLoading}
               isError={windowsError}
+              helperText={runHelperText}
             />
           )}
         </div>
@@ -711,8 +963,7 @@ export default function StatisticsPage() {
         <div className="anomaly-no-athlete">
           <i className="fa-solid fa-user-magnifying-glass" />
           <p>
-            Vyhledejte a vyberte závodníka. Zobrazí se přehled neobvyklých
-            výkonů včetně detailů analýzy.
+            Vyhledejte závodníka pro zobrazení analýzy neobvyklých výkonů.
           </p>
         </div>
       ) : windowsLoading ? (
@@ -725,8 +976,8 @@ export default function StatisticsPage() {
         <div className="anomaly-no-athlete">
           <i className="fa-solid fa-chart-line" />
           <p>
-            Pro tohoto závodníka není k dispozici žádná detekce neobvyklých
-            výkonů. Pro analýzu je potřeba alespoň 10 výsledků v daném období.
+            Pro vybraného závodníka zatím není v tomto období dostupná analýza.
+            Důvodem může být nedostatečný počet validních výsledků.
           </p>
         </div>
       ) : !selectedCategoryGroup || !selectedRunId ? (
@@ -748,6 +999,7 @@ export default function StatisticsPage() {
       ) : (
         <>
           <SummaryCard run={run} />
+          <InterpretationCard run={run} items={items} />
           <ChartCard items={items} medianTime={run?.median_time ?? null} />
           <TableCard items={items} medianTime={run?.median_time ?? null} />
           <ModelInfoCard

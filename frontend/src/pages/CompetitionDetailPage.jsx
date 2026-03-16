@@ -49,11 +49,9 @@ export default function CompetitionDetailPage() {
     formattedDate !== "-" && place && league
       ? `Závod ${name || "bez názvu"} se konal ${formattedDate} v lokalitě ${place} a je zařazen do soutěže ${league}.`
       : `${name || "Tento závod"} zatím nemá dostupné doplňující informace.`;
-  const competitionMeta = [
-    formattedDate,
-    place || null,
-    league || null,
-  ].filter(Boolean);
+  const competitionMeta = [formattedDate, place || null, league || null].filter(
+    Boolean,
+  );
   const competitionStats = [
     {
       label: "Počet závodníků",
@@ -118,7 +116,7 @@ export default function CompetitionDetailPage() {
           { label: "Závody", to: "/zavody" },
           { label: name || "Detail závodu" },
         ]}
-        action={{ label: "← Zpět na seznam závodů", to: "/zavody" }}
+        action={{ label: "Zpět na seznam závodů", to: "/zavody" }}
       />
 
       <section className="competition-profile-hero">
@@ -127,7 +125,10 @@ export default function CompetitionDetailPage() {
           <h1 className="competition-profile-hero__name">{name || "-"}</h1>
 
           {competitionMeta.length > 0 && (
-            <div className="competition-profile-hero__meta" aria-label="Základní údaje o závodu">
+            <div
+              className="competition-profile-hero__meta"
+              aria-label="Základní údaje o závodu"
+            >
               {competitionMeta.map((item) => (
                 <span className="competition-profile-hero__badge" key={item}>
                   {item}
@@ -137,7 +138,10 @@ export default function CompetitionDetailPage() {
           )}
         </div>
 
-        <div className="competition-profile-hero__stats" aria-label="Přehled statistik závodu">
+        <div
+          className="competition-profile-hero__stats"
+          aria-label="Přehled statistik závodu"
+        >
           {competitionStats.map((stat) => (
             <div className="competition-profile-hero__stat" key={stat.label}>
               <span className="competition-profile-hero__stat-label">
@@ -163,7 +167,7 @@ export default function CompetitionDetailPage() {
             Přehled závodu
           </h2>
           <p className="competition-overview-section__description">
-            Základní souhrn závodu a přehled vypsaných kategorií na jednom místě.
+            Základní souhrn závodu a přehled vypsaných kategorií.
           </p>
         </div>
 
@@ -231,7 +235,8 @@ export default function CompetitionDetailPage() {
                         <strong>
                           {categoryStatsById.get(cat.id)?.isLoading
                             ? "…"
-                            : categoryStatsById.get(cat.id)?.athleteCount ?? "—"}
+                            : (categoryStatsById.get(cat.id)?.athleteCount ??
+                              "—")}
                         </strong>
                       </span>
                       <span className="competition-detail-results-card-row__stat">
@@ -239,7 +244,7 @@ export default function CompetitionDetailPage() {
                         <strong>
                           {categoryStatsById.get(cat.id)?.isLoading
                             ? "…"
-                            : categoryStatsById.get(cat.id)?.bestTime ?? "—"}
+                            : (categoryStatsById.get(cat.id)?.bestTime ?? "—")}
                         </strong>
                       </span>
                       <span className="competition-detail-results-card-row__stat">
@@ -247,7 +252,8 @@ export default function CompetitionDetailPage() {
                         <strong>
                           {categoryStatsById.get(cat.id)?.isLoading
                             ? "…"
-                            : categoryStatsById.get(cat.id)?.validResultsCount ?? "—"}
+                            : (categoryStatsById.get(cat.id)
+                                ?.validResultsCount ?? "—")}
                         </strong>
                       </span>
                     </div>

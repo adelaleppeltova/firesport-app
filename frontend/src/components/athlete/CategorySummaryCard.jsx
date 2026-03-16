@@ -23,7 +23,7 @@ function formatTime(seconds) {
 
 // --- CategoryGroupSelect ---
 
-export function CategoryGroupSelect({ groups, value, onChange }) {
+export function CategoryGroupSelect({ groups, value, onChange, helperText }) {
   if (!groups || groups.length === 0) return null;
   const isDisabled = groups.length === 1;
   return (
@@ -44,6 +44,7 @@ export function CategoryGroupSelect({ groups, value, onChange }) {
           </option>
         ))}
       </select>
+      {helperText ? <p className="window-select__helper">{helperText}</p> : null}
     </div>
   );
 }
