@@ -6,6 +6,43 @@
   @include mixins.page-layout;
   @include mixins.page-typography;
 
+  .results-page__header {
+    margin-bottom: 1.25rem;
+  }
+
+  .results-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .results-page__competition,
+  .results-page__date,
+  .results-page__category {
+    margin: 0;
+  }
+
+  .results-page__competition {
+    font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$color-text;
+    line-height: 1.25;
+  }
+
+  .results-page__date {
+    color: variables.$gray-dark;
+    font-weight: variables.$font-weight-medium;
+    white-space: nowrap;
+  }
+
+  .results-page__category {
+    color: variables.$gray-dark;
+    font-size: variables.$font-size-s;
+    line-height: 1.35;
+  }
+
   .results-table-wrapper {
     @extend .table-wrapper;
   }
@@ -55,15 +92,11 @@
     table-layout: fixed;
 
     .results-table__col--start-number {
-      width: 6.25rem;
+      width: 2.25rem;
     }
 
-    .results-table__col--first-name {
-      width: 11%;
-    }
-
-    .results-table__col--last-name {
-      width: 13%;
+    .results-table__col--athlete {
+      width: 24%;
     }
 
     .results-table__col--birth-year {
@@ -71,11 +104,11 @@
     }
 
     .results-table__col--fscode {
-      width: 6.5rem;
+      width: 4rem;
     }
 
     .results-table__col--team {
-      width: 18%;
+      width: 30%;
     }
 
     .results-table__col--attempt {
@@ -87,12 +120,12 @@
     }
 
     .results-table__col--rank {
-      width: 4.5rem;
+      width: 3.5rem;
     }
 
     th,
     td {
-      vertical-align: top;
+      vertical-align: middle;
     }
 
     th {
@@ -103,13 +136,22 @@
       &:focus-within td {
         background: variables.$hover-color-light;
       }
+
+      &.highlight td {
+        background: variables.$hover-color-light;
+      }
+
+      &.highlight td:first-child {
+        box-shadow: inset 3px 0 0 variables.$color-background-dark;
+      }
     }
   }
 
-  .results-table__first-name,
-  .results-table__last-name,
+  .results-table__athlete,
   .results-table__team {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: manual;
     line-height: 1.35;
   }
 
@@ -128,8 +170,26 @@
     white-space: nowrap;
   }
 
-  tr.highlight td {
-    font-weight: bold;
+  .results-table__start-number,
+  .results-table__start-number-heading,
+  .results-table__attempt,
+  .results-table__attempt-heading,
+  .results-table__final-time,
+  .results-table__final-time-heading,
+  .results-table__rank,
+  .results-table__rank-heading {
+    text-align: center;
+  }
+
+  .results-table__final-time,
+  .results-table__final-time-heading {
+    color: variables.$color-text;
+    font-weight: variables.$font-weight-semibold;
+  }
+
+  .results-table__rank,
+  .results-table__rank-heading {
+    font-weight: variables.$font-weight-bold;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -144,7 +204,9 @@
     font-weight: variables.$font-weight-semibold;
     text-decoration: none;
     line-height: 1.35;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: manual;
 
     &:hover {
       text-decoration: underline;
@@ -157,25 +219,50 @@
     }
   }
 
-  @media (max-width: variables.$breakpoint-s) {
+  @media (max-width: variables.$breakpoint-m) {
+    .results-page__header {
+      margin-bottom: 1rem;
+    }
+
+    .results-page__meta {
+      gap: 0.2rem 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .results-page__competition {
+      font-size: 1.08rem;
+    }
+
+    .results-page__date,
+    .results-page__category {
+      font-size: 0.88rem;
+    }
+
     .results-table-wrapper {
       padding: 0.3rem;
       border-radius: calc(variables.$border-radius-base - 2px);
     }
 
+    .results-table__col--birth-year,
+    .results-table__col--fscode,
+    .results-table__col--start-number,
+    .results-table__birth-year,
+    .results-table__birth-year-heading,
+    .results-table__fscode,
+    .results-table__fscode-heading,
+    .results-table__start-number,
+    .results-table__start-number-heading {
+      display: none;
+    }
+
     .results-table {
+      width: max-content;
+      min-width: 100%;
+      table-layout: auto;
       font-size: 0.82rem;
 
-      .results-table__col--start-number {
-        width: 5.25rem;
-      }
-
-      .results-table__col--first-name {
-        width: 12%;
-      }
-
-      .results-table__col--last-name {
-        width: 14%;
+      .results-table__col--athlete {
+        width: 32%;
       }
 
       .results-table__col--birth-year {
@@ -187,24 +274,24 @@
       }
 
       .results-table__col--team {
-        width: 17%;
+        width: 22%;
       }
 
       .results-table__col--attempt {
-        width: 4.8rem;
+        width: 4.5rem;
       }
 
       .results-table__col--final-time {
-        width: 5.7rem;
+        width: 6.3rem;
       }
 
       .results-table__col--rank {
-        width: 4rem;
+        width: 3.6rem;
       }
 
       th,
       td {
-        padding: 0.38rem 0.3rem;
+        padding: 0.34rem 0.3rem;
       }
 
       th {
@@ -213,9 +300,22 @@
       }
     }
 
+    .results-table__athlete,
+    .results-table__team,
+    .results-row__link {
+      overflow-wrap: break-word;
+      word-break: normal;
+      hyphens: manual;
+    }
+
     .results-table__team {
       color: variables.$gray-dark;
       line-height: 1.3;
+    }
+
+    .results-table__final-time,
+    .results-table__final-time-heading {
+      min-width: 6.3rem;
     }
   }
 }

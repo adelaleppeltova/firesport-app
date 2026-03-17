@@ -34,6 +34,7 @@
 
   .athletes-table {
     @extend .table;
+    @extend .table--data;
     width: 100%;
     border-collapse: collapse;
     font-size: variables.$font-size-s;
@@ -66,6 +67,10 @@
 
     td {
       border-bottom: 1px solid variables.$gray-light;
+    }
+
+    tbody tr:nth-of-type(even) td {
+      background: #fafafa;
     }
 
     tbody tr {
@@ -219,7 +224,7 @@
 
   .athletes-pagination__button {
     width: min(180px, 100%);
-    font-size: 1.2rem;
+    font-size: variables.$font-size-s;
   }
 
   .athletes-pagination__button--previous {

@@ -96,6 +96,10 @@
     tbody tr {
       transition: background 0.15s;
 
+      &:nth-child(even) td {
+        background: #fafafa;
+      }
+
       @media (hover: hover) and (pointer: fine) {
         &:hover td {
           background: variables.$hover-color-light;

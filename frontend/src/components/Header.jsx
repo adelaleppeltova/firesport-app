@@ -19,10 +19,15 @@ function Header() {
       <div className="header__content">
         <div className="header__content--center">
           <NavLink
-            className="header__title"
+            className="header__brand"
             to={isAuthenticated ? "/home" : "/"}
           >
-            firesport
+            <img
+              className="header__logo"
+              src={`${process.env.PUBLIC_URL}/flamma-logo.svg`}
+              alt="Flamma logo"
+            />
+            <span className="header__title">flamma</span>
           </NavLink>
         </div>
         <div className="header__items">

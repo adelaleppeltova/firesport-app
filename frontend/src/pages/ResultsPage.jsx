@@ -70,20 +70,25 @@ export default function ResultsPage() {
         }}
       />
 
-      <h1>Výsledky</h1>
-      <h2>
-        {competition?.name || "Název soutěže neznámý"},{" "}
-        {competition?.date
-          ? new Date(competition.date).toLocaleDateString("cs-CZ")
-          : "Datum neznámé"}
-      </h2>
-      <p>{categoryName}</p>
+      <header className="results-page__header">
+        <h1>Výsledky</h1>
+        <div className="results-page__meta">
+          <p className="results-page__competition">
+            {competition?.name || "Název soutěže neznámý"}
+          </p>
+          <p className="results-page__date">
+            {competition?.date
+              ? new Date(competition.date).toLocaleDateString("cs-CZ")
+              : "Datum neznámé"}
+          </p>
+        </div>
+        <p className="results-page__category">{categoryName}</p>
+      </header>
       <div className="results-table-wrapper">
         <table className="results-table">
           <colgroup>
             <col className="results-table__col results-table__col--start-number" />
-            <col className="results-table__col results-table__col--first-name" />
-            <col className="results-table__col results-table__col--last-name" />
+            <col className="results-table__col results-table__col--athlete" />
             <col className="results-table__col results-table__col--birth-year" />
             <col className="results-table__col results-table__col--fscode" />
             <col className="results-table__col results-table__col--team" />
@@ -94,21 +99,24 @@ export default function ResultsPage() {
           </colgroup>
           <thead>
             <tr>
-              <th className="results-table__start-number-heading">Startovní číslo</th>
-              <th>Jméno</th>
-              <th>Příjmení</th>
-              <th className="results-table__birth-year-heading">Rok narození</th>
+              <th className="results-table__start-number-heading">Číslo</th>
+              <th>Závodník</th>
+              <th className="results-table__birth-year-heading">
+                Rok narození
+              </th>
               <th className="results-table__fscode-heading">FSCode</th>
               <th>Sbor</th>
               <th className="results-table__attempt-heading">Čas 1</th>
               <th className="results-table__attempt-heading">Čas 2</th>
-              <th className="results-table__final-time-heading">Výsledný čas</th>
+              <th className="results-table__final-time-heading">
+                Výsledný čas
+              </th>
               <th className="results-table__rank-heading">Pořadí</th>
             </tr>
           </thead>
           <tbody>
             {results && results.length > 0 ? (
-              results.map((r, idx) => (
+              results.map((r) => (
                 <tr
                   id={`row-${r.athlete._id}`}
                   key={r.athlete._id}
@@ -119,22 +127,13 @@ export default function ResultsPage() {
                   <td className="results-table__start-number">
                     {r.start_number ?? ""}
                   </td>
-                  <td className="results-table__first-name">
+                  <td className="results-table__athlete">
                     <Link
                       className="results-row__link"
                       to={`/zavodnici/${r.athlete._id}`}
                       aria-label={`Otevřít profil závodníka ${r.athlete.first_name} ${r.athlete.last_name}`}
                     >
-                      {r.athlete.first_name}
-                    </Link>
-                  </td>
-                  <td className="results-table__last-name">
-                    <Link
-                      className="results-row__link"
-                      to={`/zavodnici/${r.athlete._id}`}
-                      aria-label={`Otevřít profil závodníka ${r.athlete.first_name} ${r.athlete.last_name}`}
-                    >
-                      {r.athlete.last_name}
+                      {r.athlete.first_name} {r.athlete.last_name}
                     </Link>
                   </td>
                   <td className="results-table__birth-year">
@@ -156,7 +155,7 @@ export default function ResultsPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={10}>Žádné výsledky</td>
+                <td colSpan={9}>Žádné výsledky</td>
               </tr>
             )}
           </tbody>

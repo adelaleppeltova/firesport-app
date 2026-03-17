@@ -6,7 +6,9 @@
   left: 0;
   right: 0;
   height: variables.$header-height;
-  background: #f5f5f5;
+  background:
+    linear-gradient(135deg, rgba(15, 77, 146, 0.08), rgba(207, 54, 46, 0.08)),
+    white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,15 +50,24 @@
     }
   }
 
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
   &__logo {
-    height: 32px;
-    width: 32px;
+    height: 80px;
+    width: 80px;
     object-fit: contain;
+    flex-shrink: 0;
+    transform: translateY(2px);
   }
 
   &__title {
-    font-size: variables.$font-size-l;
-    font-weight: variables.$font-weight-regular;
+    font-size: variables.$font-size-xl;
+    font-weight: variables.$font-weight-semibold;
+    line-height: 1;
     margin: 0;
   }
   &__items {
