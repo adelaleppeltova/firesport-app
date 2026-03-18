@@ -16,6 +16,14 @@ categories_collection = db["categories"]
 logger = logging.getLogger(__name__)
 
 
+PUBLIC_RESULTS_FILTER = {
+    "$or": [
+        {"match_status": "matched"},
+        {"match_status": {"$exists": False}},
+    ]
+}
+
+
 def _build_results_query(
     athlete_id: str | None = None,
     competition_id: str | None = None,
@@ -149,6 +157,7 @@ async def list_results_service(
         competition_id=competition_id,
         category_id=category_id,
     )
+    query.update(PUBLIC_RESULTS_FILTER)
 
     cursor = results_collection.find(query).limit(limit)
     docs = await cursor.to_list(length=limit)

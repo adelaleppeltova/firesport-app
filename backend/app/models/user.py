@@ -11,7 +11,7 @@ class UserRole(str, Enum):
 
 class UserBase(BaseModel):
     email: EmailStr
-    role: UserRole
+    role: UserRole = UserRole.user
     is_active: bool = True
 
 

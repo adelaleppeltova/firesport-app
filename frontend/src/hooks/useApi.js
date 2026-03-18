@@ -335,3 +335,149 @@ export function useAthletePerCategoryStats(athleteId) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
+export function useAdminImportReview() {
+  return useQuery({
+    queryKey: ["admin", "import-review"],
+    queryFn: async () => {
+      const { data } = await api.get("/v1/admin/import/review");
+      return data;
+    },
+  });
+}
+
+export function useAdminImportResults() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (files) => {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
+      const { data } = await api.post("/v1/admin/import", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "import-review"] });
+    },
+  });
+}
+
+export function useAdminAssignResultAthlete() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ resultId, athleteId }) => {
+      const { data } = await api.post(
+        `/v1/admin/results/${resultId}/assign-athlete`,
+        { athlete_id: athleteId },
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "import-review"] });
+    },
+  });
+}
+
+export function useAdminCreateAthleteFromResult() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (resultId) => {
+      const { data } = await api.post(`/v1/admin/results/${resultId}/create-athlete`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "import-review"] });
+    },
+  });
+}
+
+export function useAdminUnassignResultAthlete() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (resultId) => {
+      const { data } = await api.post(
+        `/v1/admin/results/${resultId}/unassign-athlete`,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "import-review"] });
+    },
+  });
+}
+
+export function useAdminDeleteReviewResults() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await api.delete("/v1/admin/import/review");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "import-review"] });
+    },
+  });
+}
+
+export function useAdminAthleteSearch(query) {
+  return useQuery({
+    queryKey: ["admin", "athletes", "search", query],
+    queryFn: async () => {
+      if (!query || query.trim().length < 2) {
+        return { items: [] };
+      }
+      const { data } = await api.get(
+        `/v1/admin/athletes/search?q=${encodeURIComponent(query.trim())}`,
+      );
+      return data;
+    },
+    enabled: query.trim().length >= 2,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useAdminAthleteMergeCandidates(athleteId, query) {
+  return useQuery({
+    queryKey: ["admin", "athletes", athleteId, "merge-candidates", query],
+    queryFn: async () => {
+      if (!athleteId) {
+        return { items: [] };
+      }
+      const params = new URLSearchParams({ athlete_id: athleteId });
+      if (query?.trim()) {
+        params.set("q", query.trim());
+      }
+      const { data } = await api.get(
+        `/v1/admin/athletes/merge-candidates?${params.toString()}`,
+      );
+      return data;
+    },
+    enabled: !!athleteId,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useAdminMergeAthletes() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ sourceAthleteId, targetAthleteId }) => {
+      const { data } = await api.post(
+        `/v1/admin/athletes/${sourceAthleteId}/merge-into/${targetAthleteId}`,
+      );
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["athlete", variables.sourceAthleteId, "detail"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["athlete", variables.targetAthleteId, "detail"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["athletes"] });
+      queryClient.invalidateQueries({ queryKey: ["admin"] });
+    },
+  });
+}

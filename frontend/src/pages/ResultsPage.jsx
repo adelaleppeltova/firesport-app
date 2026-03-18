@@ -17,6 +17,23 @@ function getAttempt(times, attemptNum) {
   return t ? renderTime(t.time, t.status) : "";
 }
 
+function getAthleteDisplayData(result) {
+  const athlete = result?.athlete;
+  const importedAthlete = result?.imported_athlete ?? {};
+
+  return {
+    id: athlete?._id ?? null,
+    firstName: athlete?.first_name ?? importedAthlete.first_name ?? "",
+    lastName: athlete?.last_name ?? importedAthlete.last_name ?? "",
+    birthYear: athlete?.birth_year ?? importedAthlete.birth_year ?? null,
+    fscode: athlete?.fscode ?? importedAthlete.fscode ?? null,
+  };
+}
+
+function getResultRowId(result) {
+  return result?.athlete?._id ?? result?._id;
+}
+
 export default function ResultsPage() {
   const { id, categoryId } = useParams();
   const location = useLocation();
@@ -43,6 +60,16 @@ export default function ResultsPage() {
 
   // compute highlight id to apply class in render
   const highlightedId = location.hash ? location.hash.replace("#", "") : null;
+  const sortedResults = [...(results ?? [])].sort((a, b) => {
+    const aRank = a?.rank;
+    const bRank = b?.rank;
+
+    if (aRank == null && bRank == null) return 0;
+    if (aRank == null) return 1;
+    if (bRank == null) return -1;
+
+    return aRank - bRank;
+  });
   const categoryName =
     formatCategoryName(
       competition?.categories?.find(
@@ -115,44 +142,58 @@ export default function ResultsPage() {
             </tr>
           </thead>
           <tbody>
-            {results && results.length > 0 ? (
-              results.map((r) => (
-                <tr
-                  id={`row-${r.athlete._id}`}
-                  key={r.athlete._id}
-                  className={
-                    highlightedId === String(r.athlete._id) ? "highlight" : ""
-                  }
-                >
-                  <td className="results-table__start-number">
-                    {r.start_number ?? ""}
-                  </td>
-                  <td className="results-table__athlete">
-                    <Link
-                      className="results-row__link"
-                      to={`/zavodnici/${r.athlete._id}`}
-                      aria-label={`Otevřít profil závodníka ${r.athlete.first_name} ${r.athlete.last_name}`}
-                    >
-                      {r.athlete.first_name} {r.athlete.last_name}
-                    </Link>
-                  </td>
-                  <td className="results-table__birth-year">
-                    {r.athlete.birth_year}
-                  </td>
-                  <td className="results-table__fscode">{r.athlete.fscode}</td>
-                  <td className="results-table__team">{r.team}</td>
-                  <td className="results-table__attempt">
-                    {getAttempt(r.times, 1)}
-                  </td>
-                  <td className="results-table__attempt">
-                    {getAttempt(r.times, 2)}
-                  </td>
-                  <td className="results-table__final-time">
-                    {renderTime(r.final_time, r.final_time_status)}
-                  </td>
-                  <td className="results-table__rank">{r.rank}</td>
-                </tr>
-              ))
+            {sortedResults.length > 0 ? (
+              sortedResults.map((r) => {
+                const athlete = getAthleteDisplayData(r);
+                const rowId = getResultRowId(r);
+                const athleteName =
+                  `${athlete.firstName} ${athlete.lastName}`.trim() ||
+                  "Neznámý závodník";
+
+                return (
+                  <tr
+                    id={`row-${rowId}`}
+                    key={rowId}
+                    className={
+                      highlightedId === String(athlete.id) ? "highlight" : ""
+                    }
+                  >
+                    <td className="results-table__start-number">
+                      {r.start_number ?? ""}
+                    </td>
+                    <td className="results-table__athlete">
+                      {athlete.id ? (
+                        <Link
+                          className="results-row__link"
+                          to={`/zavodnici/${athlete.id}`}
+                          aria-label={`Otevřít profil závodníka ${athleteName}`}
+                        >
+                          {athleteName}
+                        </Link>
+                      ) : (
+                        <span className="results-row__label">{athleteName}</span>
+                      )}
+                    </td>
+                    <td className="results-table__birth-year">
+                      {athlete.birthYear ?? "—"}
+                    </td>
+                    <td className="results-table__fscode">
+                      {athlete.fscode ?? "—"}
+                    </td>
+                    <td className="results-table__team">{r.team}</td>
+                    <td className="results-table__attempt">
+                      {getAttempt(r.times, 1)}
+                    </td>
+                    <td className="results-table__attempt">
+                      {getAttempt(r.times, 2)}
+                    </td>
+                    <td className="results-table__final-time">
+                      {renderTime(r.final_time, r.final_time_status)}
+                    </td>
+                    <td className="results-table__rank">{r.rank}</td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={9}>Žádné výsledky</td>

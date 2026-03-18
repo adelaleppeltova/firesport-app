@@ -12,6 +12,7 @@ from typing import List, Dict, Optional, Any, Set
 
 from app.models.models import AthleteDetailPage
 from app.ml.anomaly_config import get_category_group
+from app.services.athlete_identity import active_athlete_query, normalize_athlete_document
 from app.services.performance_indicator import calculate_performance_indicator
 from app.services.performance_stability_service import evaluate_performance_stability
 from app.services.search_utils import build_diacritic_fuzzy_regex
@@ -32,7 +33,7 @@ async def list_athletes_service(
     run_id: Optional[str] = None,
 ) -> AthletesPage:
     """Vrátí stránkovaný seznam atletů s volitelným vyhledáváním."""
-    query: Dict[str, Any] = {}
+    query: Dict[str, Any] = active_athlete_query()
 
     if anomaly_status == "processed":
         if run_id:
@@ -75,9 +76,20 @@ async def list_athletes_service(
                             }
                         }
                     },
+                    {
+                        "fs_codes": {
+                            "$elemMatch": {
+                                "$regex": re.escape(token),
+                                "$options": "i",
+                            }
+                        }
+                    },
                 ]
                 if token.isdigit():
                     or_cond.append({"birth_year": int(token)})
+                    or_cond.append({"fs_codes": token})
+                    or_cond.append({"fscode": int(token)})
+                    or_cond.append({"fscode": token})
                 and_conditions.append({"$or": or_cond})
             query["$and"] = and_conditions
         else:
@@ -88,9 +100,13 @@ async def list_athletes_service(
                 {"first_name": {"$regex": q_regex, "$options": "i"}},
                 {"last_name": {"$regex": q_regex, "$options": "i"}},
                 {"teams": {"$elemMatch": {"$regex": q_regex, "$options": "i"}}},
+                {"fs_codes": {"$elemMatch": {"$regex": re.escape(q), "$options": "i"}}},
             ]
             if q.isdigit():
                 or_conditions.append({"birth_year": int(q)})
+                or_conditions.append({"fs_codes": q})
+                or_conditions.append({"fscode": int(q)})
+                or_conditions.append({"fscode": q})
             query["$or"] = or_conditions
 
     total = await athletes_collection.count_documents(query)
@@ -105,6 +121,9 @@ async def list_athletes_service(
         .to_list(length=page_size)
     )
     for a in athletes:
+        normalized = normalize_athlete_document(a) or a
+        a.clear()
+        a.update(normalized)
         a["_id"] = str(a["_id"])
 
     return AthletesPage(
@@ -121,7 +140,9 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     except Exception:
         raise ValueError("Invalid athlete_id")
     
-    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    athlete = normalize_athlete_document(
+        await athletes_collection.find_one({"_id": athlete_oid})
+    )
     if not athlete:
         raise ValueError("Athlete not found")
     
@@ -246,7 +267,9 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
     except Exception:
         raise ValueError("Invalid athlete_id")
     
-    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    athlete = normalize_athlete_document(
+        await athletes_collection.find_one({"_id": athlete_oid})
+    )
     if not athlete:
         raise ValueError("Athlete not found")
     
@@ -323,6 +346,7 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
         last_name=athlete.get("last_name"),
         birth_year=athlete.get("birth_year"),
         fscode=athlete.get("fscode"),
+        fs_codes=athlete.get("fs_codes", []),
         teams=athlete.get("teams", []),
         category=category_name,
         best_time=best_time,
@@ -335,17 +359,51 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
 
 
 async def search_athletes_service(q: str) -> AthletesSearch:
-    q_regex = build_diacritic_fuzzy_regex(q)
-    query = {
-        "$or": [
-            {"first_name": {"$regex": q_regex, "$options": "i"}},
-            {"last_name": {"$regex": q_regex, "$options": "i"}},
-            {"fscode": {"$regex": q_regex, "$options": "i"}}
+    raw = q.strip()
+    if not raw:
+        return AthletesSearch(items=[])
+
+    import re
+
+    tokens = re.findall(r"\S+", raw)
+
+    if len(tokens) > 1:
+        and_conditions = []
+        for token in tokens:
+            token_regex = build_diacritic_fuzzy_regex(token)
+            or_conditions = [
+                {"first_name": {"$regex": token_regex, "$options": "i"}},
+                {"last_name": {"$regex": token_regex, "$options": "i"}},
+                {"fs_codes": {"$elemMatch": {"$regex": re.escape(token), "$options": "i"}}},
+            ]
+            if token.isdigit():
+                or_conditions.append({"birth_year": int(token)})
+                or_conditions.append({"fs_codes": token})
+                or_conditions.append({"fscode": int(token)})
+                or_conditions.append({"fscode": token})
+            and_conditions.append({"$or": or_conditions})
+        query = {"$and": and_conditions}
+    else:
+        token = tokens[0]
+        token_regex = build_diacritic_fuzzy_regex(token)
+        or_conditions = [
+            {"first_name": {"$regex": token_regex, "$options": "i"}},
+            {"last_name": {"$regex": token_regex, "$options": "i"}},
+            {"fs_codes": {"$elemMatch": {"$regex": re.escape(token), "$options": "i"}}},
         ]
-    }
-    athletes = await athletes_collection.find(query).to_list(length=20)
+        if token.isdigit():
+            or_conditions.append({"birth_year": int(token)})
+            or_conditions.append({"fs_codes": token})
+            or_conditions.append({"fscode": int(token)})
+            or_conditions.append({"fscode": token})
+        query = {"$or": or_conditions}
+
+    athletes = await athletes_collection.find(active_athlete_query(query)).to_list(length=20)
     # Validace pomocí Pydantic modelu (Athlete)
     for a in athletes:
+        normalized = normalize_athlete_document(a) or a
+        a.clear()
+        a.update(normalized)
         a["_id"] = str(a["_id"])
     items = [AthleteInDB.model_validate(a) for a in athletes]
     return AthletesSearch(items=items)
@@ -458,7 +516,9 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
     except Exception:
         raise ValueError("Invalid athlete_id")
     
-    athlete = await athletes_collection.find_one({"_id": athlete_oid})
+    athlete = normalize_athlete_document(
+        await athletes_collection.find_one({"_id": athlete_oid})
+    )
     if not athlete:
         raise ValueError("Athlete not found")
     

@@ -80,8 +80,8 @@ def main():
     if len(sys.argv) < 2:
         print("Použití: python fix_final_times.py <cesta_k_souboru> [soubor2.json ...]")
         print("\nPříklad:")
-        print("  python fix_final_times.py data/2023/skutec/dorostenci_2023.json")
-        print("  python fix_final_times.py data/2023/skutec/*.json")
+        print("  python fix_final_times.py data/2023/Skuteč/dorostenci_2023.json")
+        print("  python fix_final_times.py data/2023/Skuteč/*.json")
         sys.exit(1)
     
     total_fixed = 0

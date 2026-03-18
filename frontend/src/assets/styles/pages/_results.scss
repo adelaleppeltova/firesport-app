@@ -219,6 +219,13 @@
     }
   }
 
+  .results-row__label {
+    display: inline-block;
+    color: inherit;
+    font-weight: variables.$font-weight-semibold;
+    line-height: 1.35;
+  }
+
   @media (max-width: variables.$breakpoint-m) {
     .results-page__header {
       margin-bottom: 1rem;

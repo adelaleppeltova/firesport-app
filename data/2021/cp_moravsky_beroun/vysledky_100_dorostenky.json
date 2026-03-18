@@ -336,7 +336,7 @@
   "parsing_notes": [
     "Text parsed as two category blocks separated by headings 'Mladší dorky' and 'Střední dorky'; each row interpreted as: rank, start_number, last_name first_name, birth_year, team (SDH), try1, try2, final_time.",
     "Competition name taken from title line; suffix 'VÝSLEDKOVÁ LISTINA' removed.",
-    "Place and date extracted from footer line 'Mor.Beroun 18.9.2021'.",
+    "Place and date extracted from footer line 'Moravský Beroun 18.9.2021'.",
     "Discipline inferred from filename 'vysledky_100_dorostenky.pdf' and event label 'STOVKOVÁNÍ' -> mapped to 100m."
   ],
   "warnings": [

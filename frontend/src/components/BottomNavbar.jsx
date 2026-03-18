@@ -1,6 +1,9 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const BottomNavbar = () => {
+  const { user } = useAuth();
+
   return (
     <nav className="bottom-navbar">
       <ul className="bottom-navbar-links">
@@ -28,6 +31,14 @@ const BottomNavbar = () => {
             <span>Závody</span>
           </NavLink>
         </li>
+        {user?.role === "admin" ? (
+          <li>
+            <NavLink to="/admin" className="nav-item">
+              <i className="fa-solid fa-shield-halved"></i>
+              <span>Admin</span>
+            </NavLink>
+          </li>
+        ) : null}
       </ul>
     </nav>
   );

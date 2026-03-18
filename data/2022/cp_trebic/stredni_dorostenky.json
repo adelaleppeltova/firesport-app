@@ -185,7 +185,7 @@
             "first_name": "Rozálie",
             "last_name": "Bojková",
             "birth_year": 2007,
-            "team": "Skalice.",
+            "team": "Skalice",
             "district": "Frýdek-Místek",
             "times": [
               {
@@ -1102,6 +1102,6 @@
   ],
   "warnings": [
     "Some time2 values are unusually high (e.g., 32,22; 42,25) but kept as valid because they are within the allowed numeric range and not marked invalid by known sentinels.",
-    "Team name 'Skalice.' contains a trailing dot as in source text."
+    "Team name 'Skalice' contains a trailing dot as in source text."
   ]
 }

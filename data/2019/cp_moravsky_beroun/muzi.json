@@ -17,7 +17,7 @@
             "first_name": "Jan",
             "last_name": "Vyvial",
             "birth_year": null,
-            "team": "HZS MSK Ostrava",
+            "team": "HZS Moravskoslezského kraje",
             "district": null,
             "times": [
               {
@@ -65,7 +65,7 @@
             "first_name": "Richard",
             "last_name": "Svačina",
             "birth_year": null,
-            "team": "HZS MSK Ostrava",
+            "team": "HZS Moravskoslezského kraje",
             "district": null,
             "times": [
               {
@@ -161,7 +161,7 @@
             "first_name": "Jakub",
             "last_name": "Arvai",
             "birth_year": null,
-            "team": "HZS MSK Ostrava",
+            "team": "HZS Moravskoslezského kraje",
             "district": null,
             "times": [
               {
@@ -233,7 +233,7 @@
             "first_name": "Miroslav",
             "last_name": "Arvai",
             "birth_year": null,
-            "team": "HZS MSK Ostrava",
+            "team": "HZS Moravskoslezského kraje",
             "district": null,
             "times": [
               {
@@ -905,7 +905,7 @@
             "first_name": "Daniel",
             "last_name": "Klvaňa",
             "birth_year": null,
-            "team": "HZS MSK Ostrava",
+            "team": "HZS Moravskoslezského kraje",
             "district": null,
             "times": [
               {
@@ -1001,7 +1001,7 @@
   },
   "parsing_notes": [
     "PDF obsahuje 1 stránku s jedním výsledkovým blokem kategorie Muži.",
-    "Metadata byla určena z hlavičky 'Běh na 100m s překážkami - Výsledková listina', názvu 'Stovkování pod Slunečnou 2019 - MUŽI' a řádku 'Mor.Beroun 17.8.2019'.",
+    "Metadata byla určena z hlavičky 'Běh na 100m s překážkami - Výsledková listina', názvu 'Stovkování pod Slunečnou 2019 - MUŽI' a řádku 'Moravský Beroun 17.8.2019'.",
     "Název závodu byl extrahován z textu 'Stovkování pod Slunečnou 2019 - MUŽI'; datum a označení kategorie byly z názvu odstraněny.",
     "Disciplína byla určena jako 100m na základě textu 'Běh na 100m s překážkami'.",
     "Sloupce byly rozpoznány jako pořadí, startovní číslo, příjmení, jméno, SDH, 1 pokus, 2 pokus a výsledný čas.",
@@ -1013,7 +1013,7 @@
     "V PDF není uveden sloupec FSCODE; všechny hodnoty fscode jsou null.",
     "V PDF není uveden sloupec okres/district; všechny hodnoty district jsou null.",
     "V PDF není uveden ročník narození; všechny hodnoty birth_year jsou null.",
-    "Místo konání je v PDF uvedeno zkratkou 'Mor.Beroun'; nebylo dále rozepisováno.",
+    "Místo konání je v PDF uvedeno zkratkou 'Moravský Beroun'; nebylo dále rozepisováno.",
     "Hodnota 99,99 se v PDF vyskytuje jako oficiální výsledný čas, ale není výslovně uvedena v seznamu neplatných hodnot."
   ]
 }

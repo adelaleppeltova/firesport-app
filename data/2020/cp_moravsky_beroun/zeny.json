@@ -330,7 +330,7 @@
   "parsing_notes": [
     "Jednostránkový tabulkový layout s hlavičkou závodu nahoře a řádkovou výsledkovou tabulkou.",
     "Sloupce rozpoznány jako: pořadí, startovní číslo, příjmení, jméno, SDH, 1. pokus, 2. pokus, výsledný čas.",
-    "Metadata extrahována z textů 'Stovkování pod Slunečnou 2020 - ŽENY', 'Běh na 100m s překážkami - Výsledková listina' a 'Mor.Beroun 30.8.2020'.",
+    "Metadata extrahována z textů 'Stovkování pod Slunečnou 2020 - ŽENY', 'Běh na 100m s překážkami - Výsledková listina' a 'Moravský Beroun 30.8.2020'.",
     "Disciplína určena explicitně z textu 'Běh na 100m s překážkami' a mapována na hodnotu '100m'."
   ],
   "warnings": [
@@ -338,6 +338,6 @@
     "V PDF není přítomen sloupec fscode; u všech výsledků je fscode null.",
     "V PDF není přítomen údaj birth_year; u všech výsledků je birth_year null.",
     "V PDF není přítomen sloupec okres/district; u všech výsledků je district null.",
-    "U týmu 'Mor.Beroun' byla ponechána původní zkratka z PDF."
+    "U týmu 'Moravský Beroun' byla ponechána původní zkratka z PDF."
   ]
 }

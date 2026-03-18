@@ -32,18 +32,20 @@ function Header() {
         </div>
         <div className="header__items">
           {isAuthenticated ? (
-            <button
-              type="button"
-              className="header__item header__item--button"
-              onClick={handleLogout}
-              aria-label="Odhlásit se"
-            >
-              <i
-                className="fa-solid fa-right-from-bracket"
-                aria-hidden="true"
-              ></i>
-              <span>Odhlásit se</span>
-            </button>
+            <>
+              <button
+                type="button"
+                className="header__item header__item--button"
+                onClick={handleLogout}
+                aria-label="Odhlásit se"
+              >
+                <i
+                  className="fa-solid fa-right-from-bracket"
+                  aria-hidden="true"
+                ></i>
+                <span>Odhlásit se</span>
+              </button>
+            </>
           ) : (
             <NavLink className="header__item" to="/login">
               <i className="fa-solid fa-user"></i>

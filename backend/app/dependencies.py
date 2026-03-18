@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Header
+from fastapi import Depends, HTTPException, Header, status
 from pymongo import MongoClient
 from bson import ObjectId
 import os
@@ -61,3 +61,12 @@ def get_current_user(authorization: str = Header(None)):
         "is_active": user.get("is_active", True),
         "athlete_id": user.get("athlete_id")
     }
+
+
+def require_admin(user=Depends(get_current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return user

@@ -1,6 +1,9 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function SideNavbar() {
+  const { user } = useAuth();
+
   return (
     <aside className="side-menu">
       <ul className="side-menu__links">
@@ -28,6 +31,14 @@ function SideNavbar() {
             <span>Závody</span>
           </NavLink>
         </li>
+        {user?.role === "admin" ? (
+          <li>
+            <NavLink to="/admin" className="nav-item">
+              <i className="fa-solid fa-shield-halved"></i>
+              <span>Admin</span>
+            </NavLink>
+          </li>
+        ) : null}
       </ul>
     </aside>
   );

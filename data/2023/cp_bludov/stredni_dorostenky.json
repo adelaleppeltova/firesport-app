@@ -1121,7 +1121,7 @@
             "first_name": "Petra",
             "last_name": "Lindáková",
             "birth_year": 2008,
-            "team": "Kostelec nad Č. lesy",
+            "team": "Kostelec nad Černými Lesy",
             "district": null,
             "times": [
               {
@@ -1367,7 +1367,7 @@
     "Times parsed with decimal comma converted to decimal dot; NP mapped to invalid time with time=null."
   ],
   "warnings": [
-    "Some teams contain nonstandard punctuation (e.g., 'Pardubice–Polabiny', 'Kostelec nad Č. lesy'); preserved as-is.",
+    "Some teams contain nonstandard punctuation (e.g., 'Pardubice–Polabiny', 'Kostelec nad Černými Lesy'); preserved as-is.",
     "No district/okres column found; district is null for all competitors."
   ]
 }

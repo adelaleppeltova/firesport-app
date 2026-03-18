@@ -311,7 +311,7 @@
   },
   "parsing_notes": [
     "Metadata: název převzat z titulku „STOVKOVÁNÍ POD SLUNEČNOU - VÝSLEDKOVÁ LISTINA“ (část „- VÝSLEDKOVÁ LISTINA“ odstraněna).",
-    "Místo a datum detekováno z řádku u paty: „Mor.Beroun 18.9.2021“; datum normalizováno na ISO.",
+    "Místo a datum detekováno z řádku u paty: „Moravský Beroun 18.9.2021“; datum normalizováno na ISO.",
     "Sloupce výsledků rozpoznány podle hlavičky: Poř. (rank), St.č. (start_number), PŘÍJMENÍ, JMÉNO, ROČNÍK, SDH (team), 1 pokus, 2 pokus.",
     "Výsledný čas je v textu uveden samostatně jako seznam pod „Výsledný čas“; mapováno na závodníky v pořadí dle tabulky v rámci každé kategorie.",
     "Disciplína určena z názvu souboru a názvu akce „Stovkování“ jako 100m."
@@ -319,6 +319,6 @@
   "warnings": [
     "V dokumentu chybí sloupec okres (district) – nastaveno na null u všech záznamů.",
     "V dokumentu není uveden fscode – nastaveno na null u všech záznamů.",
-    "Místo je uvedeno ve zkratce „Mor.Beroun“ (může být nejednoznačné)."
+    "Místo je uvedeno ve zkratce „Moravský Beroun“ (může být nejednoznačné)."
   ]
 }

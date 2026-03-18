@@ -1,11 +1,26 @@
 import { Link } from "react-router-dom";
 
-const ErrorPage = () => {
+const ErrorPage = ({
+  statusCode = 404,
+  title,
+  description,
+  backTo = "/home",
+}) => {
+  const resolvedTitle =
+    title ?? (statusCode === 403 ? "Přístup odepřen" : "Stránka nenalezena");
+  const resolvedDescription =
+    description ??
+    (statusCode === 403
+      ? "Na tuto stránku nemáš oprávnění."
+      : "Omlouváme se, ale stránka kterou hledáš neexistuje.");
+
   return (
     <div className="error-page page">
-      <h1>404 - Stránka nenalezena</h1>
-      <p>Omlouváme se, ale stránka kterou hledáš neexistuje.</p>
-      <Link to="/home" className="btn btn-primary">
+      <h1>
+        {statusCode} - {resolvedTitle}
+      </h1>
+      <p>{resolvedDescription}</p>
+      <Link to={backTo} className="btn btn-primary">
         Zpět na domovskou stránku
       </Link>
     </div>

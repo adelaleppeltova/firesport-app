@@ -1,107 +1,52 @@
-# Aplikace pro analýzu dat
+# Firesport App
 
-## Popis
+Webová aplikace pro správu, prohlížení a analýzu výsledků v požárním sportu. Projekt kombinuje FastAPI backend, React frontend a MongoDB databázi.
 
-Praktická část diplomové práce – webová aplikace pro správu a analýzu výkonu atletů v požárním sportu.
+## Co aplikace aktuálně umí
+
+- evidenci soutěží, kategorií, závodníků a výsledků,
+- vyhledávání a filtrování závodníků a soutěží,
+- detail závodníka včetně přehledu výkonů, vývoje po sezónách a stability výkonu,
+- detail soutěže a výsledků podle kategorií,
+- registraci, přihlášení a propojení uživatele se závodníkem,
+- administraci importu JSON dat a ruční kontrolu párování výsledků,
+- základní analytiku nad výsledky včetně detekce anomálií.
 
 ## Architektura
 
 ### Backend
 
-Implementován v jazyce Python s využitím frameworku FastAPI.
-Poskytuje REST API pro práci se sportovními daty.
-
-Obsahuje:
-
-- API endpointy pro práci s daty (např. sportovci, soutěže, výsledky),
-- datové modely a validační schémata,
-- logiku komunikace s databází MongoDB,
-- základní strukturu připravenou pro rozšíření o analytické metody.
-
-Backend v současné fázi plní funkci stabilní datové a aplikační vrstvy, na kterou budou navázány metody strojového učení.
-
-### Databáze
-
-Použita dokumentová databáze MongoDB.
-
-Datový model je navržen s ohledem na strukturu sportovních výsledků, kategorií, soutěží a sportovců.
-Databáze je v samostatném kontejneru a je přístupná přes backendovou vrstvu.
+Backend je postavený na **FastAPI** a poskytuje REST API pro práci s uživateli, závodníky, soutěžemi, výsledky, importem dat a analytickými výstupy.
 
 ### Frontend
 
-Implementován jako aplikace v React.
+Frontend je vytvořený v **Reactu**. Používá **React Router**, **TanStack Query**, **Axios** a **Recharts** pro zobrazení dat a grafů.
 
-Využívá:
+### Databáze
 
-- React Router pro navigaci mezi stránkami,
-- TanStack Query pro práci s asynchronními daty,
-- Axios pro komunikaci s backendovým API.
-- Frontend slouží jako prezentační vrstva aplikace a umožňuje ověřování funkčnosti API.
-
-Aktuálně je:
-
-- implementována základní struktura aplikace,
-- funkční napojení na backend,
-- rozpracovaná hlavní obrazovka aplikace.
+Data jsou uložená v **MongoDB**. Při spuštění přes Docker Compose se databáze naplní JSON soubory ze složky [`data`](/Users/adelaleppeltova/firesport-app/data).
 
 ## Spuštění
 
-Projekt je možné spustit lokálně pomocí Docker Compose (docker compose build, docker compose up).
-Po spuštění je k dispozici:
+Nejjednodušší způsob je přes Docker Compose:
 
-- backend na adrese http://localhost:8000,
-- frontend na adrese http://localhost:3000.
+```bash
+docker compose up --build
+```
 
-## Aktuální stav
+Po spuštění bude dostupné:
 
-V současnosti aplikace umožňuje:
+- frontend: [http://localhost:3000](http://localhost:3000)
+- backend API: [http://localhost:8000](http://localhost:8000)
+- Swagger dokumentace: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-- spuštění backendové a frontendové části v lokálním vývojovém prostředí,
-- komunikaci mezi frontendem, backendem a databází,
-- uživatelské rozhraní.
+## Struktura projektu
 
-V současné fázi je pro metody strojového učení připravena souborová a projektová struktura, samotné modely však zatím nejsou implementovány.
+- [`backend`](/Users/adelaleppeltova/firesport-app/backend) - FastAPI aplikace, API routery, služby a import dat
+- [`frontend`](/Users/adelaleppeltova/firesport-app/frontend) - React aplikace a uživatelské rozhraní
+- [`data`](/Users/adelaleppeltova/firesport-app/data) - zdrojová JSON data pro import
+- [`docs/screenshots`](/Users/adelaleppeltova/firesport-app/docs/screenshots) - screenshoty aplikace
 
-## Plánováno / Rozpracováno
+## Screenshoty
 
-- finální návrh a implementace hlavní stránky (HomePage),
-- implementace metod strojového učení,
-- vizualizace analytických výstupů ve frontendové části,
-- vyhodnocení a interpretace výsledků modelů.
-
-## Náhled aktuálního stavu aplikace
-
-Následující screenshoty dokumentují aktuální stav vývoje aplikace.
-
-### HomePage
-
-Základní stránka aplikace. Finální podoba a obsah této stránky budou dopracovány.
-
-![HomePage](docs/screenshots/HomePage.png)
-
-### Práce se sportovními daty
-
-Ukázka seznamu sportovců, soutěží a výsledků. A ukázka stránky, kde budou implementovány metody strojového učení.
-
-![Seznam sportovců](docs/screenshots/CompetitorsPage.png)
-![Seznam soutěží](/docs/screenshots/Competitions.png)
-![Výsledky](docs/screenshots/Results.png)
-![Statistiky](docs/screenshots/Statistics.png)
-
-### Detail záznamu
-
-Detailní pohled na vybraný záznam - sportovec a soutěž.
-![Detail sportovce](docs/screenshots/CompetitorDetail.png)
-![Detail soutěže](docs/screenshots/CompetitionDetail.png)
-
-### Uvítací stránka a login
-
-![Uvítací stránka](docs/screenshots/WelcomePage.png)
-![Login](docs/screenshots/Login.png)
-
-### Backend API
-
-Automaticky generovaná dokumentace REST API pomocí FastAPI (Swagger UI).
-
-![API dokumentace](docs/screenshots/API-1.png)
-![API dokumentace](docs/screenshots/API-2.png)
+Sem doplnit aktuální screenshoty aplikace.

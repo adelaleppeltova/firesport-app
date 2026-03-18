@@ -14,7 +14,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1  import auth_router, athlete_router, result_router
 from app.api.v1 import competition_router, me_router, data_import_router
-from app.api.v1 import athlete_anomalies_router, ml_router
+from app.api.v1 import admin_router, athlete_anomalies_router, ml_router
+from app.db.database import ensure_indexes
 
 app = FastAPI()
 
@@ -35,8 +36,14 @@ app.include_router(competition_router.router, prefix="/v1")
 app.include_router(result_router.router, prefix="/v1")
 app.include_router(me_router.router, prefix="/v1")
 app.include_router(data_import_router.router, prefix="/v1")
+app.include_router(admin_router.router, prefix="/v1")
 app.include_router(ml_router.router, prefix="/v1")
 app.include_router(athlete_anomalies_router.router, prefix="/v1")
+
+
+@app.on_event("startup")
+async def startup_event():
+    await ensure_indexes()
 
 @app.get("/")
 def read_root():

@@ -839,7 +839,7 @@
   },
   "parsing_notes": [
     "PDF obsahuje 1 stránku s dvěma výsledkovými bloky kategorií a samostatnými seznamy výsledných časů.",
-    "Metadata byla určena z horní hlavičky dokumentu a spodního řádku 'Mor.Beroun 17.8.2019'.",
+    "Metadata byla určena z horní hlavičky dokumentu a spodního řádku 'Moravský Beroun 17.8.2019'.",
     "Název závodu byl extrahován z textu 'STOVKOVÁNÍ POD SLUNEČNOU - VÝSLEDKOVÁ LISTINA'; část 'VÝSLEDKOVÁ LISTINA' byla odstraněna jako generický doplněk názvu.",
     "Disciplína byla určena jako 100m na základě názvu závodu 'Stovkování'.",
     "Sloupce byly rozpoznány jako pořadí, startovní číslo, příjmení, jméno, ročník, SDH, 1 pokus, 2 pokus, výsledný čas.",
@@ -851,7 +851,7 @@
     "competition.league nebylo možné jednoznačně určit z obsahu PDF.",
     "V PDF není uveden sloupec FSCODE; všechny hodnoty fscode jsou null.",
     "V PDF není uveden sloupec okres/district; všechny hodnoty district jsou null.",
-    "Místo konání je v PDF uvedeno zkratkou 'Mor.Beroun'; nebylo dále rozepisováno.",
+    "Místo konání je v PDF uvedeno zkratkou 'Moravský Beroun'; nebylo dále rozepisováno.",
     "Kategorie v PDF jsou uvedeny neformálně jako 'Mladší dorky' a 'Střední dorky'; byly normalizovány na povolené názvy kategorií."
   ]
 }

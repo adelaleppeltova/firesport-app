@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 from typing import Optional
 from enum import Enum
 
@@ -17,18 +17,48 @@ class QualityFlag(str, Enum):
     ok = "ok"
     suspicious = "suspicious"
 
+
+class MatchStatus(str, Enum):
+    matched = "matched"
+    needs_review = "needs_review"
+    unmatched = "unmatched"
+
+
+class ImportedAthleteData(BaseModel):
+    first_name: str = ""
+    last_name: str = ""
+    birth_year: Optional[int] = None
+    fscode: Optional[str] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_fscode(cls, data):
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        fscode = normalized.get("fscode")
+        if fscode is not None:
+            value = str(fscode).strip()
+            normalized["fscode"] = value or None
+        return normalized
+
+
 class TimeAttempt(BaseModel):
     attempt: int
     time: Optional[float]
     status: TimeStatus
 
 class ResultBase(BaseModel):
-    athlete: AthleteInDB
+    athlete: Optional[AthleteInDB] = None
     competition: CompetitionInDB
     category: CategoryInDB
-    
+
     date: datetime
     team: Optional[str]
+    imported_athlete: ImportedAthleteData = Field(default_factory=ImportedAthleteData)
+    match_status: MatchStatus = MatchStatus.matched
+    match_reason: Optional[str] = None
 
     start_number: Optional[int] = None
 
@@ -55,7 +85,7 @@ class ResultInDB(ResultBase):
 class ResultAthleteDetail(BaseModel):
     competition: CompetitionInDB
     category: CategoryInDB
-    
+
     date: datetime
     team: str
 

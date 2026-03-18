@@ -45,6 +45,7 @@ def get_me(user=Depends(get_current_user)):
     return {
         "user_id": user["id"],
         "email": user["email"],
+        "role": user.get("role", "user"),
         "athlete_id": athlete_id,
     }
 

@@ -14,6 +14,7 @@ import CompetitionDetailPage from "./pages/CompetitionDetailPage";
 import ResultsPage from "./pages/ResultsPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import ErrorPage from "./pages/ErrorPage";
+import AdminPage from "./pages/AdminPage";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient({
@@ -26,6 +27,17 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const AdminRoute = ({ children }) => {
+    const { user, isAuthenticated, loading } = useAuth();
+
+    if (loading) return <div>Loading...</div>;
+    if (!isAuthenticated) return <Navigate to="/welcome" replace />;
+    if (user?.role !== "admin") {
+      return <ErrorPage statusCode={403} title="Přístup odepřen" />;
+    }
+    return children;
+  };
+
   const RootPage = () => {
     const { isAuthenticated, loading } = useAuth();
     if (loading) return <div>Loading...</div>;
@@ -56,6 +68,14 @@ function App() {
               />
               <Route path="/zavodnici/:id" element={<AthleteDetailPage />} />
               <Route path="/statistiky" element={<StatisticsPage />} />
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminPage />
+                  </AdminRoute>
+                }
+              />
             </Route>
             <Route path="*" element={<ErrorPage />} />
           </Routes>

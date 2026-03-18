@@ -23,8 +23,11 @@ async def get_competition_detail_service(competition_id: str) -> CompetitionDeta
 	if not comp:
 		raise ValueError("Competition not found")
 
-	# Fetch all results for this competition
-	all_results = await results_collection.find({"competition": comp_oid}).to_list(length=None)
+	# Na detailu závodu chceme kompletní startovní / výsledkovou listinu,
+	# tedy i výsledky bez propojeného athlete záznamu.
+	all_results = await results_collection.find(
+		{"competition": comp_oid}
+	).to_list(length=None)
 	
 	# Group results by category
 	categories_dict = {}
@@ -156,7 +159,9 @@ async def get_results_for_category_service(competition_id: str, category_id: str
 	except Exception:
 		raise ValueError("Invalid competition_id or category_id")
 	
-	results_raw = await results_collection.find({"competition": comp_oid, "category": cat_oid}).to_list(length=None)
+	results_raw = await results_collection.find(
+		{"competition": comp_oid, "category": cat_oid}
+	).to_list(length=None)
 
 	# Helper function to resolve and embed reference
 	async def resolve_ref(collection, ref_id_str):
@@ -191,4 +196,13 @@ async def get_results_for_category_service(competition_id: str, category_id: str
 
 		result.append(ResultInDB.model_validate(out))
 
-	return result
+	return sorted(
+		result,
+		key=lambda item: (
+			item.rank is None,
+			item.rank if item.rank is not None else float("inf"),
+			item.start_number is None,
+			item.start_number if item.start_number is not None else float("inf"),
+			item.id,
+		),
+	)
