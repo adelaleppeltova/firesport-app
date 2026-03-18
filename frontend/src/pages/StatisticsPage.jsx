@@ -135,7 +135,9 @@ function AnomalyTooltip({ active, payload }) {
         </div>
       )}
       {p.deviationLabel && (
-        <div className="anomaly-chart__tooltip-deviation">{p.deviationLabel}</div>
+        <div className="anomaly-chart__tooltip-deviation">
+          {p.deviationLabel}
+        </div>
       )}
       {p.isAnomaly && p.qualityFlag === "suspicious" && (
         <div className="anomaly-chart__tooltip-badge anomaly-chart__tooltip-badge--warning">
@@ -196,7 +198,9 @@ function YearSelect({
           </option>
         ))}
       </select>
-      {helperText ? <p className="window-select__helper">{helperText}</p> : null}
+      {helperText ? (
+        <p className="window-select__helper">{helperText}</p>
+      ) : null}
     </div>
   );
 }
@@ -235,7 +239,7 @@ function SummaryCard({ run }) {
             <div className="anomaly-summary__headline">{summaryTitle}</div>
             {anomalyShare != null && (
               <div className="anomaly-summary__ratio">
-                {anomalyShare} % validních výsledků
+                {anomalyShare} % označených výsledků
               </div>
             )}
             <p className="anomaly-summary__lead">{summaryText}</p>
@@ -353,52 +357,53 @@ function ChartCard({ items, medianTime }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const { filtered, xDomain, yDomain, xTicks, useMonthYearTicks } = useMemo(() => {
-    const mapped = items.map((it) => ({
-      x: new Date(it.competition_date).getTime(),
-      y: it.final_time,
-      rawDate: it.competition_date,
-      isAnomaly: it.is_anomaly,
-      qualityFlag: it.quality_flag ?? "ok",
-      score: it.score,
-      competition: it.competition_name || it.competition_place || null,
-      deviationLabel: formatDeviation(
-        medianTime != null ? it.final_time - medianTime : null,
-      ),
-    }));
+  const { filtered, xDomain, yDomain, xTicks, useMonthYearTicks } =
+    useMemo(() => {
+      const mapped = items.map((it) => ({
+        x: new Date(it.competition_date).getTime(),
+        y: it.final_time,
+        rawDate: it.competition_date,
+        isAnomaly: it.is_anomaly,
+        qualityFlag: it.quality_flag ?? "ok",
+        score: it.score,
+        competition: it.competition_name || it.competition_place || null,
+        deviationLabel: formatDeviation(
+          medianTime != null ? it.final_time - medianTime : null,
+        ),
+      }));
 
-    if (mapped.length === 0)
+      if (mapped.length === 0)
+        return {
+          filtered: mapped,
+          xDomain: ["auto", "auto"],
+          yDomain: ["auto", "auto"],
+          xTicks: [],
+          useMonthYearTicks: false,
+        };
+
+      const allX = mapped.map((d) => d.x);
+      const allY = mapped.map((d) => d.y);
+      const minX = Math.min(...allX);
+      const maxX = Math.max(...allX);
+      const minY = Math.min(...allY);
+      const maxY = Math.max(...allY);
+      const xPad = Math.max(24 * 60 * 60 * 1000, (maxX - minX) * 0.04); // min 1 den
+      const yPad = Math.max(0.2, (maxY - minY) * 0.05);
+      const tickCount = isMobile ? 4 : 6;
+      const xTicks = buildTimeTicks(minX, maxX, tickCount);
+      const useMonthYearTicks = maxX - minX > 366 * 24 * 60 * 60 * 1000;
+
       return {
         filtered: mapped,
-        xDomain: ["auto", "auto"],
-        yDomain: ["auto", "auto"],
-        xTicks: [],
-        useMonthYearTicks: false,
+        xDomain: [minX - xPad, maxX + xPad],
+        yDomain: [
+          parseFloat((minY - yPad).toFixed(1)),
+          parseFloat((maxY + yPad).toFixed(1)),
+        ],
+        xTicks,
+        useMonthYearTicks,
       };
-
-    const allX = mapped.map((d) => d.x);
-    const allY = mapped.map((d) => d.y);
-    const minX = Math.min(...allX);
-    const maxX = Math.max(...allX);
-    const minY = Math.min(...allY);
-    const maxY = Math.max(...allY);
-    const xPad = Math.max(24 * 60 * 60 * 1000, (maxX - minX) * 0.04); // min 1 den
-    const yPad = Math.max(0.2, (maxY - minY) * 0.05);
-    const tickCount = isMobile ? 4 : 6;
-    const xTicks = buildTimeTicks(minX, maxX, tickCount);
-    const useMonthYearTicks = maxX - minX > 366 * 24 * 60 * 60 * 1000;
-
-    return {
-      filtered: mapped,
-      xDomain: [minX - xPad, maxX + xPad],
-      yDomain: [
-        parseFloat((minY - yPad).toFixed(1)),
-        parseFloat((maxY + yPad).toFixed(1)),
-      ],
-      xTicks,
-      useMonthYearTicks,
-    };
-  }, [isMobile, items, medianTime]);
+    }, [isMobile, items, medianTime]);
 
   const normal = filtered.filter((d) => !d.isAnomaly);
   const anomalies = filtered.filter((d) => d.isAnomaly);
@@ -445,7 +450,9 @@ function ChartCard({ items, medianTime }) {
           </div>
           <div className="anomaly-chart__canvas">
             <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 10, right: 20, bottom: 34, left: 12 }}>
+              <ScatterChart
+                margin={{ top: 10, right: 20, bottom: 34, left: 12 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                 <XAxis
                   dataKey="x"
@@ -453,7 +460,9 @@ function ChartCard({ items, medianTime }) {
                   scale="time"
                   domain={xDomain}
                   ticks={xTicks}
-                  tickFormatter={(value) => formatChartTick(value, useMonthYearTicks)}
+                  tickFormatter={(value) =>
+                    formatChartTick(value, useMonthYearTicks)
+                  }
                   stroke="#636363"
                   tick={{
                     fontSize: isMobile ? 10 : 11,
@@ -484,7 +493,10 @@ function ChartCard({ items, medianTime }) {
                     fontSize: 13,
                   }}
                 />
-                <Tooltip content={<AnomalyTooltip />} isAnimationActive={false} />
+                <Tooltip
+                  content={<AnomalyTooltip />}
+                  isAnimationActive={false}
+                />
                 {medianTime != null && (
                   <ReferenceLine
                     y={medianTime}
@@ -572,7 +584,9 @@ function TableCard({ items, medianTime }) {
                   </div>
                   <div className="anomaly-result-card__row">
                     <span className="anomaly-result-card__label">Odchylka</span>
-                    <span className="anomaly-result-card__value">{deviation}</span>
+                    <span className="anomaly-result-card__value">
+                      {deviation}
+                    </span>
                   </div>
                   {it.quality_flag === "suspicious" && (
                     <div className="anomaly-result-card__footer">
@@ -695,8 +709,8 @@ function AthleteSearchCard({
               <p className="statistics-athlete-search__meta">Vyhledávám...</p>
             ) : (
               <p className="statistics-athlete-search__meta">
-                Pro tohoto závodníka zatím není dostupná analýza v tomto
-                období. Důvodem může být nedostatečný počet validních výsledků.
+                Pro tohoto závodníka zatím není dostupná analýza v tomto období.
+                Důvodem může být nedostatečný počet validních výsledků.
               </p>
             )}
             {isSearching && searchResults.length > 0 && (
@@ -764,7 +778,10 @@ export default function StatisticsPage() {
   // 3) Available categories derived from all windows
   const availableCategoryGroups = useMemo(() => {
     const latestWindowByRunId = new Map(
-      sortedWindows.map((window) => [window.run_id, getWindowSortTimestamp(window)]),
+      sortedWindows.map((window) => [
+        window.run_id,
+        getWindowSortTimestamp(window),
+      ]),
     );
 
     return [...runIdsByCategory.keys()].sort((a, b) => {
@@ -911,8 +928,8 @@ export default function StatisticsPage() {
       <div className="statistics-page__header">
         <h1 className="statistics-page__title">Detekce neobvyklých výkonů</h1>
         <p className="statistics-page__desc">
-          Analýza výkonů pomocí metody Isolation Forest v rámci vybraného
-          období a kategorie.
+          Analýza výkonů pomocí metody Isolation Forest v rámci vybraného období
+          a kategorie.
         </p>
       </div>
 
@@ -962,9 +979,7 @@ export default function StatisticsPage() {
       {!selectedAthleteId ? (
         <div className="anomaly-no-athlete">
           <i className="fa-solid fa-user-magnifying-glass" />
-          <p>
-            Vyhledejte závodníka pro zobrazení analýzy neobvyklých výkonů.
-          </p>
+          <p>Vyhledejte závodníka pro zobrazení analýzy neobvyklých výkonů.</p>
         </div>
       ) : windowsLoading ? (
         <>
