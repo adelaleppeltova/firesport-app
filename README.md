@@ -62,52 +62,52 @@ Backend při startu čeká na MongoDB a následně automaticky spouští import 
 
 Domovská stránka zobrazuje přehled spárovaného závodníka, aktuální sezónu a základní ukazatele výkonu. Slouží jako hlavní rozcestník do uživatelské části aplikace.
 
-[Úvodní strana](/docs/screenshots/homepage.png)
+![Úvodní strana](docs/screenshots/homepage.png)
 
 ### Závodníci
 
 Stránka zobrazuje seznam závodníků s možností vyhledávání a postupného procházení dat. Umožňuje rychlý přechod na detail konkrétního profilu.
 
-[Seznam závodníků](/docs/screenshots/athletes.png)
+![Seznam závodníků](docs/screenshots/athletes.png)
 
 ### Detail závodníka
 
 Detail závodníka shrnuje základní identitu, kategorie, výsledky a hlavní statistiky. U administrátora navíc slouží i pro kontrolu a případné sloučení duplicitních profilů.
 
-[Detail závodníka](/docs/screenshots/athlete-detail-page.png)
+![Detail závodníka](docs/screenshots/athlete-detail-page.png)
 
 ### Závody
 
 Na stránce je seznam soutěží s vyhledáváním a řazením podle základních údajů. Uživatel odtud pokračuje na detail konkrétního závodu.
 
-[Seznam závodů](/docs/screenshots/competitions.png)
+![Seznam závodů](docs/screenshots/competitions.png)
 
 ### Detail závodu
 
 Detail závodu zobrazuje základní informace o soutěži a dostupné kategorie. Z této stránky je možné otevřít výsledkové listiny jednotlivých kategorií.
 
-[Detail závodu](/docs/screenshots/competition-detail.png)
+![Detail závodu](docs/screenshots/competition-detail.png)
 
 ### Výsledky
 
 Výsledková listina ukazuje pořadí, časy, pokusy a základní údaje o závodnících v dané kategorii. Pokud je závodník spárovaný, lze se z výsledku prokliknout přímo na jeho profil.
 
-[Výsledkové listiny](/docs/screenshots/result-page.png)
+![Výsledkové listiny](docs/screenshots/result-page.png)
 
 ### Statistiky
 
 Statistická stránka slouží k přehledu neobvyklých výkonů v čase a zobrazuje výstupy detekce anomálií. Součástí je i kontext analyzovaného období a doplňující informace k modelu.
 
-[Detekce neobvyklých výkonů](/docs/screenshots/statistics.png)
+![Detekce neobvyklých výkonů](docs/screenshots/statistics.png)
 
 ### Administrace importu
 
 Administrace importu umožňuje nahrát nové JSON soubory s výsledky a zkontrolovat problematické záznamy po importu. Administrátor zde může výsledky ručně přiřadit, odpárovat nebo vytvořit nového závodníka.
 
-[Kontrola párování výsledků](/docs/screenshots/admin.png)
+![Kontrola párování výsledků](docs/screenshots/admin.png)
 
 ### API
 
 Swagger dokumentace zpřístupňuje všechny aktuální backendové endpointy.
 
-[FastAPI](/docs/screenshots/API.png)
+![FastAPI](docs/screenshots/API.png)
