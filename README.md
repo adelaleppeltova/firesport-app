@@ -62,7 +62,7 @@ Backend při startu čeká na MongoDB a následně automaticky spouští import 
 
 Domovská stránka zobrazuje přehled spárovaného závodníka, aktuální sezónu a základní ukazatele výkonu. Slouží jako hlavní rozcestník do uživatelské části aplikace.
 
-![Úvodní strana](docs/screenshots/homepage.png)
+![Úvodní strana](docs/screenshots/HomePage.png)
 
 ### Závodníci
 
@@ -80,7 +80,7 @@ Detail závodníka shrnuje základní identitu, kategorie, výsledky a hlavní s
 
 Na stránce je seznam soutěží s vyhledáváním a řazením podle základních údajů. Uživatel odtud pokračuje na detail konkrétního závodu.
 
-![Seznam závodů](docs/screenshots/competitions.png)
+![Seznam závodů](docs/screenshots/Competitions.png)
 
 ### Detail závodu
 
