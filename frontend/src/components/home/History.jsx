@@ -6,8 +6,11 @@ import {
   getHistoryTrendModifier,
 } from "./cardModifiers";
 
-export default function History({ athleteId, onTrendChange }) {
-  const { data, isLoading, error } = useAthletePerformanceHistory(athleteId);
+export default function History({ athleteId, year, onTrendChange }) {
+  const { data, isLoading, error } = useAthletePerformanceHistory(
+    athleteId,
+    year,
+  );
 
   const trendKey = data?.performance_indicator?.trend;
   const trend = getHistoryTrendConfig(trendKey);
@@ -50,6 +53,10 @@ export default function History({ athleteId, onTrendChange }) {
 
   return (
     <div className={`history history--state-${trend.state}`}>
+      <span className="history__delta-detail">
+        Trend porovnává medián 3 posledních platných časů s předchozími 3
+        výsledky.
+      </span>
       <div className="history__status">
         <i className={`fa-solid ${trend.icon} history__icon`} />
         <span className="history__label">{trend.label}</span>
@@ -59,7 +66,7 @@ export default function History({ athleteId, onTrendChange }) {
         <div className="history__delta">
           <span className="history__delta-value">{getDeltaLabel()}</span>
           <span className="history__delta-detail">
-            průměr: {formatSeconds(oldValue)}
+            {formatSeconds(oldValue)}
             {" "}s → {formatSeconds(newValue)}
             {" "}s
           </span>

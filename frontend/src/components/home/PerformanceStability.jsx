@@ -5,8 +5,12 @@ import { getStabilityConfig, getStabilityModifier } from "./cardModifiers";
 
 const EMPTY_STABILITY_CONFIG = getStabilityConfig();
 
-export default function PerformanceStability({ athleteId, onStabilityChange }) {
-  const { data, isLoading, error } = useStabilityData(athleteId);
+export default function PerformanceStability({
+  athleteId,
+  year,
+  onStabilityChange,
+}) {
+  const { data, isLoading, error } = useStabilityData(athleteId, year);
   const ratingText = data?.stability_rating || "Nedostatek dat";
   const config = data ? getStabilityConfig(ratingText) : EMPTY_STABILITY_CONFIG;
 
@@ -38,6 +42,12 @@ export default function PerformanceStability({ athleteId, onStabilityChange }) {
       className={`performance-stability performance-stability--state-${config.state}`}
     >
       <div className="performance-stability__info">
+        <div className="performance-stability__header">
+          <p className="performance-stability__description">
+            Stabilita hodnotí rozptyl 6 posledních platných časů v aktuální sezóně.
+          </p>
+        </div>
+
         <div className="performance-stability__header">
           <i className={`fa-solid ${config.icon} performance-stability__icon`} />
           <div>

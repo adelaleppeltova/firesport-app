@@ -20,8 +20,12 @@ import {
 export default function HomePage() {
   const { data: user, isLoading } = useMe();
   const athleteId = user?.athlete_id ?? null;
+  const currentYear = new Date().getFullYear();
   const { data: historyData } = useAthletePerformanceHistory(athleteId);
-  const { data: stabilityData } = useAthletePerformanceStability(athleteId);
+  const { data: stabilityData } = useAthletePerformanceStability(
+    athleteId,
+    currentYear,
+  );
   const historyTrend = getHistoryTrendModifier(
     historyData?.performance_indicator?.trend,
   );
@@ -64,13 +68,13 @@ export default function HomePage() {
             <MyProfile athleteId={athleteId} />
           </Card>
           <Card title="Aktuální sezóna" className="card--home-season">
-            <Season athleteId={athleteId} />
+            <Season athleteId={athleteId} year={currentYear} />
           </Card>
           <Card
             title="Stabilita výkonu"
             className={`card--home-analytics card--state-${stabilityTrend}`}
           >
-            <PerformanceStability athleteId={athleteId} />
+            <PerformanceStability athleteId={athleteId} year={currentYear} />
           </Card>
         </div>
 

@@ -822,7 +822,10 @@ async def get_athlete_profile_service(athlete_id: str) -> AthleteProfile:
     )
 
 
-async def get_athlete_performance_history_service(athlete_id: str) -> AthletePerformanceHistoryResponse:
+async def get_athlete_performance_history_service(
+    athlete_id: str,
+    year: Optional[int] = None,
+) -> AthletePerformanceHistoryResponse:
     """Vrátí indikátor výkonnosti (trend) pro atleta."""
     try:
         athlete_oid = ObjectId(athlete_id)
@@ -856,6 +859,8 @@ async def get_athlete_performance_history_service(athlete_id: str) -> AthletePer
         comp_date = competition_dates.get(comp_id) if comp_id else None
         if comp_date is None:
             continue
+        if year is not None and comp_date.year != year:
+            continue
         indicator_entries.append({
             "competition_date": comp_date,
             "final_time": r.get("final_time"),
@@ -870,7 +875,10 @@ async def get_athlete_performance_history_service(athlete_id: str) -> AthletePer
     )
 
 
-async def get_athlete_performance_stability_service(athlete_id: str) -> AthletePerformanceStabilityResponse:
+async def get_athlete_performance_stability_service(
+    athlete_id: str,
+    year: Optional[int] = None,
+) -> AthletePerformanceStabilityResponse:
     """Vrátí data o stabilitě výkonu atleta + průměrný čas v aktuální sezóně."""
     try:
         athlete_oid = ObjectId(athlete_id)
@@ -898,11 +906,15 @@ async def get_athlete_performance_stability_service(athlete_id: str) -> AthleteP
             if c.get("date") is not None
         }
 
+    target_year = year if year is not None else datetime.now().year
+
     indicator_entries = []
     for r in results:
         comp_id = r.get("competition")
         comp_date = competition_dates.get(comp_id) if comp_id else None
         if comp_date is None:
+            continue
+        if comp_date.year != target_year:
             continue
         indicator_entries.append({
             "competition_date": comp_date,
@@ -913,8 +925,8 @@ async def get_athlete_performance_stability_service(athlete_id: str) -> AthleteP
 
     stability_info = evaluate_performance_stability(indicator_entries)
 
-    # Průměrný čas v aktuální sezóně
-    year_summary = await get_athlete_year_summary_service(athlete_id)
+    # Průměrný čas v cílové sezóně
+    year_summary = await get_athlete_year_summary_service(athlete_id, year=target_year)
     average_time_in_year = year_summary.get("average_time") if isinstance(year_summary, dict) else None
 
     return AthletePerformanceStabilityResponse(

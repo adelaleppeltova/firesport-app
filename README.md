@@ -98,7 +98,7 @@ Výsledková listina ukazuje pořadí, časy, pokusy a základní údaje o závo
 
 Statistická stránka slouží k přehledu neobvyklých výkonů v čase a zobrazuje výstupy detekce anomálií. Součástí je i kontext analyzovaného období a doplňující informace k modelu.
 
-![Detekce neobvyklých výkonů](docs/screenshots/statistics.png)
+![Detekce neobvyklých výkonů](docs/screenshots/Statistics.png)
 
 ### Administrace importu
 

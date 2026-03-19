@@ -79,7 +79,7 @@ def calculate_performance_indicator(entries: list[dict]) -> PerformanceIndicator
 
     recent_results = [
         RecentResult(final_time=item["time"], rank=item.get("rank"))
-        for item in valid_entries[:5]
+        for item in valid_entries[:6]
     ]
 
     sample = valid_entries[:6]

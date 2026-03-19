@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -25,8 +25,26 @@ export default function PerformanceByYear({ athleteId }) {
     error,
   } = useAthletePerformanceByYear(athleteId);
   const [view, setView] = useState("current"); // "current" | "recent"
+  const autoSwitchedRef = useRef(false);
 
   const currentYear = new Date().getFullYear();
+  const hasCurrentYearData = performanceData?.years?.includes(currentYear);
+
+  useEffect(() => {
+    if (!performanceData?.years?.length) {
+      autoSwitchedRef.current = false;
+      return;
+    }
+
+    if (
+      !autoSwitchedRef.current &&
+      view === "current" &&
+      !hasCurrentYearData
+    ) {
+      autoSwitchedRef.current = true;
+      setView("recent");
+    }
+  }, [hasCurrentYearData, performanceData, view]);
 
   const chartData = useMemo(() => {
     if (!performanceData?.years?.length) return null;
@@ -36,9 +54,7 @@ export default function PerformanceByYear({ athleteId }) {
     // Výběr zobrazených let podle přepínače
     let selectedYears;
     if (view === "current") {
-      selectedYears = years.includes(currentYear)
-        ? [currentYear]
-        : [years[years.length - 1]];
+      selectedYears = years.includes(currentYear) ? [currentYear] : [];
     } else {
       const sorted = [...years].sort((a, b) => b - a);
       selectedYears = sorted.slice(0, 4).reverse();
@@ -64,6 +80,7 @@ export default function PerformanceByYear({ athleteId }) {
       });
     });
 
+    if (!selectedYears.length) return null;
     if (!allTimes.length) return null;
 
     const minTime = Math.min(...allTimes);
@@ -102,16 +119,7 @@ export default function PerformanceByYear({ athleteId }) {
       />
     );
   }
-  if (!chartData) {
-    return (
-      <CardState
-        type="no-data"
-        text="Pro vybranou sezónu nejsou žádné záznamy."
-      />
-    );
-  }
-
-  const { yearLines, years, colors, minTime, maxTime, xDomain } = chartData;
+  const { yearLines, years, colors, minTime, maxTime, xDomain } = chartData ?? {};
 
   const dayOfYearToLabel = (day) => {
     const d = new Date(2000, 0, day);
@@ -156,69 +164,80 @@ export default function PerformanceByYear({ athleteId }) {
         </button>
       </div>
 
-      {/* Graf */}
-      <ResponsiveContainer width="100%" height={280}>
-        <LineChart margin={{ top: 8, right: 20, left: 8, bottom: 32 }}>
-          <CartesianGrid strokeDasharray="4,4" stroke="#e0e0e0" />
-          <XAxis
-            type="number"
-            dataKey="x"
-            domain={xDomain}
-            tickFormatter={dayOfYearToLabel}
-            stroke="#636363"
-            tick={{ fontSize: 10, angle: 0, textAnchor: "middle" }}
-            height={42}
-            label={{
-              value: "Datum",
-              position: "bottom",
-              offset: 8,
-              fontSize: 12,
-            }}
-          />
-          <YAxis
-            reversed={false}
-            domain={[minTime, maxTime]}
-            tickFormatter={(v) => `${v.toFixed(1)}s`}
-            stroke="#636363"
-            tick={{ fontSize: 10 }}
-            width={54}
-            label={{
-              value: "Čas (s)",
-              angle: -90,
-              position: "left",
-              offset: 0,
-              fontSize: 12,
-            }}
-          />
-          <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
-          {years.map((year) => (
-            <Line
-              key={year}
-              data={yearLines[year]}
-              type="linear"
-              dataKey="time"
-              name={String(year)}
-              stroke={colors[year].color}
-              strokeWidth={2}
-              dot={{ r: 3, fill: colors[year].color }}
-              activeDot={{ r: 5 }}
-              isAnimationActive={false}
-            />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
-      {/* Legenda – jen pokud je víc let */}
-      {years.length > 1 && (
-        <div className="performance-by-year__legend">
-          {years.map((year) => (
-            <span key={year} className="performance-by-year__legend-item">
-              <span
-                className={`performance-by-year__legend-dot performance-by-year__legend-dot--${colors[year].tone}`}
+      {!chartData ? (
+        <CardState
+          type="no-data"
+          text={
+            view === "current"
+              ? "Žádná data v aktuální sezóně."
+              : "Pro vybranou sezónu nejsou žádné záznamy."
+          }
+        />
+      ) : (
+        <>
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart margin={{ top: 8, right: 20, left: 8, bottom: 32 }}>
+              <CartesianGrid strokeDasharray="4,4" stroke="#e0e0e0" />
+              <XAxis
+                type="number"
+                dataKey="x"
+                domain={xDomain}
+                tickFormatter={dayOfYearToLabel}
+                stroke="#636363"
+                tick={{ fontSize: 10, angle: 0, textAnchor: "middle" }}
+                height={42}
+                label={{
+                  value: "Datum",
+                  position: "bottom",
+                  offset: 8,
+                  fontSize: 12,
+                }}
               />
-              {year}
-            </span>
-          ))}
-        </div>
+              <YAxis
+                reversed={false}
+                domain={[minTime, maxTime]}
+                tickFormatter={(v) => `${v.toFixed(1)}s`}
+                stroke="#636363"
+                tick={{ fontSize: 10 }}
+                width={54}
+                label={{
+                  value: "Čas (s)",
+                  angle: -90,
+                  position: "left",
+                  offset: 0,
+                  fontSize: 12,
+                }}
+              />
+              <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
+              {years.map((year) => (
+                <Line
+                  key={year}
+                  data={yearLines[year]}
+                  type="linear"
+                  dataKey="time"
+                  name={String(year)}
+                  stroke={colors[year].color}
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: colors[year].color }}
+                  activeDot={{ r: 5 }}
+                  isAnimationActive={false}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+          {years.length > 1 && (
+            <div className="performance-by-year__legend">
+              {years.map((year) => (
+                <span key={year} className="performance-by-year__legend-item">
+                  <span
+                    className={`performance-by-year__legend-dot performance-by-year__legend-dot--${colors[year].tone}`}
+                  />
+                  {year}
+                </span>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

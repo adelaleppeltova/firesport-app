@@ -85,10 +85,14 @@ async def get_athlete_performance_by_year(athlete_id: str, user=Depends(get_curr
         raise HTTPException(status_code=404, detail=str(e))
     
 @router.get("/{athlete_id}/performance-in-year", response_model=PerformanceInYear)
-async def get_athlete_performance_in_year(athlete_id: str, user=Depends(get_current_user)):
+async def get_athlete_performance_in_year(
+    athlete_id: str,
+    year: Optional[int] = Query(None, description="Kalendářní rok pro souhrn sezóny"),
+    user=Depends(get_current_user),
+):
     """Vrátí data vývoje výkonu atleta po jednotlivých sezónách pro graf."""
     try:
-        return await get_athlete_year_summary_service(athlete_id)
+        return await get_athlete_year_summary_service(athlete_id, year=year)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -101,18 +105,26 @@ async def get_athlete_profile(athlete_id: str, user=Depends(get_current_user)):
         raise HTTPException(status_code=404, detail=str(e))
 
 @router.get("/{athlete_id}/performance-history", response_model=AthletePerformanceHistoryResponse)
-async def get_athlete_performance_history(athlete_id: str, user=Depends(get_current_user)):
+async def get_athlete_performance_history(
+    athlete_id: str,
+    year: Optional[int] = Query(None, description="Kalendářní rok pro výpočet trendu"),
+    user=Depends(get_current_user),
+):
     """Vrátí indikátor výkonnosti (trend) pro atleta."""
     try:
-        return await get_athlete_performance_history_service(athlete_id)
+        return await get_athlete_performance_history_service(athlete_id, year=year)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
 @router.get("/{athlete_id}/performance-stability", response_model=AthletePerformanceStabilityResponse)
-async def get_athlete_performance_stability(athlete_id: str, user=Depends(get_current_user)):
+async def get_athlete_performance_stability(
+    athlete_id: str,
+    year: Optional[int] = Query(None, description="Kalendářní rok pro výpočet stability"),
+    user=Depends(get_current_user),
+):
     """Vrátí data o stabilitě výkonu atleta."""
     try:
-        return await get_athlete_performance_stability_service(athlete_id)
+        return await get_athlete_performance_stability_service(athlete_id, year=year)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 

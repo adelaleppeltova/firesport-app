@@ -97,12 +97,15 @@ export function useAthleteProfile(athleteId) {
 }
 
 // GET /athletes/:id/performance-history – trend výkonnosti pro History
-export function useAthletePerformanceHistory(athleteId) {
+export function useAthletePerformanceHistory(athleteId, year) {
   return useQuery({
-    queryKey: ["athletes", athleteId, "performance-history"],
+    queryKey: ["athletes", athleteId, "performance-history", year ?? null],
     queryFn: async () => {
+      const params = new URLSearchParams();
+      if (year != null) params.set("year", String(year));
+      const suffix = params.size ? `?${params.toString()}` : "";
       const { data } = await api.get(
-        `/v1/athletes/${athleteId}/performance-history`,
+        `/v1/athletes/${athleteId}/performance-history${suffix}`,
       );
       return data;
     },
@@ -111,12 +114,15 @@ export function useAthletePerformanceHistory(athleteId) {
 }
 
 // GET /athletes/:id/performance-stability – stabilita výkonu pro PerformanceStability
-export function useAthletePerformanceStability(athleteId) {
+export function useAthletePerformanceStability(athleteId, year) {
   return useQuery({
-    queryKey: ["athletes", athleteId, "performance-stability"],
+    queryKey: ["athletes", athleteId, "performance-stability", year ?? null],
     queryFn: async () => {
+      const params = new URLSearchParams();
+      if (year != null) params.set("year", String(year));
+      const suffix = params.size ? `?${params.toString()}` : "";
       const { data } = await api.get(
-        `/v1/athletes/${athleteId}/performance-stability`,
+        `/v1/athletes/${athleteId}/performance-stability${suffix}`,
       );
       return data;
     },
@@ -215,12 +221,15 @@ export function useAthletePerformanceByYear(athleteId) {
 }
 
 // GET /athletes/:id/performance-in-year
-export function useAthletePerformanceInYear(athleteId) {
+export function useAthletePerformanceInYear(athleteId, year) {
   return useQuery({
-    queryKey: ["athletes", athleteId, "performance-in-year"],
+    queryKey: ["athletes", athleteId, "performance-in-year", year ?? null],
     queryFn: async () => {
+      const params = new URLSearchParams();
+      if (year != null) params.set("year", String(year));
+      const suffix = params.size ? `?${params.toString()}` : "";
       const { data } = await api.get(
-        `/v1/athletes/${athleteId}/performance-in-year`,
+        `/v1/athletes/${athleteId}/performance-in-year${suffix}`,
       );
       return data;
     },
