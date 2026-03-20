@@ -14,7 +14,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo:27017
       - DEBUG=true
-      - IMPORT_DATA=true
+      - IMPORT_DATA=false
 
   mongo:
     image: mongo
