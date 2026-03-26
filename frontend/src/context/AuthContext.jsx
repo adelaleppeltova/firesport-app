@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api, { setAuthToken } from "../api/axios";
+import { hashPassword } from "../utils/passwordHash";
 
 const AuthContext = createContext();
 
@@ -25,7 +26,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await api.post("/v1/auth/login", { email, password });
+    const passwordHash = await hashPassword(password);
+    const { data } = await api.post("/v1/auth/login", {
+      email,
+      password,
+      password_hash: passwordHash,
+    });
     localStorage.setItem("token", data.access_token);
     setAuthToken(data.access_token);
     setUser(data.user);

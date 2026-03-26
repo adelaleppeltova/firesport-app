@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, status, Response, Depends, Request
 from fastapi.concurrency import run_in_threadpool
 from bson import ObjectId
 
-from app.models.user import UserCreate, UserOut
+from app.models.user import UserRegisterRequest, UserLoginRequest, UserOut
 from app.models.auth import Token
 from app.services.auth import (
     hash_password,
@@ -20,10 +20,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 users = db["users"]
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-async def register(payload: UserCreate):
+async def register(payload: UserRegisterRequest):
     if await users.find_one({"email": payload.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
-    hashed = await run_in_threadpool(hash_password, payload.password)
+    hashed = await run_in_threadpool(hash_password, payload.password_hash)
     user_doc = {
         "email": payload.email,
         "hashed_password": hashed,
@@ -36,15 +36,34 @@ async def register(payload: UserCreate):
     return UserOut(id=str(result.inserted_id), email=payload.email, role="user", is_active=True)
 
 @router.post("/login", response_model=Token)
-async def login(response: Response, payload: UserCreate):
+async def login(response: Response, payload: UserLoginRequest):
     user = await users.find_one({"email": payload.email})
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    # verify password in threadpool
-    ok = await run_in_threadpool(verify_password, user.get("hashed_password", ""), payload.password)
+
+    user_id = str(user["_id"])
+    stored_password_hash = user.get("hashed_password", "")
+    ok = await run_in_threadpool(verify_password, stored_password_hash, payload.password_hash)
+
+    # Compatibility path for accounts created before frontend-side hashing.
+    # Once the legacy plaintext password matches, migrate the stored secret
+    # to argon2(password_hash) so following logins no longer need plaintext.
+    if not ok and payload.password:
+        legacy_ok = await run_in_threadpool(
+            verify_password,
+            stored_password_hash,
+            payload.password,
+        )
+        if legacy_ok:
+            migrated_hash = await run_in_threadpool(hash_password, payload.password_hash)
+            await users.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$set": {"hashed_password": migrated_hash}},
+            )
+            ok = True
+
     if not ok:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    user_id = str(user["_id"])
     access_token = create_access_token(user_id)
     refresh = create_refresh_token(user_id)
     # store refresh jti

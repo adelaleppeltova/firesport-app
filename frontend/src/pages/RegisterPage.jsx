@@ -5,6 +5,7 @@ import usePersistedState, {
 } from "../hooks/usePersistedState";
 import api from "../api/axios";
 import PrimaryButton from "../components/PrimaryButton";
+import { hashPassword } from "../utils/passwordHash";
 
 const passwordRules =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&#^().,_-]{8,}$/;
@@ -57,7 +58,11 @@ function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await api.post("/v1/auth/register", { email, password });
+      const passwordHash = await hashPassword(password);
+      await api.post("/v1/auth/register", {
+        email,
+        password_hash: passwordHash,
+      });
       clearPersistedState("register:firstName");
       clearPersistedState("register:lastName");
       clearPersistedState("register:email");

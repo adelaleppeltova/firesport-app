@@ -15,9 +15,27 @@ class UserBase(BaseModel):
     is_active: bool = True
 
 
-class UserCreate(BaseModel):
+CLIENT_PASSWORD_HASH_PATTERN = r"^[a-f0-9]{64}$"
+
+
+class UserRegisterRequest(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8)
+    password_hash: str = Field(
+        ...,
+        min_length=64,
+        max_length=64,
+        pattern=CLIENT_PASSWORD_HASH_PATTERN,
+    )
+
+
+class UserLoginRequest(BaseModel):
+    email: EmailStr
+    password_hash: str = Field(
+        ...,
+        min_length=64,
+        max_length=64,
+        pattern=CLIENT_PASSWORD_HASH_PATTERN,
+    )
 
 
 class UserInDB(UserBase):
