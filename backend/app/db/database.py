@@ -27,8 +27,6 @@ async def ensure_indexes():
     
     # anomaly_runs indexes
     await db["anomaly_runs"].create_index("run_id", unique=True, name="idx_run_id_unique")
-    await db["anomaly_runs"].create_index([("summary.athlete_id", 1), ("created_at", -1)], name="idx_athlete_created_at")
-    
     # anomaly_scores indexes
     await db["anomaly_scores"].create_index([("run_id", 1), ("result_id", 1)], unique=True, name="idx_run_result_unique")
     await db["anomaly_scores"].create_index([("athlete_id", 1), ("competition_date", -1)], name="idx_athlete_competition")

@@ -28,12 +28,6 @@ function formatShortDate(dateStr) {
   });
 }
 
-function formatContamination(c) {
-  if (c == null) return "—";
-  const pct = Math.round(c * 100);
-  return `${c.toFixed(2).replace(".", ",")} (≈\u202f${pct}\u202f%)`;
-}
-
 function InfoRow({ label, value }) {
   return (
     <div className="model-info-card__row">
@@ -73,9 +67,7 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
 
   const computedDate = formatFullDate(run.created_at);
   const modelName = run.model_name ?? "Isolation Forest";
-  const contamination = run.contamination; // float – skutečná hodnota pro tohoto závodníka
-  const contaminationBase = run.contamination_base; // string – strategie (window runy)
-  const contaminationStats = run.contamination_stats; // { min, median, max }
+  const contaminationMode = run.contamination_mode ?? "auto";
   const nEstimators = run.n_estimators;
   const randomState = run.random_state;
   const maxSamples = run.max_samples;
@@ -91,22 +83,15 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
 
   // Zobrazení contamination pro detail
   const contaminationDetail =
-    contamination != null ? (
+    contaminationMode === "auto" ? (
       <>
-        {formatContamination(contamination)}
+        auto
         <span className="model-info-card__value-note">
-          {`Označí se přibližně horních ${Math.round(contamination * 100)}\u202f% výsledků podle skóre atypičnosti`}
+          Model používá interní rozhodnutí Isolation Forestu; nepředepisuje se
+          vlastní podíl anomálií.
         </span>
       </>
-    ) : contaminationBase ? (
-      contaminationBase
-    ) : (
-      "—"
-    );
-
-  const contaminationStatsText = contaminationStats
-    ? `min ${formatContamination(contaminationStats.min)}, medián ${formatContamination(contaminationStats.median)}, max ${formatContamination(contaminationStats.max)}`
-    : null;
+    ) : "—";
 
   return (
     <Card title="Detaily analýzy">
@@ -168,15 +153,9 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
             <SectionTitle>Parametry detekce</SectionTitle>
             <div className="model-info-card__section">
               <InfoRow
-                label="Nastavení prahu (contamination)"
+                label="Režim contamination"
                 value={contaminationDetail}
               />
-              {contaminationStats && (
-                <InfoRow
-                  label="Rozsah prahu napříč sportovci (min/medián/max)"
-                  value={contaminationStatsText}
-                />
-              )}
               <InfoRow
                 label="Seed (reprodukovatelnost)"
                 value={randomState != null ? String(randomState) : "—"}

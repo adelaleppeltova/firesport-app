@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any, Literal
+from typing import Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
 
@@ -31,7 +31,7 @@ class AnomalyRunModel(BaseModel):
     params: Dict[str, Any] = Field(
         default_factory=lambda: {
             "n_estimators": DEFAULT_CONFIG.n_estimators,
-            "contamination": DEFAULT_CONFIG.contamination,
+            "contamination_mode": DEFAULT_CONFIG.contamination,
             "random_state": DEFAULT_CONFIG.random_state,
             "eps_std": DEFAULT_CONFIG.eps_std,
         }
@@ -47,7 +47,6 @@ class AnomalyRunSummary(BaseModel):
     athlete_id: str
     n_valid_results_in_window: int
     n_anomalies: int = 0
-    threshold_score: Optional[float] = None
     median_time: Optional[float] = None
     reason: Optional[str] = None
 
@@ -67,25 +66,6 @@ class SkipReasonCounts(BaseModel):
     not_enough_data_after_cleaning: int = 0
     low_variance: int = 0
     no_valid_results: int = 0
-
-
-class RecomputeResponse(BaseModel):
-    """Response model for ML recomputation endpoint."""
-    window_start: datetime
-    window_end: datetime
-    started_at: datetime
-    finished_at: datetime
-    processed: int
-    skipped: int
-    failed: int
-    scores_inserted: int
-    # --- new fields (backward-compatible additions) ---
-    min_results_used: int = DEFAULT_CONFIG.min_results
-    contamination_used: float = DEFAULT_CONFIG.contamination
-    eps_std_used: float = DEFAULT_CONFIG.eps_std
-    n_estimators_used: int = DEFAULT_CONFIG.n_estimators
-    random_state_used: int = DEFAULT_CONFIG.random_state
-    skip_reason_counts: SkipReasonCounts = Field(default_factory=SkipReasonCounts)
 
 
 # API Response Models
@@ -112,18 +92,12 @@ class AnomalyRunInfo(BaseModel):
     n_valid_results_in_window: int
     n_invalid_results_in_window: int = 0
     n_anomalies: int
-    threshold_score: Optional[float] = None
     median_time: Optional[float] = None
     status: AnomalyRunStatus
     reason: Optional[str] = None
     # Model parameters (populated from run document)
     model_name: Optional[str] = None
-    # contamination: fixed float (per-athlete run) OR adaptive per-athlete value (window run)
-    contamination: Optional[float] = None
-    # contamination_base: strategy string (only on window-level runs)
-    contamination_base: Optional[str] = None
-    # contamination_stats: min/median/max across athletes (only on window-level runs)
-    contamination_stats: Optional[Dict[str, float]] = None
+    contamination_mode: Optional[str] = None
     n_estimators: Optional[int] = None
     random_state: Optional[int] = None
     max_samples: Optional[str] = None
@@ -156,13 +130,6 @@ class WindowListItem(BaseModel):
     window_end: datetime
     label: str                # e.g. "Q1 2026 (2023-04-01\u20132026-03-31)"
 
-class ContaminationStats(BaseModel):
-    """Per-window min/median/max of per-athlete contamination values."""
-    min: float
-    median: float
-    max: float
-
-
 class WindowRecomputeSummary(BaseModel):
     """Returned by ``recompute_for_window`` after a single-window ML run."""
     run_id: str
@@ -170,8 +137,6 @@ class WindowRecomputeSummary(BaseModel):
     anchor_date: str           # YYYY-MM-DD
     window_start: datetime
     window_end: datetime
-    contamination_base: str    # human-readable strategy description
-    contamination_stats: Optional[ContaminationStats] = None
     processed: int
     skipped: int
     failed: int

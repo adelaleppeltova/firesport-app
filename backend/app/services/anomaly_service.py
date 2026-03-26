@@ -1,11 +1,10 @@
-"""Anomaly detection service – orchestrates per-athlete Isolation Forest runs.
+"""Anomaly detection service for yearly 3-year window Isolation Forest runs.
 
 All hyper-parameters are read from ``AnomalyConfig`` (single source of truth).
 No magic numbers live in this file.
 """
 
 import logging
-import statistics
 from datetime import date, datetime, timezone
 from uuid import uuid4
 from typing import Any, Dict, List, Optional, Tuple
@@ -17,7 +16,6 @@ from pymongo.errors import BulkWriteError
 from app.models.anomaly import (
     AnomalyRunStatus,
     AnomalyDirection,
-    ContaminationStats,
     YearlyBatchItem,
     YearlyBatchResponse,
     SkipReasonCounts,
@@ -25,10 +23,8 @@ from app.models.anomaly import (
 )
 from app.ml.anomaly_config import AnomalyConfig, DEFAULT_CONFIG, get_category_group
 from app.ml.isolation_forest import compute_iforest_anomalies
-from app.services.quality_flag_service import recompute_quality_flags
 from app.services.windows import (
     window_for_anchor,
-    adaptive_contamination,
     list_year_anchors,
     is_year_end,
     year_label,
@@ -62,7 +58,7 @@ def _build_model(cfg: AnomalyConfig) -> Dict[str, Any]:
         "name": "Isolation Forest",
         "params": {
             "n_estimators": cfg.n_estimators,
-            "contamination": cfg.contamination,
+            "contamination_mode": "auto",
             "random_state": cfg.random_state,
             "eps_std": cfg.eps_std,
         },
@@ -107,301 +103,6 @@ def _empty_skip_reason_counts() -> Dict[str, int]:
 
 
 # ------------------------------------------------------------------
-# Per-athlete computation
-# ------------------------------------------------------------------
-
-async def compute_for_athlete(
-    db: AsyncIOMotorDatabase,
-    athlete_id: str,
-    window_start: datetime,
-    window_end: datetime,
-    *,
-    config: AnomalyConfig | None = None,
-    use_adaptive_contamination: bool = False,
-) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
-    """Compute anomalies for a single athlete within a time window.
-
-    Parameters
-    ----------
-    db:
-        Motor database instance.
-    athlete_id:
-        String representation of athlete ``ObjectId``.
-    window_start / window_end:
-        Inclusive date boundaries.
-    config:
-        Hyper-parameters.  Defaults to ``DEFAULT_CONFIG``.
-
-    Returns
-    -------
-    tuple[run_doc, score_docs]
-        ``run_doc``  → insert into ``anomaly_runs``
-        ``score_docs`` → insert into ``anomaly_scores`` (empty on skip/fail)
-
-    Never raises; all errors are caught and returned as *failed* runs.
-    """
-    cfg = config or DEFAULT_CONFIG
-    run_id = str(uuid4())
-    created_at = datetime.now(timezone.utc)
-    window = _build_window(window_start, window_end, cfg)
-    model = _build_model(cfg)
-
-    try:
-        athlete_oid = ObjectId(athlete_id)
-
-        # --- load valid results in window --------------------------------
-        results = await db["results"].find(
-            {
-                "athlete": athlete_oid,
-                "final_time_status": "valid",
-                "date": {"$gte": window_start, "$lte": window_end},
-            },
-            projection={"_id": 1, "final_time": 1, "date": 1},
-        ).sort("date", 1).to_list(None)
-
-        n_valid_results = len(results)
-
-        # --- early skip: no valid results at all -------------------------
-        if n_valid_results == 0:
-            summary = {
-                "athlete_id": athlete_oid,
-                "n_valid_results_in_window": 0,
-                "n_anomalies": 0,
-                "threshold_score": None,
-                "median_time": None,
-                "reason": "no_valid_results",
-            }
-            return (
-                _build_run_doc(run_id, created_at, window, model,
-                               AnomalyRunStatus.skipped.value, summary),
-                [],
-            )
-
-        # --- early skip: fewer results than min_results ------------------
-        if n_valid_results < cfg.min_results:
-            summary = {
-                "athlete_id": athlete_oid,
-                "n_valid_results_in_window": n_valid_results,
-                "n_anomalies": 0,
-                "threshold_score": None,
-                "median_time": None,
-                "reason": "not_enough_data",
-            }
-            return (
-                _build_run_doc(run_id, created_at, window, model,
-                               AnomalyRunStatus.skipped.value, summary),
-                [],
-            )
-
-        # --- adaptive contamination override (optional) ------------------
-        if use_adaptive_contamination:
-            c = adaptive_contamination(n_valid_results)
-            cfg = AnomalyConfig(
-                min_results=cfg.min_results,
-                n_estimators=cfg.n_estimators,
-                eps_std=cfg.eps_std,
-                random_state=cfg.random_state,
-                contamination=c,
-            )
-            # rebuild model doc with updated contamination
-            model = _build_model(cfg)
-
-        # --- run ML ------------------------------------------------------
-        times = [r["final_time"] for r in results]
-        ml_result = compute_iforest_anomalies(times, config=cfg)
-        ml_status = ml_result.get("status")
-
-        if ml_status == "skipped":
-            reason = ml_result.get("reason", "unknown")
-            summary = {
-                "athlete_id": athlete_oid,
-                "n_valid_results_in_window": n_valid_results,
-                "n_anomalies": 0,
-                "threshold_score": None,
-                "median_time": None,
-                "reason": reason,
-            }
-            return (
-                _build_run_doc(run_id, created_at, window, model,
-                               AnomalyRunStatus.skipped.value, summary),
-                [],
-            )
-
-        # --- ML succeeded ------------------------------------------------
-        scores = ml_result.get("scores", [])
-        threshold_score = ml_result.get("threshold_score", 0.0)
-        median_time = ml_result.get("median_time", 0.0)
-        n_anomalies = ml_result.get("n_anomalies", 0)
-        is_anomaly_list = ml_result.get("is_anomaly", [])
-        direction_list = ml_result.get("direction", [])
-
-        summary = {
-            "athlete_id": athlete_oid,
-            "n_valid_results_in_window": n_valid_results,
-            "n_anomalies": n_anomalies,
-            "threshold_score": threshold_score,
-            "median_time": median_time,
-            "reason": None,
-        }
-        run_doc = _build_run_doc(
-            run_id, created_at, window, model,
-            AnomalyRunStatus.success.value, summary,
-        )
-
-        score_docs: List[Dict[str, Any]] = []
-        for i, result in enumerate(results):
-            score_docs.append({
-                "run_id": run_id,
-                "created_at": created_at,
-                "athlete_id": athlete_oid,
-                "result_id": result["_id"],
-                "competition_date": result["date"],
-                "final_time": result["final_time"],
-                "score": scores[i] if i < len(scores) else 0.0,
-                "threshold_score": threshold_score,
-                "median_time": median_time,
-                "is_anomaly": is_anomaly_list[i] if i < len(is_anomaly_list) else False,
-                "direction": (
-                    direction_list[i]
-                    if i < len(direction_list)
-                    else AnomalyDirection.none.value
-                ),
-            })
-
-        return run_doc, score_docs
-
-    except Exception as e:
-        logger.exception("Error computing anomalies for athlete %s: %s", athlete_id, e)
-        try:
-            athlete_oid = ObjectId(athlete_id)
-        except Exception:
-            athlete_oid = None
-
-        summary = {
-            "athlete_id": athlete_oid,
-            "athlete_id_str": athlete_id if not athlete_oid else None,
-            "n_valid_results_in_window": 0,
-            "n_anomalies": 0,
-            "threshold_score": None,
-            "median_time": None,
-            "reason": str(e),
-        }
-        return (
-            _build_run_doc(run_id, created_at, window, model,
-                           AnomalyRunStatus.failed.value, summary),
-            [],
-        )
-
-
-# ------------------------------------------------------------------
-# Bulk recomputation
-# ------------------------------------------------------------------
-
-async def recompute_for_all_athletes(
-    db: AsyncIOMotorDatabase,
-    window_start: datetime,
-    window_end: datetime,
-    *,
-    config: AnomalyConfig | None = None,
-    use_adaptive_contamination: bool = True,
-) -> Dict[str, Any]:
-    """Recompute anomalies for every athlete in the database.
-
-    Returns a dict with counters **and** structured skip-reason counts
-    for full observability.
-
-    When *use_adaptive_contamination* is ``True`` (default), each athlete
-    gets ``contamination = clamp(1/n, 0.02, 0.10)`` instead of the fixed
-    value from *config*.  This mirrors the behaviour of
-    :func:`recompute_for_window`.
-    """
-    cfg = config or DEFAULT_CONFIG
-
-    counters: Dict[str, Any] = {
-        "processed": 0,
-        "skipped": 0,
-        "failed": 0,
-        "scores_inserted": 0,
-        "skip_reason_counts": _empty_skip_reason_counts(),
-        # echo back the used params so the API can forward them
-        "min_results_used": cfg.min_results,
-        "contamination_used": cfg.contamination,
-        "eps_std_used": cfg.eps_std,
-        "n_estimators_used": cfg.n_estimators,
-        "random_state_used": cfg.random_state,
-    }
-
-    try:
-        athletes = await db["athletes"].find(
-            {}, projection={"_id": 1},
-        ).to_list(None)
-
-        logger.info("Starting anomaly computation for %d athletes", len(athletes))
-
-        for athlete_doc in athletes:
-            athlete_id = str(athlete_doc["_id"])
-
-            run_doc, score_docs = await compute_for_athlete(
-                db, athlete_id, window_start, window_end, config=cfg,
-                use_adaptive_contamination=use_adaptive_contamination,
-            )
-
-            # persist run doc
-            await db["anomaly_runs"].insert_one(run_doc)
-
-            status = run_doc["status"]
-            if status == AnomalyRunStatus.success.value:
-                counters["processed"] += 1
-                if score_docs:
-                    try:
-                        result = await db["anomaly_scores"].insert_many(
-                            score_docs, ordered=False,
-                        )
-                        counters["scores_inserted"] += len(result.inserted_ids)
-                    except BulkWriteError as e:
-                        logger.warning(
-                            "BulkWriteError inserting scores for athlete %s: %s",
-                            athlete_id, e.details,
-                        )
-                        n_ins = (e.details or {}).get("nInserted", len(score_docs))
-                        counters["scores_inserted"] += n_ins
-
-            elif status == AnomalyRunStatus.skipped.value:
-                counters["skipped"] += 1
-                reason = (run_doc.get("summary") or {}).get("reason", "unknown")
-                sr = counters["skip_reason_counts"]
-                if reason in sr:
-                    sr[reason] += 1
-                else:
-                    # catch-all for any unexpected reason string
-                    sr.setdefault(reason, 0)
-                    sr[reason] += 1
-
-            elif status == AnomalyRunStatus.failed.value:
-                counters["failed"] += 1
-
-        logger.info(
-            "Anomaly computation completed. processed=%d skipped=%d failed=%d scores=%d",
-            counters["processed"], counters["skipped"],
-            counters["failed"], counters["scores_inserted"],
-        )
-
-        # Přepočítej quality_flag pro všechny výsledky
-        try:
-            qf_stats = await recompute_quality_flags(db)
-            counters["quality_flag_stats"] = qf_stats
-        except Exception as qf_err:
-            logger.exception("quality_flag recompute failed: %s", qf_err)
-            counters["quality_flag_stats"] = {"error": str(qf_err)}
-
-        return counters
-
-    except Exception as e:
-        logger.exception("Critical error in recompute_for_all_athletes: %s", e)
-        return counters
-
-
-# ------------------------------------------------------------------
 # Window listing
 # ------------------------------------------------------------------
 
@@ -433,9 +134,7 @@ async def list_detection_windows(
             "$match": {
                 "window_type": window_type,
                 "is_superseded": {"$ne": True},
-                # Vyloučit per-athlete runy z recompute_for_all_athletes,
-                # které mají pole "summary" místo "stats".
-                # Okno-level runy z recompute_for_window mají vždy "stats".
+                # Do výpisu patří jen window-level runy, které mají "stats".
                 "stats": {"$exists": True},
             }
         },
@@ -510,29 +209,6 @@ async def list_detection_windows(
 # Single-window recomputation
 # ------------------------------------------------------------------
 
-def _contamination_stats(values: list[float]) -> Optional[ContaminationStats]:
-    """Compute min / median / max of per-athlete contamination values.
-
-    Returns ``None`` when *values* is empty.
-
-    Parameters
-    ----------
-    values:
-        List of contamination floats actually used across athletes.
-
-    Returns
-    -------
-    ContaminationStats | None
-    """
-    if not values:
-        return None
-    return ContaminationStats(
-        min=min(values),
-        median=statistics.median(values),
-        max=max(values),
-    )
-
-
 async def _supersede_existing_window_run(
     db: AsyncIOMotorDatabase,
     window_type: str,
@@ -564,7 +240,7 @@ async def _supersede_existing_window_run(
             "window_type": window_type,
             "window.end_date": anchor_dt,
             "is_superseded": {"$ne": True},
-            # Supersedujeme pouze window-level runy, ne per-athlete legacy runy.
+            # Supersedujeme pouze window-level runy.
             "stats": {"$exists": True},
         }
     )
@@ -594,13 +270,10 @@ def _build_window_run_doc(
     window_years: int,
     window_type: str,
     min_results_used: int,
-    contamination_base: str,
-    contamination_stats: Optional[ContaminationStats],
     counters: Dict[str, Any],
     cfg: AnomalyConfig,
 ) -> Dict[str, Any]:
     """Assemble the single ``anomaly_runs`` document for a window-level run."""
-    c_stats = contamination_stats.model_dump() if contamination_stats else None
     return {
         "run_id": run_id,
         "created_at": created_at,
@@ -615,7 +288,7 @@ def _build_window_run_doc(
             "name": "Isolation Forest",
             "params": {
                 "n_estimators": cfg.n_estimators,
-                "contamination_base": contamination_base,
+                "contamination_mode": "auto",
                 "random_state": cfg.random_state,
                 "eps_std": cfg.eps_std,
             },
@@ -629,7 +302,6 @@ def _build_window_run_doc(
             "failed": counters["failed"],
             "scores_inserted": counters["scores_inserted"],
             "skip_reason_counts": counters["skip_reason_counts"],
-            "contamination": c_stats,
         },
     }
 
@@ -641,7 +313,6 @@ async def recompute_for_window(
     window_years: int = 3,
     window_type: str = "yearly_3y",
     min_results_used: int = 10,
-    use_adaptive_contamination: bool = True,
 ) -> WindowRecomputeSummary:
     """Recompute Isolation Forest anomalies for all athletes within one window.
 
@@ -661,10 +332,9 @@ async def recompute_for_window(
 
     Contamination strategy
     ----------------------
-    When *use_adaptive_contamination* is ``True`` (default), each athlete
-    gets ``contamination = clamp(1/n, 0.02, 0.10)``.  Otherwise 0.05 is
-    used for all athletes.  The strategy string is stored in
-    ``model.params.contamination_base`` on the run document.
+    Isolation Forest is always fit with ``contamination="auto"``, so we do
+    not prescribe our own anomaly fraction or derive a custom score
+    quantile threshold.
 
     Parameters
     ----------
@@ -678,10 +348,6 @@ async def recompute_for_window(
         Label stored on the run document.  Defaults to ``"yearly_3y"``.
     min_results_used:
         Minimum valid results required per athlete to run the model.
-    use_adaptive_contamination:
-        If ``True``, contamination = ``adaptive_contamination(n)``.
-        If ``False``, contamination = 0.05 (fixed default).
-
     Returns
     -------
     WindowRecomputeSummary
@@ -693,10 +359,6 @@ async def recompute_for_window(
     )
     window_start, window_end = window_for_anchor(anchor_dt, years=window_years)
 
-    contamination_base = (
-        "adaptive(1/n clamped 0.02-0.10)" if use_adaptive_contamination else "fixed(0.05)"
-    )
-
     run_id = str(uuid4())
     created_at = datetime.now(timezone.utc)
 
@@ -707,14 +369,12 @@ async def recompute_for_window(
         "scores_inserted": 0,
         "skip_reason_counts": _empty_skip_reason_counts(),
     }
-    contaminations_used: list[float] = []
-
     cfg_base = AnomalyConfig(
         min_results=min_results_used,
         n_estimators=DEFAULT_CONFIG.n_estimators,
         eps_std=DEFAULT_CONFIG.eps_std,
         random_state=DEFAULT_CONFIG.random_state,
-        contamination=DEFAULT_CONFIG.contamination,  # overridden per athlete below
+        contamination="auto",
     )
 
     try:
@@ -760,25 +420,9 @@ async def recompute_for_window(
                 sr["not_enough_data"] = sr.get("not_enough_data", 0) + 1
                 continue
 
-            # Determine contamination
-            if use_adaptive_contamination:
-                c = adaptive_contamination(n)
-            else:
-                c = 0.05
-            contaminations_used.append(c)
-
-            # Build per-athlete config with overridden contamination
-            cfg = AnomalyConfig(
-                min_results=cfg_base.min_results,
-                n_estimators=cfg_base.n_estimators,
-                eps_std=cfg_base.eps_std,
-                random_state=cfg_base.random_state,
-                contamination=c,
-            )
-
             times = [r["final_time"] for r in results]
             try:
-                ml_result = compute_iforest_anomalies(times, config=cfg)
+                ml_result = compute_iforest_anomalies(times, config=cfg_base)
             except Exception as ml_exc:
                 logger.exception(
                     "ML error for athlete %s in window %s: %s",
@@ -792,14 +436,12 @@ async def recompute_for_window(
                 reason = ml_result.get("reason", "unknown")
                 counters["skipped"] += 1
                 sr[reason] = sr.get(reason, 0) + 1
-                contaminations_used.pop()  # don't count skipped athlete
                 continue
 
             # ML succeeded – build score docs
             scores = ml_result.get("scores", [])
             is_anomaly_list = ml_result.get("is_anomaly", [])
             direction_list = ml_result.get("direction", [])
-            threshold_score = ml_result.get("threshold_score", 0.0)
             median_time = ml_result.get("median_time", 0.0)
             athlete_oid = ObjectId(athlete_id)
 
@@ -812,7 +454,6 @@ async def recompute_for_window(
                     "competition_date": result["date"],
                     "final_time": result["final_time"],
                     "score": scores[i] if i < len(scores) else 0.0,
-                    "threshold_score": threshold_score,
                     "median_time": median_time,
                     "is_anomaly": is_anomaly_list[i] if i < len(is_anomaly_list) else False,
                     "direction": (
@@ -820,7 +461,7 @@ async def recompute_for_window(
                         if i < len(direction_list)
                         else AnomalyDirection.none.value
                     ),
-                    "contamination_used": c,
+                    "contamination_mode": "auto",
                     "category_group": category_group,
                 })
             counters["processed"] += 1
@@ -837,10 +478,7 @@ async def recompute_for_window(
                 counters["scores_inserted"] = n_ins
                 logger.warning("BulkWriteError inserting window scores: %s", bwe.details)
 
-        # 7) Compute contamination stats
-        c_stats = _contamination_stats(contaminations_used)
-
-        # 8) Persist run document
+        # 7) Persist run document
         run_doc = _build_window_run_doc(
             run_id=run_id,
             created_at=created_at,
@@ -849,8 +487,6 @@ async def recompute_for_window(
             window_years=window_years,
             window_type=window_type,
             min_results_used=min_results_used,
-            contamination_base=contamination_base,
-            contamination_stats=c_stats,
             counters=counters,
             cfg=cfg_base,
         )
@@ -869,8 +505,6 @@ async def recompute_for_window(
             anchor_date=anchor_date.isoformat(),
             window_start=window_start,
             window_end=window_end,
-            contamination_base=contamination_base,
-            contamination_stats=c_stats,
             processed=counters["processed"],
             skipped=counters["skipped"],
             failed=counters["failed"],
@@ -942,7 +576,6 @@ async def recompute_yearly_batch(
     window_years: int = 3,
     window_type: str = "yearly_3y",
     min_results_used: int = 10,
-    use_adaptive_contamination: bool = True,
 ) -> YearlyBatchResponse:
     """Recompute Isolation Forest for every yearly anchor (Dec 31) in a date range.
 
@@ -977,8 +610,6 @@ async def recompute_yearly_batch(
         Tag stored on every run document.  Defaults to ``"yearly_3y"``.
     min_results_used:
         Minimum per-athlete results threshold.
-    use_adaptive_contamination:
-        Whether to use adaptive contamination strategy.
 
     Returns
     -------
@@ -1003,9 +634,7 @@ async def recompute_yearly_batch(
     anchors = list_year_anchors(date_min, date_max)
     logger.info("Found %d yearly anchors in range", len(anchors))
 
-    # 3) Pre-load existing non-superseded runs for skip logic (force=False)
-    # Filtrujeme pouze window-level runy (mají "stats"), aby legacy per-athlete
-    # runy z recompute_for_all_athletes neblokují přepočet.
+    # 3) Pre-load existing non-superseded window runs for skip logic (force=False)
     existing_anchor_dates: set[str] = set()
     if not force:
         cursor = db["anomaly_runs"].find(
@@ -1054,7 +683,6 @@ async def recompute_yearly_batch(
                 window_years=window_years,
                 window_type=window_type,
                 min_results_used=min_results_used,
-                use_adaptive_contamination=use_adaptive_contamination,
             )
             batch_results.append(
                 YearlyBatchItem(

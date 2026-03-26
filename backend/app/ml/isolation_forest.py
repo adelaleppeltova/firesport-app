@@ -40,9 +40,8 @@ def compute_iforest_anomalies(
         On **skip** the dict also carries ``"reason"`` and ``"n"``.
 
         On **success** the dict carries:
-        ``scores``, ``threshold_score``, ``median_time``,
-        ``is_anomaly``, ``direction``, ``n_anomalies``, ``n``,
-        plus the five config values that were actually used.
+        ``scores``, ``median_time``, ``is_anomaly``, ``direction``,
+        ``n_anomalies``, ``n``, plus the config values that were actually used.
     """
     cfg = config or DEFAULT_CONFIG
 
@@ -78,20 +77,20 @@ def compute_iforest_anomalies(
     X = arr.reshape(-1, 1)
     model = IsolationForest(
         n_estimators=cfg.n_estimators,
-        contamination=cfg.contamination,
+        contamination="auto",
         random_state=cfg.random_state,
         n_jobs=-1,
     )
     model.fit(X)
 
-    # --- scores & threshold -----------------------------------------------
-    scores = (-model.decision_function(X)).astype(float)
-    threshold_q = 1.0 - cfg.contamination
-    threshold_score = float(np.quantile(scores, threshold_q))
+    # --- scores & model decision boundary ---------------------------------
+    # score is only an interpretable outlierness measure for ranking/UI.
+    decision = model.decision_function(X)
+    scores = (-decision).astype(float)
     median_time = float(np.median(arr))
 
-    # --- anomaly flags & direction ----------------------------------------
-    is_anomaly = [bool(s >= threshold_score) for s in scores]
+    # Anomaly classification follows Isolation Forest directly.
+    is_anomaly = [bool(flag == -1) for flag in model.predict(X)]
     direction: List[str] = []
     for t, flag in zip(arr, is_anomaly):
         if not flag:
@@ -108,7 +107,6 @@ def compute_iforest_anomalies(
     return {
         "status": "success",
         "scores": [float(s) for s in scores],
-        "threshold_score": threshold_score,
         "median_time": median_time,
         "is_anomaly": is_anomaly,
         "direction": direction,
@@ -123,10 +121,13 @@ def compute_iforest_anomalies(
 # ------------------------------------------------------------------
 
 def _used_params(cfg: AnomalyConfig) -> Dict[str, Any]:
-    """Return the five config values as a flat dict (for embedding in results)."""
+    """Return config metadata embedded into results.
+
+    ``contamination_mode="auto"`` captures the effective Isolation Forest setting.
+    """
     return {
         "min_results_used": cfg.min_results,
-        "contamination_used": cfg.contamination,
+        "contamination_mode": "auto",
         "eps_std_used": cfg.eps_std,
         "n_estimators_used": cfg.n_estimators,
         "random_state_used": cfg.random_state,

@@ -29,58 +29,6 @@ _YEAR_END_MONTH: int = 12
 _YEAR_END_DAY: int = 31
 
 
-def adaptive_contamination(
-    n: int,
-    *,
-    min_c: float = 0.02,
-    max_c: float = 0.10,
-) -> float:
-    """Return an adaptive contamination rate for Isolation Forest.
-
-    The raw estimate is ``1 / n`` (one expected outlier per *n* samples).
-    The result is clamped to ``[min_c, max_c]`` so it stays in a
-    meaningful range regardless of the dataset size.
-
-    Parameters
-    ----------
-    n:
-        Number of samples.  Must be a positive integer (≥ 1).
-    min_c:
-        Lower clamp bound.  Defaults to 0.02 (2 %).
-    max_c:
-        Upper clamp bound.  Defaults to 0.10 (10 %).
-
-    Returns
-    -------
-    float
-        ``clamp(1/n, min_c, max_c)``
-
-    Raises
-    ------
-    ValueError
-        If *n* ≤ 0.
-
-    Notes
-    -----
-    The ML pipeline requires at least 10 results to run (``min_results_used``).
-    This function is intentionally general and does **not** enforce that
-    threshold – callers are responsible for the guard.
-
-    Examples
-    --------
-    >>> adaptive_contamination(10)   # 1/10 = 0.10  → clamped to max_c
-    0.1
-    >>> adaptive_contamination(20)   # 1/20 = 0.05
-    0.05
-    >>> adaptive_contamination(100)  # 1/100 = 0.01 → clamped to min_c
-    0.02
-    """
-    if n <= 0:
-        raise ValueError(f"n must be a positive integer, got {n!r}.")
-    raw = 1.0 / n
-    return max(min_c, min(raw, max_c))
-
-
 def window_for_anchor(
     anchor: datetime,
     years: int = 3,

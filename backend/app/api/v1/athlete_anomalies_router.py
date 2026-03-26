@@ -40,8 +40,7 @@ async def _resolve_run(
     2. ``anchor_date`` supplied (YYYY-MM-DD) → find non-superseded
        ``yearly_3y`` run whose ``window.end_date`` falls on that date.
     3. Neither supplied → find the most recent non-superseded
-       ``yearly_3y`` run; if none exists, fall back to any latest run
-       matching ``summary.athlete_id`` (legacy per-athlete runs).
+       ``yearly_3y`` run.
 
     Returns ``None`` when nothing is found.
     """
@@ -77,12 +76,7 @@ async def _resolve_run(
     )
     if run is not None:
         return run
-
-    # Fallback: legacy per-athlete run (old recompute_for_all_athletes format)
-    return await db["anomaly_runs"].find_one(
-        {"summary.athlete_id": athlete_oid},
-        sort=[("created_at", -1)],
-    )
+    return None
 
 
 @router.get("/{athlete_id}/anomalies", response_model=AthleteAnomaliesResponse)
@@ -172,10 +166,9 @@ async def get_athlete_anomalies(
             "score": 1,
             "is_anomaly": 1,
             "direction": 1,
-            "threshold_score": 1,
             "median_time": 1,
             "category_group": 1,
-            "contamination_used": 1,
+            "contamination_mode": 1,
         },
     ).sort("competition_date", -1)
 
@@ -183,12 +176,9 @@ async def get_athlete_anomalies(
 
     # Derive per-athlete stats from scores when not available on summary
     n_anomalies = summary.get("n_anomalies", sum(1 for s in score_docs if s.get("is_anomaly")))
-    threshold_score = summary.get("threshold_score") or (
-        score_docs[0].get("threshold_score") if score_docs else None
-    )
-    median_time = summary.get("median_time") or (
-        score_docs[0].get("median_time") if score_docs else None
-    )
+    median_time = summary.get("median_time")
+    if median_time is None and score_docs:
+        median_time = score_docs[0].get("median_time")
 
     # Count valid and invalid results directly from the results collection
     n_valid = 0
@@ -216,7 +206,6 @@ async def get_athlete_anomalies(
 
     model_doc = run.get("model") or {}
     model_params = model_doc.get("params") or {}
-    run_stats = run.get("stats") or {}
 
     # Resolve discipline from the athlete's categories within the window
     discipline_val: Optional[str] = None
@@ -236,25 +225,10 @@ async def get_athlete_anomalies(
             if cat_doc:
                 discipline_val = cat_doc.get("discipline")
 
-    # contamination: prefer per-athlete value from scores;
-    # fall back to global fixed value stored on old per-athlete runs
-    contamination_val: Optional[float] = (
-        score_docs[0].get("contamination_used")
+    contamination_mode: Optional[str] = (
+        score_docs[0].get("contamination_mode")
         if score_docs
-        else model_params.get("contamination")
-    )
-    # contamination_base strategy string (window-level runs only)
-    contamination_base: Optional[str] = model_params.get("contamination_base")
-    # contamination_stats: min/median/max across all athletes in this window run
-    c_stats_raw = run_stats.get("contamination")
-    contamination_stats_val = (
-        {
-            "min": c_stats_raw.get("min"),
-            "median": c_stats_raw.get("median"),
-            "max": c_stats_raw.get("max"),
-        }
-        if c_stats_raw
-        else None
+        else model_params.get("contamination_mode")
     )
 
     run_info = AnomalyRunInfo(
@@ -265,15 +239,12 @@ async def get_athlete_anomalies(
         n_valid_results_in_window=n_valid,
         n_invalid_results_in_window=n_invalid,
         n_anomalies=n_anomalies,
-        threshold_score=threshold_score,
         median_time=median_time,
         status=AnomalyRunStatus(run.get("status", "success")),
         reason=summary.get("reason"),
         # Model parameters
         model_name=model_doc.get("name"),
-        contamination=contamination_val,
-        contamination_base=contamination_base,
-        contamination_stats=contamination_stats_val,
+        contamination_mode=contamination_mode,
         n_estimators=model_params.get("n_estimators"),
         random_state=model_params.get("random_state"),
         max_samples=str(model_params.get("max_samples", "auto")),

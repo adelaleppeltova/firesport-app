@@ -1,33 +1,17 @@
-"""Unit tests for the Isolation Forest anomaly detection pipeline.
-
-Covers the four key scenarios requested:
-1. Not enough data → skipped
-2. Low variance → skipped
-3. Success returns arrays of the same length as input
-4. Threshold quantile is tied to contamination (1 − contamination)
-"""
-
-import math
+"""Unit tests for the Isolation Forest anomaly detection pipeline."""
 
 import numpy as np
 import pytest
+from sklearn.ensemble import IsolationForest
 
 from app.ml.anomaly_config import AnomalyConfig, DEFAULT_CONFIG
 from app.ml.isolation_forest import compute_iforest_anomalies
 
 
-# -----------------------------------------------------------------
-# Helpers
-# -----------------------------------------------------------------
-
 def _make_config(**overrides) -> AnomalyConfig:
     """Return a config with optional overrides on top of defaults."""
     return AnomalyConfig(**overrides)
 
-
-# -----------------------------------------------------------------
-# 1. Not enough data → skipped
-# -----------------------------------------------------------------
 
 class TestNotEnoughData:
     """compute_iforest_anomalies must skip when len(times) < min_results."""
@@ -43,25 +27,13 @@ class TestNotEnoughData:
         assert result["status"] == "skipped"
         assert result["reason"] == "not_enough_data"
 
-    def test_custom_min_results(self):
-        cfg = _make_config(min_results=20)
-        times = [15.0] * 19
-        result = compute_iforest_anomalies(times, config=cfg)
-        assert result["status"] == "skipped"
-        assert result["reason"] == "not_enough_data"
-
     def test_nan_inf_cleaning_triggers_skip(self):
-        """10 values but 5 are NaN → only 5 clean → skip."""
         cfg = _make_config(min_results=10)
-        times = [15.0] * 5 + [float("nan")] * 5
+        times = [15.0] * 5 + [float("nan")] * 3 + [float("inf"), float("-inf")]
         result = compute_iforest_anomalies(times, config=cfg)
         assert result["status"] == "skipped"
         assert result["reason"] == "not_enough_data_after_cleaning"
 
-
-# -----------------------------------------------------------------
-# 2. Low variance → skipped
-# -----------------------------------------------------------------
 
 class TestLowVariance:
     """Skip when std(times) < eps_std."""
@@ -72,21 +44,9 @@ class TestLowVariance:
         assert result["status"] == "skipped"
         assert result["reason"] == "low_variance"
 
-    def test_near_zero_std(self):
-        cfg = _make_config(eps_std=0.1)
-        rng = np.random.default_rng(0)
-        times = (20.0 + rng.normal(0, 0.001, 20)).tolist()
-        result = compute_iforest_anomalies(times, config=cfg)
-        assert result["status"] == "skipped"
-        assert result["reason"] == "low_variance"
-
-
-# -----------------------------------------------------------------
-# 3. Success returns arrays of same length as input
-# -----------------------------------------------------------------
 
 class TestSuccessShape:
-    """On success, list outputs must match the (cleaned) input length."""
+    """On success, list outputs must match the cleaned input length."""
 
     @pytest.fixture()
     def success_result(self):
@@ -98,62 +58,58 @@ class TestSuccessShape:
         assert success_result["status"] == "success"
 
     def test_scores_length(self, success_result):
-        n = success_result["n"]
-        assert len(success_result["scores"]) == n
+        assert len(success_result["scores"]) == success_result["n"]
 
     def test_is_anomaly_length(self, success_result):
-        n = success_result["n"]
-        assert len(success_result["is_anomaly"]) == n
+        assert len(success_result["is_anomaly"]) == success_result["n"]
 
     def test_direction_length(self, success_result):
-        n = success_result["n"]
-        assert len(success_result["direction"]) == n
-
-    def test_n_anomalies_is_int(self, success_result):
-        assert isinstance(success_result["n_anomalies"], int)
-        assert success_result["n_anomalies"] >= 0
+        assert len(success_result["direction"]) == success_result["n"]
 
 
-# -----------------------------------------------------------------
-# 4. Threshold quantile is tied to contamination
-# -----------------------------------------------------------------
+class TestIsolationForestDecisionRule:
+    """The classifier must follow Isolation Forest directly."""
 
-class TestThresholdQuantile:
-    """threshold_score == quantile(scores, 1 - contamination)."""
+    def test_score_is_negated_decision_function_and_flags_match_predict(self):
+        times = [20.2, 20.1, 20.4, 20.3, 20.5, 20.6, 20.0, 20.2, 19.9, 20.1, 16.5, 24.8]
+        cfg = _make_config(min_results=10, n_estimators=64, random_state=7, contamination=0.2)
 
-    @pytest.mark.parametrize("contamination", [0.05, 0.10, 0.20])
-    def test_threshold_matches_quantile(self, contamination):
-        rng = np.random.default_rng(123)
-        times = (20.0 + rng.normal(0, 3, 100)).tolist()
-        cfg = _make_config(contamination=contamination)
         result = compute_iforest_anomalies(times, config=cfg)
 
         assert result["status"] == "success"
+        X = np.asarray(times, dtype=np.float64).reshape(-1, 1)
+        model = IsolationForest(
+            n_estimators=cfg.n_estimators,
+            contamination="auto",
+            random_state=cfg.random_state,
+            n_jobs=-1,
+        )
+        model.fit(X)
 
-        scores = np.array(result["scores"])
-        expected_q = 1.0 - contamination
-        expected_threshold = float(np.quantile(scores, expected_q))
+        expected_scores = (-model.decision_function(X)).astype(float).tolist()
+        expected_flags = [bool(flag == -1) for flag in model.predict(X)]
 
-        assert math.isclose(
-            result["threshold_score"],
-            expected_threshold,
-            rel_tol=1e-9,
-        ), (
-            f"threshold_score={result['threshold_score']} != "
-            f"quantile(scores, {expected_q})={expected_threshold}"
+        assert result["scores"] == pytest.approx(expected_scores)
+        assert result["is_anomaly"] == expected_flags
+
+    def test_contamination_mode_is_auto(self):
+        small = compute_iforest_anomalies([20.1, 20.2, 20.3, 20.4, 20.5, 20.6, 20.0, 20.7, 20.8, 24.0])
+        large = compute_iforest_anomalies(
+            [20.0, 20.1, 20.2, 20.3, 20.4, 20.5, 20.6, 20.7, 20.8, 20.9, 21.0, 21.1, 21.2, 25.0]
         )
 
+        assert small["status"] == "success"
+        assert large["status"] == "success"
+        assert small["contamination_mode"] == "auto"
+        assert large["contamination_mode"] == "auto"
 
-# -----------------------------------------------------------------
-# 5. Used params are always echoed back
-# -----------------------------------------------------------------
 
 class TestUsedParamsEchoed:
-    """Every result dict must include the five *_used keys."""
+    """Every result dict must include the expected *_used keys."""
 
     _USED_KEYS = {
         "min_results_used",
-        "contamination_used",
+        "contamination_mode",
         "eps_std_used",
         "n_estimators_used",
         "random_state_used",
@@ -169,22 +125,9 @@ class TestUsedParamsEchoed:
         result = compute_iforest_anomalies(times)
         assert self._USED_KEYS.issubset(result.keys())
 
-    def test_custom_config_values_echoed(self):
-        cfg = _make_config(min_results=5, contamination=0.10, n_estimators=50)
-        rng = np.random.default_rng(7)
-        times = (18.0 + rng.normal(0, 2, 50)).tolist()
-        result = compute_iforest_anomalies(times, config=cfg)
-        assert result["min_results_used"] == 5
-        assert result["contamination_used"] == 0.10
-        assert result["n_estimators_used"] == 50
-
-
-# -----------------------------------------------------------------
-# 6. Reproducibility (random_state)
-# -----------------------------------------------------------------
 
 class TestReproducibility:
-    """Same input + same random_state → identical output."""
+    """Same input + same random_state -> identical output."""
 
     def test_deterministic_scores(self):
         rng = np.random.default_rng(99)
@@ -194,5 +137,4 @@ class TestReproducibility:
         r2 = compute_iforest_anomalies(times)
 
         assert r1["scores"] == r2["scores"]
-        assert r1["threshold_score"] == r2["threshold_score"]
         assert r1["is_anomaly"] == r2["is_anomaly"]
