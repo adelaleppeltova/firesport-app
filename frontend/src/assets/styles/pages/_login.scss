@@ -4,6 +4,9 @@
 .login {
   display: grid;
   justify-items: center;
+  align-content: start;
+  min-height: 68vh;
+  padding-top: 12vh;
 
   @include mixins.auth-form;
 }
