@@ -8,7 +8,7 @@ function SideNavbar() {
     <aside className="side-menu">
       <ul className="side-menu__links">
         <li>
-          <NavLink to="/home" className="nav-item">
+          <NavLink to="/domu" className="nav-item">
             <i className="fa-solid fa-house"></i>
             <span>Domů</span>
           </NavLink>

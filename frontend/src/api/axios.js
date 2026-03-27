@@ -47,6 +47,8 @@ api.interceptors.response.use(
     const isAuthEndpoint =
       url.includes("/v1/auth/login") ||
       url.includes("/v1/auth/register") ||
+      url.includes("/v1/auth/forgot-password") ||
+      url.includes("/v1/auth/reset-password") ||
       url.includes("/v1/auth/refresh");
 
     if (isAuthEndpoint || original._retry) {

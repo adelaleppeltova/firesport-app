@@ -10,11 +10,18 @@ services:
       - ./data:/app/data:ro
     depends_on:
       - mongo
+      - mailpit
     entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
     environment:
       - MONGO_URL=mongodb://mongo:27017
       - DEBUG=true
       - IMPORT_DATA=false
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_USE_TLS=false
+      - SMTP_USE_SSL=false
+      - SMTP_FROM_EMAIL=no-reply@firesport.local
+      - FRONTEND_URL=http://localhost:3000
 
   mongo:
     image: mongo
@@ -23,6 +30,13 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: firesport-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
   frontend:
     container_name: firesport-frontend

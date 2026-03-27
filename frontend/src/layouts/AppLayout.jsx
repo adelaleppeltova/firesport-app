@@ -14,7 +14,7 @@ const AppLayout = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/welcome" replace />;
+    return <Navigate to="/vitejte" replace />;
   }
 
   return (

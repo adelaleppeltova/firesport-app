@@ -66,7 +66,7 @@ function RegisterPage() {
       clearPersistedState("register:firstName");
       clearPersistedState("register:lastName");
       clearPersistedState("register:email");
-      navigate("/login", {
+      navigate("/prihlaseni", {
         state: {
           flash: {
             type: "success",
@@ -201,7 +201,7 @@ function RegisterPage() {
 
       <div className="register__content">
         <p>Již máte účet?</p>
-        <Link className="register__link" to={"/login"}>
+        <Link className="register__link" to={"/prihlaseni"}>
           Přihlaste se
         </Link>
       </div>

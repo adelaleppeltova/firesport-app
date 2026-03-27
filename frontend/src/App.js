@@ -6,6 +6,8 @@ import BasicLayout from "./layouts/BasicLayout";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import WelcomePage from "./pages/WelcomePage";
 import AthletesPage from "./pages/AthletesPage";
 import AthleteDetailPage from "./pages/AthleteDetailPage";
@@ -31,7 +33,7 @@ function App() {
     const { user, isAuthenticated, loading } = useAuth();
 
     if (loading) return <div>Loading...</div>;
-    if (!isAuthenticated) return <Navigate to="/welcome" replace />;
+    if (!isAuthenticated) return <Navigate to="/vitejte" replace />;
     if (user?.role !== "admin") {
       return <ErrorPage statusCode={403} title="Přístup odepřen" />;
     }
@@ -41,7 +43,7 @@ function App() {
   const RootPage = () => {
     const { isAuthenticated, loading } = useAuth();
     if (loading) return <div>Loading...</div>;
-    if (isAuthenticated) return <Navigate to="/home" replace />;
+    if (isAuthenticated) return <Navigate to="/domu" replace />;
     return <WelcomePage />;
   };
 
@@ -53,12 +55,17 @@ function App() {
           <Routes>
             <Route element={<BasicLayout />}>
               <Route path="/" element={<RootPage />} />
-              <Route path="/welcome" element={<WelcomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/vitejte" element={<WelcomePage />} />
+              <Route path="/prihlaseni" element={<LoginPage />} />
+              <Route path="/registrace" element={<RegisterPage />} />
+              <Route
+                path="/zapomenute-heslo"
+                element={<ForgotPasswordPage />}
+              />
+              <Route path="/obnoveni-hesla" element={<ResetPasswordPage />} />
             </Route>
             <Route element={<AppLayout />}>
-              <Route path="/home" element={<HomePage />} />
+              <Route path="/domu" element={<HomePage />} />
               <Route path="/zavodnici" element={<AthletesPage />} />
               <Route path="/zavody" element={<CompetitionsPage />} />
               <Route path="/zavody/:id" element={<CompetitionDetailPage />} />

@@ -7,7 +7,7 @@ function Header() {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login", {
+    navigate("/prihlaseni", {
       state: {
         flash: { type: "success", message: "Odhlášení proběhlo úspěšně." },
       },
@@ -20,7 +20,7 @@ function Header() {
         <div className="header__content--center">
           <NavLink
             className="header__brand"
-            to={isAuthenticated ? "/home" : "/"}
+            to={isAuthenticated ? "/domu" : "/"}
           >
             <img
               className="header__logo"
@@ -47,7 +47,7 @@ function Header() {
               </button>
             </>
           ) : (
-            <NavLink className="header__item" to="/login">
+            <NavLink className="header__item" to="/prihlaseni">
               <i className="fa-solid fa-user"></i>
               <span>Přihlásit se</span>
             </NavLink>

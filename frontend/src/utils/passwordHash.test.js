@@ -3,8 +3,11 @@ import { webcrypto } from "crypto";
 import { hashPassword } from "./passwordHash";
 
 beforeAll(() => {
-  if (!globalThis.crypto?.subtle) {
-    globalThis.crypto = webcrypto;
+  if (!window.crypto?.subtle) {
+    Object.defineProperty(window, "crypto", {
+      value: webcrypto,
+      configurable: true,
+    });
   }
 });
 

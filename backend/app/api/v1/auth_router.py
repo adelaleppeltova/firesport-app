@@ -1,17 +1,24 @@
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, status, Response, Depends, Request, Header
+from fastapi import APIRouter, HTTPException, status, Response, Depends, Request
 from fastapi.concurrency import run_in_threadpool
 from bson import ObjectId
 
 from app.models.user import UserRegisterRequest, UserLoginRequest, UserOut
-from app.models.auth import Token
+from app.models.auth import (
+    Token,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    MessageResponse,
+)
 from app.services.auth import (
     hash_password,
     verify_password,
     create_access_token,
     create_refresh_token,
+    create_password_reset_token,
     decode_token,
 )
+from app.services.email_service import send_password_reset_email
 from app.db.database import db
 from app.dependencies import get_current_user
 
@@ -45,23 +52,6 @@ async def login(response: Response, payload: UserLoginRequest):
     stored_password_hash = user.get("hashed_password", "")
     ok = await run_in_threadpool(verify_password, stored_password_hash, payload.password_hash)
 
-    # Compatibility path for accounts created before frontend-side hashing.
-    # Once the legacy plaintext password matches, migrate the stored secret
-    # to argon2(password_hash) so following logins no longer need plaintext.
-    if not ok and payload.password:
-        legacy_ok = await run_in_threadpool(
-            verify_password,
-            stored_password_hash,
-            payload.password,
-        )
-        if legacy_ok:
-            migrated_hash = await run_in_threadpool(hash_password, payload.password_hash)
-            await users.update_one(
-                {"_id": ObjectId(user_id)},
-                {"$set": {"hashed_password": migrated_hash}},
-            )
-            ok = True
-
     if not ok:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     access_token = create_access_token(user_id)
@@ -80,6 +70,80 @@ async def login(response: Response, payload: UserLoginRequest):
         expires=int((refresh["expires_at"] - datetime.utcnow()).total_seconds()),
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/forgot-password", response_model=MessageResponse)
+async def forgot_password(payload: ForgotPasswordRequest):
+    generic_message = (
+        "Pokud učet s tímto emailem existuje, poslali jsme instrukce pro obnovení hesla."
+    )
+    user = await users.find_one({"email": payload.email})
+    if not user:
+        return {"message": generic_message}
+
+    user_id = str(user["_id"])
+    reset_token = create_password_reset_token(user_id)
+    await users.update_one(
+        {"_id": ObjectId(user_id)},
+        {
+            "$set": {
+                "password_reset_jti": reset_token["jti"],
+                "password_reset_expires_at": reset_token["expires_at"],
+            }
+        },
+    )
+
+    await run_in_threadpool(
+        send_password_reset_email,
+        payload.email,
+        reset_token["token"],
+    )
+    return {"message": generic_message}
+
+
+@router.post("/reset-password", response_model=MessageResponse)
+async def reset_password(payload: ResetPasswordRequest, response: Response):
+    try:
+        token_payload = decode_token(payload.token)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+
+    if token_payload.get("type") != "password_reset":
+        raise HTTPException(status_code=400, detail="Invalid reset token type")
+
+    user_id = token_payload.get("sub")
+    jti = token_payload.get("jti")
+    if not user_id or not jti:
+        raise HTTPException(status_code=400, detail="Invalid reset token")
+
+    user = await users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid reset token")
+
+    expires_at = user.get("password_reset_expires_at")
+    if (
+        user.get("password_reset_jti") != jti
+        or expires_at is None
+        or expires_at < datetime.utcnow()
+    ):
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+
+    new_password_hash = await run_in_threadpool(hash_password, payload.password_hash)
+    await users.update_one(
+        {"_id": ObjectId(user_id)},
+        {
+            "$set": {
+                "hashed_password": new_password_hash,
+                "refresh_tokens": [],
+            },
+            "$unset": {
+                "password_reset_jti": "",
+                "password_reset_expires_at": "",
+            },
+        },
+    )
+    response.delete_cookie("refresh_token")
+    return {"message": "Heslo bylo uspesne obnoveno."}
 
 @router.post("/refresh", response_model=Token)
 async def refresh(request: Request, response: Response):

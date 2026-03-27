@@ -95,7 +95,7 @@ function LoginPage() {
             </button>
           </div>
         </label>
-        {error && <p className="form-error">{error}</p>} {/* přidáno */}
+        {error && <p className="form-error">{error}</p>}
         <PrimaryButton
           className="btn login__button"
           aria-label="Přihlásit se"
@@ -107,8 +107,11 @@ function LoginPage() {
         </PrimaryButton>
       </form>
       <div className="login__content">
+        <Link className="login__link" to="/zapomenute-heslo">
+          Zapomněl(a) jsem heslo
+        </Link>
         <p>Nemáte účet?</p>
-        <Link className="login__link" to={"/register"}>
+        <Link className="login__link" to={"/registrace"}>
           Zaregistrujte se
         </Link>
       </div>

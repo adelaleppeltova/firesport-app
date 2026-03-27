@@ -7,7 +7,7 @@ function WelcomePage() {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) return <div>Loading...</div>;
-  if (isAuthenticated) return <Navigate to="/home" replace />;
+  if (isAuthenticated) return <Navigate to="/domu" replace />;
 
   return (
     <div className="welcome">
@@ -15,7 +15,7 @@ function WelcomePage() {
         <h1 className="welcome__title">Vítejte</h1>
         <PrimaryButton
           className="btn welcome__button"
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/prihlaseni")}
           aria-label="Přihlásit se"
           type="button"
           isLoading={false}
@@ -25,7 +25,7 @@ function WelcomePage() {
         </PrimaryButton>
         <div className="welcome__content">
           <p>Nemáte účet?</p>
-          <Link className="welcome__link" to={"/register"}>
+          <Link className="welcome__link" to={"/registrace"}>
             Zaregistrujte se
           </Link>
         </div>

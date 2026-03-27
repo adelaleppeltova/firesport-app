@@ -4,7 +4,7 @@ const ErrorPage = ({
   statusCode = 404,
   title,
   description,
-  backTo = "/home",
+  backTo = "/domu",
 }) => {
   const resolvedTitle =
     title ?? (statusCode === 403 ? "Přístup odepřen" : "Stránka nenalezena");

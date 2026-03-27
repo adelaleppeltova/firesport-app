@@ -29,20 +29,19 @@ export function AuthProvider({ children }) {
     const passwordHash = await hashPassword(password);
     const { data } = await api.post("/v1/auth/login", {
       email,
-      password,
       password_hash: passwordHash,
     });
     localStorage.setItem("token", data.access_token);
     setAuthToken(data.access_token);
     setUser(data.user);
-    window.location.href = "/home";
+    window.location.href = "/domu";
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     setAuthToken(null);
     setUser(null);
-    window.location.href = "/login";
+    window.location.href = "/prihlaseni";
   };
 
   const isAuthenticated = !!user;
