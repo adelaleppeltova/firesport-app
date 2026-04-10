@@ -1,0 +1,27 @@
+@use "../abstracts/variables";
+
+.error-page {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 12px;
+  min-height: 68vh;
+  width: min(100%, 42rem);
+  max-width: 42rem;
+  margin-inline: auto;
+  padding-top: 12vh;
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    font-size: variables.$font-size-xl;
+    font-weight: variables.$font-weight-extrabold;
+    color: variables.$color-text;
+  }
+
+  p {
+    margin: 0;
+    font-size: variables.$font-size-m;
+    color: variables.$color-text;
+  }
+}
