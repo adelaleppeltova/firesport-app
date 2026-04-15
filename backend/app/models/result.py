@@ -45,7 +45,7 @@ class ImportedAthleteData(BaseModel):
 
 
 class TimeAttempt(BaseModel):
-    attempt: int
+    attempt: Optional[int] = None
     time: Optional[float]
     status: TimeStatus
 
@@ -83,7 +83,7 @@ class ResultAthleteDetail(BaseModel):
     category: CategoryInDB
 
     date: datetime
-    team: str
+    team: Optional[str] = None
 
     start_number: Optional[int] = None
 
