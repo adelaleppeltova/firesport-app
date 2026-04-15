@@ -10,7 +10,6 @@ export default function BasicLayout() {
       <main className="main">
         <Outlet />
       </main>
-      {/* <Footer /> */}
     </div>
   );
 }

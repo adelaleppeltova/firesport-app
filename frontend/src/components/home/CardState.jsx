@@ -1,12 +1,3 @@
-/**
- * Shared empty / error state for home dashboard cards.
- *
- * type:
- *   "error"       – data se nepodařilo načíst (síťová chyba)
- *   "no-data"     – data zatím nejsou k dispozici
- *   "insufficient"– nedostatek záznamů pro výpočet
- */
-
 const STATE_CONFIG = {
   error: {
     icon: "fa-triangle-exclamation",

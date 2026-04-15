@@ -8,9 +8,6 @@ function formatTime(seconds) {
   return mins > 0 ? `${mins}:${secs}` : `${secs} s`;
 }
 
-/**
- * Select pro výběr konkrétní kategorie z DB (např. "Střední dorostenci").
- */
 export function CategorySelect({ categories, value, onChange }) {
   if (!categories || categories.length === 0) return null;
   return (
@@ -35,9 +32,6 @@ export function CategorySelect({ categories, value, onChange }) {
   );
 }
 
-/**
- * Karta přehledu v konkrétní kategorii (ne groupby).
- */
 export default function AthleteDetailCategoryCard({
   totalResults,
   bestTime,

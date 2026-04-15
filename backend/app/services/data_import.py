@@ -3,7 +3,6 @@ Service pro import dat ze JSON souborů do MongoDB.
 Podporuje import z externího zdroje a automatické vytváření entit.
 """
 import logging
-import json
 import re
 from typing import Dict, List, Optional, Any
 from datetime import datetime
@@ -509,21 +508,3 @@ class DataImporter:
             self.stats["review_required"] += 1
         else:
             self.stats["results_unmatched"] += 1
-
-
-async def import_json_file(file_path: str) -> Dict[str, Any]:
-    """Bezpečně importuje JSON soubor a vrátí statistiky."""
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        importer = DataImporter()
-        await importer.import_from_dict(data)
-        return importer.stats
-        
-    except json.JSONDecodeError as e:
-        logger.error(f"Chyba při parsování JSON {file_path}: {e}")
-        return {"errors": [f"JSON parse error: {str(e)}"]}
-    except Exception as e:
-        logger.error(f"Chyba při importu souboru {file_path}: {e}")
-        return {"errors": [str(e)]}

@@ -3,7 +3,7 @@ import PrimaryButton from "../PrimaryButton";
 import { useUnpairAthlete } from "../../hooks/useApi";
 
 function getErrorMessage(error) {
-  return error?.response?.data?.detail || "Odpárování se nepodařilo. Zkus to prosím znovu.";
+  return error?.response?.data?.detail || "Odpárování se nezdařilo. Zkuste to znovu.";
 }
 
 export default function UnpairAthleteCard() {
@@ -21,7 +21,7 @@ export default function UnpairAthleteCard() {
     try {
       await unpairMutation.mutateAsync();
     } catch (error) {
-      // Chybu zobrazujeme přímo v kartě.
+      return;
     }
   };
 
@@ -32,8 +32,8 @@ export default function UnpairAthleteCard() {
     >
       <div className="unpair-athlete">
         <p className="unpair-athlete__text">
-          Pokud chceš svůj účet propojit s jiným závodníkem, nejdřív zruš
-          stávající propojení.
+          Chcete-li účet propojit s jiným závodníkem, nejdřív zrušte současné
+          propojení.
         </p>
 
         {unpairMutation.isError ? (

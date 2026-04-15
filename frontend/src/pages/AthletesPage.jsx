@@ -210,7 +210,6 @@ export default function AthletesPage() {
               </div>
             )}
           </div>
-          {/* PAGINACE */}
           {pageCount > 1 && (
             <div className="athletes-pagination" aria-label="Stránkování závodníků">
               <PrimaryButton

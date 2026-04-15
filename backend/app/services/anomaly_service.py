@@ -34,64 +34,6 @@ from app.services.windows import (
 logger = logging.getLogger(__name__)
 
 
-# ------------------------------------------------------------------
-# Internal helpers
-# ------------------------------------------------------------------
-
-def _build_window(
-    window_start: datetime,
-    window_end: datetime,
-    cfg: AnomalyConfig,
-) -> Dict[str, Any]:
-    """Build window sub-document stored inside an anomaly run."""
-    return {
-        "start_date": window_start,
-        "end_date": window_end,
-        "years": 3,
-        "min_results": cfg.min_results,
-    }
-
-
-def _build_model(cfg: AnomalyConfig) -> Dict[str, Any]:
-    """Build model sub-document with the *actually used* parameters."""
-    return {
-        "name": "Isolation Forest",
-        "params": {
-            "n_estimators": cfg.n_estimators,
-            "contamination_mode": "auto",
-            "random_state": cfg.random_state,
-            "eps_std": cfg.eps_std,
-        },
-        "feature": "final_time",
-        "score_definition": "-decision_function",
-    }
-
-
-def _build_run_doc(
-    run_id: str,
-    created_at: datetime,
-    window: Dict[str, Any],
-    model: Dict[str, Any],
-    status: str,
-    summary: Dict[str, Any],
-    window_type: str = "yearly_3y",
-) -> Dict[str, Any]:
-    """Build run document for ``anomaly_runs`` collection.
-
-    ``window_type`` is a top-level field used for efficient filtering.
-    Recommended compound index: (window_type, window.end_date DESC).
-    """
-    return {
-        "run_id": run_id,
-        "created_at": created_at,
-        "window_type": window_type,
-        "window": window,
-        "model": model,
-        "status": status,
-        "summary": summary,
-    }
-
-
 def _empty_skip_reason_counts() -> Dict[str, int]:
     """Return zeroed skip-reason counter dict."""
     return {

@@ -286,7 +286,6 @@ export default function CompetitionsPage() {
               </div>
             )}
           </div>
-          {/* PAGINACE */}
           {pageCount > 1 && (
             <div
               className="competitions-pagination"

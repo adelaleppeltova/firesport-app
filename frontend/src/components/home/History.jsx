@@ -54,8 +54,7 @@ export default function History({ athleteId, year, onTrendChange }) {
   return (
     <div className={`history history--state-${trend.state}`}>
       <span className="history__delta-detail">
-        Trend porovnává medián 3 posledních platných časů s předchozími 3
-        výsledky.
+        Trend porovnává medián posledních 3 platných časů s předchozími 3.
       </span>
       <div className="history__status">
         <i className={`fa-solid ${trend.icon} history__icon`} />

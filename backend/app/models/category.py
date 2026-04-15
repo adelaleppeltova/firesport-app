@@ -7,10 +7,6 @@ class CategoryBase(BaseModel):
     discipline: Optional[str] = None
 
 
-class CategoryCreate(CategoryBase):
-    pass
-
-
 class CategoryInDB(CategoryBase):
     id: str = Field(..., alias="_id")
 

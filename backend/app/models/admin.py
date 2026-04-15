@@ -5,19 +5,7 @@ from pydantic import BaseModel, Field
 from app.models.result import ImportedAthleteData, MatchStatus
 
 
-class ImportRunResponse(BaseModel):
-    success: bool = True
-    message: str
-    data: dict
-
-
 class AssignAthleteRequest(BaseModel):
-    athlete_id: str
-
-
-class CreateAthleteFromResultResponse(BaseModel):
-    ok: bool = True
-    result_id: str
     athlete_id: str
 
 

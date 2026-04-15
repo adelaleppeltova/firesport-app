@@ -16,9 +16,7 @@ export default function FlashBanner() {
     setVisible(true);
     setFadeOut(false);
 
-    // spustit fade-out 300 ms před koncem
     const fadeTimer = setTimeout(() => setFadeOut(true), 3700);
-    // schovat úplně po 4 s
     const hideTimer = setTimeout(() => setVisible(false), 4000);
 
     return () => {

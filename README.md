@@ -107,7 +107,7 @@ Vstupní obrazovka odděluje veřejnou část aplikace od funkcí dostupných po
 
 Domovská stránka poskytuje přehled o vybraném závodníkovi, jeho výkonnosti a základních analytických výstupech.
 
-![Domovská stránka](docs/screenshots/homepage.png)
+![Domovská stránka](docs/screenshots/HomePage.png)
 ![Domovská stránka (mobilní rozložení)](docs/screenshots/homepage-mobile.png)
 
 ### Seznam závodníků
@@ -167,7 +167,7 @@ Registrační obrazovka umožňuje vytvoření nového uživatelského účtu pr
 
 ### API dokumentace
 
-Součástí backendu je automaticky generovaná dokumentace REST API dostupná prostřednictvím rozhraní Swagger UI.
+Součástí backendu je automaticky generovaná dokumentace REST API dostupná prostřednictvím rozhraní Swagger.
 
 ![API dokumentace](docs/screenshots/API.png)
 

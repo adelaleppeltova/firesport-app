@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Card from "../Card";
 
 // Mapování identifikátorů skupin na čitelné názvy
@@ -41,14 +41,6 @@ function SectionTitle({ children }) {
   return <h3 className="model-info-card__section-title">{children}</h3>;
 }
 
-/**
- * Karta s informacemi o nastavení modelu Isolation Forest.
- *
- * Props:
- *   run           – AnomalyRunInfo objekt (z API anomaly endpointu)
- *   athlete       – detailní objekt závodníka { first_name, last_name }
- *   categoryGroup – identifikátor skupiny kategorií (např. "muz", "zena")
- */
 export default function ModelInfoCard({ run, athlete, categoryGroup }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -73,7 +65,6 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
   const maxSamples = run.max_samples;
   const epsStd = run.eps_std;
 
-  // Zobrazení počtu označených pro viditelnou část
   const nValid = run.n_valid_results_in_window;
   const nAnom = run.n_anomalies;
   const markedShort =
@@ -81,14 +72,12 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
       ? `${nAnom} z ${nValid} (\u2248\u202f${Math.round((nAnom / nValid) * 100)}\u202f%)`
       : "—";
 
-  // Zobrazení contamination pro detail
   const contaminationDetail =
     contaminationMode === "auto" ? (
       <>
         auto
         <span className="model-info-card__value-note">
-          Model používá interní rozhodnutí Isolation Forestu; nepředepisuje se
-          vlastní podíl anomálií.
+          Podíl anomálií určuje model.
         </span>
       </>
     ) : "—";
@@ -96,19 +85,17 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
   return (
     <Card title="Detaily analýzy">
       <div className="model-info-card">
-        {/* ── Viditelná část (vždy zobrazena) ── */}
         <div className="model-info-card__visible">
           <InfoRow label="Algoritmus" value={modelName} />
           <InfoRow label="Období analýzy" value={windowRangeFull} />
 
           <InfoRow
-            label="Výsledky (validní / vyřazené)"
+            label="Validní / vyřazené"
             value={`${run.n_valid_results_in_window} / ${run.n_invalid_results_in_window ?? 0}`}
           />
           <InfoRow label="Označeno" value={markedShort} />
         </div>
 
-        {/* ── Tlačítko pro rozbalení ── */}
         <button
           type="button"
           className="model-info-card__toggle"
@@ -121,25 +108,22 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
           />
         </button>
 
-        {/* ── Rozbalitelná část ── */}
         {expanded && (
           <div className="model-info-card__details">
-            {/* Identifikace analýzy */}
             <SectionTitle>Identifikace analýzy</SectionTitle>
             <div className="model-info-card__section">
               <InfoRow label="Algoritmus" value={modelName} />
               <InfoRow label="Vypočteno" value={computedDate} />
 
-              <InfoRow label="ID výpočtu (run ID)" value={run.run_id} />
+              <InfoRow label="Run ID" value={run.run_id} />
             </div>
 
-            {/* Kontext */}
             <SectionTitle>Kontext</SectionTitle>
             <div className="model-info-card__section">
               <InfoRow label="Závodník" value={athleteName} />
               <InfoRow label="Kategorie" value={categoryLabel} />
               <InfoRow
-                label="Validní výsledky v okně"
+                label="Validní výsledky"
                 value={run.n_valid_results_in_window}
               />
               <InfoRow
@@ -149,7 +133,6 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
               <InfoRow label="Disciplína" value={run.discipline ?? "—"} />
             </div>
 
-            {/* Hlavní parametry modelu */}
             <SectionTitle>Parametry detekce</SectionTitle>
             <div className="model-info-card__section">
               <InfoRow
@@ -157,26 +140,25 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
                 value={contaminationDetail}
               />
               <InfoRow
-                label="Seed (reprodukovatelnost)"
+                label="Seed"
                 value={randomState != null ? String(randomState) : "—"}
               />
               <InfoRow
-                label="Počet stromů (n_estimators)"
+                label="Počet stromů"
                 value={nEstimators != null ? nEstimators : "—"}
               />
               <InfoRow
-                label="Velikost vzorku (max_samples)"
+                label="Velikost vzorku"
                 value={maxSamples ?? "auto"}
               />
               {epsStd != null && (
                 <InfoRow
                   label="Minimální variabilita dat"
-                  value={`${String(epsStd).replace(".", ",")} (pokud jsou časy téměř stejné, detekce se nespustí)`}
+                  value={`${String(epsStd).replace(".", ",")} (při téměř shodných časech se detekce nespustí)`}
                 />
               )}
             </div>
 
-            {/* Omezení metody */}
             <SectionTitle>Omezení metody</SectionTitle>
             <div className="model-info-card__section model-info-card__section--notes">
               <ul className="model-info-card__limits-list">
@@ -188,16 +170,8 @@ export default function ModelInfoCard({ run, athlete, categoryGroup }) {
                 <li>
                   Do výpočtu vstupují jen validní výsledky v okně analýzy.
                 </li>
-                <li>
-                  Označení je podnět k interpretaci v kontextu, nikoli
-                  automatický důkaz chyby.
-                </li>
+                <li>Označení samo o sobě neznamená chybu.</li>
               </ul>
-              <p className="model-info-card__note model-info-card__note--muted">
-                Označení „Doporučeno ověřit záznam“ upozorňuje na výkon, který
-                je vhodné zkontrolovat v kontextu průběhu závodu nebo známých
-                okolností. Neznamená samo o sobě chybný výsledek.
-              </p>
             </div>
           </div>
         )}

@@ -26,29 +26,26 @@ function RegisterPage() {
     ttlMs: 30 * 60_000,
   });
   const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState(""); // přidáno — pro kontrolu shody
+  const [password2, setPassword2] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [showPass2, setShowPass2] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(""); // přidáno
+  const [error, setError] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // FE validace emailu
     if (!email.includes("@") || !email.includes(".")) {
       setError("Zadejte platný email.");
       return;
     }
 
-    // kontrola shody hesel
     if (password !== password2) {
       setError("Hesla se neshodují.");
       return;
     }
 
-    // kontrola síly hesla
     if (!passwordRules.test(password)) {
       setError(
         "Heslo musí obsahovat min. 8 znaků, velké a malé písmeno a číslici.",
@@ -70,7 +67,7 @@ function RegisterPage() {
         state: {
           flash: {
             type: "success",
-            message: "Registrace proběhla úspěšně. Přihlaste se.",
+            message: "Registrace byla dokončena. Přihlaste se.",
           },
         },
       });
@@ -124,7 +121,7 @@ function RegisterPage() {
               type="email"
               id="email"
               name="email"
-              autoComplete="section-register email" // upřesněno
+              autoComplete="section-register email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value.toLowerCase())}
@@ -187,7 +184,7 @@ function RegisterPage() {
             </button>
           </div>
         </label>
-        {error && <p className="form-error">{error}</p>} {/* přidáno */}
+        {error && <p className="form-error">{error}</p>}
         <PrimaryButton
           className="btn register__button"
           aria-label="Registrovat se"
@@ -200,7 +197,7 @@ function RegisterPage() {
       </form>
 
       <div className="register__content">
-        <p>Již máte účet?</p>
+          <p>Máte účet?</p>
         <Link className="register__link" to={"/prihlaseni"}>
           Přihlaste se
         </Link>

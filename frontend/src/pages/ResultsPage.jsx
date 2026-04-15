@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { useResultsByCategory, useCompetitionDetail } from "../hooks/useApi";
 import PageContextNav from "../components/PageContextNav";
@@ -75,7 +75,7 @@ export default function ResultsPage() {
       competition?.categories?.find(
         (cat) => String(cat.id) === String(categoryId),
       )?.name,
-    ) || "Název kategorie neznámý";
+    ) || "Neznámá kategorie";
 
   if (isLoading || isCompLoading) return <div>Načítání...</div>;
   if (error) return <div>Chyba při načítání výsledků.</div>;
@@ -101,7 +101,7 @@ export default function ResultsPage() {
         <h1>Výsledky</h1>
         <div className="results-page__meta">
           <p className="results-page__competition">
-            {competition?.name || "Název soutěže neznámý"}
+            {competition?.name || "Neznámá soutěž"}
           </p>
           <p className="results-page__date">
             {competition?.date

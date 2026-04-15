@@ -44,12 +44,15 @@ export default function PerformanceStability({
       <div className="performance-stability__info">
         <div className="performance-stability__header">
           <p className="performance-stability__description">
-            Stabilita hodnotí rozptyl 6 posledních platných časů v aktuální sezóně.
+            Stabilita hodnotí rozptyl 6 posledních platných časů v aktuální
+            sezóně.
           </p>
         </div>
 
         <div className="performance-stability__header">
-          <i className={`fa-solid ${config.icon} performance-stability__icon`} />
+          <i
+            className={`fa-solid ${config.icon} performance-stability__icon`}
+          />
           <div>
             <p className="performance-stability__rating">
               <strong>{ratingText}</strong>

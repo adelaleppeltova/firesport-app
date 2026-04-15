@@ -8,9 +8,6 @@ class CompetitionBase(BaseModel):
     date: datetime
     league: Optional[List[str]] = None
 
-class CompetitionCreate(CompetitionBase):
-    pass   
-
 class CompetitionInDB(CompetitionBase):
     id: str = Field(..., alias="_id")
 

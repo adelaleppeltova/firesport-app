@@ -9,7 +9,6 @@ export default function PairAthleteDialog({ onClose }) {
   const inputRef = useRef(null);
   const pairMutation = usePairAthlete();
 
-  // Zavření přes Escape
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
@@ -18,7 +17,6 @@ export default function PairAthleteDialog({ onClose }) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  // Focus na input při otevření
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -43,7 +41,7 @@ export default function PairAthleteDialog({ onClose }) {
       await pairMutation.mutateAsync(athleteId);
       onClose();
     } catch (err) {
-      // chyba je ošetřena v mutaci
+      return;
     }
   };
 

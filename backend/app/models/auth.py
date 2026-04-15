@@ -5,11 +5,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-class TokenPayload(BaseModel):
-    sub: Optional[str] = None
-    jti: Optional[str] = None
-    type: Optional[str] = None
-
 
 class MessageResponse(BaseModel):
     message: str

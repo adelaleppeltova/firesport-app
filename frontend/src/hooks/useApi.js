@@ -58,32 +58,6 @@ export function useUnpairAthlete() {
   });
 }
 
-export function useSearchAthletes(query) {
-  return useQuery({
-    queryKey: ["athletes", "search", query],
-    queryFn: async () => {
-      if (!query || query.length < 2) return { items: [] };
-      const { data } = await api.get(
-        `/v1/athletes/search?q=${encodeURIComponent(query)}`,
-      );
-      return data;
-    },
-    enabled: query.length >= 2,
-    placeholderData: keepPreviousData,
-  });
-}
-
-export function useAthleteOverview(athleteId) {
-  return useQuery({
-    queryKey: ["athletes", athleteId, "overview"],
-    queryFn: async () => {
-      const { data } = await api.get(`/v1/athletes/${athleteId}/overview`);
-      return data;
-    },
-    enabled: !!athleteId,
-  });
-}
-
 // GET /athletes/:id/profile – základní profil pro MyProfile
 export function useAthleteProfile(athleteId) {
   return useQuery({
@@ -312,21 +286,6 @@ export function useMlWindows(type = "yearly_3y", athleteId = null) {
     },
     enabled: !!athleteId, // načteme teprve po výběru závodníka
     staleTime: 2 * 60 * 1000,
-  });
-}
-
-// GET /athletes/:id/category-stats
-export function useAthleteCategoryStats(athleteId) {
-  return useQuery({
-    queryKey: ["athletes", athleteId, "category-stats"],
-    queryFn: async () => {
-      const { data } = await api.get(
-        `/v1/athletes/${athleteId}/category-stats`,
-      );
-      return data; // { stats: { [category_group]: { total_races, best_time } } }
-    },
-    enabled: !!athleteId,
-    staleTime: 5 * 60 * 1000,
   });
 }
 

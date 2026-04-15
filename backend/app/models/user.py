@@ -37,21 +37,6 @@ class UserLoginRequest(BaseModel):
     )
 
 
-class UserInDB(UserBase):
-    id: str = Field(..., alias="_id")
-    hashed_password: str
-    created_at: datetime = Field(default_factory=datetime.now)
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-    )
-
-
-class UserPublic(UserBase):
-    id: str
-    created_at: datetime
-
-
 class UserOut(BaseModel):
     id: str
     email: EmailStr

@@ -10,10 +10,6 @@ export default function PairAthleteCard() {
     <>
       <Card title="Propoj účet se závodníkem" className="card--home-account">
         <div className="pair-athlete">
-          <p className="pair-athlete__text">
-            Propojení účtu zpřístupní personalizovaný přehled výsledků,
-            statistik a vývoje výkonu.
-          </p>
           <div className="button-center">
             <PrimaryButton onClick={() => setShowPairDialog(true)}>
               Vybrat závodníka

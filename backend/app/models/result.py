@@ -71,10 +71,6 @@ class ResultBase(BaseModel):
     quality_flag: QualityFlag = QualityFlag.ok
 
 
-class ResultCreate(ResultBase):
-    pass
-
-
 class ResultInDB(ResultBase):
     id: str = Field(alias="_id")
 

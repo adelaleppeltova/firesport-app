@@ -1,4 +1,3 @@
-
 from motor.motor_asyncio import AsyncIOMotorClient
 from os import getenv
 
@@ -7,7 +6,6 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client["firesport"]
 
 users_col = db["users"]
-sessions_col = db["sessions"]
 
 def get_db():
     return db
@@ -16,8 +14,6 @@ def get_db():
 async def ensure_indexes():
     await users_col.create_index("email", unique=True)
     await users_col.create_index("role")
-    await sessions_col.create_index("session_id", unique=True)
-    await sessions_col.create_index("expires_at", expireAfterSeconds=0)  # TTL
     await db["athletes"].create_index("fscode", name="idx_athletes_fscode")
     await db["athletes"].create_index("fs_codes", name="idx_athletes_fs_codes")
     await db["athletes"].create_index(

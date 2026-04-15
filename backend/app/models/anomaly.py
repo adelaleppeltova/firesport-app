@@ -19,47 +19,6 @@ class AnomalyRunStatus(str, Enum):
     failed = "failed"
 
 
-class AnomalyRunWindow(BaseModel):
-    start_date: datetime
-    end_date: datetime
-    years: int = 3
-    min_results: int = DEFAULT_CONFIG.min_results
-
-
-class AnomalyRunModel(BaseModel):
-    name: str = "Isolation Forest"
-    params: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "n_estimators": DEFAULT_CONFIG.n_estimators,
-            "contamination_mode": DEFAULT_CONFIG.contamination,
-            "random_state": DEFAULT_CONFIG.random_state,
-            "eps_std": DEFAULT_CONFIG.eps_std,
-        }
-    )
-    feature: str = "final_time"
-    score_definition: str = "-decision_function"
-
-
-# API/DTO schemas for anomaly runs and scores
-# Note: These are used for API responses and internal DTOs.
-# Raw Mongo documents use ObjectId directly; conversion to str happens in routers.
-class AnomalyRunSummary(BaseModel):
-    athlete_id: str
-    n_valid_results_in_window: int
-    n_anomalies: int = 0
-    median_time: Optional[float] = None
-    reason: Optional[str] = None
-
-
-class AnomalyRunBase(BaseModel):
-    run_id: str
-    created_at: datetime
-    window: AnomalyRunWindow
-    model: AnomalyRunModel
-    status: AnomalyRunStatus
-    summary: AnomalyRunSummary
-
-
 class SkipReasonCounts(BaseModel):
     """Structured skip-reason counters for observability."""
     not_enough_data: int = 0

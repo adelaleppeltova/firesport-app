@@ -79,9 +79,6 @@ class AthleteBase(BaseModel):
         normalized["fscode"] = fs_codes[0] if fs_codes else None
         return normalized
 
-class AthleteCreate(AthleteBase):
-    pass
-
 class AthleteInDB(AthleteBase):
     id: str = Field(..., alias="_id")
 
@@ -154,13 +151,6 @@ class AthletesPage(BaseModel):
     page: int
     page_size: int
 
-
-class PerformanceDataPoint(BaseModel):
-    """Datový bod pro graf vývoje výkonu v čase"""
-    date: str  # ISO formát nebo "YYYY-MM-DD"
-    time: float  # Čas v sekundách
-    rank: Optional[int] = None
-    place: Optional[str] = None
 
 class PerformanceByYear(BaseModel):
     """Data pro graf vývoje výkonu po sezónách"""
