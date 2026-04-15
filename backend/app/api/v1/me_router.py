@@ -4,6 +4,7 @@ from app.dependencies import get_current_user
 from pydantic import BaseModel
 import logging
 from app.dependencies import sync_db
+from app.models.user import AthletePairingResponse, CurrentUserResponse
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +13,8 @@ router = APIRouter(prefix="/me", tags=["user"])
 class PairAthleteRequest(BaseModel):
     athlete_id: str
 
-@router.get("")
-@router.get("/")
+@router.get("", response_model=CurrentUserResponse)
+@router.get("/", response_model=CurrentUserResponse)
 def get_me(user=Depends(get_current_user)):
     """Vrátí údaje o aktuálně přihlášeném uživateli"""
     users_collection = sync_db["users"]
@@ -49,7 +50,7 @@ def get_me(user=Depends(get_current_user)):
         "athlete_id": athlete_id,
     }
 
-@router.patch("/pair-athlete")
+@router.patch("/pair-athlete", response_model=AthletePairingResponse)
 def pair_athlete(body: PairAthleteRequest, user=Depends(get_current_user)):
     """Spáruje uživatele s atletem"""
     logger.info(f"Pairing user {user['id']} with athlete {body.athlete_id}")
@@ -76,7 +77,7 @@ def pair_athlete(body: PairAthleteRequest, user=Depends(get_current_user)):
     
     return {"ok": True, "athlete_id": body.athlete_id}
 
-@router.delete("/pair-athlete")
+@router.delete("/pair-athlete", response_model=AthletePairingResponse)
 def unpair_athlete(user=Depends(get_current_user)):
     """Zruší propojení uživatele s atletem"""
     users_collection = sync_db["users"]

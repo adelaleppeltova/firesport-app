@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 
 class UserRole(str, Enum):
@@ -42,3 +42,23 @@ class UserOut(BaseModel):
     email: EmailStr
     role: UserRole
     is_active: bool
+
+
+class AuthenticatedUserOut(BaseModel):
+    id: str
+    email: EmailStr
+    role: UserRole
+    is_active: bool
+    athlete_id: Optional[str] = None
+
+
+class CurrentUserResponse(BaseModel):
+    user_id: str
+    email: EmailStr
+    role: UserRole
+    athlete_id: Optional[str] = None
+
+
+class AthletePairingResponse(BaseModel):
+    ok: bool = True
+    athlete_id: Optional[str] = None

@@ -3,7 +3,12 @@ from fastapi import APIRouter, HTTPException, status, Response, Depends, Request
 from fastapi.concurrency import run_in_threadpool
 from bson import ObjectId
 
-from app.models.user import UserRegisterRequest, UserLoginRequest, UserOut
+from app.models.user import (
+    UserRegisterRequest,
+    UserLoginRequest,
+    UserOut,
+    AuthenticatedUserOut,
+)
 from app.models.auth import (
     Token,
     ForgotPasswordRequest,
@@ -191,6 +196,6 @@ async def logout(request: Request, response: Response):
     response.delete_cookie("refresh_token")
     return Response(status_code=204)
 
-@router.get("/me")
+@router.get("/me", response_model=AuthenticatedUserOut)
 async def me(current=Depends(get_current_user)):
     return current

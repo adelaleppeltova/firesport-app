@@ -5,13 +5,14 @@ import logging
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from typing import Optional
 import json
+from app.models.admin import DataImportResponse
 from app.services.data_import import DataImporter
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/data", tags=["data"])
 
 
-@router.post("/import")
+@router.post("/import", response_model=DataImportResponse)
 async def import_json_endpoint(file: UploadFile = File(...)):
     """
     Importuje JSON soubor do databáze.
@@ -79,7 +80,7 @@ async def import_json_endpoint(file: UploadFile = File(...)):
         )
 
 
-@router.post("/import/raw")
+@router.post("/import/raw", response_model=DataImportResponse)
 async def import_raw_json(data: dict):
     """
     Importuje data přímo z JSON těla requestu.
