@@ -53,22 +53,30 @@ def normalize_teams(*values: Any) -> list[str]:
     return normalized
 
 
+def normalize_athlete_identity(
+    *,
+    fs_codes: Any = None,
+    teams: Any = None,
+) -> tuple[list[str], list[str]]:
+    normalized_fs_codes = normalize_fs_codes(fs_codes)
+    normalized_teams = normalize_teams(teams)
+    return normalized_fs_codes, normalized_teams
+
+
 def normalize_athlete_document(doc: Optional[dict]) -> Optional[dict]:
     if doc is None:
         return None
 
     normalized = dict(doc)
-    normalized["fs_codes"] = normalize_fs_codes(
-        normalized.get("fs_codes"),
-        normalized.get("fscode"),
+    (
+        normalized["fs_codes"],
+        normalized["teams"],
+    ) = normalize_athlete_identity(
+        fs_codes=normalized.get("fs_codes"),
+        teams=normalized.get("teams"),
     )
-    normalized["fscode"] = (
-        normalized["fs_codes"][0] if normalized["fs_codes"] else None
-    )
-    normalized["teams"] = normalize_teams(
-        normalized.get("teams"),
-        normalized.get("team"),
-    )
+    normalized.pop("fscode", None)
+    normalized.pop("team", None)
     return normalized
 
 
@@ -83,13 +91,4 @@ def build_fs_code_query(fs_code: Any) -> Optional[dict]:
     if not normalized_code:
         return None
 
-    variants: list[Any] = [normalized_code]
-    if normalized_code.isdigit():
-        variants.append(int(normalized_code))
-
-    return {
-        "$or": [
-            {"fs_codes": normalized_code},
-            {"fscode": {"$in": variants}},
-        ]
-    }
+    return {"fs_codes": normalized_code}

@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field, ConfigDict, model_validator
 from typing import Optional, List
 from enum import Enum
 
+from app.services.athlete_identity import normalize_athlete_identity
+
 
 class PerformanceIndicatorTrend(str, Enum):
     up = "up"
@@ -33,7 +35,6 @@ class AthleteBase(BaseModel):
     last_name: str
     teams: List[str] = Field(default_factory=list)
     fs_codes: List[str] = Field(default_factory=list)
-    fscode: Optional[str] = None
     birth_year: Optional[int] = None
     district: Optional[str] = None
 
@@ -44,39 +45,13 @@ class AthleteBase(BaseModel):
             return data
 
         normalized = dict(data)
-
-        teams = normalized.get("teams")
-        if teams is None:
-            team = normalized.get("team")
-            teams = [team] if team else []
-        elif not isinstance(teams, list):
-            teams = [teams]
-        normalized["teams"] = [
-            str(team).strip()
-            for team in teams
-            if team is not None and str(team).strip()
-        ]
-
-        raw_fs_codes = normalized.get("fs_codes")
-        if raw_fs_codes is None:
-            fallback_fscode = normalized.get("fscode")
-            raw_fs_codes = [fallback_fscode] if fallback_fscode is not None else []
-        elif not isinstance(raw_fs_codes, list):
-            raw_fs_codes = [raw_fs_codes]
-
-        fs_codes: list[str] = []
-        seen = set()
-        for value in raw_fs_codes:
-            if value is None:
-                continue
-            code = str(value).strip()
-            if not code or code in seen:
-                continue
-            seen.add(code)
-            fs_codes.append(code)
-
-        normalized["fs_codes"] = fs_codes
-        normalized["fscode"] = fs_codes[0] if fs_codes else None
+        (
+            normalized["fs_codes"],
+            normalized["teams"],
+        ) = normalize_athlete_identity(
+            fs_codes=normalized.get("fs_codes"),
+            teams=normalized.get("teams"),
+        )
         return normalized
 
 class AthleteInDB(AthleteBase):

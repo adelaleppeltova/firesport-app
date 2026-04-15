@@ -14,7 +14,6 @@ def get_db():
 async def ensure_indexes():
     await users_col.create_index("email", unique=True)
     await users_col.create_index("role")
-    await db["athletes"].create_index("fscode", name="idx_athletes_fscode")
     await db["athletes"].create_index("fs_codes", name="idx_athletes_fs_codes")
     await db["athletes"].create_index(
         [("first_name", 1), ("last_name", 1), ("birth_year", 1)],

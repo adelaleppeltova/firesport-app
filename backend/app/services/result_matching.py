@@ -83,10 +83,6 @@ def build_match_enrichment_update(
     if team and team not in (normalized_athlete.get("teams") or []):
         add_to_set_fields["teams"] = team
 
-    existing_codes = normalized_athlete.get("fs_codes") or []
-    if add_to_set_fields.get("fs_codes") and not existing_codes:
-        set_fields["fscode"] = add_to_set_fields["fs_codes"]
-
     if set_fields:
         set_fields["updated_at"] = datetime.utcnow()
         update["$set"] = set_fields

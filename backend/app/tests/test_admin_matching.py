@@ -109,7 +109,6 @@ def test_auto_reassigned_name_plus_team_enriches_missing_fscode_only():
         "last_name": "Maly",
         "teams": ["SDH Lhota"],
         "fs_codes": [],
-        "fscode": None,
         "birth_year": 2002,
     }
 
@@ -142,7 +141,6 @@ def test_auto_reassigned_name_plus_team_enriches_missing_fscode_only():
     assert response["auto_reassigned"] == 1
     rematch_enrichment_call = mock_athletes.update_one.await_args_list[0]
     assert rematch_enrichment_call.args[0] == {"_id": rematched_athlete_id}
-    assert rematch_enrichment_call.args[1]["$set"]["fscode"] == "54321"
     assert rematch_enrichment_call.args[1]["$addToSet"]["fs_codes"] == "54321"
     assert "updated_at" in rematch_enrichment_call.args[1]["$set"]
-    assert rematch_enrichment_call.args[1]["$addToSet"]["teams"] == "SDH Lhota"
+    assert "teams" not in rematch_enrichment_call.args[1]["$addToSet"]

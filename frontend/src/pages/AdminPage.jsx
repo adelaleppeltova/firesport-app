@@ -20,11 +20,7 @@ function formatAthleteMeta(athlete) {
   return [
     athlete.birth_year ? `Ročník ${athlete.birth_year}` : null,
     athlete.teams?.length ? athlete.teams.join(", ") : null,
-    athlete.fs_codes?.length
-      ? `FS kódy ${athlete.fs_codes.join(", ")}`
-      : athlete.fscode
-        ? `FSCode ${athlete.fscode}`
-        : null,
+    athlete.fs_codes?.length ? `FS kódy ${athlete.fs_codes.join(", ")}` : null,
   ]
     .filter(Boolean)
     .join(" • ");

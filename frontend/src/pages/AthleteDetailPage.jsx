@@ -133,7 +133,7 @@ export default function AthleteDetailPage() {
     athlete.district ? `Okres ${athlete.district}` : null,
   ].filter(Boolean);
   const athleteTeams = athlete.teams ?? [];
-  const athleteFsCodes = athlete.fs_codes ?? (athlete.fscode ? [athlete.fscode] : []);
+  const athleteFsCodes = athlete.fs_codes ?? [];
   const lastResult = [...filteredResults].sort(
     (a, b) => getResultDateValue(b) - getResultDateValue(a),
   )[0];

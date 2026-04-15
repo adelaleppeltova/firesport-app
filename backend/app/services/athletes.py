@@ -88,8 +88,6 @@ async def list_athletes_service(
                 if token.isdigit():
                     or_cond.append({"birth_year": int(token)})
                     or_cond.append({"fs_codes": token})
-                    or_cond.append({"fscode": int(token)})
-                    or_cond.append({"fscode": token})
                 and_conditions.append({"$or": or_cond})
             query["$and"] = and_conditions
         else:
@@ -105,8 +103,6 @@ async def list_athletes_service(
             if q.isdigit():
                 or_conditions.append({"birth_year": int(q)})
                 or_conditions.append({"fs_codes": q})
-                or_conditions.append({"fscode": int(q)})
-                or_conditions.append({"fscode": q})
             query["$or"] = or_conditions
 
     total = await athletes_collection.count_documents(query)
@@ -121,9 +117,6 @@ async def list_athletes_service(
         .to_list(length=page_size)
     )
     for a in athletes:
-        normalized = normalize_athlete_document(a) or a
-        a.clear()
-        a.update(normalized)
         a["_id"] = str(a["_id"])
 
     return AthletesPage(
@@ -345,7 +338,6 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
         first_name=athlete.get("first_name"),
         last_name=athlete.get("last_name"),
         birth_year=athlete.get("birth_year"),
-        fscode=athlete.get("fscode"),
         fs_codes=athlete.get("fs_codes", []),
         teams=athlete.get("teams", []),
         category=category_name,
@@ -379,8 +371,6 @@ async def search_athletes_service(q: str) -> AthletesSearch:
             if token.isdigit():
                 or_conditions.append({"birth_year": int(token)})
                 or_conditions.append({"fs_codes": token})
-                or_conditions.append({"fscode": int(token)})
-                or_conditions.append({"fscode": token})
             and_conditions.append({"$or": or_conditions})
         query = {"$and": and_conditions}
     else:
@@ -394,16 +384,11 @@ async def search_athletes_service(q: str) -> AthletesSearch:
         if token.isdigit():
             or_conditions.append({"birth_year": int(token)})
             or_conditions.append({"fs_codes": token})
-            or_conditions.append({"fscode": int(token)})
-            or_conditions.append({"fscode": token})
         query = {"$or": or_conditions}
 
     athletes = await athletes_collection.find(active_athlete_query(query)).to_list(length=20)
     # Validace pomocí Pydantic modelu (Athlete)
     for a in athletes:
-        normalized = normalize_athlete_document(a) or a
-        a.clear()
-        a.update(normalized)
         a["_id"] = str(a["_id"])
     items = [AthleteInDB.model_validate(a) for a in athletes]
     return AthletesSearch(items=items)

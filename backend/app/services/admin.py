@@ -54,8 +54,6 @@ async def _enrich_athlete_from_result(athlete_oid: ObjectId, result_doc: dict) -
     add_to_set = {}
     if imported.get("birth_year") is not None and not athlete.get("birth_year"):
         update_fields["birth_year"] = imported.get("birth_year")
-    if imported.get("fscode") is not None and not athlete.get("fs_codes"):
-        update_fields["fscode"] = imported.get("fscode")
     if imported.get("fscode") is not None:
         add_to_set["fs_codes"] = imported.get("fscode")
     if team:
@@ -279,7 +277,6 @@ async def create_athlete_from_result(result_id: str) -> dict:
         "last_name": last_name,
         "birth_year": imported.get("birth_year"),
         "fs_codes": [imported.get("fscode")] if imported.get("fscode") else [],
-        "fscode": imported.get("fscode"),
         "teams": [team] if team else [],
         "is_active": True,
         "merged_into_athlete_id": None,

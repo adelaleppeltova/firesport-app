@@ -26,7 +26,7 @@ function getAthleteDisplayData(result) {
     firstName: athlete?.first_name ?? importedAthlete.first_name ?? "",
     lastName: athlete?.last_name ?? importedAthlete.last_name ?? "",
     birthYear: athlete?.birth_year ?? importedAthlete.birth_year ?? null,
-    fscode: athlete?.fscode ?? importedAthlete.fscode ?? null,
+    fscode: athlete?.fs_codes?.[0] ?? importedAthlete.fscode ?? null,
   };
 }
 

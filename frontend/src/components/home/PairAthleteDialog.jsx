@@ -107,7 +107,7 @@ export default function PairAthleteDialog({ onClose }) {
                       athlete.teams?.length ? athlete.teams.join(", ") : null,
                       athlete.fs_codes?.length
                         ? athlete.fs_codes.join(", ")
-                        : athlete.fscode,
+                        : null,
                     ]
                       .filter(Boolean)
                       .join(" • ")}

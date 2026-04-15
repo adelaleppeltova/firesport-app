@@ -92,7 +92,6 @@ async def merge_athletes_service(source_athlete_id: str, target_athlete_id: str)
             "$set": {
                 "birth_year": birth_year,
                 "fs_codes": merged_fs_codes,
-                "fscode": merged_fs_codes[0] if merged_fs_codes else None,
                 "teams": merged_teams,
                 "updated_at": datetime.utcnow(),
             }

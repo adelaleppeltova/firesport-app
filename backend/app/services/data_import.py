@@ -482,7 +482,6 @@ class DataImporter:
                 if imported_athlete.get("fscode")
                 else []
             ),
-            "fscode": imported_athlete.get("fscode"),
             "teams": [team] if team else [],
             "is_active": True,
             "merged_into_athlete_id": None,
