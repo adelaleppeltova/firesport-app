@@ -99,50 +99,77 @@ Frontend běží jako vývojový server Reactu. Backend startuje přes [`backend
 
 ### Uvítací obrazovka
 
+Vstupní obrazovka odděluje veřejnou část aplikace od funkcí dostupných po přihlášení.
+
 ![Uvítací obrazovka](docs/screenshots/vitejte.png)
 
 ### Domovská stránka
+
+Domovská stránka poskytuje přehled o vybraném závodníkovi, jeho výkonnosti a základních analytických výstupech.
 
 ![Domovská stránka](docs/screenshots/homepage.png)
 ![Domovská stránka (mobilní rozložení)](docs/screenshots/homepage-mobile.png)
 
 ### Seznam závodníků
 
+Seznam závodníků umožňuje vyhledávání a rychlou orientaci v evidovaných sportovcích podle základních identifikačních údajů.
+
 ![Seznam závodníků](docs/screenshots/zavodnici.png)
 
 ### Detail závodníka
+
+Detail závodníka soustřeďuje profilové údaje, historii výkonů a přehled výsledků v jednotlivých kategoriích na jednom místě.
 
 ![Detail závodníka](docs/screenshots/detail-zavodnika.png)
 
 ### Seznam soutěží
 
+Seznam soutěží poskytuje přehled evidovaných závodů s možností vyhledávání, řazení a následného přechodu na detail konkrétní soutěže.
+
 ![Seznam soutěží](docs/screenshots/zavody.png)
 
 ### Detail soutěže
+
+Detail soutěže zobrazuje základní informace o vybraném závodu a přehled kategorií, pro které jsou dostupné výsledky.
 
 ![Detail soutěže](docs/screenshots/detail-zavodu.png)
 
 ### Výsledková listina
 
+Výsledková listina prezentuje výkony závodníků ve vybrané kategorii v přehledné tabulkové podobě odpovídající charakteru soutěžních dat.
+
 ![Výsledková listina](docs/screenshots/vysledky.png)
 
-### Statistiky a neobvyklé výkony
+### Analytická obrazovka
+
+Analytická obrazovka zobrazuje výstupy detekce neobvyklých výkonů v časovém kontextu výsledků konkrétního závodníka.
 
 ![Statistiky](docs/screenshots/statistiky.png)
 ![Statistiky (mobilní rozložení)](docs/screenshots/statistiky-mobile.png)
 
 ### Administrace importu
 
+Administrátorská část slouží ke správě importu dat a ke kontrole problematických nebo nejednoznačných záznamů vzniklých při zpracování výsledků.
+
 ![Administrace importu](docs/screenshots/admin.png)
 
-### Přihlášení a registrace
+### Přihlášení
+
+Přihlašovací obrazovka slouží pro přístup registrovaného uživatele do chráněné části aplikace.
 
 ![Přihlašovací obrazovka](docs/screenshots/login.png)
+
+### Registrace
+
+Registrační obrazovka umožňuje vytvoření nového uživatelského účtu pro práci s aplikací.
+
 ![Registrační obrazovka](docs/screenshots/registrace.png)
 
 ### API dokumentace
 
-![API dokumentace](docs/screenshots/api.png)
+Součástí backendu je automaticky generovaná dokumentace REST API dostupná prostřednictvím rozhraní Swagger UI.
+
+![API dokumentace](docs/screenshots/API.png)
 
 ## Poznámka k využití dat a interpretaci výstupů
 
