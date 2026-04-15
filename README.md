@@ -138,7 +138,7 @@ Frontend běží jako vývojový server Reactu. Backend startuje přes [`backend
 ### Přihlášení a registrace
 
 ![Přihlašovací obrazovka](docs/screenshots/login.png)
-![Registrační obrazovka](docs/screenshots/register.png)
+![Registrační obrazovka](docs/screenshots/registrace.png)
 
 ### API dokumentace
 
