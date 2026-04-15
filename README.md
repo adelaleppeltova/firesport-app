@@ -1,113 +1,151 @@
-# Firesport App
+# Flamma
 
-Webová aplikace pro prohlížení, správu a analýzu výsledků v požárním sportu. Projekt kombinuje FastAPI backend, React frontend a MongoDB databázi.
+Projekt vznikl jako praktická část diplomové práce „Analýza sportovních dat metodami strojového učení“.
 
-## Co aplikace aktuálně umí
+Flamma je webová aplikace pro evidenci, prohlížení a základní analytické vyhodnocení historických výsledků v požárním sportu, konkrétně v disciplíně běh na 100 m s překážkami. Aplikace propojuje databázové uložení výsledků, prezentaci sportovní historie závodníků a analytickou vrstvu pro detekci neobvyklých výkonů.
 
-- evidenci soutěží, kategorií, závodníků a výsledků importovaných z JSON souborů,
-- stránkovaný seznam závodníků a soutěží včetně vyhledávání a řazení,
-- detail závodníka s přehledem identit, kategorií, výsledků a základních statistik,
-- uživatelskou domovskou stránku po spárování se závodníkem, včetně přehledu sezóny, trendu výkonu a stability výkonu,
-- detail závodu a výsledky jednotlivých kategorií,
-- registraci, přihlášení a propojení uživatele se závodníkem,
-- administraci importu, ruční kontrolu problematických záznamů, ruční přiřazení výsledků a slučování duplicitních závodníků,
-- analytiku neobvyklých výkonů nad vybraným obdobím pomocí Isolation Forest.
+## Vztah k diplomové práci
+
+Repozitář slouží jako příloha diplomové práce. Praktická část navazuje na datovou přípravu výsledků, jejich uložení do strukturované podoby a následné zpracování v prostředí webové aplikace. Vedle evidenční a prezentační funkce obsahuje také implementaci detekce neobvyklých výkonů pomocí modelu Isolation Forest.
+
+## Hlavní funkce
+
+- evidence soutěží, kategorií, závodníků a jednotlivých výsledků,
+- seznam závodníků a soutěží s vyhledáváním, stránkováním a řazením,
+- detail závodníka s historií výkonů, přehledem kategorií a základními ukazateli,
+- zobrazení analytických výstupů pro neobvyklé výkony,
+- registraci, přihlášení, obnovu hesla a spárování uživatelského účtu se závodníkem,
+- import strukturovaných JSON souborů s výsledky,
+- uživatelská domovská stránka po spárování účtu se závodníkem,
+- administrace importu a ruční kontrola problematických záznamů,
+- REST API se Swagger dokumentací na `/docs`.
+
+## Technologie
+
+- backend: FastAPI, Motor, PyMongo, NumPy, scikit-learn, python-jose, argon2-cffi,
+- frontend: React 18, React Router, TanStack Query, Axios, Recharts, Sass,
+- databáze: MongoDB,
+- provozní prostředí: Docker Compose,
+- lokální e-mailové testování: Mailpit.
 
 ## Architektura
 
-### Backend
+Projekt je rozdělen na frontend, backend, databázi a datovou složku.
 
-Backend je postavený na **FastAPI** a poskytuje REST API pro autentizaci, uživatelský profil, závodníky, soutěže, výsledky, import dat, administraci a analytické endpointy pro detekci anomálií. Data jsou ukládána do **MongoDB**, backend používá knihovny **Motor/PyMongo** a pro analytiku **scikit-learn**.
+- Frontend v Reactu zajišťuje veřejné stránky, přihlášenou část aplikace i administrační rozhraní.
+- Backend ve FastAPI poskytuje REST API pro autentizaci, práci se závodníky, soutěžemi, výsledky, importem dat a analytickými výstupy.
+- Data jsou ukládána do MongoDB.
+- Docker Compose v aktuální konfiguraci spouští služby `frontend`, `backend`, `mongo` a `mailpit`.
 
-### Frontend
+Hlavní skupiny endpointů:
 
-Frontend je vytvořený v **Reactu 18**. Používá **React Router**, **TanStack Query**, **Axios**, **Recharts** a **Sass**. Obsahuje veřejné stránky pro přihlášení a registraci i přihlášenou část aplikace s přehledem závodníků, závodů, statistik a administrace.
+- `/v1/auth` a `/v1/me` pro registraci, přihlášení, správu relace a spárování uživatele se závodníkem,
+- `/v1/athletes` pro seznamy, detail závodníka a související přehledy výkonu,
+- `/v1/competitions` a `/v1/results` pro soutěže a výsledkové listiny,
+- `/v1/data` a `/v1/admin` pro import a administrativní práci s daty,
+- `/v1/ml` a `/v1/athletes/{id}/anomalies` pro analytickou vrstvu.
 
-### Databáze
+## Datový základ a import
 
-Data jsou uložená v **MongoDB**. Při spuštění přes Docker Compose backend podle aktuální konfigurace automaticky načte JSON soubory ze složky [`data`](/firesport-app/data) a provede import databáze. Importovací skript při startu maže existující kolekce s výsledky, soutěžemi, závodníky, kategoriemi a daty anomálií, aby byl start konzistentní.
+Aplikace pracuje se strukturovanými JSON soubory vytvořenými ze zdrojových výsledkových listin. Ve složce [`data`](data) jsou data uspořádána podle roku a soutěže, typicky ve tvaru `data/<rok>/<soutez>/*.json`.
 
-## Spuštění
+Import podporuje tyto cesty:
 
-Nejjednodušší způsob je přes Docker Compose:
+- nahrání JSON souboru přes administraci v aplikaci,
+- API endpointy `/v1/data/import`, `/v1/data/import/raw` a `/v1/admin/import`,
+- volitelný seed při startu backendu skriptem [`backend/scripts/load_data.py`](backend/scripts/load_data.py), který je spuštěn pouze při nastavení `IMPORT_DATA=true`.
+
+V aktuálním souboru [`docker-compose.yml`](docker-compose.yml) je `IMPORT_DATA=false`. Po běžném spuštění `docker compose up --build` se tedy data automaticky nenačítají. Automatický seed je podmíněný a neslouží jako výchozí chování.
+
+Při seed importu při startu backendu se pro čistý začátek mažou kolekce `results`, `competitions`, `athletes`, `categories`, `anomaly_runs` a `anomaly_scores`.
+
+## Detekce neobvyklých výkonů
+
+Detekce neobvyklých výkonů je implementována v backendu pomocí modelu Isolation Forest z knihovny scikit-learn.
+
+- vstupní proměnnou je finální čas `final_time`,
+- do výpočtu vstupují pouze výsledky označené jako validní (`final_time_status="valid"`) a s vyplněným finálním časem,
+- výpočet probíhá nad uloženými časovými okny typu `yearly_3y`, tedy nad tříletými ročními okny,
+- výsledkem je skóre a označení neobvyklých výkonů pro závodníka v daném období.
+
+Označení neobvyklého výkonu neznamená automaticky chybu v datech. Může jít o mimořádně rychlý nebo naopak výrazně slabší výkon, který se odlišuje od ostatních validních výsledků v analyzovaném souboru.
+
+## Spuštění projektu
+
+Nejjednodušší způsob spuštění je přes Docker Compose:
 
 ```bash
 docker compose up --build
 ```
 
-Po spuštění bude dostupné:
+Po spuštění jsou dostupné tyto služby:
 
 - frontend: [http://localhost:3000](http://localhost:3000)
 - backend API: [http://localhost:8000](http://localhost:8000)
 - Swagger dokumentace: [http://localhost:8000/docs](http://localhost:8000/docs)
+- Mailpit: [http://localhost:8025](http://localhost:8025)
 
-Aktuální `docker-compose.yml` spouští tři služby:
-
-- `frontend` - React development server
-- `backend` - FastAPI aplikaci s volitelným debug portem `5679`
-- `mongo` - MongoDB databázi
-
-Backend při startu čeká na MongoDB a následně automaticky spouští import dat ze složky `data/`.
+Frontend běží jako vývojový server Reactu. Backend startuje přes [`backend/entrypoint.sh`](backend/entrypoint.sh), nejprve čeká na MongoDB a teprve poté případně spouští seed import dat podle hodnoty `IMPORT_DATA`.
 
 ## Struktura projektu
 
-- [`backend`](/backend/) - FastAPI aplikace, API routery, služby, modely, databázová vrstva a skripty pro import dat
-- [`frontend`](/frontend) - React aplikace, stránky, komponenty, hooky a styly
-- [`data`](/data) - zdrojová JSON data pro seed a import výsledků
-- [`docs/screenshots`](/docs/screenshots) - screenshoty aplikace
+- [`backend`](backend) - FastAPI aplikace, API routery, služby, modely, databázová vrstva a analytická logika,
+- [`frontend`](frontend) - React aplikace, stránky, komponenty, hooky a styly,
+- [`data`](data) - strukturovaná vstupní data ve formátu JSON,
+- [`docs/screenshots`](docs/screenshots) - obrazové ukázky aplikace,
+- [`docs/notebooks`](docs/notebooks) - doprovodné analytické materiály.
 
-## Screenshoty
+## Ukázky aplikace
 
-### Úvodní strana
+### Uvítací obrazovka
 
-Domovská stránka zobrazuje přehled spárovaného závodníka, aktuální sezónu a základní ukazatele výkonu. Slouží jako hlavní rozcestník do uživatelské části aplikace.
+![Uvítací obrazovka](docs/screenshots/vitejte.png)
 
-![Úvodní strana](docs/screenshots/HomePage.png)
+### Domovská stránka
 
-### Závodníci
+![Domovská stránka](docs/screenshots/homepage.png)
+![Domovská stránka (mobilní rozložení)](docs/screenshots/homepage-mobile.png)
 
-Stránka zobrazuje seznam závodníků s možností vyhledávání a postupného procházení dat. Umožňuje rychlý přechod na detail konkrétního profilu.
+### Seznam závodníků
 
-![Seznam závodníků](docs/screenshots/athletes.png)
+![Seznam závodníků](docs/screenshots/zavodnici.png)
 
 ### Detail závodníka
 
-Detail závodníka shrnuje základní identitu, kategorie, výsledky a hlavní statistiky. U administrátora navíc slouží i pro kontrolu a případné sloučení duplicitních profilů.
+![Detail závodníka](docs/screenshots/detail-zavodnika.png)
 
-![Detail závodníka](docs/screenshots/athlete-detail-page.png)
+### Seznam soutěží
 
-### Závody
+![Seznam soutěží](docs/screenshots/zavody.png)
 
-Na stránce je seznam soutěží s vyhledáváním a řazením podle základních údajů. Uživatel odtud pokračuje na detail konkrétního závodu.
+### Detail soutěže
 
-![Seznam závodů](docs/screenshots/Competitions.png)
+![Detail soutěže](docs/screenshots/detail-zavodu.png)
 
-### Detail závodu
+### Výsledková listina
 
-Detail závodu zobrazuje základní informace o soutěži a dostupné kategorie. Z této stránky je možné otevřít výsledkové listiny jednotlivých kategorií.
+![Výsledková listina](docs/screenshots/vysledky.png)
 
-![Detail závodu](docs/screenshots/competition-detail.png)
+### Statistiky a neobvyklé výkony
 
-### Výsledky
-
-Výsledková listina ukazuje pořadí, časy, pokusy a základní údaje o závodnících v dané kategorii. Pokud je závodník spárovaný, lze se z výsledku prokliknout přímo na jeho profil.
-
-![Výsledkové listiny](docs/screenshots/result-page.png)
-
-### Statistiky
-
-Statistická stránka slouží k přehledu neobvyklých výkonů v čase a zobrazuje výstupy detekce anomálií. Součástí je i kontext analyzovaného období a doplňující informace k modelu.
-
-![Detekce neobvyklých výkonů](docs/screenshots/Statistics.png)
+![Statistiky](docs/screenshots/statistiky.png)
+![Statistiky (mobilní rozložení)](docs/screenshots/statistiky-mobile.png)
 
 ### Administrace importu
 
-Administrace importu umožňuje nahrát nové JSON soubory s výsledky a zkontrolovat problematické záznamy po importu. Administrátor zde může výsledky ručně přiřadit, odpárovat nebo vytvořit nového závodníka.
+![Administrace importu](docs/screenshots/admin.png)
 
-![Kontrola párování výsledků](docs/screenshots/admin.png)
+### Přihlášení a registrace
 
-### API
+![Přihlašovací obrazovka](docs/screenshots/login.png)
+![Registrační obrazovka](docs/screenshots/register.png)
 
-Swagger dokumentace zpřístupňuje všechny aktuální backendové endpointy.
+### API dokumentace
 
-![FastAPI](docs/screenshots/API.png)
+![API dokumentace](docs/screenshots/api.png)
+
+## Poznámka k využití dat a interpretaci výstupů
+
+Použitá data vycházejí ze zdrojových výsledkových listin a byla převedena do strukturovaných JSON souborů pro potřeby evidence a analytického zpracování. Aplikace je určena především pro dokumentaci výsledků, prezentaci sportovní historie závodníků a podporu analytické interpretace.
+
+Analytické výstupy je vhodné chápat jako podpůrnou informaci, nikoli jako automatický důkaz chyby nebo mimořádnosti bez dalšího kontextu. Význam výsledků závisí také na úplnosti importovaných dat, kvalitě párování závodníků a rozsahu dostupné historie výkonů.
