@@ -30,6 +30,9 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    mem_limit: 1g
+    memswap_limit: 1g
+    command: ["mongod", "--wiredTigerCacheSizeGB=0.5", "--maxConns=50"]
 
   mailpit:
     image: axllent/mailpit
