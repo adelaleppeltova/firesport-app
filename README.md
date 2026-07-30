@@ -72,11 +72,23 @@ Označení neobvyklého výkonu neznamená automaticky chybu v datech. Může j�
 
 ## Spuštění projektu
 
-Nejjednodušší způsob spuštění je přes Docker Compose:
+Po čistém klonu nejprve vytvořte lokální konfiguraci backendu:
+
+```bash
+cp backend/.env.example backend/.env
+python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
+Vygenerovanou hodnotu vložte do souboru `backend/.env` jako hodnotu
+`SECRET_KEY`. Teprve potom aplikaci sestavte a spusťte:
 
 ```bash
 docker compose up --build
 ```
+
+Soubor `.env` nikdy necommitujte. Verzovaný soubor `.env.example` obsahuje
+pouze bezpečné ukázkové hodnoty, nikoli skutečná tajemství. Pro produkční
+prostředí vždy použijte vlastní silný a jedinečný klíč uložený mimo Git.
 
 Po spuštění jsou dostupné tyto služby:
 

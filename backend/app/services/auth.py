@@ -7,8 +7,21 @@ from jose import JWTError, jwt
 
 ph = PasswordHasher()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY or SECRET_KEY == "replace-with-a-random-secret":
+SECRET_KEY = os.getenv("SECRET_KEY", "").strip()
+SECRET_KEY_PLACEHOLDERS = {
+    "change-me",
+    "changeme",
+    "replace-me",
+    "replace-with-a-random-secret",
+    "secret",
+    "your-secret-key",
+}
+if (
+    not SECRET_KEY
+    or SECRET_KEY.lower() in SECRET_KEY_PLACEHOLDERS
+    or SECRET_KEY.lower().startswith("replace-with-")
+    or "placeholder" in SECRET_KEY.lower()
+):
     raise RuntimeError(
         "SECRET_KEY must be set to a non-placeholder value in the environment"
     )

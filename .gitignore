@@ -16,6 +16,7 @@ cookies.txt
 *.pyc
 *.pyo
 *.pyd
+*.py[cod]
 __pycache__/
 *.so
 *.egg
@@ -23,6 +24,8 @@ __pycache__/
 dist/
 build/
 .venv/
+venv/
+backend/.venv/
 
 # IDEs
 .vscode/
