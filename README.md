@@ -108,6 +108,7 @@ cd backend
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
+python -m ruff check app main.py scripts
 python -m pytest app/tests
 ```
 
@@ -119,12 +120,14 @@ Frontend používá verzi Node.js uvedenou v [`frontend/.nvmrc`](frontend/.nvmrc
 
 ```bash
 cd frontend
+nvm use
 npm ci
+npm run lint
 CI=true npm test -- --watchAll=false
 npm run build
 ```
 
-První příkaz nainstaluje přesné verze závislostí z `package-lock.json`, druhý spustí testy neinteraktivně a poslední vytvoří produkční build.
+`npm ci` nainstaluje přesné verze závislostí z `package-lock.json`, `npm run lint` provede statickou kontrolu, test se spustí neinteraktivně a poslední příkaz vytvoří produkční build.
 
 ## Struktura projektu
 
