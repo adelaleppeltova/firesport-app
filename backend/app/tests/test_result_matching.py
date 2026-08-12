@@ -75,7 +75,7 @@ def test_decide_athlete_match_same_name_without_birth_year_requires_review():
                 last_name="Smida",
                 birth_year=None,
                 fscode="44444",
-                team="Bukovice",
+                team=None,
             )
         )
 

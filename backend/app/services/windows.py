@@ -14,9 +14,9 @@ Example for anchor = 2025-12-31 and years = 3:
   window_start = 2022-12-31 + 1 day = 2023-01-01
   window_end   = 2025-12-31
 
-This gives exactly 3 years of data with no day overlap between consecutive
-yearly windows (the previous yearly window would end on 2024-12-31 and
-start on 2022-01-01, so the intervals are contiguous but not overlapping).
+This gives exactly 3 years of data. Because anchors are generated yearly,
+consecutive 3-year windows overlap by 2 years (the previous window is
+2022-01-01 through 2024-12-31).
 """
 
 from datetime import date, datetime, timedelta, timezone

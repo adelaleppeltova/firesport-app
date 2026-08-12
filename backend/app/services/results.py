@@ -4,9 +4,6 @@ import logging
 
 from app.db.database import db
 from app.models.result import ResultInDB
-from app.models.athlete import AthleteInDB
-from app.models.competition import CompetitionInDB
-from app.models.category import CategoryInDB
 
 results_collection = db["results"]
 athletes_collection = db["athletes"]

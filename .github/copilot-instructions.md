@@ -1,36 +1,37 @@
 # Firesport App - AI Coding Guidelines
 
-## Architecture Overview
-- **Full-stack app**: FastAPI backend (Python) + React frontend, MongoDB database
-- **Backend structure**: `app/` contains `api/v1/` (routers), `models/` (Pydantic schemas), `services/` (business logic), `db/` (CRUD), `ml/` (performance analysis)
-- **Frontend structure**: React with `pages/`, `components/`, `hooks/`, `layouts/`, SCSS styling
-- **Data flow**: API endpoints call services, which use ML utils for trend/stability analysis; frontend uses TanStack Query for caching
+## Current architecture
 
-## Key Patterns
-- **Models**: Use Pydantic Base/Create/InDB pattern (e.g., `AthleteBase`, `AthleteCreate`, `AthleteInDB`); alias `_id` to `id` with `populate_by_name=True`
-- **Authentication**: JWT tokens stored in localStorage; axios interceptor sets `Authorization` header; check `/auth/me` on app load
-- **MongoDB**: Use `ObjectId` for IDs, convert to string; collections: athletes, results, competitions, categories
-- **ML Integration**: Import from `ml.utils` for performance trends (improving/declining/stable) and stability ratings
-- **Routing**: Czech paths (e.g., `/zavodnici` for athletes); protected routes in `AppLayout`, public in `BasicLayout`
-- **Styling**: SCSS with BEM-like classes; mixins/variables in `assets/styles/abstracts/`
+- FastAPI backend, React frontend and MongoDB run together through Docker Compose.
+- `backend/app/` contains `api/v1/`, `models/`, `services/`, `db/`, `ml/` and `tests/`.
+- The backend exposes REST endpoints under `/v1/`; its ML layer includes anomaly detection with Isolation Forest.
+- The frontend uses React, React Router, TanStack Query, Axios, Recharts and SCSS.
+- Docker builds the frontend in a Node stage. Nginx serves the production build and proxies `/v1/` to the backend.
 
-## Developer Workflows
-- **Run full app**: `docker-compose up` (backend:8000, frontend:3000, mongo:27017)
-- **Backend dev**: `uvicorn main:app --reload` (requires MongoDB)
-- **Frontend dev**: `npm start` (proxies API to localhost:8000)
-- **Database**: MongoDB with collections for athletes/results/competitions/categories; no migrations, schema-less
-- **Testing**: No automated tests; validate with API calls and UI checks
+## Development checks
 
-## Conventions
-- **Backend**: snake_case files/functions; async/await everywhere; log with `logging`; raise `HTTPException` for errors
-- **Frontend**: camelCase; use hooks (`useApi`, `usePersistedState`); TanStack Query for data fetching
-- **Commits**: No specific pattern observed; focus on feature branches
-- **Dependencies**: Backend uses motor (async Mongo), argon2 for passwords; frontend uses axios + TanStack Query
+Use Python 3.12 for the backend:
 
-## Common Tasks
-- **Add new model**: Create in `models/`, add CRUD in `db/crud.py`, service in `services/`, router in `api/v1/`
-- **New API endpoint**: Add to router, call service; use Depends for auth
-- **Frontend page**: Add route in `App.js`, create in `pages/`, use `useApi` hook
-- **ML feature**: Add to `ml/tasks/` or `utils/`, integrate in services
+```bash
+cd backend
+python -m pip install -r requirements-dev.txt
+python -m pytest app/tests
+```
 
-Reference: `docker-compose.yml`, `backend/main.py`, `frontend/src/App.js`, `backend/app/models/athlete.py`
+Use the Node.js version from `frontend/.nvmrc` for the frontend:
+
+```bash
+cd frontend
+npm ci
+CI=true npm test -- --watchAll=false
+npm run build
+```
+
+Run the complete local stack with `docker compose up --build`. The frontend is
+available on port 3000 and the backend on port 8000.
+
+GitHub Actions in `.github/workflows/ci.yml` runs backend tests, frontend tests
+and the frontend production build for the configured pushes and pull requests.
+
+Keep changes minimal and follow the existing router, service, model and component
+patterns. Do not assume files or layers that are not present in the repository.

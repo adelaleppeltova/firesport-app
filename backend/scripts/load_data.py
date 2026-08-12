@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Seed script pro automatický import dat ze složky /app/data do MongoDB.
-Běží při startu Docker kontejneru.
+Entrypoint jej při startu Docker kontejneru spustí pouze s IMPORT_DATA=true.
 
 Použití:
     python scripts/load_data.py

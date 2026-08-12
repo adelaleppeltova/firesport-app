@@ -97,13 +97,44 @@ Po spuštění jsou dostupné tyto služby:
 - Swagger dokumentace: [http://localhost:8000/docs](http://localhost:8000/docs)
 - Mailpit: [http://localhost:8025](http://localhost:8025)
 
-Frontend běží jako vývojový server Reactu. Backend startuje přes [`backend/entrypoint.sh`](backend/entrypoint.sh), nejprve čeká na MongoDB a teprve poté případně spouští seed import dat podle hodnoty `IMPORT_DATA`.
+Frontend se při sestavení Docker image zkompiluje v Node.js stage a výsledné statické soubory servíruje nginx. Nginx zároveň předává požadavky na `/v1/` backendu. Backend startuje přes [`backend/entrypoint.sh`](backend/entrypoint.sh), nejprve čeká na MongoDB a teprve poté případně spouští seed import dat podle hodnoty `IMPORT_DATA`.
+
+## Backend testy
+
+Pro lokální spuštění backend testů použijte Python 3.12 a samostatné virtuální prostředí:
+
+```bash
+cd backend
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m ruff check app main.py scripts
+python -m pytest app/tests
+```
+
+Soubor `requirements-dev.txt` zahrnuje produkční závislosti backendu a navíc pouze nástroje potřebné pro testy. Testy nevyžadují spuštěnou MongoDB.
+
+## Frontend testy a build
+
+Frontend používá verzi Node.js uvedenou v [`frontend/.nvmrc`](frontend/.nvmrc). Po její aktivaci spusťte:
+
+```bash
+cd frontend
+nvm use
+npm ci
+npm run lint
+CI=true npm test -- --watchAll=false
+npm run build
+```
+
+`npm ci` nainstaluje přesné verze závislostí z `package-lock.json`, `npm run lint` provede statickou kontrolu, test se spustí neinteraktivně a poslední příkaz vytvoří produkční build.
 
 ## Struktura projektu
 
 - [`backend`](backend) - FastAPI aplikace, API routery, služby, modely, databázová vrstva a analytická logika,
 - [`frontend`](frontend) - React aplikace, stránky, komponenty, hooky a styly,
 - [`data`](data) - strukturovaná vstupní data ve formátu JSON,
+- [`docs/architecture.md`](docs/architecture.md) - stručný popis současné architektury aplikace,
 - [`docs/screenshots`](docs/screenshots) - obrazové ukázky aplikace,
 - [`docs/notebooks`](docs/notebooks) - doprovodné analytické materiály.
 

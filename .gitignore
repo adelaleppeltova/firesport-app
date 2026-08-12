@@ -45,6 +45,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Testing
+.pytest_cache/
+.ruff_cache/
 coverage/
 .nyc_output/
 

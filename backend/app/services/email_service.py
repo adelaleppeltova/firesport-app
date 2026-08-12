@@ -15,7 +15,7 @@ SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", SMTP_USERNAME or "no-reply@exampl
 SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
 SMTP_USE_SSL = os.getenv("SMTP_USE_SSL", "false").lower() == "true"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
-RESET_PASSWORD_PATH = os.getenv("RESET_PASSWORD_PATH", "/reset-password")
+RESET_PASSWORD_PATH = os.getenv("RESET_PASSWORD_PATH", "/obnoveni-hesla")
 
 
 def build_password_reset_url(token: str) -> str:

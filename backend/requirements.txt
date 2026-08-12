@@ -5,7 +5,7 @@ python-dotenv
 argon2-cffi
 python-jose[cryptography]
 email-validator
-fastapi-utils
+pydantic
 motor
 numpy
 python-multipart

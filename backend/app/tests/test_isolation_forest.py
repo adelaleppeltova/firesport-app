@@ -72,7 +72,7 @@ class TestIsolationForestDecisionRule:
 
     def test_score_is_negated_decision_function_and_flags_match_predict(self):
         times = [20.2, 20.1, 20.4, 20.3, 20.5, 20.6, 20.0, 20.2, 19.9, 20.1, 16.5, 24.8]
-        cfg = _make_config(min_results=10, n_estimators=64, random_state=7, contamination=0.2)
+        cfg = _make_config(min_results=10, n_estimators=64, random_state=7, contamination="auto")
 
         result = compute_iforest_anomalies(times, config=cfg)
 

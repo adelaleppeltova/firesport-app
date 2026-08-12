@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
 
-from app.models.competition import CompetitionInDB, CompetitionDetail, CompetitionsPage
+from app.models.competition import CompetitionDetail, CompetitionsPage
 from app.models.result import ResultInDB
 from app.services.competitions import (
     get_competition_detail_service,
@@ -45,4 +45,3 @@ async def get_results_for_category(competition_id: str, category_id: str):
         raise HTTPException(status_code=404, detail=str(e))
 
     
-
