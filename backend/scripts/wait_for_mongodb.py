@@ -2,7 +2,6 @@
 """
 Script pro čekání na MongoDB připojení.
 """
-import time
 import sys
 from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
@@ -20,7 +19,7 @@ async def wait_for_mongo():
             client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
             # Zkus ping
             await client.admin.command('ping')
-            print(f"✓ MongoDB je připravena!")
+            print("✓ MongoDB je připravena!")
             return True
         except Exception as e:
             attempt_num = attempt + 1

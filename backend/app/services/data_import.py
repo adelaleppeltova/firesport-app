@@ -4,7 +4,7 @@ Podporuje import z externího zdroje a automatické vytváření entit.
 """
 import logging
 import re
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional, Any
 from datetime import datetime
 from bson import ObjectId
 from app.db.database import db
@@ -155,7 +155,7 @@ class DataImporter:
         }
         """
         try:
-            logger.info(f"Zahájen import dat")
+            logger.info("Zahájen import dat")
             
             # Import soutěže
             competition_data = data.get("competition", {})

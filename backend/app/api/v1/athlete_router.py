@@ -1,16 +1,12 @@
-from typing import List, Optional, Literal
+from typing import Optional, Literal
 from fastapi import APIRouter, Query, HTTPException, Depends
 from app.models.athlete import (
-    AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview,
+    AthletesSearch, AthletesPage, AthleteOverview,
     PerformanceByYear, PerformanceInYear, AthleteProfile,
     AthletePerformanceHistoryResponse, AthletePerformanceStabilityResponse,
  AthleteCategoryStatsResponse, AthletePerCategoryStatsResponse)
 from app.models.models import AthleteDetailPage
 from app.dependencies import get_current_user
-from bson import ObjectId
-from datetime import datetime
-
-
 import logging
   
 

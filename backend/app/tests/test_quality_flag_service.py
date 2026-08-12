@@ -18,7 +18,6 @@ import asyncio
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-import pytest
 from bson import ObjectId
 
 from app.models.result import QualityFlag
@@ -92,7 +91,7 @@ class TestDetermineQualityFlag:
     # --- Případ 2: příliš pomalý čas (> high) → suspicious ---
     def test_suspicious_too_slow(self):
         """Čas výrazně over high → suspicious (absolutní hranice)."""
-        flag = determine_quality_flag(
+        _ = determine_quality_flag(
             time_seconds=45.0,  # == HIGH, tedy > HIGH je 45.1
             final_time_status="valid",
             low=LOW,

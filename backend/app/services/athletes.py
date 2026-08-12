@@ -2,7 +2,7 @@ from bson import ObjectId
 from app.db.database import db
 from app.models.athlete import (
     AthleteCategoryStatsResponse, AthleteInDB, AthletesSearch, AthletesPage, AthleteOverview, AthleteDetail,
-    BestPerformance, AthleteProfile, AthletePerformanceHistoryResponse,
+    AthleteProfile, AthletePerformanceHistoryResponse,
     AthletePerformanceStabilityResponse, CategoryRaceStats,
     AthletePerCategoryStats, AthletePerCategoryStatsResponse,
 )

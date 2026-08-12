@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements-dev.txt
 
+      - name: Run backend lint
+        run: python -m ruff check app main.py scripts
+
       - name: Run backend tests
         run: python -m pytest app/tests
 
@@ -60,6 +63,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Run frontend lint
+        run: npm run lint
 
       - name: Run frontend tests
         run: CI=true npm test -- --watchAll=false

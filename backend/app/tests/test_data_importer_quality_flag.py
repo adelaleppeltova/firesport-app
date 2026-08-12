@@ -8,7 +8,7 @@ Veškerá DB volání jsou mockována – testy nepotřebují běžící MongoDB
 """
 
 import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch, call
+from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from bson import ObjectId
 
@@ -157,15 +157,10 @@ class TestDataImporterQualityFlag:
 
     def test_quality_flag_value_set_on_result_doc(self, importer_with_mocks):
         """Hodnota quality_flag vrácená compute_quality_flag se zapíše do result_doc."""
-        from app.services.data_import import DataImporter
-
         importer, _, mock_quality = importer_with_mocks
         mock_quality.return_value = QualityFlag.suspicious
 
         inserted_docs = []
-
-        import app.services.data_import as di_module
-        original_insert = di_module.results_collection.insert_one
 
         async def capture_insert(doc):
             inserted_docs.append(dict(doc))

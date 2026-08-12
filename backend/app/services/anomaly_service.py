@@ -27,7 +27,6 @@ from app.services.windows import (
     window_for_anchor,
     list_year_anchors,
     is_year_end,
-    year_label,
 )
 
 

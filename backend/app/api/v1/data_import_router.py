@@ -3,7 +3,6 @@ Router pro import dat - API endpoint pro nahrávání souborů.
 """
 import logging
 from fastapi import APIRouter, File, UploadFile, HTTPException
-from typing import Optional
 import json
 from app.models.admin import DataImportResponse
 from app.services.data_import import DataImporter
@@ -62,7 +61,7 @@ async def import_json_endpoint(file: UploadFile = File(...)):
         
         return {
             "success": True,
-            "message": f"Import dokončen",
+            "message": "Import dokončen",
             "data": stats
         }
         
