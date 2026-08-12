@@ -184,7 +184,7 @@ def test_year_label_format():
     anchor = utc(2025, 12, 31)
     ws = utc(2023, 1, 1)
     we = utc(2025, 12, 31)
-    assert year_label(anchor, ws, we) == "Rok 2025 (2023-01-01\u20132025-12-31)"
+    assert year_label(anchor, ws, we) == "2025\u20132023"
 
 
 def test_year_label_with_date_objects():
@@ -194,7 +194,7 @@ def test_year_label_with_date_objects():
         date(2022, 1, 1),
         date(2024, 12, 31),
     )
-    assert label == "Rok 2024 (2022-01-01\u20132024-12-31)"
+    assert label == "2024\u20132022"
 
 
 def test_year_label_invalid_anchor_raises():
@@ -209,11 +209,10 @@ def test_year_label_invalid_anchor_quarter_end_raises():
         year_label(utc(2026, 3, 31), utc(2023, 4, 1), utc(2026, 3, 31))
 
 
-def test_year_label_returns_string_with_rok_prefix():
-    """Label začíná 'Rok '."""
+def test_year_label_returns_compact_year_range():
+    """Label obsahuje koncový a počáteční rok okna."""
     label = year_label(utc(2022, 12, 31), utc(2020, 1, 1), utc(2022, 12, 31))
-    assert label.startswith("Rok ")
-    assert "2022" in label
+    assert label == "2022\u20132020"
 
 
 def test_is_year_end_and_year_label_consistent():
@@ -222,4 +221,4 @@ def test_is_year_end_and_year_label_consistent():
         anchor = utc(year, 12, 31)
         assert is_year_end(anchor)
         label = year_label(anchor, utc(year - 3, 1, 1), anchor)
-        assert f"Rok {year}" in label
+        assert label == f"{year}\u2013{year - 3}"

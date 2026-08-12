@@ -99,6 +99,20 @@ Po spuštění jsou dostupné tyto služby:
 
 Frontend běží jako vývojový server Reactu. Backend startuje přes [`backend/entrypoint.sh`](backend/entrypoint.sh), nejprve čeká na MongoDB a teprve poté případně spouští seed import dat podle hodnoty `IMPORT_DATA`.
 
+## Backend testy
+
+Pro lokální spuštění backend testů použijte Python 3.12 a samostatné virtuální prostředí:
+
+```bash
+cd backend
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m pytest app/tests
+```
+
+Soubor `requirements-dev.txt` zahrnuje produkční závislosti backendu a navíc pouze nástroje potřebné pro testy. Testy nevyžadují spuštěnou MongoDB.
+
 ## Struktura projektu
 
 - [`backend`](backend) - FastAPI aplikace, API routery, služby, modely, databázová vrstva a analytická logika,

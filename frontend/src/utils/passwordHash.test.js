@@ -1,8 +1,11 @@
 import { webcrypto } from "crypto";
+import { TextEncoder } from "node:util";
 
 import { hashPassword } from "./passwordHash";
 
 beforeAll(() => {
+  global.TextEncoder = TextEncoder;
+
   if (!window.crypto?.subtle) {
     Object.defineProperty(window, "crypto", {
       value: webcrypto,
