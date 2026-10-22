@@ -1,3 +1,5 @@
+[EN](data-baseline.en.md) · **CZ** · [Projekt](../README.cs.md)
+
 # Data baseline
 
 Tento dokument zachycuje současný datový stav M0. Popisuje verzované vstupy, MongoDB kolekce a importní pravidla; není datovým katalogem ani výsledkem nové analýzy.
@@ -8,7 +10,7 @@ Vstupem jsou strukturované JSON soubory v `data/<rok>/<soutěž>/*.json`, vytvo
 
 Každý verzovaný soubor má pole `source_file` s názvem původního souboru a `generated_at`; řada souborů obsahuje také `warnings` a `parsing_notes`. Původní výsledkové listiny ani jejich URL však v repozitáři nejsou, takže přesnou externí provenienci nelze pouze z repozitáře znovu ověřit.
 
-Reprodukovatelný obsah adresáře `data` v této baseline:
+Obsah adresáře `data` znovu přepočítaný z checkoutu dne **22. 10. 2026** (počty zdrojových řádků, nikoli zaručené počty po importu):
 
 - 329 JSON souborů,
 - 394 bloků kategorií,
@@ -67,7 +69,7 @@ Při importu se do `results.quality_flag` ukládá `ok` nebo `suspicious`. Kontr
 
 ## Počty v lokální databázi
 
-Read-only kontrola právě běžícího lokálního Docker volume dne 12. 8. 2026 zjistila:
+Původní dokumentace uvádí read-only kontrolu lokálního Docker volume dne **12. 8. 2026**. Následující historický snapshot nebyl při této úpravě znovu ověřen:
 
 | Kolekce | Počet |
 | --- | ---: |
@@ -89,3 +91,37 @@ Tyto hodnoty jsou pouze snapshot lokálního perzistentního volume. Volume nen�
 - Ruční `warnings` a `parsing_notes` dokládají rozdíly ve formátu a kvalitě původních výsledkových listin, ale importer je neukládá do MongoDB.
 - Párování a deduplikace jsou heuristické. Nejednoznačné identity zůstávají k administrátorské kontrole a databáze nevynucuje unikátnost výsledků.
 - Počty v lokální MongoDB nelze odvodit jen z klonu repozitáře bez explicitního čistého importu a stejné historie následných změn.
+
+## Tok dat a validační hranice
+
+```mermaid
+flowchart LR
+    Sheets[Původní listiny - chybějí] -.-> JSON[Verzované JSON a metadata]
+    JSON --> Normalize[Normalizace polí]
+    Normalize --> Match[Párování aktivních identit]
+    Match --> Review[Kontrola nejednoznačností]
+    Match --> Dedupe[Aplikační hledání duplicit]
+    Dedupe --> Flags[Příznak kvality při importu]
+    Flags --> DB[(Výsledky a související kolekce)]
+    Review -->|přiřazení / sloučení| DB
+    DB --> Windows[Závodník / skupina / okno]
+    Windows --> IF[Isolation Forest]
+    IF --> Scores[(Běhy a skóre)]
+    Scores --> API[API a React grafy]
+```
+
+[Reálný JSON](../data/2019/beloves/komplet.json) a [importer](../backend/app/services/data_import.py) ukazují strukturu i převody. `final_status` se převádí na `final_time_status`. [Pydantic modely](../backend/app/models/result.py) popisují API, ale importer vkládá slovníky přímo; chybí úplný validační průchod a MongoDB validátor. Jednotlivé chyby se mohou sbírat bez vrácení předchozích zápisů. HTTP úspěch ani návratový kód seedu sám nepotvrzuje úplný import.
+
+**Seed maže šest uvedených kolekcí ještě před kontrolou existence datové složky. Používejte jej pouze na izolovaných jednorázových datech.** Ponechané účty mohou mít po seedu neplatné párování na smazané atlety. Cesty `/app/data` a kontrolní Mongo URI předpokládají síť Dockeru. Běžný souborový import kolekce takto nemaže, ale mění databázi. [Postup reprodukce](reproducibility.cs.md) obsahuje bezpečné oddělení dat a kontrolu výstupů.
+
+Párování omezuje načítání kandidátů na deset na dotaz. U několika shod jména a roku narození může rozhodnout FS kód; konfliktní známý rok může vést na novou identitu. Deduplikace výsledků není mechanismus aktualizace oprav ani ochrana souběžných importů. Změněné vstupní identifikátory mohou ovlivnit opakovaný import.
+
+Příznaky kvality při importu závisejí na dosavadní databázi a cache hranic; hromadný přepočet může vyjít jinak. Nespárovaný výsledek nebo chyba výpočtu dostává `ok`, což neověřuje validitu času. Importní a ML zápisové endpointy na rozdíl od `/v1/admin` nemají autentizační závislost. Validní výsledek bez `athlete` může zablokovat celé ML okno.
+
+## Provenience, soukromí a licence
+
+`generated_at` označuje vytvoření odvozeného souboru, nikoli ověřené datum stažení originálu. Chybí extrakční workflow, původní listiny i URL. Data jsou vybraný historický vzorek, nikoli úplná evidence všech závodů a závodníků. Příznaky v [EDA notebooku](notebooks/README.cs.md) mají odlišné definice od aplikační kontroly kvality a ML.
+
+Jména, roky narození, týmy, FS kódy a propojené účty mohou identifikovat osoby včetně mladých závodníků. Veřejná listina sama nedokládá oprávnění ke každému dalšímu použití. Licence k redistribuci datasetu ani registr souhlasů zdrojů nebyly nalezeny. Vlastník musí vyjasnit oprávnění ke zdrojům, zveřejnění, uchovávání, řešení žádostí o opravu a zveřejnění screenshotů. Účty a tajemství nepatří do analytických exportů. Příznaky slouží ke kontrole, nikoli k osobnímu hodnocení či obvinění.
+
+[README](../README.cs.md) uvádí stav softwarové licence a neformální odkaz na software. Manifest URL, dat stažení, kontrolních součtů, verzí extrakce a oprávnění je návrh pro budoucí práci.

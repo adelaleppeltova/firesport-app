@@ -1,3 +1,5 @@
+[EN](ml-baseline.en.md) · **CZ** · [Projekt](../README.cs.md)
+
 # ML baseline
 
 Tento dokument popisuje implementovaný stav detekce neobvyklých výkonů v M0. Neobsahuje nové experimenty, měření přesnosti ani vědecké závěry.
@@ -106,3 +108,22 @@ Isolation Forest používá skupiny porovnatelných kategorií a tříleté okno
 - Čištění nečíselných hodnot probíhá uvnitř modelové funkce, zatímco ukládací služba páruje výstupy s původním seznamem podle pořadí. Nestandardní `NaN` nebo nekonečné hodnoty v databázi proto nejsou na úrovni celé pipeline robustně podporované.
 
 Unit testy ověřují minimální počet, čištění ne-konečných hodnot, nízkou varianci, reprodukovatelnost, shodu skóre s negovanou `decision_function` a shodu příznaků s `predict` při `contamination="auto"`.
+
+## Spuštění, návaznost a provozní hranice
+
+Zdroje: [konfigurace a skupiny](../backend/app/ml/anomaly_config.py), [numerický výpočet](../backend/app/ml/isolation_forest.py), [orchestrace](../backend/app/services/anomaly_service.py), [API](../backend/app/api/v1/ml_router.py). Po běžném importu se ML automaticky nepřepočítává. [Postup reprodukce](reproducibility.cs.md) nejprve kontroluje validní výsledky bez odkazu na atleta a teprve pak spouští:
+
+```bash
+curl --fail-with-body -X POST 'http://localhost:8000/v1/ml/recompute-yearly?force=false'
+curl --fail-with-body 'http://localhost:8000/v1/ml/windows'
+```
+
+Po změně dat či identit použijte `force=true`, jinak existující aktivní anchor zůstane přeskočený. API aktuálně nevyžaduje autentizaci. Kontrolujte i selhané anchory a skupiny v těle odpovědi: HTTP úspěch nevylučuje částečné selhání. Výchozí čtení anomálií vybírá nejnovější aktivní běh globálně, nikoli poslední běh se skóre konkrétního závodníka.
+
+Okna končí půlnocí UTC zadaného dne, nikoli rozšířením na konec dne. Poslední rok dostává prosincový anchor i při dřívější horní mezi. Časové pořadí výsledků není rysem modelu. Fit a skórování používají stejnou historii; jde o retrospektivní detekci, nikoli predikci na oddělených datech. Skóre není pravděpodobnost a není kalibrované mezi modely. Pevný seed podporuje opakovatelnost při stejných uspořádaných datech a prostředí, ale neuzamčené závislosti nezaručují stejný výstup v nové instalaci.
+
+Ukládají se všechna skóre úspěšné skupiny, nikoli objekty naučených modelů. Počítadla `processed` a `skipped` označují skupiny závodník/kategorie. Nahrazení běhu ponechá jeho metadata, ale smaže stará skóre; nejde tedy o trvalý archiv všech analýz. Zápis skóre a metadat není transakční a souběžný přepočet či částečné selhání nejsou robustně izolovány.
+
+Příznaky kvality při importu závisejí na tehdejší databázi a cache hranic importeru. Nespárované výsledky a chyby výpočtu dostávají `ok`. Hromadný přepočet nad kompletní databází může dát jiné příznaky. `ok` u invalidního času neznamená validní výkon. EDA notebook používá další, odlišné definice příznaků.
+
+Současný model není kontextový hierarchický model výkonnosti. Chybí kontext závodu a korekce věkového vývoje; překrývající se okna nejsou nezávislé vzorky. [Testy modelu](../backend/app/tests/test_isolation_forest.py) a [oken](../backend/app/tests/test_windows.py) ověřují programové chování, nikoli vědeckou validitu.
