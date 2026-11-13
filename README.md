@@ -86,7 +86,7 @@ flowchart TB
 
 The repository contains **329 JSON files, 394 category blocks and 13,854 source result rows**, with competition dates from **2019-05-04 to 2025-10-04** (recounted 2026-10-22). These are source counts, not guaranteed MongoDB counts: import normalizes values, reuses competitions and categories, and skips results considered duplicates.
 
-Source filenames and generation timestamps are retained in JSON, but the original result sheets, retrieval URLs and extraction pipeline are absent. Matching is heuristic, and incomplete birth years and FS codes leave unresolved identities. See [data structure, collections, provenance and responsible use](docs/data-baseline.en.md) / [CZ](docs/data-baseline.md).
+Historical JSON retains source filenames and generation timestamps but lacks original result sheets and retrieval URLs. New URL imports use the [tested extraction pipeline](docs/extraction.cs.md), which records the source URL, validates JSON and saves diagnostics. Matching is heuristic, and incomplete birth years and FS codes leave unresolved identities. See [data structure, collections, provenance and responsible use](docs/data-baseline.en.md) / [CZ](docs/data-baseline.md).
 
 ## Machine Learning Approach
 

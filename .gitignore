@@ -56,3 +56,6 @@ frontend/dist/
 
 # Docker
 .docker/
+
+# Source snapshots and operational extraction diagnostics (not result data)
+.extraction-diagnostics/

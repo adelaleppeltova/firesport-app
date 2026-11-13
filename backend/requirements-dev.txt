@@ -2,3 +2,4 @@
 
 pytest
 ruff==0.15.22
+-r requirements-extraction.txt
