@@ -63,7 +63,7 @@ def is_result_header(mapping):
     return names and bool({"rank", "try1", "try2", "final"} & mapping.keys())
 
 
-def table_label(table):
+def table_label(table, *, site=False):
     caption = table.find("caption")
     if caption:
         return caption.get_text(" ", strip=True)
@@ -74,6 +74,23 @@ def table_label(table):
             return re.sub(r"^\d+\)\s*", "", banner.get_text(" ", strip=True))
         if parent.name in {"body", "html"}:
             break
+    if site:
+        # Older result cards omit the named banner but show a gender/age label.
+        card = table.parent.parent
+        if card and len(card.find_all("table")) == 1:
+            header = card.select_one("div.text-red-600")
+            if header:
+                labels = [
+                    child.get_text(" ", strip=True)
+                    for child in header.find_all(recursive=False)
+                ]
+                age = [
+                    label
+                    for label in labels
+                    if re.fullmatch(r".+ - věk: \d+ - \d+", label)
+                ]
+                if len(age) == 1:
+                    return age[0]
     heading = table.find_previous(["h2", "h3", "h4"])
     return heading.get_text(" ", strip=True) if heading else None
 
@@ -120,7 +137,7 @@ def parse_html(data, url, fetcher=None):
         columns = column_map(headers)
         if not ("name" in columns or {"first_name", "last_name"} <= columns.keys()):
             raise ValueError("Result table has no identifiable participant column")
-        name = table_label(table)
+        name = table_label(table, site=site)
         if not name:
             raise ValueError("Result table category cannot be determined")
         if re.search(r"\b(finalovy beh|superfinale)\b", norm(name)):
@@ -140,6 +157,12 @@ def parse_html(data, url, fetcher=None):
             cells = row.find_all(["td", "th"], recursive=False)
             values = [c.get_text(" ", strip=True) for c in cells]
             if not cells or values == headers:
+                continue
+            if (
+                site
+                and len(cells) == 1
+                and norm(values[0]) == "v kategorii neni nikdo prihlasen"
+            ):
                 continue
             if any("neobsazen" in norm(v) for v in values):
                 continue
@@ -195,10 +218,7 @@ def parse_html(data, url, fetcher=None):
                 }
                 for i in (1, 2)
             ]
-            reasons_count += len(
-                re.findall(r"(?:^|[,;]\s*)[12]\s*[-–—.]\s*", get("reason") or "")
-            )
-            assign_reasons(get("reason"), attempts, warnings, context)
+            reasons_count += assign_reasons(get("reason"), attempts, warnings, context)
             final = final_time(
                 get("final"),
                 attempts,

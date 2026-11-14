@@ -501,3 +501,37 @@ def test_missing_rank_column_is_null_not_calculated():
     competition, _, warnings, _ = parse_html(page, "https://example.org")
     assert competition["categories"][0]["results"][0]["rank"] is None
     assert any("unavailable rank" in warning for warning in warnings)
+
+
+def test_legacy_result_card_uses_explicit_age_label():
+    html = """
+    <div><div class="text-red-600"><div>dívky - věk: 13 - 14</div>
+    <div>závodníků v kategorii: 1</div></div><div>
+    <table><tr><th>Poř.</th><th>Jméno</th><th>Čas 1</th></tr>
+    <tr><td>1</td><td>Nová Jana (12)</td><td>15.00 P</td></tr></table>
+    </div></div>
+    """
+    competition, _, _, audit = parse_html(html, "https://pozarnisporty.cz/races/382")
+    assert competition["categories"][0]["name"] == "dívky - věk: 13 - 14"
+    assert audit[0]["rows"] == 1
+
+
+def test_shared_reason_for_explicitly_numbered_attempts():
+    attempts = [{"status": "invalid"}, {"status": "invalid"}]
+    warnings = []
+    assert assign_reasons("1, 2 - nenastoupil - úraz", attempts, warnings, "row") == 2
+    assert [a["invalid_reason"] for a in attempts] == ["nenastoupil - úraz"] * 2
+    assert warnings == []
+
+
+def test_empty_legacy_category_is_not_a_participant():
+    html = """
+    <div><div class="text-red-600"><div>ženy - věk: 17 - 18</div>
+    <div>závodníků v kategorii: 0</div></div><div>
+    <table><tr><th>Poř.</th><th>Jméno</th><th>Čas 1</th></tr>
+    <tr><td colspan="3">V kategorii není nikdo přihlášen</td></tr></table>
+    </div></div>
+    """
+    competition, _, _, audit = parse_html(html, "https://pozarnisporty.cz/races/1239")
+    assert competition["categories"][0]["results"] == []
+    assert audit[0]["rows"] == 0
