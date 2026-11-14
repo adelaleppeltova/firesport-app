@@ -160,3 +160,28 @@ def test_identical_rows_within_one_file_are_reported(import_collections):
     assert stats["results_created"] == stats["results_duplicates_skipped"] == 0
     assert len(stats["errors"]) == 2
     assert not import_collections["results"].documents
+
+
+def test_import_preserves_original_team_and_stores_numeric_start_number(import_collections):
+    race = _race()
+    rows = race["competition"]["categories"][0]["results"]
+    rows[0].update(team="SDH KAMENEC U POLIČKY", start_number=" 017 ")
+    rows[1]["start_number"] = ""
+    with patch.object(data_import, "decide_athlete_match", AsyncMock(return_value={
+        "match_status": MatchStatus.unmatched, "match_reason": "no_match", "matched_athlete": None,
+    })) as match:
+        stats = asyncio.run(data_import.DataImporter().import_from_dict(race))
+
+    assert stats["errors"] == []
+    first, second = import_collections["results"].documents.values()
+    assert first["team"] == "Kamenec u Poličky"
+    assert first["imported_team"] == "SDH KAMENEC U POLIČKY"
+    assert first["start_number"] == 17
+    assert second["start_number"] is None
+    assert match.await_args_list[0].kwargs["team"] == "Kamenec u Poličky"
+
+
+@pytest.mark.parametrize("value", ["17A", 17.5, True])
+def test_invalid_start_number_is_reported(value):
+    with pytest.raises(ValueError, match="Neplatné startovní číslo"):
+        data_import.DataImporter._parse_start_number(value)

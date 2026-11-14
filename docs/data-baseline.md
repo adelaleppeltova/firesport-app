@@ -45,7 +45,8 @@ Automatický import se spouští při `IMPORT_DATA=true` a zachovává stávají
 
 - datum soutěže se převádí z `YYYY-MM-DD` na `datetime` a `league` na seznam řetězců,
 - názvy kategorií dostávají jednotnou kapitalizaci; `HZS` zůstává velkými písmeny,
-- importované jméno a název týmu se ukládají v podobě ze zdroje,
+- jméno a původní zápis týmu se zachovají pro kontrolu, běžné zobrazení používá normalizovaný název týmu,
+- číselné startovní číslo se ukládá jako celé číslo a prázdná hodnota jako `null`,
 - FS kód se převádí na oříznutý řetězec,
 - pokusy se při uložení mapují z pole `try` na `attempt`,
 - vstupní hodnota roku narození `0` se při importu chápe jako chybějící údaj.

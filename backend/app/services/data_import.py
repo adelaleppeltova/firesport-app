@@ -84,6 +84,60 @@ class DataImporter:
                 normalized_words.append(lower_word)
         return " ".join(normalized_words)
 
+    @staticmethod
+    def _normalize_team_name(value: str) -> str:
+        """
+        Converts team name to proper case with Czech-style capitalization.
+        - Prepositions (u, nad, pod, v, z, na, do, od) are lowercase
+        - Other words are title case
+        - Acronyms like 'HZS', 'VHJ', 'ČHJ', 'PS' stay uppercase
+        - Hyphenated words: both parts follow same rules
+
+        Examples:
+        - 'DOLNÍ LHOTA' -> 'Dolní Lhota'
+        - 'KAMENEC U POLIČKY' -> 'Kamenec u Poličky'
+        - 'NAD MORAVOU' -> 'Nad Moravou'
+        - 'DOLNÍ-DVŮR' -> 'Dolní-Dvůr'
+        """
+        KEEP_UPPER = {"hzs", "vhj", "čhj", "ps"}
+        LOWERCASE_WORDS = {"u", "nad", "pod", "v", "z", "na", "do", "od"}
+
+        stripped = value.strip()
+        if not stripped:
+            return stripped
+
+        result = []
+        words = stripped.split()
+
+        for word in words:
+            # Handle hyphenated words (e.g., 'DOLNÍ-DVŮR')
+            if "-" in word:
+                parts = word.split("-")
+                normalized_parts = []
+                for part in parts:
+                    if part:
+                        lower = part.lower()
+                        if lower in KEEP_UPPER:
+                            normalized_parts.append(lower.upper())
+                        elif lower in LOWERCASE_WORDS:
+                            normalized_parts.append(lower)
+                        else:
+                            normalized_parts.append(part[0].upper() + part[1:].lower() if len(part) > 1 else part.upper())
+                    else:
+                        normalized_parts.append(part)
+                result.append("-".join(normalized_parts))
+            else:
+                lower = word.lower()
+                if lower in KEEP_UPPER:
+                    result.append(lower.upper())
+                elif lower in LOWERCASE_WORDS:
+                    result.append(lower)
+                else:
+                    result.append(word[0].upper() + word[1:].lower() if len(word) > 1 else word.upper())
+
+        return " ".join(result)
+
+
     async def import_from_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Importuje data ze slovníku (parsovaný JSON).
@@ -255,16 +309,20 @@ class DataImporter:
     ) -> None:
         """Importuje nový řádek a existující výkon ponechá beze změny."""
         try:
-            team = result_data.get("team")
+            imported_team = result_data.get("team")
+            raw_team = (imported_team or "").replace("SDH", "").strip()
+            team = self._normalize_team_name(raw_team) if raw_team else None
+            start_number = self._parse_start_number(result_data.get("start_number"))
             imported_athlete = self._extract_imported_athlete_data(result_data)
             competition = await competitions_collection.find_one({"_id": ObjectId(competition_id)})
             row = {
                 "competition": ObjectId(competition_id),
                 "category": ObjectId(category_id),
                 "team": team,
+                "imported_team": imported_team,
                 "district": result_data.get("district"),
                 "imported_athlete": imported_athlete,
-                "start_number": result_data.get("start_number"),
+                "start_number": start_number,
                 "final_time": result_data.get("final_time"),
                 "final_time_status": result_data.get("final_status", "invalid"),
                 "rank": result_data.get("rank"),
@@ -313,8 +371,17 @@ class DataImporter:
             logger.error("Chyba při importu výsledku: %s", exc)
 
     @staticmethod
+    def _parse_start_number(value: Any) -> Optional[int]:
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return None
+        if type(value) is int or (isinstance(value, str) and re.fullmatch(r"[0-9]+", value.strip())):
+            return int(value)
+        raise ValueError(f"Neplatné startovní číslo {value!r}.")
+
+    @staticmethod
     def _row_identity(row: dict) -> dict:
         athlete = row.get("imported_athlete") or {}
+        start_number = DataImporter._parse_start_number(row.get("start_number"))
         # Compare the representation written by both the old and new importer.
         team = re.sub(r"\bSDH\b", "", row.get("team") or "", flags=re.IGNORECASE)
         return {
@@ -327,7 +394,7 @@ class DataImporter:
             ),
             "birth_year": athlete.get("birth_year"),
             "fscode": normalize_fs_code(athlete.get("fscode")),
-            "start_number": str(row["start_number"]).strip() if row.get("start_number") else None,
+            "start_number": str(start_number) if start_number is not None else None,
             "rank": row.get("rank"),
             "final_time": float(row["final_time"]) if row.get("final_time") is not None else None,
             "final_time_status": row.get("final_time_status"),

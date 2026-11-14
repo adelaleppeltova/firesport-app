@@ -148,7 +148,7 @@ async def get_review_results() -> AdminReviewResponse:
                 imported_athlete=ImportedAthleteData.model_validate(imported),
                 match_status=status_value,
                 match_reason=doc.get("match_reason"),
-                team=doc.get("team"),
+                team=doc.get("imported_team", doc.get("team")),
                 date=doc.get("date").isoformat() if doc.get("date") else None,
             )
         )

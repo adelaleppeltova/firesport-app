@@ -88,6 +88,7 @@ def test_review_queue_includes_unresolved_import_with_original_identity_and_reas
     doc = _result(
         imported_athlete={"first_name": "JAN", "last_name": "Novák", "birth_year": 2000, "fscode": "12345"},
         match_reason="no_match",
+        imported_team="SDH LHOTA",
     )
     with patch.object(admin, "results_collection") as results:
         results.find.return_value.sort.return_value.to_list = AsyncMock(return_value=[doc])
@@ -98,3 +99,4 @@ def test_review_queue_includes_unresolved_import_with_original_identity_and_reas
     assert response.items[0].imported_athlete.first_name == "JAN"
     assert response.items[0].imported_athlete.fscode == "12345"
     assert response.items[0].match_reason == "no_match"
+    assert response.items[0].team == "SDH LHOTA"
