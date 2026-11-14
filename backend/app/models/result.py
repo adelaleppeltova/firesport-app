@@ -11,6 +11,7 @@ from app.models.category import CategoryInDB
 class TimeStatus(str, Enum):
     valid = "valid"
     invalid = "invalid"
+    missing = "missing"
 
 
 class QualityFlag(str, Enum):
@@ -48,6 +49,7 @@ class TimeAttempt(BaseModel):
     attempt: Optional[int] = None
     time: Optional[float]
     status: TimeStatus
+    invalid_reason: Optional[str] = None
 
 class ResultBase(BaseModel):
     athlete: Optional[AthleteInDB] = None
@@ -60,7 +62,7 @@ class ResultBase(BaseModel):
     match_status: MatchStatus = MatchStatus.matched
     match_reason: Optional[str] = None
 
-    start_number: Optional[int] = None
+    start_number: Optional[int | str] = None
 
     times: list[TimeAttempt] = Field(default_factory=list)
 
@@ -85,7 +87,7 @@ class ResultAthleteDetail(BaseModel):
     date: datetime
     team: Optional[str] = None
 
-    start_number: Optional[int] = None
+    start_number: Optional[int | str] = None
 
     times: list[TimeAttempt] = Field(default_factory=list)
 

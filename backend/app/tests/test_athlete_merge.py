@@ -46,6 +46,10 @@ def test_merge_athletes_moves_results_and_unifies_identity():
 
     assert response["ok"] is True
     assert response["moved_results"] == 4
+    predicate, update = mock_results.update_many.await_args.args
+    assert predicate == {"athlete": source_id}
+    assert update["$set"]["athlete"] == target_id
+    assert set(update["$set"]) == {"athlete", "updated_at"}
 
     target_update = mock_athletes.update_one.await_args_list[0]
     assert target_update.args[0] == {"_id": target_id}

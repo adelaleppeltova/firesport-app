@@ -34,9 +34,8 @@ Existing container environment values take precedence.
 
 Run the local development stack with `docker compose up --build`. The frontend
 is available on port 3000 and the backend on port 8000. Data import is off by
-default. `scripts/load_data.py` deletes six collections and retains users;
-never run it on a dataset that must be preserved. Follow the isolated workflow
-in `docs/reproducibility.md` before seeding.
+default. `scripts/load_data.py` imports incrementally and preserves existing
+collections. See `docs/reproducibility.md` for a reproducible local setup.
 
 GitHub Actions in `.github/workflows/ci.yml` runs backend tests, frontend tests
 and the frontend production build for the configured pushes and pull requests.

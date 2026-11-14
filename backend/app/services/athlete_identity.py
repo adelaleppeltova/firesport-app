@@ -91,4 +91,10 @@ def build_fs_code_query(fs_code: Any) -> Optional[dict]:
     if not normalized_code:
         return None
 
-    return {"fs_codes": normalized_code}
+    # Historical imports can contain numerical codes in the array.
+    values = [normalized_code]
+    if normalized_code.isascii() and normalized_code.isdecimal() and len(normalized_code) <= 18:
+        number = int(normalized_code)
+        if str(number) == normalized_code:
+            values.append(number)
+    return {"fs_codes": {"$in": values}}

@@ -41,27 +41,22 @@ flowchart LR
     Scores --> API[API and React charts]
 ```
 
-## Import paths and destructive seed
+## Incremental import paths
 
 - `POST /v1/data/import`: multipart JSON file, currently without auth dependency.
 - `POST /v1/data/import/raw`: JSON request body, currently without auth dependency.
 - `POST /v1/admin/import`: administrator import route, protected by `require_admin`.
 - [`scripts/load_data.py`](../backend/scripts/load_data.py): sorted recursive `/app/data/**/*.json` import, optionally called by the entrypoint when `IMPORT_DATA=true` (Compose defaults to `false`).
 
-**The seed deletes all documents in `results`, `competitions`, `athletes`, `categories`, `anomaly_runs` and `anomaly_scores` before checking the data directory. It leaves `users` intact.** Existing account pairing references can therefore become stale. Its paths and MongoDB readiness URI assume the Docker network; use only an isolated disposable dataset. Ordinary file/body imports do not perform this collection wipe, but still write to the database. Follow [reproducibility](reproducibility.md).
+The script imports results incrementally and preserves existing collections. The paths and MongoDB readiness URI assume the Docker network. Follow [reproducibility](reproducibility.md).
 
 ## Athlete matching and duplicates
 
-[Matching](../backend/app/services/result_matching.py) searches active athletes using normalized names, then birth year, team and FS code:
+[Matching](../backend/app/services/result_matching.py) requires one active profile with an exact first and last name and corroboration from a birth year or unique FS code. Name variants and historical teams can surface candidates for review. Ambiguous rows enter `needs_review`, and rows without a candidate enter `unmatched`. Both retain the imported identity and the decision reason.
 
-- A unique name/birth-year match is accepted; with several such candidates, an FS code can disambiguate.
-- Without a birth year, one name/team match can be accepted; name-only and multiple candidates require review.
-- A known birth year can match a name/team athlete with a missing year and enrich that identity. Conflicting known birth years can lead to creating a separate athlete.
-- Missing names or no match yield `unmatched`. The importer creates a new athlete when both names are present, marking the result matched; otherwise the result can remain without an athlete reference.
+Administrators create new profiles. Rematching after a manual action is scoped to unassigned rows with a name matching the affected profile. Manual assignments and unassignments take precedence.
 
-The match reason and original identity remain on the result. Existing identities can gain missing birth year, FS codes or teams. Candidate lookup is limited to ten per query; matching is a heuristic, not a globally unique identifier guarantee. Admin services support manual assignment, new identity creation and merging. These decisions change subsequent analysis eligibility.
-
-Competitions are reused by exact `(name, place, date)` and categories primarily by name, including case-insensitive lookup. Result duplicate lookup uses competition, category, imported first/last name and start number, adding birth year/FS code when available. It is not a unique index or correction/upsert mechanism; changed metadata and concurrent imports can produce unexpected duplicate behaviour. Do not equate source row totals with stored counts.
+Races use source URLs and complete metadata, and categories use name and discipline. Duplicate lookup compares the row and performance within the race and category. Exact repeats are skipped, and ambiguous row changes are reported in the import summary. Identical new inserts share a database ID even when imports overlap.
 
 ## MongoDB collections
 

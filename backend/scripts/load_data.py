@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Seed script pro automatický import dat ze složky /app/data do MongoDB.
+Inkrementální skript pro automatický import dat ze složky /app/data do MongoDB.
 Entrypoint jej při startu Docker kontejneru spustí pouze s IMPORT_DATA=true.
 
 Použití:
@@ -55,24 +55,8 @@ async def load_all_json_files():
     """Najde a importuje všechny JSON soubory ze složky data/."""
     # TEPRVE TEĎKA importuj DataImporter - po čekání na MongoDB!
     from app.services.data_import import DataImporter
-    from app.db.database import db
-    
-    # Smaz existující kolekce results a competitions
-    results_collection = db["results"]
-    competitions_collection = db["competitions"]
-    athletes_collection = db["athletes"]
-    categories_collection = db["categories"]
-    anomaly_runs_collection = db["anomaly_runs"]
-    anomaly_scores_collection = db["anomaly_scores"]
-    
-    await results_collection.delete_many({})
-    await competitions_collection.delete_many({})
-    await athletes_collection.delete_many({})
-    await categories_collection.delete_many({})
-    await anomaly_runs_collection.delete_many({})
-    await anomaly_scores_collection.delete_many({})
-    logger.info("✓ Smazány všechny existující výsledky, soutěže, atleti, kategorie a anomálie z MongoDB pro čistý start")
-    
+    from app.models.admin import ImportStats
+
     # Kontrola existence složky
     if not DATA_DIR.exists():
         logger.warning(f"Složka {DATA_DIR} neexistuje - přeskočit import")
@@ -87,15 +71,8 @@ async def load_all_json_files():
     
     logger.info(f"Nalezeno {len(json_files)} JSON souborů k importu")
     
-    total_stats = {
-        "athletes_created": 0,
-        "athletes_skipped": 0,
-        "categories_created": 0,
-        "competitions_created": 0,
-        "results_created": 0,
-        "errors": []
-    }
-    
+    total_stats = ImportStats().model_dump()
+
     for json_file in sorted(json_files):
         try:
             logger.info(f"Importuji: {json_file}")
@@ -106,14 +83,11 @@ async def load_all_json_files():
             importer = DataImporter()
             stats = await importer.import_from_dict(data)
             
-            # Agregace statistik
-            total_stats["athletes_created"] += stats.get("athletes_created", 0)
-            total_stats["athletes_skipped"] += stats.get("athletes_skipped", 0)
-            total_stats["categories_created"] += stats.get("categories_created", 0)
-            total_stats["competitions_created"] += stats.get("competitions_created", 0)
-            total_stats["results_created"] += stats.get("results_created", 0)
-            total_stats["errors"].extend(stats.get("errors", []))
-            
+            for key, value in stats.items():
+                if key != "errors":
+                    total_stats[key] += value
+            total_stats["errors"].extend(stats["errors"])
+
             logger.info(f"✓ Import souboru {json_file.name} dokončen: {stats}")
             
         except json.JSONDecodeError as e:
@@ -125,20 +99,9 @@ async def load_all_json_files():
             logger.error(error_msg, exc_info=True)
             total_stats["errors"].append(error_msg)
     
-    logger.info("=" * 60)
-    logger.info("SOUHRN IMPORTU")
-    logger.info("=" * 60)
-    logger.info(f"✓ Atleti: {total_stats['athletes_created']} nových, {total_stats['athletes_skipped']} existujících")
-    logger.info(f"✓ Kategorie: {total_stats['categories_created']} nových")
-    logger.info(f"✓ Soutěže: {total_stats['competitions_created']} nových")
-    logger.info(f"✓ Výsledky: {total_stats['results_created']} importováno")
-    
-    if total_stats["errors"]:
-        logger.warning(f"⚠ Chyby ({len(total_stats['errors'])}): {total_stats['errors']}")
-    else:
-        logger.info("✓ Bez chyb!")
-    
-    logger.info("=" * 60)
+    logger.info("Souhrn inkrementálního importu: %s", total_stats)
+    logger.info("Počet chyb a konfliktů: %d", len(total_stats["errors"]))
+    return total_stats
 
 
 async def main():

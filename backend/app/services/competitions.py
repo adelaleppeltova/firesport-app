@@ -196,13 +196,17 @@ async def get_results_for_category_service(competition_id: str, category_id: str
 
 		result.append(ResultInDB.model_validate(out))
 
+	def start_number_key(value):
+		label = str(value or "")
+		return (0, int(label)) if label.isdecimal() else (1, label.casefold())
+
 	return sorted(
 		result,
 		key=lambda item: (
 			item.rank is None,
 			item.rank if item.rank is not None else float("inf"),
 			item.start_number is None,
-			item.start_number if item.start_number is not None else float("inf"),
+			start_number_key(item.start_number),
 			item.id,
 		),
 	)

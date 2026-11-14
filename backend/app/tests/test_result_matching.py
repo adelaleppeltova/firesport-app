@@ -1,191 +1,101 @@
 import asyncio
-from unittest.mock import AsyncMock, patch
+import re
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from app.models.result import MatchStatus
 from app.services.result_matching import decide_athlete_match
 
 
-def test_decide_athlete_match_matches_same_name_and_birth_year_with_different_fscode():
-    athlete = {"_id": "athlete-1", "birth_year": 1997, "fs_codes": ["11111"]}
-    mocked_find = AsyncMock(return_value=[athlete])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=1997,
-                fscode="22222",
-                team="Bukovice",
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.matched
-    assert decision["match_reason"] == "name_plus_birth_year"
-    assert decision["matched_athlete"] == athlete
-
-
-def test_decide_athlete_match_matches_same_name_and_birth_year_with_different_team():
-    athlete = {"_id": "athlete-2", "birth_year": 1997, "teams": ["Bukovice"]}
-    mocked_find = AsyncMock(return_value=[athlete])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=1997,
-                fscode="33333",
-                team="Olesnice",
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.matched
-    assert decision["match_reason"] == "name_plus_birth_year"
-
-
-def test_decide_athlete_match_does_not_match_same_name_with_conflicting_birth_year():
-    athlete = {"_id": "athlete-3", "birth_year": 1997}
-    mocked_find = AsyncMock(return_value=[athlete])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=1998,
-                fscode="33333",
-                team="Olesnice",
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.unmatched
-    assert decision["match_reason"] == "name_match_conflicting_birth_year_create_new"
-    assert decision["matched_athlete"] is None
-
-
-def test_decide_athlete_match_same_name_without_birth_year_requires_review():
-    athlete = {"_id": "athlete-4", "teams": ["Bukovice"]}
-    mocked_find = AsyncMock(return_value=[athlete])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=None,
-                fscode="44444",
-                team=None,
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.needs_review
-    assert decision["match_reason"] == "name_only_missing_birth_year"
-    assert decision["matched_athlete"] is None
-
-
-def test_decide_athlete_match_same_name_and_team_without_birth_year_matches_unique_candidate():
-    athlete = {"_id": "athlete-4b", "teams": ["Bukovice"]}
-    mocked_find = AsyncMock(return_value=[athlete])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=None,
-                fscode="44444",
-                team="Bukovice",
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.matched
-    assert decision["match_reason"] == "name_plus_team"
-    assert decision["matched_athlete"] == athlete
-
-
-def test_decide_athlete_match_same_name_and_team_without_birth_year_requires_review_when_ambiguous():
-    athlete_a = {"_id": "athlete-4c", "teams": ["Bukovice"]}
-    athlete_b = {"_id": "athlete-4d", "teams": ["Bukovice"]}
-    mocked_find = AsyncMock(return_value=[athlete_a, athlete_b])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=None,
-                fscode="44444",
-                team="Bukovice",
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.needs_review
-    assert decision["match_reason"] == "multiple_name_plus_team_candidates"
-    assert decision["matched_athlete"] is None
-
-
-def test_decide_athlete_match_keeps_single_athlete_when_multiple_fs_codes_exist():
-    athlete = {
-        "_id": "athlete-5",
-        "birth_year": 1997,
-        "fs_codes": ["11111", "22222"],
-        "teams": ["Bukovice", "Olesnice"],
+def _athlete(identifier, year=None, codes=(), *, first="Jan", last="Novák", active=True):
+    return {
+        "_id": identifier,
+        "first_name": first,
+        "last_name": last,
+        "birth_year": year,
+        "fs_codes": list(codes),
+        "teams": ["Lhota"],
+        "is_active": active,
     }
-    mocked_find = AsyncMock(return_value=[athlete])
 
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=1997,
-                fscode="33333",
-                team="Lubna",
-            )
+
+def _matches(doc, query):
+    for key, condition in query.items():
+        if key == "$and":
+            if not all(_matches(doc, entry) for entry in condition):
+                return False
+        elif key == "$or":
+            if not any(_matches(doc, entry) for entry in condition):
+                return False
+        elif isinstance(condition, dict):
+            value = doc.get(key)
+            if "$ne" in condition and value == condition["$ne"]:
+                return False
+            if "$in" in condition and not any(item in value for item in condition["$in"]):
+                return False
+            if "$regex" in condition and not any(
+                re.search(condition["$regex"], item, re.I)
+                for item in (value if isinstance(value, list) else [value])
+            ):
+                return False
+        elif doc.get(key) != condition:
+            return False
+    return True
+
+
+@pytest.mark.parametrize(
+    "profiles, year, code, last, team, status, reason, expected_id",
+    [
+        ([_athlete(1, 2000), _athlete(2, 2001)], 2000, None, "Novák", None,
+         "matched", "name_plus_birth_year", 1),
+        ([_athlete(1, 2000)], 2001, None, "Novák", "Lhota",
+         "needs_review", "conflicting_birth_year", None),
+        ([_athlete(1, 2000), _athlete(2, 2000)], 2000, None, "Novák", "Lhota",
+         "needs_review", "multiple_name_candidates", None),
+        ([_athlete(1, 2000)], None, None, "Novák", "Lhota",
+         "needs_review", "insufficient_identity", None),
+        ([_athlete(1, 2000)], 2000, None, "Novák", "Bukovice",
+         "matched", "name_plus_birth_year", 1),
+        ([_athlete(1, 2000, [12345, "54321"])], None, "12345", "Novák", None,
+         "matched", "name_plus_fscode", 1),
+        ([_athlete(1, 2000, ["12345"]), _athlete(2, 2000)], 2000, "12345", "Novák", None,
+         "matched", "name_plus_fscode", 1),
+        ([_athlete(1, 2000), _athlete(2, 2000, ["12345"], last="Malý")], 2000, "12345", "Novák", None,
+         "needs_review", "conflicting_fscode", None),
+        ([_athlete(1, 2000, ["12345"]), _athlete(2, 2000, ["12345"], last="Malý")],
+         2000, "12345", "Novák", None, "needs_review", "shared_fscode", None),
+        ([_athlete(1, None, ["12345"]), _athlete(2, 2000)], 2000, "12345", "Novák", None,
+         "needs_review", "conflicting_fscode", None),
+        ([_athlete(1, 2000, ["54321"])], 2000, "12345", "Novák", None,
+         "needs_review", "unrecognized_fscode", None),
+        ([_athlete(1, 2000)], None, None, "Novák", None, "needs_review", "insufficient_identity", None),
+        ([_athlete(1, 2000), _athlete(2)], 2000, None, "Novák", None,
+         "needs_review", "multiple_name_candidates", None),
+        ([_athlete(1, 2000)], 2000, None, "Novak", None, "needs_review", "insufficient_identity", None),
+        ([_athlete(1, 2000)], 2000, None, "Novka", None, "needs_review", "possible_name_variant", None),
+        ([_athlete(1, 2000, ["12345"])], 2000, "12345", "Novak", None,
+         "needs_review", "conflicting_fscode", None),
+        ([_athlete(1, 2000), _athlete(2, 2000, active=False)], 2000, None, "Novák", None,
+         "matched", "name_plus_birth_year", 1),
+        ([_athlete(1, 2000, last="Novák Svoboda")], 2000, None, "NovákSvoboda", None,
+         "needs_review", "insufficient_identity", None),
+        ([], 2000, "12345", "Novák", None, "unmatched", "no_match", None),
+    ],
+)
+def test_automatic_matching(profiles, year, code, last, team, status, reason, expected_id):
+    def find(query):
+        docs = [doc for doc in profiles if _matches(doc, query)]
+        cursor = MagicMock(to_list=AsyncMock(return_value=docs))
+        cursor.limit.return_value = cursor
+        return cursor
+
+    with patch("app.services.result_matching.athletes_collection.find", side_effect=find):
+        result = asyncio.run(
+            decide_athlete_match(first_name="Jan", last_name=last, birth_year=year, fscode=code, team=team)
         )
 
-    assert decision["match_status"] == MatchStatus.matched
-    assert decision["match_reason"] == "name_plus_birth_year"
-    assert decision["matched_athlete"] == athlete
-
-
-def test_decide_athlete_match_birth_year_uses_team_when_athlete_birth_year_missing():
-    athlete = {"_id": "athlete-5b", "birth_year": None, "teams": ["Bukovice"]}
-    mocked_find = AsyncMock(return_value=[athlete])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=1997,
-                fscode="33333",
-                team="Bukovice",
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.matched
-    assert decision["match_reason"] == "name_plus_team"
-    assert decision["matched_athlete"] == athlete
-
-
-def test_decide_athlete_match_multiple_candidates_with_same_name_and_birth_year_require_review():
-    athlete_a = {"_id": "athlete-6", "birth_year": 1997, "fs_codes": ["11111"]}
-    athlete_b = {"_id": "athlete-7", "birth_year": 1997, "fs_codes": ["22222"]}
-    mocked_find = AsyncMock(return_value=[athlete_a, athlete_b])
-
-    with patch("app.services.result_matching._find_athletes", mocked_find):
-        decision = asyncio.run(
-            decide_athlete_match(
-                first_name="Jakub",
-                last_name="Smida",
-                birth_year=1997,
-                fscode="33333",
-                team="Bukovice",
-            )
-        )
-
-    assert decision["match_status"] == MatchStatus.needs_review
-    assert decision["match_reason"] == "multiple_name_plus_birth_year_candidates"
-    assert decision["matched_athlete"] is None
+    assert result["match_status"] == MatchStatus(status)
+    assert result["match_reason"] == reason
+    athlete = result["matched_athlete"]
+    assert (athlete["_id"] if athlete else None) == expected_id
