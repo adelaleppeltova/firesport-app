@@ -1,0 +1,227 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_file": {
+      "type": "string",
+      "format": "uri"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "competition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "place": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "league": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "discipline": {
+                "enum": [
+                  "100m",
+                  "60m",
+                  "100mPHP",
+                  "4x100m",
+                  "PU",
+                  "vez",
+                  null
+                ]
+              },
+              "results": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start_number": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "first_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "last_name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "team": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "district": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "fscode": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "birth_year": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "times": {
+                      "type": "array",
+                      "maxItems": 2,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "try": {
+                            "enum": [
+                              1,
+                              2
+                            ]
+                          },
+                          "time": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "minimum": 0
+                          },
+                          "status": {
+                            "enum": [
+                              "valid",
+                              "invalid",
+                              "missing"
+                            ]
+                          },
+                          "invalid_reason": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": [
+                          "try",
+                          "time",
+                          "status"
+                        ]
+                      }
+                    },
+                    "final_time": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "final_status": {
+                      "enum": [
+                        "valid",
+                        "invalid",
+                        "missing"
+                      ]
+                    },
+                    "rank": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "start_number",
+                    "first_name",
+                    "last_name",
+                    "team",
+                    "district",
+                    "fscode",
+                    "birth_year",
+                    "times",
+                    "final_time",
+                    "final_status",
+                    "rank"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "name",
+              "discipline",
+              "results"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "place",
+        "league",
+        "date",
+        "categories"
+      ]
+    },
+    "parsing_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "source_file",
+    "generated_at",
+    "competition",
+    "parsing_notes",
+    "warnings"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

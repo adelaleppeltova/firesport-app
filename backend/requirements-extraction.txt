@@ -1,0 +1,7 @@
+-r requirements.txt
+beautifulsoup4>=4.12,<5
+jsonschema>=4.23,<5
+pdfplumber>=0.11,<0.12
+PyMuPDF>=1.24,<3
+# Optional dynamic HTML fallback: pip install playwright && playwright install chromium
+# OCR additionally requires the tesseract executable and ces language data.

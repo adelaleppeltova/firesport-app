@@ -86,7 +86,7 @@ flowchart TB
 
 Repozitář obsahuje **329 JSON souborů, 394 bloků kategorií a 13 854 zdrojových řádků výsledků**, s daty soutěží od **2019-05-04 do 2025-10-04** (přepočítáno 2026-10-22). Jde o počty vstupních záznamů, nikoli zaručené počty v MongoDB: import hodnoty normalizuje, znovu používá soutěže i kategorie a vynechává výsledky považované za duplicity.
 
-JSON zachovává názvy zdrojových souborů a čas vytvoření, ale původní listiny, URL stažení a extrakční pipeline chybí. Párování je heuristické a chybějící roky narození či FS kódy vedou k nevyřešeným identitám. Viz [struktura dat, kolekce, provenience a odpovědné použití](docs/data-baseline.md) / [EN](docs/data-baseline.en.md).
+Historické JSON zachovávají názvy zdrojových souborů a čas vytvoření, ale původní listiny a URL stažení u nich chybí. Nové importy z URL zajišťuje [testovaná extrakční pipeline](docs/extraction.cs.md), která ukládá přesný zdroj, validuje JSON a uchovává diagnostiku. Párování je heuristické a chybějící roky narození či FS kódy vedou k nevyřešeným identitám. Viz [struktura dat, kolekce, provenience a odpovědné použití](docs/data-baseline.md) / [EN](docs/data-baseline.en.md).
 
 ## Přístup ke strojovému učení
 
