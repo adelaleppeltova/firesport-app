@@ -49,7 +49,7 @@ def importer_with_mocks():
     Vrátí trojici (importer, mock_bounds, mock_quality_flag).
 
     Interní kolekce DataImporteru jsou patchovány tak, aby:
-    - find_one na results vrátil None  → výsledek neexistuje → bude vložen
+    - find na results vrátil prázdný kurzor  → výsledek neexistuje → bude vložen
     - find_one na competitions vrátil dokument se 'date'
     - insert_one na results uspěl
     - decide_athlete_match vrátí jednoznačný match na FAKE_ATHLETE_ID
@@ -67,7 +67,6 @@ def importer_with_mocks():
 
     # Mock results_collection.insert_one
     mock_res_insert = AsyncMock(return_value=MagicMock(inserted_id=ObjectId()))
-    mock_athlete_insert = AsyncMock(return_value=MagicMock(inserted_id=ObjectId()))
 
     # Mock compute_bounds_for_recompute a compute_quality_flag
     fake_bounds: dict = {ObjectId(FAKE_CATEGORY_ID): (14.0, 40.0)}
@@ -87,13 +86,11 @@ def importer_with_mocks():
         patch("app.services.data_import.compute_bounds_for_recompute", mock_bounds),
         patch("app.services.data_import.compute_quality_flag", mock_quality),
         patch("app.services.data_import.decide_athlete_match", mock_match),
-        patch("app.services.data_import.athletes_collection") as mock_athletes_col,
     ):
         mock_comp_col.find_one = mock_comp_find
         mock_res_col.find_one = mock_res_find
+        mock_res_col.find.return_value.__aiter__.return_value = []
         mock_res_col.insert_one = mock_res_insert
-        mock_athletes_col.insert_one = mock_athlete_insert
-        mock_athletes_col.update_one = AsyncMock(return_value=MagicMock())
 
         yield importer, mock_bounds, mock_quality
 
@@ -187,126 +184,3 @@ def test_normalize_category_name_uses_sentence_case_with_hzs():
         == "Muži a starší dorostenci"
     )
     assert DataImporter._normalize_category_name("MUŽI HZS") == "Muži HZS"
-
-
-def test_import_category_reuses_existing_case_variant():
-    from app.services.data_import import DataImporter
-
-    importer = DataImporter()
-    existing_id = ObjectId()
-    exact_find = AsyncMock(return_value=None)
-    case_insensitive_find = AsyncMock(
-        return_value={"_id": existing_id, "name": "Mladší Dorostenky"}
-    )
-    update_one = AsyncMock()
-    insert_one = AsyncMock()
-
-    with patch("app.services.data_import.categories_collection") as mock_categories:
-        mock_categories.find_one = AsyncMock(
-            side_effect=[exact_find.return_value, case_insensitive_find.return_value]
-        )
-        mock_categories.update_one = update_one
-        mock_categories.insert_one = insert_one
-
-        category_id = asyncio.run(importer._import_category("Mladší dorostenky"))
-
-    assert category_id == str(existing_id)
-    update_one.assert_awaited_once_with(
-        {"_id": existing_id},
-        {"$set": {"name": "Mladší dorostenky"}},
-    )
-    insert_one.assert_not_awaited()
-
-
-def test_unmatched_result_creates_new_athlete_and_matches_result():
-    from app.services.data_import import DataImporter
-
-    importer = DataImporter()
-    created_athlete_id = ObjectId()
-    fake_competition = {"_id": ObjectId(FAKE_COMPETITION_ID), "date": None}
-
-    with (
-        patch("app.services.data_import.competitions_collection") as mock_comp_col,
-        patch("app.services.data_import.results_collection") as mock_res_col,
-        patch("app.services.data_import.athletes_collection") as mock_athletes_col,
-        patch("app.services.data_import.compute_bounds_for_recompute", AsyncMock(return_value={})),
-        patch("app.services.data_import.compute_quality_flag", AsyncMock(return_value=QualityFlag.ok)),
-        patch(
-            "app.services.data_import.decide_athlete_match",
-            AsyncMock(
-                return_value={
-                    "match_status": MatchStatus.unmatched,
-                    "match_reason": "no_match",
-                    "matched_athlete": None,
-                }
-            ),
-        ),
-    ):
-        mock_comp_col.find_one = AsyncMock(return_value=fake_competition)
-        mock_res_col.find_one = AsyncMock(return_value=None)
-        inserted_results = []
-
-        async def capture_result_insert(doc):
-            inserted_results.append(dict(doc))
-            return MagicMock(inserted_id=ObjectId())
-
-        mock_res_col.insert_one = AsyncMock(side_effect=capture_result_insert)
-        mock_athletes_col.insert_one = AsyncMock(
-            return_value=MagicMock(inserted_id=created_athlete_id)
-        )
-
-        asyncio.run(
-            importer._import_result(_make_result_data(1), FAKE_CATEGORY_ID, FAKE_COMPETITION_ID)
-        )
-
-    assert len(inserted_results) == 1
-    assert inserted_results[0]["match_status"] == MatchStatus.matched.value
-    assert inserted_results[0]["match_reason"] == "auto_created_from_unmatched"
-    assert inserted_results[0]["athlete"] == created_athlete_id
-
-
-def test_conflicting_name_only_identity_creates_new_athlete():
-    from app.services.data_import import DataImporter
-
-    importer = DataImporter()
-    created_athlete_id = ObjectId()
-    fake_competition = {"_id": ObjectId(FAKE_COMPETITION_ID), "date": None}
-
-    with (
-        patch("app.services.data_import.competitions_collection") as mock_comp_col,
-        patch("app.services.data_import.results_collection") as mock_res_col,
-        patch("app.services.data_import.athletes_collection") as mock_athletes_col,
-        patch("app.services.data_import.compute_bounds_for_recompute", AsyncMock(return_value={})),
-        patch("app.services.data_import.compute_quality_flag", AsyncMock(return_value=QualityFlag.ok)),
-        patch(
-            "app.services.data_import.decide_athlete_match",
-            AsyncMock(
-                return_value={
-                    "match_status": MatchStatus.unmatched,
-                    "match_reason": "name_match_conflicting_identity_create_new",
-                    "matched_athlete": None,
-                }
-            ),
-        ),
-    ):
-        mock_comp_col.find_one = AsyncMock(return_value=fake_competition)
-        mock_res_col.find_one = AsyncMock(return_value=None)
-        inserted_results = []
-
-        async def capture_result_insert(doc):
-            inserted_results.append(dict(doc))
-            return MagicMock(inserted_id=ObjectId())
-
-        mock_res_col.insert_one = AsyncMock(side_effect=capture_result_insert)
-        mock_athletes_col.insert_one = AsyncMock(
-            return_value=MagicMock(inserted_id=created_athlete_id)
-        )
-
-        asyncio.run(
-            importer._import_result(_make_result_data(7), FAKE_CATEGORY_ID, FAKE_COMPETITION_ID)
-        )
-
-    assert len(inserted_results) == 1
-    assert inserted_results[0]["match_status"] == MatchStatus.matched.value
-    assert inserted_results[0]["match_reason"] == "auto_created_from_unmatched"
-    assert inserted_results[0]["athlete"] == created_athlete_id

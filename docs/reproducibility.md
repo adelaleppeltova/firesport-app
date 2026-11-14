@@ -37,7 +37,7 @@ Existing environment values override `.env`: Compose supplies `MONGO_URL=mongodb
 
 ## 4. Create an isolated Compose project
 
-The seed is destructive. A project name alone does not isolate the repository's fixed `container_name` values, so this temporary override gives **all four services** distinct names and a fresh project-scoped `mongo-data` volume. Verify the generated project name is unused. Record the two printed values if you need to reconnect later. Standard host ports 3000, 8000, 5679, 27017, 1025 and 8025 must be free; container renaming does not change port mappings.
+A project name alone does not isolate the repository's fixed `container_name` values, so this temporary override gives **all four services** distinct names and a fresh project-scoped `mongo-data` volume. Verify the generated project name is unused. Record the two printed values if you need to reconnect later. Standard host ports 3000, 8000, 5679, 27017, 1025 and 8025 must be free; container renaming does not change port mappings.
 
 ```bash
 export FLAMMA_REPRO_PROJECT="flamma-repro-$(date +%s)"
@@ -80,13 +80,13 @@ MongoDB is published on port 27017; Mailpit SMTP on 1025. `DEBUG=true` publishes
 
 ## 6. Import the versioned dataset
 
-**Only on the isolated, disposable project created above:** the following command immediately empties `results`, `competitions`, `athletes`, `categories`, `anomaly_runs` and `anomaly_scores`, even before checking `/app/data`. It retains `users`, so previous account-to-athlete pairings can become invalid. Never use it on an existing dataset you need to preserve.
+Run the incremental import in the isolated project above. The script preserves existing collections.
 
 ```bash
 dc exec backend python /app/scripts/load_data.py
 ```
 
-The [actual seed](../backend/scripts/load_data.py) recursively imports sorted JSON under `/app/data`. Expect 329 discovered files for this source snapshot, per-file logs and an aggregate summary. Inspect its `errors` list: the script can finish with per-file/per-result errors. Do not expect 13,854 inserted results or the historical local-volume counts. Normalization, identity decisions and duplicate lookup affect records. An alternative single-file import without the seed wipe is:
+The [actual seed](../backend/scripts/load_data.py) recursively imports sorted JSON under `/app/data`. Expect 329 discovered files for this source snapshot, per-file logs and an aggregate summary. Inspect its `errors` list: the script can finish with per-file/per-result errors. Do not expect 13,854 inserted results or the historical local-volume counts. Normalization, identity decisions and duplicate lookup affect records. An alternative single-file import through the API is:
 
 ```bash
 curl --fail-with-body -F 'file=@data/2019/beloves/komplet.json' \

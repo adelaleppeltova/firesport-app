@@ -39,29 +39,29 @@ Odkazy z `results` a `anomaly_scores` používají převážně MongoDB `ObjectI
 
 Import zajišťuje `DataImporter` v `backend/app/services/data_import.py`. Data lze dodat jako nahraný JSON (`/v1/data/import`), JSON tělo (`/v1/data/import/raw`), administrátorský hromadný import (`/v1/admin/import`) nebo volitelný Docker seed přes `backend/scripts/load_data.py`.
 
-Seed se spouští jen při `IMPORT_DATA=true`; výchozí `docker-compose.yml` používá `false`. Před seedem skript vyprázdní `results`, `competitions`, `athletes`, `categories`, `anomaly_runs` a `anomaly_scores`, nikoli `users`.
+Automatický import se spouští při `IMPORT_DATA=true` a zachovává stávající kolekce. Výchozí `docker-compose.yml` používá `false`.
 
 ### Normalizace
 
 - datum soutěže se převádí z `YYYY-MM-DD` na `datetime` a `league` na seznam řetězců,
 - názvy kategorií dostávají jednotnou kapitalizaci; `HZS` zůstává velkými písmeny,
-- ze jména týmu se odstraňuje `SDH`, upravuje se kapitalizace a zachovávají se vybrané zkratky,
-- jména závodníků se oříznou a normalizuje se velikost písmen,
+- jméno a původní zápis týmu se zachovají pro kontrolu, běžné zobrazení používá normalizovaný název týmu,
+- číselné startovní číslo se ukládá jako celé číslo a prázdná hodnota jako `null`,
 - FS kód se převádí na oříznutý řetězec,
 - pokusy se při uložení mapují z pole `try` na `attempt`,
 - vstupní hodnota roku narození `0` se při importu chápe jako chybějící údaj.
 
-Pole `source_file`, `generated_at`, `warnings`, `parsing_notes` a vstupní `district` se do hlavních databázových dokumentů tímto importerem nepřenášejí.
+Webový odkaz ze `source_file` se ukládá u soutěže a `district` u výsledku. `generated_at`, `warnings` a `parsing_notes` zůstávají ve zdrojovém souboru.
 
 ### Párování závodníků
 
-Párování pracuje pouze s aktivními atlety a postupně vyhodnocuje normalizované jméno, rok narození, tým a FS kód. Jednoznačná shoda jména a roku narození se páruje automaticky; při chybějícím roku lze automaticky použít jedinou shodu jména a týmu. Více kandidátů nebo pouze slabá shoda vede na `needs_review`. Chybějící jméno či žádná shoda vede na `unmatched`; pokud jsou jméno a příjmení k dispozici, importer pro takový výsledek vytvoří nového atleta a výsledek označí jako spárovaný.
+Automatické přiřazení vyžaduje jednoznačný aktivní profil s přesnou shodou jména a příjmení a s potvrzením rokem narození nebo jedinečným FS kódem. Podobné zápisy jmen a historické týmy pomáhají najít kandidáty ke kontrole. Nejednoznačné výsledky dostanou stav `needs_review` a výsledky bez kandidáta stav `unmatched`. Oba stavy zachovají importované údaje a důvod rozhodnutí.
 
-Při úspěšné shodě může být existující atlet doplněn o dosud chybějící rok narození, FS kód nebo tým. Nejednoznačné výsledky lze následně řešit v administraci ručním přiřazením, vytvořením atleta nebo sloučením duplicitních identit.
+Nový profil vytváří administrátor. Přepárování po ručním zásahu se omezuje na dosud nepřiřazené výsledky se jménem dotčeného profilu. Ruční přiřazení i ruční odebrání vazby mají přednost.
 
 ### Deduplikace výsledků
 
-Soutěž se znovu použije při shodě `name`, `place` a `date`; kategorie primárně při shodě názvu, včetně kontroly bez ohledu na velikost písmen. Výsledek se před vložením hledá podle soutěže, kategorie, importovaného jména a příjmení a startovního čísla; je-li dostupný rok narození nebo FS kód, přidává se i do tohoto dotazu. Pro výsledky není definován unikátní databázový index, takže jde o aplikační deduplikační pravidlo, nikoli úplnou garanci unikátnosti.
+Závod se identifikuje podle zdrojového URL a úplných metadat, kategorie podle názvu a disciplíny. Import porovnává údaje o řádku a výkonu v rámci závodu a kategorie. Přesné opakování přeskočí a při nejednoznačné změně řádku zapíše konflikt do souhrnu. Shodná nová vložení používají stejný databázový identifikátor i při souběhu.
 
 ### Quality flag
 

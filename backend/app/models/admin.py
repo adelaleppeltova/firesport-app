@@ -40,6 +40,7 @@ class ImportStats(BaseModel):
     results_matched: int = 0
     results_needs_review: int = 0
     results_unmatched: int = 0
+    results_duplicates_skipped: int = 0
     errors: list[str] = Field(default_factory=list)
 
 

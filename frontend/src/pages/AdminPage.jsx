@@ -26,6 +26,19 @@ function formatAthleteMeta(athlete) {
     .join(" • ");
 }
 
+const matchReasons = {
+  missing_name: "Ve zdroji chybí jméno nebo příjmení.",
+  shared_fscode: "FSCode sdílí více aktivních profilů.",
+  conflicting_fscode: "FSCode je v rozporu se jménem nebo rokem narození.",
+  unrecognized_fscode: "Profil má evidované jiné FSCode.",
+  multiple_name_candidates: "Údajům odpovídá více profilů.",
+  conflicting_birth_year: "Rok narození se liší od evidovaných profilů.",
+  insufficient_identity: "Jméno a dostupné údaje k potvrzení identity nestačí.",
+  possible_name_variant: "Podobný záznam může patřit existujícímu závodníkovi.",
+  no_match: "Import nenašel odpovídající profil.",
+  manual_admin_unassignment: "Přiřazení ručně odebral administrátor.",
+};
+
 function formatImportedLabel(item) {
   const imported = item.imported_athlete;
   return `${imported.first_name} ${imported.last_name}`.trim();
@@ -100,8 +113,8 @@ export default function AdminPage() {
       const response = await importMutation.mutateAsync(selectedFiles);
       setImportSummary(response.data ?? null);
       setMessage({
-        type: "success",
-        text: `Import dokončen. Zpracováno souborů: ${response.data?.files_processed ?? selectedFiles.length}. Vytvořeno výsledků: ${response.data?.results_created ?? 0}. Ke kontrole: ${(response.data?.results_needs_review ?? 0) + (response.data?.results_unmatched ?? 0)}.`,
+        type: response.data?.errors?.length ? "error" : "success",
+        text: response.data?.errors?.length ? "Import dokončen s chybami nebo konflikty." : "Import dokončen.",
       });
       setSelectedFiles([]);
     } catch (error) {
@@ -210,7 +223,10 @@ export default function AdminPage() {
   };
   const importStatus = {
     totalImported: importSummary?.total_imported ?? 0,
-    reviewRequired: importSummary?.review_required ?? summary.total,
+    reviewRequired: importSummary?.results_needs_review ?? summary.needs_review,
+    unmatched: importSummary?.results_unmatched ?? summary.unmatched,
+    duplicates: importSummary?.results_duplicates_skipped ?? 0,
+    errors: importSummary?.errors ?? [],
     athletesCreatedNew: importSummary?.athletes_created_new ?? 0,
     athletesExistingMatched: importSummary?.athletes_existing_matched ?? 0,
   };
@@ -277,14 +293,33 @@ export default function AdminPage() {
               <strong>{importStatus.reviewRequired}</strong>
             </div>
             <div className="admin-page__summary-item">
-              <span>Vytvoření</span>
+              <span>Noví závodníci</span>
               <strong>{importStatus.athletesCreatedNew}</strong>
             </div>
             <div className="admin-page__summary-item">
-              <span>Existující</span>
+              <span>Automaticky přiřazené výsledky</span>
               <strong>{importStatus.athletesExistingMatched}</strong>
             </div>
+            <div className="admin-page__summary-item">
+              <span>Bez potvrzené identity</span>
+              <strong>{importStatus.unmatched}</strong>
+            </div>
+            <div className="admin-page__summary-item">
+              <span>Přeskočené duplicity</span>
+              <strong>{importStatus.duplicates}</strong>
+            </div>
+            <div className="admin-page__summary-item">
+              <span>Chyby a konflikty</span>
+              <strong>{importStatus.errors.length}</strong>
+            </div>
           </div>
+          {importStatus.errors.length > 0 && (
+            <ul>
+              {importStatus.errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          )}
         </Card>
       </div>
 
@@ -431,6 +466,11 @@ export default function AdminPage() {
                       >
                         {item.match_status}
                       </span>
+                      {item.match_reason && (
+                        <div className="admin-review-table__meta">
+                          {matchReasons[item.match_reason] ?? item.match_reason}
+                        </div>
+                      )}
                     </td>
                     <td>{item.imported_athlete.birth_year ?? "—"}</td>
                     <td>{item.imported_athlete.fscode ?? "—"}</td>

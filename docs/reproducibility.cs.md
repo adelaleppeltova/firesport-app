@@ -37,7 +37,7 @@ Existující hodnoty prostředí mají přednost před `.env`: Compose dodává 
 
 ## 4. Izolovaný projekt Compose
 
-Seed je destruktivní. Samotný název projektu neizoluje pevné `container_name` v repozitáři, proto dočasný override přejmenuje **všechny čtyři služby** a nový projekt získá vlastní `mongo-data` volume. Ověřte, že název projektu dosud neexistuje. Dvě vypsané hodnoty si uchovejte pro pozdější připojení. Porty hostitele 3000, 8000, 5679, 27017, 1025 a 8025 musejí být volné; přejmenování kontejnerů je nemění.
+Samotný název projektu neizoluje pevné `container_name` v repozitáři, proto dočasný override přejmenuje **všechny čtyři služby** a nový projekt získá vlastní `mongo-data` volume. Ověřte, že název projektu dosud neexistuje. Dvě vypsané hodnoty si uchovejte pro pozdější připojení. Porty hostitele 3000, 8000, 5679, 27017, 1025 a 8025 musejí být volné; přejmenování kontejnerů je nemění.
 
 ```bash
 export FLAMMA_REPRO_PROJECT="flamma-repro-$(date +%s)"
@@ -80,13 +80,13 @@ MongoDB je zveřejněno na portu 27017, SMTP Mailpit na 1025 a při `DEBUG=true`
 
 ## 6. Import verzovaných dat
 
-**Pouze v izolovaném jednorázovém projektu výše:** tento příkaz ihned vyprázdní `results`, `competitions`, `athletes`, `categories`, `anomaly_runs` a `anomaly_scores`, ještě před kontrolou `/app/data`. Ponechá `users`, takže dřívější párování účtů může přestat platit. Nepoužívejte jej na existující sadě, kterou potřebujete zachovat.
+V izolovaném projektu výše spusťte inkrementální import. Příkaz zachovává stávající kolekce.
 
 ```bash
 dc exec backend python /app/scripts/load_data.py
 ```
 
-[Seed](../backend/scripts/load_data.py) rekurzivně prochází seřazené JSON v `/app/data`. Pro tento snapshot očekávejte nalezení 329 souborů, logy jednotlivých importů a závěrečný souhrn. Kontrolujte `errors`: skript může skončit i s chybami souborů či výsledků. Neočekávejte přesně 13 854 vložených výsledků ani počty historického volume. Normalizace, párování a deduplikace je mění. Alternativní import jediného souboru bez mazání seedem:
+[Seed](../backend/scripts/load_data.py) rekurzivně prochází seřazené JSON v `/app/data`. Pro tento snapshot očekávejte nalezení 329 souborů, logy jednotlivých importů a závěrečný souhrn. Kontrolujte `errors`: skript může skončit i s chybami souborů či výsledků. Neočekávejte přesně 13 854 vložených výsledků ani počty historického volume. Normalizace, párování a deduplikace je mění. Alternativní import jediného souboru přes API:
 
 ```bash
 curl --fail-with-body -F 'file=@data/2019/beloves/komplet.json' \

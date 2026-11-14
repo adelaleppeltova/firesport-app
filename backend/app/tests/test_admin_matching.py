@@ -4,143 +4,99 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from bson import ObjectId
 
 from app.models.result import MatchStatus
-from app.services.admin import assign_result_to_athlete
+from app.services import admin
 
 
-def test_manual_assignment_reassigns_matching_review_results():
-    result_id = ObjectId()
-    selected_athlete_id = ObjectId()
-    rematched_result_id = ObjectId()
-
-    selected_result = {
-        "_id": result_id,
-        "imported_athlete": {
-            "first_name": "Jan",
-            "last_name": "Novak",
-            "birth_year": None,
-            "fscode": None,
-        },
-        "team": None,
-    }
-    review_result = {
-        "_id": rematched_result_id,
-        "imported_athlete": {
-            "first_name": "Jan",
-            "last_name": "Novak",
-            "birth_year": 2002,
-            "fscode": "12345",
-        },
-        "team": "SDH Lhota",
-        "match_status": MatchStatus.needs_review.value,
+def _result(**fields):
+    return {
+        "_id": ObjectId(),
+        "imported_athlete": {"first_name": "Jan", "last_name": "Novák", "birth_year": 2000},
+        "team": "Lhota",
+        "match_status": MatchStatus.unmatched.value,
+        **fields,
     }
 
-    find_one_side_effect = [
-        {"_id": selected_athlete_id, "first_name": "Jan", "last_name": "Novak", "teams": []},
-        selected_result,
-        {"_id": selected_athlete_id, "first_name": "Jan", "last_name": "Novak", "teams": []},
-    ]
 
+def test_manual_assignment_guarded_rematch_preserves_concurrent_admin_decision():
+    profile = {"_id": ObjectId(), "first_name": "Jan", "last_name": "Novák"}
+    selected = _result()
+    pending = _result()
+    reconsidered = _result()
     with (
-        patch("app.services.admin.athletes_collection") as mock_athletes,
-        patch("app.services.admin.results_collection") as mock_results,
-        patch(
-            "app.services.admin.decide_athlete_match",
-            AsyncMock(
-                return_value={
-                    "match_status": MatchStatus.matched,
-                    "match_reason": "name_plus_birth_year",
-                    "matched_athlete": {"_id": selected_athlete_id},
-                }
-            ),
-        ),
+        patch.object(admin, "athletes_collection") as athletes,
+        patch.object(admin, "results_collection") as results,
+        patch.object(admin, "decide_athlete_match", new_callable=AsyncMock) as decide,
     ):
-        mock_athletes.find_one = AsyncMock(side_effect=find_one_side_effect)
-        mock_athletes.update_one = AsyncMock(return_value=MagicMock())
-        mock_results.find_one = AsyncMock(side_effect=find_one_side_effect[:2])
-        mock_results.update_one = AsyncMock(return_value=MagicMock())
-        mock_results.find.return_value.to_list = AsyncMock(return_value=[review_result])
+        athletes.find_one = AsyncMock(return_value=profile)
+        results.find_one = AsyncMock(return_value=selected)
+        results.find.return_value.__aiter__.return_value = [pending, reconsidered]
+        results.update_one = AsyncMock(side_effect=[
+            MagicMock(modified_count=1),
+            MagicMock(modified_count=1),
+            MagicMock(modified_count=0),  # Admin assigned or unassigned after cursor read.
+        ])
+        decide.return_value = {
+            "match_status": MatchStatus.matched,
+            "matched_athlete": profile,
+            "match_reason": "name_plus_birth_year",
+        }
 
-        response = asyncio.run(
-            assign_result_to_athlete(str(result_id), str(selected_athlete_id))
-        )
-
-    assert response["ok"] is True
-    assert response["auto_reassigned"] == 1
-    assert mock_results.update_one.await_count >= 2
-
-
-def test_auto_reassigned_name_plus_team_enriches_missing_fscode_only():
-    result_id = ObjectId()
-    selected_athlete_id = ObjectId()
-    rematched_result_id = ObjectId()
-    rematched_athlete_id = ObjectId()
-
-    selected_result = {
-        "_id": result_id,
-        "imported_athlete": {
-            "first_name": "Jan",
-            "last_name": "Novak",
-            "birth_year": 2001,
-            "fscode": "12345",
-        },
-        "team": "SDH Lhota",
-    }
-    review_result = {
-        "_id": rematched_result_id,
-        "imported_athlete": {
-            "first_name": "Petr",
-            "last_name": "Maly",
-            "birth_year": 2002,
-            "fscode": "54321",
-        },
-        "team": "SDH Lhota",
-        "match_status": MatchStatus.needs_review.value,
-    }
-
-    find_one_side_effect = [
-        {"_id": selected_athlete_id, "first_name": "Jan", "last_name": "Novak", "teams": []},
-        selected_result,
-        {"_id": selected_athlete_id, "first_name": "Jan", "last_name": "Novak", "teams": []},
-    ]
-
-    rematched_athlete = {
-        "_id": rematched_athlete_id,
-        "first_name": "Petr",
-        "last_name": "Maly",
-        "teams": ["SDH Lhota"],
-        "fs_codes": [],
-        "birth_year": 2002,
-    }
-
-    with (
-        patch("app.services.admin.athletes_collection") as mock_athletes,
-        patch("app.services.admin.results_collection") as mock_results,
-        patch(
-            "app.services.admin.decide_athlete_match",
-            AsyncMock(
-                side_effect=[
-                    {
-                        "match_status": MatchStatus.matched,
-                        "match_reason": "name_plus_birth_year",
-                        "matched_athlete": rematched_athlete,
-                    }
-                ]
-            ),
-        ),
-    ):
-        mock_athletes.find_one = AsyncMock(side_effect=find_one_side_effect)
-        mock_athletes.update_one = AsyncMock(return_value=MagicMock())
-        mock_results.find_one = AsyncMock(side_effect=find_one_side_effect[:2])
-        mock_results.update_one = AsyncMock(return_value=MagicMock())
-        mock_results.find.return_value.to_list = AsyncMock(return_value=[review_result])
-
-        response = asyncio.run(
-            assign_result_to_athlete(str(result_id), str(selected_athlete_id))
-        )
+        response = asyncio.run(admin.assign_result_to_athlete(str(selected["_id"]), str(profile["_id"])))
 
     assert response["auto_reassigned"] == 1
-    rematch_enrichment_call = mock_athletes.update_one.await_args_list[0]
-    assert rematch_enrichment_call.args[0] == {"_id": rematched_athlete_id}
-    assert rematch_enrichment_call.args[1]["$addToSet"]["fs_codes"] == "54321"
-    assert "updated_at" in rematch_enrichment_call.args[1]["$set"]
-    assert "teams" not in rematch_enrichment_call.args[1]["$addToSet"]
+    manual, auto, _ = [call.args for call in results.update_one.await_args_list]
+    assert manual[1]["$set"]["match_reason"] == "manual_admin_assignment"
+    assert auto[0]["athlete"] is None
+    assert auto[0]["match_status"] == {"$in": ["needs_review", "unmatched"]}
+    assert auto[0]["match_reason"] == {"$not": {"$regex": "^manual_admin_"}}
+    assert auto[1]["$set"]["athlete"] == profile["_id"]
+    athletes.update_one.assert_not_called()
+
+
+def test_rematch_requires_same_strong_identity_as_import():
+    profile = {"_id": ObjectId(), "first_name": "Jan", "last_name": "Novák", "teams": ["Lhota"]}
+    pending = _result(imported_athlete={"first_name": "Jan", "last_name": "Novák"})
+    with (
+        patch.object(admin, "results_collection") as results,
+        patch("app.services.result_matching._find_athletes", AsyncMock(return_value=[profile])),
+    ):
+        results.find.return_value.__aiter__.return_value = [pending]
+        assert asyncio.run(admin._rematch_review_results(profile)) == 0
+    results.update_one.assert_not_called()
+
+
+def test_manual_profile_creation_retains_admin_assignment():
+    candidate = _result()
+    athlete_id = ObjectId()
+    with (
+        patch.object(admin, "results_collection") as results,
+        patch.object(admin, "athletes_collection") as athletes,
+    ):
+        results.find_one = AsyncMock(return_value=candidate)
+        results.update_one = AsyncMock(return_value=MagicMock(modified_count=1))
+        results.find.return_value.__aiter__.return_value = []
+        athletes.insert_one = AsyncMock(return_value=MagicMock(inserted_id=athlete_id))
+        response = asyncio.run(admin.create_athlete_from_result(str(candidate["_id"])))
+
+    assert response["athlete_id"] == str(athlete_id)
+    assert athletes.insert_one.await_args.args[0]["birth_year"] == 2000
+    assert results.update_one.await_args.args[1]["$set"]["match_reason"] == "manual_admin_create_athlete"
+    assert results.find.call_args.args[0]["athlete"] is None
+
+
+def test_review_queue_includes_unresolved_import_with_original_identity_and_reason():
+    doc = _result(
+        imported_athlete={"first_name": "JAN", "last_name": "Novák", "birth_year": 2000, "fscode": "12345"},
+        match_reason="no_match",
+        imported_team="SDH LHOTA",
+    )
+    with patch.object(admin, "results_collection") as results:
+        results.find.return_value.sort.return_value.to_list = AsyncMock(return_value=[doc])
+        response = asyncio.run(admin.get_review_results())
+
+    assert results.find.call_args.args[0]["match_status"] == {"$in": ["needs_review", "unmatched"]}
+    assert response.summary.unmatched == 1
+    assert response.items[0].imported_athlete.first_name == "JAN"
+    assert response.items[0].imported_athlete.fscode == "12345"
+    assert response.items[0].match_reason == "no_match"
+    assert response.items[0].team == "SDH LHOTA"
