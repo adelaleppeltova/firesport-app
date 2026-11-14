@@ -61,7 +61,12 @@ def extract(url, fetcher, diagnostics, browser=False):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("urls", nargs="+")
-    parser.add_argument("--output", type=Path, default=ROOT / "data/results")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=ROOT / "data",
+        help="Data root; results go into year/competition-folder",
+    )
     parser.add_argument(
         "--diagnostics", type=Path, default=ROOT / ".extraction-diagnostics"
     )
@@ -71,6 +76,7 @@ def main(argv=None):
     for url in dict.fromkeys(args.urls):
         directory = args.diagnostics / source_id(url)
         directory.mkdir(parents=True, exist_ok=True)
+        result = None
         try:
             competition, notes, warnings, audit = extract(
                 url, fetcher, directory, args.browser
@@ -83,6 +89,12 @@ def main(argv=None):
             )
         except Exception as exc:
             failed = True
+            if result is not None:
+                (directory / "pending.json").write_text(
+                    json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False)
+                    + "\n",
+                    encoding="utf-8",
+                )
             entry = {
                 "url": url,
                 "success": False,

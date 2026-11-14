@@ -21,10 +21,53 @@ nezastaví ostatní. Nenulový návratový kód znamená alespoň jeden neúspě
 `--output` a `--diagnostics` umožňují vlastní adresáře. Výchozí cesty jsou relativní
 ke kořeni repozitáře, nikoliv pracovnímu adresáři.
 
-Výstup: `data/results/<sha256-kanonické-URL-prvních-16-znaků>.json`.
-Název zůstává stabilní při opravě názvu či data soutěže. Stejný obsah nemění soubor
-ani čas generování; skutečně změněný obsah získá aktuální UTC čas. Snížení počtu
-výsledků/kategorií blokuje přepis a vyžaduje kontrolu opravy zdroje.
+Všechny nové výsledky se ukládají výhradně do
+`data/{year}/{competition-folder}/`. **Nikdy do `data/results/`.** `--output` nyní
+určuje kořen dat (výchozí `data/`), nikoliv cílovou složku jednoho závodu.
+
+Rok se bere pouze z `competition.date`. Neznámé datum zabrání uložení do finálních
+dat; celý připravený JSON zůstane v diagnostice jako `pending.json` spolu s chybou.
+
+Cílová složka se hledá podle stejné zdrojové URL nebo jednoznačné shody názvu,
+data a místa závodu v existujících JSON. Samotné místo nestačí. Prázdnou vlastní
+složku lze převzít jen při jednoznačné shodě rozlišujícího názvu soutěže i místa;
+například `chomutov-stimax`. Existující názvy složek se nemění. Nejednoznačná
+shoda a existující neidentifikovatelný JSON v cílovém roce ukládání zastaví.
+Nesouvisející nečitelný historický soubor z jiného roku výběr cílové složky neovlivní.
+
+Nová složka a název souboru používají lowercase ASCII a pomlčky. Soubor má formát
+`YYYY-MM-DD-{nazev-zavodu}-{misto}.json`, například
+`data/2026/chomutov-stimax/2026-09-19-stimax-cup-chomutov.json`.
+Místo se neopakuje; v čitelném názvu se vynechá ročník odpovídající prefixu data
+a výslovně očíslované kolo. Oficiální metadata uvnitř JSON se nijak nemění.
+
+Stejná URL dohledá stávající soubor i po opravě názvu závodu. Existující jména
+souborů jiných importů se automaticky nepřejmenovávají. Kolize názvů různých závodů
+se rozliší výslovným ID závodu z URL (například `-1034`); pokud není takové ID
+dostupné nebo nestačí k rozlišení, vznikne konflikt. Hash se používá jen pro
+provozní diagnostiku, nikdy jako název finálního výsledku.
+
+Stejný obsah nemění soubor ani čas generování; skutečně změněný obsah získá
+aktuální UTC čas. Snížení počtu výsledků/kategorií nebo ztráta známých údajů blokuje
+přepis a vyžaduje kontrolu opravy zdroje. Různé verze stejného závodu se při migraci
+neslučují ani nepřepisují. JSON schéma i extrakce HTML/PDF zůstávají stejné.
+
+### Migrace starých souborů
+
+```bash
+# Z backend/; nejprve pouze plán a konflikty:
+../.venv/bin/python -m app.extraction.migrate
+# Pro verzované soubory použije git mv; bezpečné přesuny provede, konflikty zachová:
+../.venv/bin/python -m app.extraction.migrate --apply --git
+```
+
+Migrace porovnává existující soubory stejného závodu. Při konfliktu ponechá obě
+verze beze změn a vrátí nenulový kód, ale dokončí ostatní bezpečné přesuny.
+U každého přesunu ověří shodu všech bajtů a JSON validaci. Původní soubor zmizí
+teprve po ověření cíle; obsah, formátování i generated_at zůstanou identické.
+`data/results/` se odstraní jen po úspěšném vyprázdnění. Pro neversionované testovací
+soubory lze vynechat `--git`. Skutečné přesuny a otevřené konflikty jsou popsány
+v [souhrnu migrace](extraction-storage-migration.cs.md).
 
 Diagnostika: `.extraction-diagnostics/<ID>/source.html|pdf`, `audit.json`,
 `report.json`; pro PDF navíc text všech stran a případné OCR obrázky/TSV. Tento
@@ -66,10 +109,12 @@ CLI samo neprovádí Git operace; agent po úspěšné validaci vytvoří commit
 `metadata.py`: metadata a disciplíny; `participants.py`: identity;
 `times.py`: časy; `penalties.py`: očíslované důvody;
 `validation.py` + JSON Schema: struktura a obsah;
+`paths.py`: výběr roku, existující složky a čitelného názvu;
 `storage.py`: idempotentní atomické uložení a kontrolní souhrn;
+`migrate.py`: kontrolované přesuny starých JSON beze změny obsahu;
 `__main__.py`: více URL, diagnostika a návratový kód.
 
-`app/tests/test_extraction.py` běží bez sítě. Fixture `race-1034.html` je zmenšený
+`app/tests/test_extraction.py` a `app/tests/test_extraction_storage.py` běží bez sítě. Fixture `race-1034.html` je zmenšený
 snímek skutečného HTML ověřeného 13. 11. 2026 (jen výsledkové tabulky, metadata,
 propozice; bez skriptů a kontaktů). Reference 12 kategorií, 416 výsledků, 76 důvodů
 u 68 výsledků patří pouze této fixture, není zakódována do parseru.

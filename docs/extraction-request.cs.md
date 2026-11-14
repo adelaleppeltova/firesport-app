@@ -35,7 +35,7 @@ Nejprve prozkoumej strukturu aktuálně připojeného GitHub repozitáře.
 - Pokud už existují parsery, datové modely nebo validační funkce, využij je.
 - Nevytvářej zbytečně duplicitní infrastrukturu.
 - Nezasahuj do nesouvisejících částí projektu.
-- Pokud není definována složka pro výsledky, vytvoř `data/results/`.
+- Výsledky ukládej výhradně do `data/{year}/{competition-folder}/`, podle skutečného `competition.date`. Nikdy do `data/results/`. Toto pravidlo bylo upřesněno navazujícím zadáním pro ukládání výsledků.
 - Každý závod ukládej jako samostatný `.json` soubor.
 - Používej stabilní názvy souborů, ideálně podle data, názvu závodu a ID zdroje.
 - Opětovné zpracování stejného závodu musí být idempotentní: nesmí vytvářet duplicity.

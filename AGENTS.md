@@ -32,8 +32,20 @@ future imports and parser changes.
 - Fail closed for incomplete/unsupported layouts, unavailable categories/pages,
   unresolved pagination or multiple ambiguous attachments. Save diagnostics outside
   result JSON and never replace a good existing result with a partial import.
-- Store JSON in `data/results/` with stable source identity, atomic replacement,
-  schema/content validation, and guards against reduced category/result counts.
+- Store every new result ONLY in `data/{year}/{competition-folder}/`, NEVER in
+  `data/results/`. The year comes from competition.date. Reuse an unambiguous
+  existing race folder based on source URL or full event metadata, never place
+  alone; preserve existing folder names. Use readable ASCII filenames
+  `YYYY-MM-DD-{race-name}-{place}.json`, with no repeated place. On a collision,
+  use the explicit stable race ID from the source URL, never a random hash/UUID.
+- Reimports of the same source update the same file with atomic replacement,
+  schema/content validation, and guards against loss of results or known identity
+  fields. Unknown dates or destination conflicts retain pending JSON in ignored
+  diagnostics outside final data. Do not guess a year or overwrite conflicting data.
+- Migrate legacy hash files with the byte-preserving migration command and git mv
+  for tracked files. Inspect existing same-race JSON first; preserve both versions
+  and report conflicts. Remove data/results only when truly empty. Diagnostic
+  directory IDs may remain hashed; final result filenames may not.
 - Add offline regression fixtures and tests for every new supported source format.
   Run backend lint/tests and revalidate all newly generated JSON before committing.
 - Preserve unrelated user work. Stage only task files. Use a working branch and PR;

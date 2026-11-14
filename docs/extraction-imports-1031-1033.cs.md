@@ -10,9 +10,9 @@ Import tří uživatelem zadaných URL do samostatných JSON souborů. Každý z
 
 ## Výstupy
 
-- `data/results/6b6d3056fb0aa913.json` — UTC čas generování `2026-11-13T22:30:24Z`; Profiles inspected: 432; failed: 0. Only birth year extracted.
-- `data/results/1c9bfcfe2eb34eb4.json` — UTC čas generování `2026-11-13T22:28:42Z`; Profiles inspected: 384; failed: 0. Only birth year extracted.
-- `data/results/66e0f6c5dc0e2535.json` — UTC čas generování `2026-11-13T22:25:52Z`; Profiles inspected: 391; failed: 0. Only birth year extracted.
+- `data/2026/stimax-cup-usti-nad-labem/2026-04-26-stimax-cup-usti-nad-labem.json` — UTC čas generování `2026-11-13T22:30:24Z`; Profiles inspected: 432; failed: 0. Only birth year extracted.
+- `data/2026/stimax-cup-lovosice/2026-05-09-stimax-cup-lovosice.json` — UTC čas generování `2026-11-13T22:28:42Z`; Profiles inspected: 384; failed: 0. Only birth year extracted.
+- `data/2026/stimax-cup-decin/2026-08-29-stimax-cup-decin.json` — UTC čas generování `2026-11-13T22:25:52Z`; Profiles inspected: 391; failed: 0. Only birth year extracted.
 
 ## Ověření
 

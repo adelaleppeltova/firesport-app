@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 from .validation import validate
+from .paths import resolve_path
 
 
 def canonical_url(url):
@@ -41,9 +42,7 @@ def document(source, competition, notes, warnings):
 def save(document, output, audit):
     validate(document, audit)
     output = Path(output)
-    output.mkdir(parents=True, exist_ok=True)
-    # URL identity remains stable even when source title/date metadata is corrected.
-    path = output / f"{source_id(document['source_file'])}.json"
+    path = resolve_path(document, output)
     if path.exists():
         previous = json.loads(path.read_text(encoding="utf-8"))
         old = {
@@ -97,7 +96,8 @@ def save(document, output, audit):
             k: v for k, v in document.items() if k != "generated_at"
         }:
             return path
-    descriptor, temporary = tempfile.mkstemp(dir=output, suffix=".tmp")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
     try:
         with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
             json.dump(document, stream, ensure_ascii=False, indent=2, allow_nan=False)

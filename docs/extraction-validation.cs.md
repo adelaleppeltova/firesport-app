@@ -4,7 +4,10 @@ Ověřený zdroj: https://pozarnisporty.cz/races/1034.
 Živé HTML a 412 propojených veřejných profilů bylo načteno při importu
 13. 11. 2026. JSON byl vygenerován v `2026-11-13T22:10:05Z`.
 
-Výstup: `data/results/a7bb4dd25257b4f5.json`.
+Původní výstup: `data/results/a7bb4dd25257b4f5.json`. Tento soubor zatím zůstává
+v původním umístění kvůli konfliktu s odlišným
+`data/2026/chomutov-stimax/komplet.json`; nové importy sem nikdy neukládat.
+Podrobnosti: [souhrn migrace](extraction-storage-migration.cs.md).
 
 | Kontrola | Výsledek |
 | --- | ---: |
