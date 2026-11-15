@@ -1,6 +1,6 @@
 {
   "source_file": "https://pozarnisporty.cz/races/161",
-  "generated_at": "2026-11-15T17:17:07Z",
+  "generated_at": "2026-11-15T18:42:33Z",
   "competition": {
     "name": "XIX. ročníku Memoriálu MARTY HABADOVÉ",
     "place": "Za Císařským mlýnem 1063, Praha 7- Bubeneč (GPS: 50°6’34.561“ N, 14°24’32.28“ E)",
@@ -9,7 +9,7 @@
     "categories": [
       {
         "name": "chlapci - věk: 6 - 11",
-        "discipline": "100m",
+        "discipline": "60m",
         "results": [
           {
             "start_number": "101",
@@ -4782,7 +4782,7 @@
       },
       {
         "name": "dívky - věk: 6 - 11",
-        "discipline": "100m",
+        "discipline": "60m",
         "results": [
           {
             "start_number": "153",
@@ -9448,12 +9448,13 @@
   },
   "parsing_notes": [
     "Source: HTML; all result tables inspected.",
-    "chlapci - věk: 6 - 11: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'try2': 7, 'reason': 9}; discipline=100m; category from caption/heading/source banner.",
-    "dívky - věk: 6 - 11: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'try2': 7, 'reason': 9}; discipline=100m; category from caption/heading/source banner.",
+    "chlapci - věk: 6 - 11: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'try2': 7, 'reason': 9}; discipline=60m; category from caption/heading/source banner.",
+    "dívky - věk: 6 - 11: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'try2': 7, 'reason': 9}; discipline=60m; category from caption/heading/source banner.",
     "Profiles inspected: 12; failed: 0. Only birth year extracted.",
     "Official rank and final time copied; no ranking or best-time calculation.",
     "Numbered penalties assigned to corresponding tries; unnumbered reasons warned.",
-    "On pozarnisporty.cz start number is the last numeric name suffix, never lane; region is not district."
+    "On pozarnisporty.cz start number is the last numeric name suffix, never lane; region is not district.",
+    "Discipline confirmed by the 2022 organizer report: https://www.hasicovo.cz/cs/zpravy/nejvetsi-sportovni-udalost-memorial-marty-habadove-zna-sve-viteze"
   ],
   "warnings": [
     "Competition: unavailable league",
