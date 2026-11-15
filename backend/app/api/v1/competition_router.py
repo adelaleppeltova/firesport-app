@@ -36,11 +36,15 @@ async def get_competitions(
 
 
 @router.get("/{competition_id}/results/{category_id}", response_model=List[ResultInDB])
-async def get_results_for_category(competition_id: str, category_id: str):
+async def get_results_for_category(
+    competition_id: str, category_id: str, result_list_id: Optional[str] = Query(None, min_length=1)
+):
     """Vrátí výsledky pro danou soutěž a kategorii jako seznam ResultInDB."""
 
     try:
-        return await get_results_for_category_service(competition_id, category_id)
+        return await get_results_for_category_service(
+            competition_id, category_id, result_list_id=result_list_id
+        )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
