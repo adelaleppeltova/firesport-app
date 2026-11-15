@@ -1,0 +1,327 @@
+{
+  "source_file": "https://pozarnisporty.cz/races/500",
+  "generated_at": "2026-11-15T16:37:38Z",
+  "competition": {
+    "name": "9. ročník běhu Upřímných srdcí - ŠTAFETOVÉ BĚHY - firmy a hasiči",
+    "place": "Jezero Milada",
+    "date": "2024-10-20",
+    "league": null,
+    "categories": [
+      {
+        "name": "ŠTAFETA 3x1km - Pro firmy a organizace",
+        "discipline": null,
+        "results": []
+      },
+      {
+        "name": "ŠTAFETA 3x1km - Pro hasiče s aktivním DT",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "SDH Osek (Teplice)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 309.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 294.9,
+                "status": "valid"
+              }
+            ],
+            "rank": 1,
+            "final_time": 267.4,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "HuDroPro (Litoměřice)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 347.2,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 289.1,
+                "status": "valid"
+              }
+            ],
+            "rank": 2,
+            "final_time": 289.1,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "OnLaPa (Louny)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 397.5,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 293.4,
+                "status": "valid"
+              }
+            ],
+            "rank": 3,
+            "final_time": 293.4,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "SDH Očihov (Louny)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 357.7,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 320.0,
+                "status": "valid"
+              }
+            ],
+            "rank": 4,
+            "final_time": 320.0,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "SDH Kryry (Louny)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 329.5,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 393.4,
+                "status": "valid"
+              }
+            ],
+            "rank": 5,
+            "final_time": 329.5,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Hasiči Libouchec (Ústí nad Labem)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 393.2,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 394.6,
+                "status": "valid"
+              }
+            ],
+            "rank": 6,
+            "final_time": 346.7,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "HaKlaKLa (Litoměřice)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 486.7,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 388.4,
+                "status": "valid"
+              }
+            ],
+            "rank": 7,
+            "final_time": 365.2,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Hasiči Polepy (Litoměřice)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 398.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 453.9,
+                "status": "valid"
+              }
+            ],
+            "rank": 8,
+            "final_time": 372.4,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "SDH Peruc - chlapi (Louny)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 457.4,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 411.9,
+                "status": "valid"
+              }
+            ],
+            "rank": 9,
+            "final_time": 386.4,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "SDH Kryry (Louny)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 431.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 405.9,
+                "status": "valid"
+              }
+            ],
+            "rank": 10,
+            "final_time": 405.9,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "SDH Lenešice (Louny)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 11,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "SDH Verneřice (Děčín)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 12,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Source: HTML compact team timing tables; team labels copied verbatim. Expandable team rosters are not result rows.",
+    "ŠTAFETA 3x1km - Pro firmy a organizace: try 3/4 columns ignored; first two retained.",
+    "ŠTAFETA 3x1km - Pro firmy a organizace: 30 unscored registrations skipped.",
+    "ŠTAFETA 3x1km - Pro hasiče s aktivním DT: try 3/4 columns ignored; first two retained."
+  ],
+  "warnings": [
+    "Competition: unavailable league",
+    "ŠTAFETA 3x1km - Pro firmy a organizace: unknown discipline",
+    "ŠTAFETA 3x1km - Pro hasiče s aktivním DT: unknown discipline",
+    "ŠTAFETA 3x1km - Pro hasiče s aktivním DT / SDH Osek (Teplice): official final time disagrees with published attempts; preserved",
+    "ŠTAFETA 3x1km - Pro hasiče s aktivním DT / Hasiči Libouchec (Ústí nad Labem): official final time disagrees with published attempts; preserved",
+    "ŠTAFETA 3x1km - Pro hasiče s aktivním DT / HaKlaKLa (Litoměřice): official final time disagrees with published attempts; preserved",
+    "ŠTAFETA 3x1km - Pro hasiče s aktivním DT / Hasiči Polepy (Litoměřice): official final time disagrees with published attempts; preserved",
+    "ŠTAFETA 3x1km - Pro hasiče s aktivním DT / SDH Peruc - chlapi (Louny): official final time disagrees with published attempts; preserved"
+  ]
+}

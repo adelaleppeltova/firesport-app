@@ -1,0 +1,225 @@
+{
+  "source_file": "https://pozarnisporty.cz/races/761",
+  "generated_at": "2026-11-15T16:45:23Z",
+  "competition": {
+    "name": "Mezinárodní soutěž dorostu v požárním sportu - požární útok",
+    "place": "Kolín",
+    "date": "2025-06-30",
+    "league": null,
+    "categories": [
+      {
+        "name": "Dorostenci",
+        "discipline": "PU",
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Česko () [18]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 1,
+            "final_time": 20.57,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Ukrajina () [16]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 2,
+            "final_time": 24.45,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Lotyšsko () [17]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 3,
+            "final_time": 25.54,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Bulharsko () [19]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 4,
+            "final_time": 34.55,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Estonsko () [20]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 5,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      },
+      {
+        "name": "Dorostenky",
+        "discipline": "PU",
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Bulharsko () [16]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 1,
+            "final_time": 45.97,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Česko () [17]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 2,
+            "final_time": 26.12,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Estonsko () [18]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "missing"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "rank": 3,
+            "final_time": 29.46,
+            "final_status": "valid"
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Source: HTML compact team timing tables; team labels copied verbatim. Expandable team rosters are not result rows.",
+    "Dorostenci: left/right stream times are splits; no official overall attempt times published.",
+    "Dorostenky: left/right stream times are splits; no official overall attempt times published."
+  ],
+  "warnings": [
+    "Competition: unavailable league",
+    "Dorostenci / Estonsko () [20]: unrecognized time: '-----'"
+  ]
+}

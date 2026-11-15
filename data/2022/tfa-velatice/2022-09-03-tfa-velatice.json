@@ -1,0 +1,1570 @@
+{
+  "source_file": "https://pozarnisporty.cz/races/139",
+  "generated_at": "2026-11-15T17:14:09Z",
+  "competition": {
+    "name": "TFA Velatice 2022",
+    "place": "Velatice",
+    "date": "2022-09-03",
+    "league": null,
+    "categories": [
+      {
+        "name": "muži - věk: 35 - 100",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": "10",
+            "fscode": null,
+            "first_name": "Zdeněk",
+            "last_name": "Král",
+            "birth_year": 1987,
+            "team": "SDH Trpín / HZS Svitavy",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 131.01,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 131.01,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "35",
+            "fscode": null,
+            "first_name": "Marek",
+            "last_name": "Víšek",
+            "birth_year": 1979,
+            "team": "HZS Pardubice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 133.04,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 133.04,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "39",
+            "fscode": null,
+            "first_name": "Radek",
+            "last_name": "Tesař",
+            "birth_year": 1979,
+            "team": "SDH Sebranice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 155.6,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 155.6,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "23",
+            "fscode": null,
+            "first_name": "Kamil",
+            "last_name": "Josepčuk",
+            "birth_year": 1987,
+            "team": "JSDH Svitavy",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 157.61,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 157.61,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "20",
+            "fscode": null,
+            "first_name": "František",
+            "last_name": "Dědič",
+            "birth_year": 1984,
+            "team": "Dětřichov u Moravské Třebové",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 164.27,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 164.27,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "27",
+            "fscode": null,
+            "first_name": "Petr",
+            "last_name": "Slouka",
+            "birth_year": 1975,
+            "team": "SDH Sokolnice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 165.59,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 165.59,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "31",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "Buchta",
+            "birth_year": 1987,
+            "team": "SDH Vendolí",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 174.32,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 174.32,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "51",
+            "fscode": null,
+            "first_name": "Milan",
+            "last_name": "Smékal",
+            "birth_year": 1983,
+            "team": "Lipová - Lázně",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 185.61,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 185.61,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "1",
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "Sedlák",
+            "birth_year": 1985,
+            "team": "SDH Velatice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 187.24,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 187.24,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "2",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "Soukal",
+            "birth_year": 1985,
+            "team": "SDH Olešnice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 189.61,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 189.61,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "42",
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "Volf",
+            "birth_year": 1981,
+            "team": "JSDH Svitavy",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 201.29,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 201.29,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "53",
+            "fscode": null,
+            "first_name": "Petr",
+            "last_name": "Čandrla",
+            "birth_year": 1983,
+            "team": "---",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 219.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 219.0,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "45",
+            "fscode": null,
+            "first_name": "Václav",
+            "last_name": "Mikulica",
+            "birth_year": 1981,
+            "team": "SDH Kobylí",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 219.63,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 219.63,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "48",
+            "fscode": null,
+            "first_name": "Pavel",
+            "last_name": "Mašek",
+            "birth_year": 1985,
+            "team": "SDH Vranov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 229.27,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 229.27,
+            "final_status": "valid",
+            "rank": 14
+          },
+          {
+            "start_number": "16",
+            "fscode": null,
+            "first_name": "Radek",
+            "last_name": "Hajny",
+            "birth_year": 1968,
+            "team": "SDH Doubravice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 258.73,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 258.73,
+            "final_status": "valid",
+            "rank": 15
+          }
+        ]
+      },
+      {
+        "name": "ženy - věk: 15 - 100",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": "3",
+            "fscode": null,
+            "first_name": "Kateřina",
+            "last_name": "Vodičková",
+            "birth_year": 1997,
+            "team": "Rokytnice nad Rokytnou",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 135.6,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 135.6,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "10",
+            "fscode": null,
+            "first_name": "Martina",
+            "last_name": "Švábová",
+            "birth_year": 1996,
+            "team": "SDH Trpín",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 136.09,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 136.09,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "9",
+            "fscode": null,
+            "first_name": "Michaela",
+            "last_name": "Honsová",
+            "birth_year": 1981,
+            "team": "SDH Petrůvky",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 136.98,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 136.98,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "13",
+            "fscode": null,
+            "first_name": "Miluše",
+            "last_name": "Smékalová",
+            "birth_year": 1981,
+            "team": "Lipová - Lázně",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 141.47,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 141.47,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "1",
+            "fscode": null,
+            "first_name": "Kristýna",
+            "last_name": "Kachlíková",
+            "birth_year": 1993,
+            "team": "SDH Dražovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 152.66,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 152.66,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "7",
+            "fscode": null,
+            "first_name": "Tereza",
+            "last_name": "Smékalová",
+            "birth_year": 2006,
+            "team": "SDH Lipová - lázně",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 195.89,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 195.89,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "4",
+            "fscode": null,
+            "first_name": "Anna",
+            "last_name": "Gotvaldová",
+            "birth_year": 2003,
+            "team": "SDH Podolí",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 235.91,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 235.91,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "12",
+            "fscode": null,
+            "first_name": "Veronika",
+            "last_name": "Kadlecová",
+            "birth_year": 1992,
+            "team": "---",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 251.83,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 251.83,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "6",
+            "fscode": null,
+            "first_name": "Blanka",
+            "last_name": "Maráková",
+            "birth_year": 2000,
+            "team": "SDH Moravská Nová Ves",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 256.14,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 256.14,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "2",
+            "fscode": null,
+            "first_name": "Hana",
+            "last_name": "Doležalová",
+            "birth_year": 1981,
+            "team": "SDH Velké Němčice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 288.49,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 288.49,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "5",
+            "fscode": null,
+            "first_name": "Žaneta",
+            "last_name": "Divišová",
+            "birth_year": 2005,
+            "team": "SDH Rokytnice nad Rokytnou",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 332.36,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 332.36,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "8",
+            "fscode": null,
+            "first_name": "Natálie",
+            "last_name": "Šmídová",
+            "birth_year": 2001,
+            "team": "Nové Dvory",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 332.88,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 332.88,
+            "final_status": "valid",
+            "rank": 12
+          }
+        ]
+      },
+      {
+        "name": "muži - věk: 15 - 34",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": "49",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "Tkaný",
+            "birth_year": 1988,
+            "team": "Babice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 131.01,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 131.01,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": "28",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "Rybnikář",
+            "birth_year": 1998,
+            "team": "SDH Blatnice pod Svatým Antonínkem",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 131.44,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 131.44,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": "15",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "Skřivánek",
+            "birth_year": 1992,
+            "team": "Rohatec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 135.22,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 135.22,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": "3",
+            "fscode": null,
+            "first_name": "Lukáš",
+            "last_name": "Navrátil",
+            "birth_year": 1996,
+            "team": "SDH Ludéřov / CHS Olomouc",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 141.83,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 141.83,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": "26",
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "Veselý",
+            "birth_year": 1990,
+            "team": "Násedlovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 145.05,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 145.05,
+            "final_status": "valid",
+            "rank": 5
+          },
+          {
+            "start_number": "14",
+            "fscode": null,
+            "first_name": "Zdeněk",
+            "last_name": "Maňák",
+            "birth_year": 1998,
+            "team": "Velká nad Veličkou",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 146.72,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 146.72,
+            "final_status": "valid",
+            "rank": 6
+          },
+          {
+            "start_number": "41",
+            "fscode": null,
+            "first_name": "Jan",
+            "last_name": "Morávek",
+            "birth_year": 1993,
+            "team": "HZS",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 147.81,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 147.81,
+            "final_status": "valid",
+            "rank": 7
+          },
+          {
+            "start_number": "24",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "Zábrš",
+            "birth_year": 2003,
+            "team": "SDH Brno-Slatina",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 150.13,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 150.13,
+            "final_status": "valid",
+            "rank": 8
+          },
+          {
+            "start_number": "29",
+            "fscode": null,
+            "first_name": "Daniel",
+            "last_name": "Knápek",
+            "birth_year": 1995,
+            "team": "HZS Pardubického kraje",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 156.76,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 156.76,
+            "final_status": "valid",
+            "rank": 9
+          },
+          {
+            "start_number": "21",
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "Vlach",
+            "birth_year": 2000,
+            "team": "HZS OLK - HS Šternberk",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 160.81,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 160.81,
+            "final_status": "valid",
+            "rank": 10
+          },
+          {
+            "start_number": "52",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "Pilný",
+            "birth_year": 2002,
+            "team": "HZS PAK",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 164.63,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 164.63,
+            "final_status": "valid",
+            "rank": 11
+          },
+          {
+            "start_number": "17",
+            "fscode": null,
+            "first_name": "Lukáš",
+            "last_name": "Cakl",
+            "birth_year": 1995,
+            "team": "Rokytnice nad Rokytnou",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 166.93,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 166.93,
+            "final_status": "valid",
+            "rank": 12
+          },
+          {
+            "start_number": "5",
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "Hovězák",
+            "birth_year": 2005,
+            "team": "Rohatec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 170.2,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 170.2,
+            "final_status": "valid",
+            "rank": 13
+          },
+          {
+            "start_number": "40",
+            "fscode": null,
+            "first_name": "Zdeněk",
+            "last_name": "Salajka",
+            "birth_year": 1997,
+            "team": "SDH Tvrdonice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 172.24,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 172.24,
+            "final_status": "valid",
+            "rank": 14
+          },
+          {
+            "start_number": "37",
+            "fscode": null,
+            "first_name": "Jaroslav",
+            "last_name": "Pospíšil",
+            "birth_year": 1992,
+            "team": "HZS PAK",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 174.48,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 174.48,
+            "final_status": "valid",
+            "rank": 15
+          },
+          {
+            "start_number": "38",
+            "fscode": null,
+            "first_name": "David",
+            "last_name": "Melichar",
+            "birth_year": 1997,
+            "team": "Bobrová",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 177.19,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 177.19,
+            "final_status": "valid",
+            "rank": 16
+          },
+          {
+            "start_number": "30",
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "Kovář",
+            "birth_year": 1988,
+            "team": "SDH Borovnice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 182.35,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 182.35,
+            "final_status": "valid",
+            "rank": 17
+          },
+          {
+            "start_number": "22",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "Jakubec",
+            "birth_year": 1992,
+            "team": "---",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 184.71,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 184.71,
+            "final_status": "valid",
+            "rank": 18
+          },
+          {
+            "start_number": "9",
+            "fscode": null,
+            "first_name": "Rostislav",
+            "last_name": "Doušek",
+            "birth_year": 2006,
+            "team": "Černá Hora",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 190.51,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 190.51,
+            "final_status": "valid",
+            "rank": 19
+          },
+          {
+            "start_number": "18",
+            "fscode": null,
+            "first_name": "Vojtěch",
+            "last_name": "Křetínský",
+            "birth_year": 2001,
+            "team": "SDH Dražovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 193.94,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 193.94,
+            "final_status": "valid",
+            "rank": 20
+          },
+          {
+            "start_number": "6",
+            "fscode": null,
+            "first_name": "Vít",
+            "last_name": "Janečka",
+            "birth_year": 2002,
+            "team": "SDH Žeranovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 199.9,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 199.9,
+            "final_status": "valid",
+            "rank": 21
+          },
+          {
+            "start_number": "25",
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "Klimeš",
+            "birth_year": 2004,
+            "team": "SDH Útěchov",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 205.61,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 205.61,
+            "final_status": "valid",
+            "rank": 22
+          },
+          {
+            "start_number": "44",
+            "fscode": null,
+            "first_name": "Vít",
+            "last_name": "Navrátil",
+            "birth_year": 2001,
+            "team": "SDH Dražovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 206.27,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 206.27,
+            "final_status": "valid",
+            "rank": 23
+          },
+          {
+            "start_number": "34",
+            "fscode": null,
+            "first_name": "Karel",
+            "last_name": "Šimůnek",
+            "birth_year": 1996,
+            "team": "KOPIS Brno",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 210.51,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 210.51,
+            "final_status": "valid",
+            "rank": 24
+          },
+          {
+            "start_number": "32",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "Skořepa",
+            "birth_year": 2003,
+            "team": "SDH Rohatec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 220.52,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 220.52,
+            "final_status": "valid",
+            "rank": 25
+          },
+          {
+            "start_number": "7",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "Novotný",
+            "birth_year": 1992,
+            "team": "SDH Velatice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 226.03,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 226.03,
+            "final_status": "valid",
+            "rank": 26
+          },
+          {
+            "start_number": "43",
+            "fscode": null,
+            "first_name": "Štěpán",
+            "last_name": "Svoboda",
+            "birth_year": 1998,
+            "team": "---",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 227.81,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 227.81,
+            "final_status": "valid",
+            "rank": 27
+          },
+          {
+            "start_number": "33",
+            "fscode": null,
+            "first_name": "Sebastian",
+            "last_name": "Matějek",
+            "birth_year": 2004,
+            "team": "---",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 228.51,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 228.51,
+            "final_status": "valid",
+            "rank": 28
+          },
+          {
+            "start_number": "50",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "Svoboda",
+            "birth_year": 2006,
+            "team": "SDH Podolí",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 231.94,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 231.94,
+            "final_status": "valid",
+            "rank": 29
+          },
+          {
+            "start_number": "47",
+            "fscode": null,
+            "first_name": "Dominik",
+            "last_name": "Polach",
+            "birth_year": 2004,
+            "team": "SDH Rohatec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 234.06,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 234.06,
+            "final_status": "valid",
+            "rank": 30
+          },
+          {
+            "start_number": "12",
+            "fscode": null,
+            "first_name": "Jiří",
+            "last_name": "Bulva",
+            "birth_year": 2021,
+            "team": "SDH Lezník",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 244.48,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 244.48,
+            "final_status": "valid",
+            "rank": 31
+          },
+          {
+            "start_number": "8",
+            "fscode": null,
+            "first_name": "Lukáš",
+            "last_name": "Langer",
+            "birth_year": 1991,
+            "team": "SDH Žeranovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 269.26,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 269.26,
+            "final_status": "valid",
+            "rank": 32
+          },
+          {
+            "start_number": "36",
+            "fscode": null,
+            "first_name": "Viktor",
+            "last_name": "Matějek",
+            "birth_year": 2006,
+            "team": "SDH Podolí",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 270.23,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 270.23,
+            "final_status": "valid",
+            "rank": 33
+          },
+          {
+            "start_number": "19",
+            "fscode": null,
+            "first_name": "Marek",
+            "last_name": "Hruška",
+            "birth_year": 1989,
+            "team": "---",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 274.1,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 274.1,
+            "final_status": "valid",
+            "rank": 34
+          },
+          {
+            "start_number": "46",
+            "fscode": null,
+            "first_name": "Miroslav",
+            "last_name": "Neveselý",
+            "birth_year": 1990,
+            "team": "SDH Mokrá",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 395.34,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 395.34,
+            "final_status": "valid",
+            "rank": 35
+          },
+          {
+            "start_number": "13",
+            "fscode": null,
+            "first_name": "Jaroslav",
+            "last_name": "Gric",
+            "birth_year": 2006,
+            "team": "SDH Černá Hora",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 465.99,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": 465.99,
+            "final_status": "valid",
+            "rank": 36
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Source: HTML; all result tables inspected.",
+    "muži - věk: 35 - 100: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'try2': 7, 'try3': 8, 'try4': 9, 'reason': 12}; discipline=None; category from caption/heading/source banner.",
+    "muži - věk: 35 - 100: try 3/4 columns ignored; first two retained.",
+    "ženy - věk: 15 - 100: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'try2': 7, 'try3': 8, 'try4': 9, 'reason': 12}; discipline=None; category from caption/heading/source banner.",
+    "ženy - věk: 15 - 100: try 3/4 columns ignored; first two retained.",
+    "muži - věk: 15 - 34: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'try2': 7, 'try3': 8, 'try4': 9, 'reason': 12}; discipline=None; category from caption/heading/source banner.",
+    "muži - věk: 15 - 34: try 3/4 columns ignored; first two retained.",
+    "Profiles inspected: 63; failed: 0. Only birth year extracted.",
+    "Official rank and final time copied; no ranking or best-time calculation.",
+    "Numbered penalties assigned to corresponding tries; unnumbered reasons warned.",
+    "On pozarnisporty.cz start number is the last numeric name suffix, never lane; region is not district."
+  ],
+  "warnings": [
+    "Competition: unavailable league",
+    "muži - věk: 35 - 100: unknown discipline",
+    "muži - věk: 35 - 100: unavailable fscode for 15/15 results",
+    "muži - věk: 35 - 100: unavailable district for 15/15 results",
+    "ženy - věk: 15 - 100: unknown discipline",
+    "ženy - věk: 15 - 100: unavailable fscode for 12/12 results",
+    "ženy - věk: 15 - 100: unavailable district for 12/12 results",
+    "muži - věk: 15 - 34: unknown discipline",
+    "muži - věk: 15 - 34: unavailable fscode for 36/36 results",
+    "muži - věk: 15 - 34: unavailable district for 36/36 results",
+    "muži - věk: 35 - 100: source event TFA is outside the supported discipline enum",
+    "ženy - věk: 15 - 100: source event TFA is outside the supported discipline enum",
+    "muži - věk: 15 - 34: source event TFA is outside the supported discipline enum"
+  ]
+}

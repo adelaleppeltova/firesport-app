@@ -1,0 +1,191 @@
+{
+  "source_file": "https://pozarnisporty.cz/races/1134",
+  "generated_at": "2026-11-15T16:39:06Z",
+  "competition": {
+    "name": "10. BOBO běh",
+    "place": "Rogalo - Smetanovo nábřeží Děčín",
+    "date": "2026-06-20",
+    "league": null,
+    "categories": [
+      {
+        "name": "smíšená - věk: 0 - 100",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "Viceník",
+            "birth_year": 2007,
+            "team": "Klapý",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 391.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "final_time": 391.0,
+            "final_status": "valid",
+            "rank": 1
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": "Martin",
+            "last_name": "Krinert",
+            "birth_year": 2009,
+            "team": "Libouchec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 392.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "final_time": 392.0,
+            "final_status": "valid",
+            "rank": 2
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": "Helena",
+            "last_name": "Stanková",
+            "birth_year": 2007,
+            "team": "Stebno",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 425.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "final_time": 425.0,
+            "final_status": "valid",
+            "rank": 3
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": "Tomáš",
+            "last_name": "Mezei",
+            "birth_year": 2003,
+            "team": "Mojžíř",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 426.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "final_time": 426.0,
+            "final_status": "valid",
+            "rank": 4
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": "Jakub",
+            "last_name": "Podráský",
+            "birth_year": 2006,
+            "team": "Libouchec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": null
+          }
+        ]
+      },
+      {
+        "name": "smíšená - MASTERS - s aktivním dýchacím přístrojem - věk: 18 - 100",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": "Josef",
+            "last_name": "Kafka",
+            "birth_year": 1983,
+            "team": "Libouchec",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 423.0,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "missing"
+              }
+            ],
+            "final_time": 423.0,
+            "final_status": "valid",
+            "rank": 1
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Source: HTML; all result tables inspected.",
+    "smíšená - věk: 0 - 100: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'reason': 9}; discipline=None; category from caption/heading/source banner.",
+    "smíšená - MASTERS - s aktivním dýchacím přístrojem - věk: 18 - 100: columns {'rank': 0, 'name': 2, 'team': 4, 'final': 5, 'try1': 6, 'reason': 9}; discipline=None; category from caption/heading/source banner.",
+    "Profiles inspected: 6; failed: 0. Only birth year extracted.",
+    "Official rank and final time copied; no ranking or best-time calculation.",
+    "Numbered penalties assigned to corresponding tries; unnumbered reasons warned.",
+    "On pozarnisporty.cz start number is the last numeric name suffix, never lane; region is not district."
+  ],
+  "warnings": [
+    "Competition: unavailable league",
+    "smíšená - věk: 0 - 100: unknown discipline",
+    "smíšená - věk: 0 - 100: unavailable fscode for 5/5 results",
+    "smíšená - věk: 0 - 100: unavailable district for 5/5 results",
+    "smíšená - věk: 0 - 100: unavailable rank for 1/5 results",
+    "smíšená - věk: 0 - 100: unavailable start_number for 5/5 results",
+    "smíšená - věk: 0 - 100: try 2 column not published; status missing",
+    "smíšená - MASTERS - s aktivním dýchacím přístrojem - věk: 18 - 100: unknown discipline",
+    "smíšená - MASTERS - s aktivním dýchacím přístrojem - věk: 18 - 100: unavailable fscode for 1/1 results",
+    "smíšená - MASTERS - s aktivním dýchacím přístrojem - věk: 18 - 100: unavailable district for 1/1 results",
+    "smíšená - MASTERS - s aktivním dýchacím přístrojem - věk: 18 - 100: unavailable start_number for 1/1 results",
+    "smíšená - MASTERS - s aktivním dýchacím přístrojem - věk: 18 - 100: try 2 column not published; status missing"
+  ]
+}

@@ -51,3 +51,9 @@ future imports and parser changes.
 - Preserve unrelated user work. Stage only task files. Use a working branch and PR;
   do not claim commit, push, or PR success unless confirmed. Never commit cookies,
   tokens, raw operational profile snapshots or other unnecessary personal data.
+
+For race catalog requests, check all listed dates and sections. Skip future and cancelled races, and entries
+without published results. Before writing, compare the participants
+and published performances with existing data, including races stored under
+different filenames or legacy categories. Skip confirmed duplicates as a whole.
+Keep partial or conflicting overlaps in diagnostics for review.

@@ -113,13 +113,25 @@ def resolve_path(document, data_root):
     year = root / str(when.year)
     files = sorted(root.glob("[0-9][0-9][0-9][0-9]/*/*.json"))
     inventory = []
+    empty_placeholders = set()
+    event_tokens = set(base.split("-"))
     for path in files:
         try:
             inventory.append((path, read_existing(path)))
         except StorageConflict:
             # An unrelated historical year cannot determine this year's destination.
-            if path.parent.parent == year:
+            if path.parent.parent != year:
+                continue
+            folder_tokens = set(slug(path.parent.name).split("-"))
+            # A zero-byte placeholder cannot contain results. Its folder still
+            # blocks a race with overlapping name or place evidence.
+            if (
+                not document["competition"].get("place")
+                or folder_tokens & event_tokens
+                or path.stat().st_size != 0
+            ):
                 raise
+            empty_placeholders.add(path.parent)
     source = document["source_file"]
     existing = [
         p
@@ -157,7 +169,7 @@ def resolve_path(document, data_root):
         empty_matches, weak_matches = [], []
         place = slug(document["competition"].get("place"))
         event = set(base.split("-")) - set(place.split("-")) - {"cup", "pohar"}
-        occupied = {p.parent for p, d in inventory}
+        occupied = {p.parent for p, d in inventory} | empty_placeholders
         if year.exists():
             for candidate in sorted(year.iterdir()):
                 if not candidate.is_dir() or candidate in occupied:

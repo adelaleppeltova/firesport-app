@@ -1,0 +1,765 @@
+{
+  "source_file": "https://pozarnisporty.cz/races/927",
+  "generated_at": "2026-11-15T16:37:28Z",
+  "competition": {
+    "name": "Rokytnické štafety",
+    "place": "Rokytnice nad Rokytnou",
+    "date": "2026-05-08",
+    "league": null,
+    "categories": [
+      {
+        "name": "přípravka",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Rokytnice nad Rokytnou 11 (Třebíč) [54]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 78.71,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 87.58,
+                "status": "valid"
+              }
+            ],
+            "rank": 1,
+            "final_time": 78.71,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Budíkovice  11 (Třebíč) [51]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 82.16,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 86.96,
+                "status": "valid"
+              }
+            ],
+            "rank": 2,
+            "final_time": 82.16,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Markvartice 11 (Třebíč) [53]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 99.02,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 85.02,
+                "status": "valid"
+              }
+            ],
+            "rank": 3,
+            "final_time": 85.02,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Kojetice - přípravka (Třebíč) [52]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 87.63,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 88.36,
+                "status": "valid"
+              }
+            ],
+            "rank": 4,
+            "final_time": 87.63,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Budíkovice 12 (Třebíč) [55]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 118.94,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 109.35,
+                "status": "valid"
+              }
+            ],
+            "rank": 5,
+            "final_time": 109.35,
+            "final_status": "valid"
+          }
+        ]
+      },
+      {
+        "name": "mladší",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Markvartice m (Třebíč) [7]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 62.86,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 51.45,
+                "status": "valid"
+              }
+            ],
+            "rank": 1,
+            "final_time": 51.45,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Předín mladší A (Třebíč) [9]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 58.18,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 52.66,
+                "status": "valid"
+              }
+            ],
+            "rank": 2,
+            "final_time": 52.66,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Šebkovice mladší A (Třebíč) [11]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 53.69,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 57.04,
+                "status": "valid"
+              }
+            ],
+            "rank": 3,
+            "final_time": 53.69,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Březník mladší (Třebíč) [12]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 56.01,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 4,
+            "final_time": 56.01,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Kojetice - mladší A (Třebíč) [8]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 57.32,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 64.19,
+                "status": "valid"
+              }
+            ],
+            "rank": 5,
+            "final_time": 57.32,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Vladislav mladší A (Třebíč) [2]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 63.38,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 58.08,
+                "status": "valid"
+              }
+            ],
+            "rank": 6,
+            "final_time": 58.08,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Předín mladší B (Třebíč) [1]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 63.63,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 61.05,
+                "status": "valid"
+              }
+            ],
+            "rank": 7,
+            "final_time": 61.05,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Šebkovice mladší B (Třebíč) [4]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 66.39,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 61.2,
+                "status": "valid"
+              }
+            ],
+            "rank": 8,
+            "final_time": 61.2,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Předín mladší C (Třebíč) [13]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 65.99,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 66.5,
+                "status": "valid"
+              }
+            ],
+            "rank": 9,
+            "final_time": 65.99,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Budíkovice 21 (Třebíč) [6]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 67.94,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 67.47,
+                "status": "valid"
+              }
+            ],
+            "rank": 10,
+            "final_time": 67.47,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Slavice 41 (Třebíč) [10]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 69.65,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 79.42,
+                "status": "valid"
+              }
+            ],
+            "rank": 11,
+            "final_time": 69.65,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Rokytnice nad Rokytnou 31 (Třebíč) [5]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 71.11,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 70.54,
+                "status": "valid"
+              }
+            ],
+            "rank": 12,
+            "final_time": 70.54,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Kojetice - mladší B (Třebíč) [3]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 75.08,
+                "status": "valid"
+              }
+            ],
+            "rank": 13,
+            "final_time": 75.08,
+            "final_status": "valid"
+          }
+        ]
+      },
+      {
+        "name": "starší",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Markvartice s A (Třebíč) [9]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 47.15,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 44.47,
+                "status": "valid"
+              }
+            ],
+            "rank": 1,
+            "final_time": 44.47,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Vladislav starší A (Třebíč) [13]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 49.28,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 46.82,
+                "status": "valid"
+              }
+            ],
+            "rank": 2,
+            "final_time": 46.82,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Markvartice s B (Třebíč) [1]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 49.15,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 51.24,
+                "status": "valid"
+              }
+            ],
+            "rank": 3,
+            "final_time": 49.15,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Šebkovice starší A (Třebíč) [12]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 49.83,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 49.31,
+                "status": "valid"
+              }
+            ],
+            "rank": 4,
+            "final_time": 49.31,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Kojetice - starší (Třebíč) [8]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 52.64,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 49.53,
+                "status": "valid"
+              }
+            ],
+            "rank": 5,
+            "final_time": 49.53,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Okříšky A 41 (Třebíč) [10]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 54.13,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 50.07,
+                "status": "valid"
+              }
+            ],
+            "rank": 6,
+            "final_time": 50.07,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Předín starší A (Třebíč) [11]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 53.73,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 51.22,
+                "status": "valid"
+              }
+            ],
+            "rank": 7,
+            "final_time": 51.22,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Velké Meziříčí (Žďár nad Sázavou) [6]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 53.36,
+                "status": "valid"
+              }
+            ],
+            "rank": 8,
+            "final_time": 53.36,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Okříšky B (Třebíč) [2]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 54.54,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 9,
+            "final_time": 54.54,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Šebkovice starší B (Třebíč) [3]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 54.98,
+                "status": "valid"
+              }
+            ],
+            "rank": 10,
+            "final_time": 54.98,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Březník starší (Třebíč) [5]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": 57.98,
+                "status": "valid"
+              }
+            ],
+            "rank": 11,
+            "final_time": 57.98,
+            "final_status": "valid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Slavice 31 (Třebíč) [7]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 69.12,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 68.13,
+                "status": "valid"
+              }
+            ],
+            "rank": 12,
+            "final_time": 68.13,
+            "final_status": "valid"
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Source: HTML compact team timing tables; team labels copied verbatim. Expandable team rosters are not result rows."
+  ],
+  "warnings": [
+    "Competition: unavailable league",
+    "přípravka: unknown discipline",
+    "mladší: unknown discipline",
+    "mladší / Březník mladší (Třebíč) [12]: unclassified note for try 2: nezapojená proudnice",
+    "mladší / Kojetice - mladší B (Třebíč) [3]: unclassified note for try 1: nezapojená proudnice",
+    "starší: unknown discipline",
+    "starší / Velké Meziříčí (Žďár nad Sázavou) [6]: unclassified note for try 1: předávka na 1.úseku",
+    "starší / Okříšky B (Třebíč) [2]: unclassified note for try 2: předávka, proudnice",
+    "starší / Šebkovice starší B (Třebíč) [3]: unclassified note for try 1: bariéra",
+    "starší / Březník starší (Třebíč) [5]: unclassified note for try 1: držení spojky"
+  ]
+}

@@ -1,0 +1,643 @@
+{
+  "source_file": "https://pozarnisporty.cz/races/1087",
+  "generated_at": "2026-11-15T16:37:27Z",
+  "competition": {
+    "name": "TFA Plchov 2026 štafety a tandemy",
+    "place": "Hasičské hřiště Plchov 72, 273 75",
+    "date": "2026-06-07",
+    "league": null,
+    "categories": [
+      {
+        "name": "štafety muži",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "4Takt (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 267.23,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 1,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Aku vrtračky (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 271.03,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 2,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Satalice Tandem (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 301.69,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 3,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      },
+      {
+        "name": "štafety ženy",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "víly (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 334.48,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 1,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      },
+      {
+        "name": "štafety smíšené",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Dubínci a Impostor (Kladno)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 296.9,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 1,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "4 ogurti (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 381.28,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 2,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Jelita (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 413.65,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 3,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Neposereme se (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 477.76,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 4,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      },
+      {
+        "name": "Tandem muži",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Dědek a junior (Praha) [3]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 292.81,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 1,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Jirka a Ondra (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 396.68,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 2,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Chodovaci (Praha) [1]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 435.31,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 3,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Hliníkovi (Praha) [11]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 474.45,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 4,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Ti krásní (Praha) [2]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 5,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      },
+      {
+        "name": "tandem ženy",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Bobinky (Praha) [10]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 341.64,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 1,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Salvatorovu (Louny)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 352.96,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 2,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Růžoví dinosauři () [3]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 373.37,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 3,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Míša a Denča (Beroun)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 457.88,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 4,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      },
+      {
+        "name": "tandem smíšený",
+        "discipline": null,
+        "results": [
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Braškováci (Kladno) [9]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 276.07,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 1,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Prskavky (Kladno) [4]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 313.36,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 2,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Červený broučci (Praha)",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 313.57,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 3,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Magoři (Praha) [5]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 387.2,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 4,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Romeo a Julie (Praha) [8]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 454.55,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 5,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Jirka a Barča (Praha) [4]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 513.53,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 6,
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "start_number": null,
+            "fscode": null,
+            "first_name": null,
+            "last_name": null,
+            "birth_year": null,
+            "team": "Mája a Tom (Praha) [7]",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 529.37,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "rank": 7,
+            "final_time": null,
+            "final_status": "invalid"
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Source: HTML compact team timing tables; team labels copied verbatim. Expandable team rosters are not result rows."
+  ],
+  "warnings": [
+    "Competition: unavailable league",
+    "štafety muži: unknown discipline",
+    "štafety ženy: unknown discipline",
+    "štafety smíšené: unknown discipline",
+    "Tandem muži: unknown discipline",
+    "Tandem muži / Ti krásní (Praha) [2]: unrecognized time: '-----'",
+    "tandem ženy: unknown discipline",
+    "tandem smíšený: unknown discipline",
+    "štafety muži: source event TFA is outside the supported discipline enum",
+    "štafety ženy: source event TFA is outside the supported discipline enum",
+    "štafety smíšené: source event TFA is outside the supported discipline enum",
+    "Tandem muži: source event TFA is outside the supported discipline enum",
+    "tandem ženy: source event TFA is outside the supported discipline enum",
+    "tandem smíšený: source event TFA is outside the supported discipline enum"
+  ]
+}

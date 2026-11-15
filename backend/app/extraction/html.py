@@ -95,6 +95,12 @@ def table_label(table, *, site=False):
     return heading.get_text(" ", strip=True) if heading else None
 
 
+def _site_time(value):
+    if value and re.fullmatch(r"0+(?::0+){0,2}(?:[.,]0+)?(?:-|\s+[PN])?", value.strip()):
+        return "-"
+    return value
+
+
 def parse_html(data, url, fetcher=None):
     soup = BeautifulSoup(data, "html.parser")
     site = urlsplit(url).hostname in {"pozarnisporty.cz", "www.pozarnisporty.cz"}
@@ -105,6 +111,7 @@ def parse_html(data, url, fetcher=None):
         [],
     )
     competition = competition_metadata(soup, warnings, site=site)
+    event_year = int(competition["date"][:4]) if competition["date"] else None
     document = soup.get_text("\n", strip=True)
     profile_failures = 0
     profile_used = 0
@@ -206,11 +213,22 @@ def parse_html(data, url, fetcher=None):
                     notes.append(
                         f"{context}: unambiguous decimal-time suffix split from team into mapped empty try columns."
                     )
+            zero_fields = [
+                field
+                for field in ("try1", "try2", "final")
+                if site
+                and get(field) not in (None, "-")
+                and _site_time(get(field)) == "-"
+            ]
+            if zero_fields:
+                warnings.append(
+                    f"{context}: site zero time placeholder in {', '.join(zero_fields)}"
+                )
             attempts = [
                 {
                     "try": i,
                     **parse_time(
-                        get(f"try{i}"),
+                        _site_time(get(f"try{i}")) if site else get(f"try{i}"),
                         warnings,
                         context,
                         absent=f"try{i}" not in columns,
@@ -220,7 +238,7 @@ def parse_html(data, url, fetcher=None):
             ]
             reasons_count += assign_reasons(get("reason"), attempts, warnings, context)
             final = final_time(
-                get("final"),
+                _site_time(get("final")) if site else get("final"),
                 attempts,
                 warnings,
                 context,
@@ -243,6 +261,15 @@ def parse_html(data, url, fetcher=None):
                         except (OSError, ValueError) as exc:
                             profile_failures += 1
                             warnings.append(f"{context}: profile fetch failed: {exc}")
+            if (
+                year is not None
+                and event_year is not None
+                and not event_year - 125 <= year <= event_year
+            ):
+                warnings.append(
+                    f"{context}: implausible published birth year {year}; retained as null"
+                )
+                year = None
             result = {
                 "start_number": start,
                 "fscode": fscode(get("fscode"), warnings, context),

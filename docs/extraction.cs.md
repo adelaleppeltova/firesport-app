@@ -33,7 +33,9 @@ data a místa závodu v existujících JSON. Samotné místo nestačí. Prázdno
 složku lze převzít jen při jednoznačné shodě rozlišujícího názvu soutěže i místa;
 například `chomutov-stimax`. Existující názvy složek se nemění. Nejednoznačná
 shoda a existující neidentifikovatelný JSON v cílovém roce ukládání zastaví.
-Nesouvisející nečitelný historický soubor z jiného roku výběr cílové složky neovlivní.
+Výjimkou je prokazatelně prázdný soubor ve složce bez shody názvu či místa.
+Složka s takovým souborem zůstává obsazená. Nesouvisející nečitelný soubor
+z jiného roku výběr cílové složky neovlivní.
 
 Nová složka a název souboru používají lowercase ASCII a pomlčky. Soubor má formát
 `YYYY-MM-DD-{nazev-zavodu}-{misto}.json`, například
@@ -81,6 +83,15 @@ chybějících identifikátorů, warnings a chyb validace. Neúspěšný import 
   umožňují věkové mapování disciplín. Profily ze stejné domény se načítají kvůli
   roku narození, nikoliv pro odhad FSCode z ID profilu. Minimálně 0,3 s mezi
   požadavky, timeout 30 s, limit 30 MB, cache během běhu.
+- Kompaktní týmové tabulky na pozarnisporty.cz se sloupci Název, Výsledný čas
+  a Čas 1/2 (P/N) zachovávají oficiální časy a pořadí družstva. Rozbalovací
+  soupiska nemá vlastní výkony. Čas 00:00:00.00 je v tomto formátu zástupná
+  hodnota. U požárního útoku se samostatnými proudy se ukládá oficiální výsledný
+  čas a poznámky k proudům zůstávají v upozorněních. Čas celého pokusu se z proudů
+  nedopočítává. Tabulky celkových bodů za víc disciplín vyžadují vlastní adaptér.
+- Týmové tabulky ZHVB se sloupci pro časy a kontrolní stanoviště zachovávají
+  oficiální výsledný čas a pořadí. Časy startu a cíle, mezičasy, body na stanovištích
+  a rozbalovací soupisky nejsou pokusy. Disciplína zůstává null.
 - Obecné HTML s rozeznatelnými záhlavími a oficiální kategorií v caption/h2/h3/h4.
   Samostatné sloupce jména a příjmení mají přednost. U společného jména musí být
   pořadí zdroje doložené (`data-name-order="surname-first"`) nebo použita čárka.
