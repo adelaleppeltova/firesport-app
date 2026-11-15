@@ -98,3 +98,20 @@ def build_fs_code_query(fs_code: Any) -> Optional[dict]:
         if str(number) == normalized_code:
             values.append(number)
     return {"fs_codes": {"$in": values}}
+
+
+def is_valid_fs_code(code: str) -> bool:
+    return len(code) >= 4 and code.isascii() and code.isdecimal()
+
+
+def identity_group(
+    first_name: str, last_name: str, birth_year: Optional[int], fscode: Any, team: Optional[str],
+) -> tuple[str, str, int | None, str | None, str] | None:
+    """Group explicit, equal observations. Membership is a review aid only."""
+    code = normalize_fs_code(fscode)
+    team_key = " ".join((team or "").casefold().split())
+    if not first_name or not last_name or (code and not is_valid_fs_code(code)):
+        return None
+    if not code and (birth_year is None or not team_key):
+        return None
+    return first_name, last_name, birth_year, code, team_key

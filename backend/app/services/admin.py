@@ -1,93 +1,155 @@
 from __future__ import annotations
 
-from datetime import datetime
+import json
+from datetime import UTC, datetime
+from hashlib import sha256
 
 from bson import ObjectId
 from fastapi import HTTPException, UploadFile, status
+from pymongo.errors import DuplicateKeyError
 
 from app.db.database import db
-from app.models.admin import AdminImportStats, AdminReviewItem, AdminReviewResponse, AdminReviewSummary
+from app.models.admin import (
+    AdminImportStats,
+    AdminReviewItem,
+    AdminReviewResponse,
+    AdminReviewSummary,
+    ReviewCandidatesResponse,
+)
 from app.models.result import ImportedAthleteData, MatchStatus
-from app.services.athlete_identity import active_athlete_query, build_fs_code_query
+from app.services.athlete_identity import active_athlete_query, build_fs_code_query, identity_group
 from app.services.athlete_merge import (
     merge_athletes_service,
     search_merge_candidates_service,
 )
 from app.services.athletes import search_athletes_service
 from app.services.data_import import DataImporter
-from app.services.result_matching import build_name_candidate_query, decide_athlete_match, normalize_person_name
+from app.services.external_identity import ExternalIdentity, ExternalIdentitySidecar, external_identities
+from app.services.result_matching import decide_athlete_match, name_key
 
 results_collection = db["results"]
 athletes_collection = db["athletes"]
+competitions_collection = db["competitions"]
 
 
-def _assignment_fields(athlete_oid: ObjectId, reason: str) -> dict:
-    return {
-        "athlete": athlete_oid,
-        "match_status": MatchStatus.matched.value,
-        "match_reason": reason,
-        "updated_at": datetime.utcnow(),
-    }
+REVIEW_STATUSES = [MatchStatus.needs_review.value, MatchStatus.unmatched.value]
+
+
+def _oid(value: str) -> ObjectId:
+    try:
+        return ObjectId(value)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Invalid ID") from exc
+
+
+def _snapshot(doc: dict) -> dict:
+    return {key: doc.get(key) for key in ("_id", "athlete", "match_status", "match_reason", "updated_at")}
+
+
+def _manual_record(reason: str, admin_id: str | None, athlete_id: ObjectId | None) -> dict:
+    return {"reason": reason, "admin_id": admin_id, "athlete_id": athlete_id, "at": datetime.now(UTC)}
 
 
 async def _apply_result_assignment(
-    result_oid: ObjectId, athlete_oid: ObjectId, *, match_reason: str
-) -> None:
-    await results_collection.update_one(
-        {"_id": result_oid},
-        {"$set": _assignment_fields(athlete_oid, match_reason)},
+    doc: dict, athlete_oid: ObjectId, *, match_reason: str, admin_id: str | None,
+) -> bool:
+    record = _manual_record(match_reason, admin_id, athlete_oid)
+    outcome = await results_collection.update_one(
+        _snapshot(doc),
+        {
+            "$set": {
+                "athlete": athlete_oid,
+                "match_status": MatchStatus.matched.value,
+                "match_reason": match_reason,
+                "updated_at": record["at"],
+            },
+            "$push": {"manual_identity_history": record},
+        },
+    )
+    return outcome.modified_count == 1
+
+
+def _external_observation(doc: dict) -> ExternalIdentity | None:
+    raw = doc.get("external_identity")
+    return ExternalIdentity.model_validate(raw) if raw else None
+
+
+def _group_key(doc: dict) -> str | None:
+    imported = doc.get("imported_athlete") or {}
+    fingerprint = identity_group(
+        name_key(imported.get("first_name")), name_key(imported.get("last_name")),
+        imported.get("birth_year"), imported.get("fscode"), doc.get("team"),
+    )
+    if fingerprint is None:
+        return None
+    external = _external_observation(doc)
+    return sha256(json.dumps([fingerprint, external.key if external else None]).encode()).hexdigest()
+
+
+async def _review_decision(doc: dict, *, include_variants: bool = False) -> dict:
+    imported = ImportedAthleteData.model_validate(doc.get("imported_athlete") or {})
+    return await decide_athlete_match(
+        **imported.model_dump(), team=doc.get("team"),
+        external_identity=_external_observation(doc), include_variants=include_variants,
     )
 
 
-async def _rematch_review_results(athlete: dict) -> int:
-    review_query = {
-        "match_status": {"$in": [MatchStatus.needs_review.value, MatchStatus.unmatched.value]},
-        "athlete": None,
-        "match_reason": {"$not": {"$regex": "^manual_admin_"}},
-    }
-    first_name = normalize_person_name(athlete.get("first_name"))
-    last_name = normalize_person_name(athlete.get("last_name"))
-    if not first_name or not last_name:
-        return 0
-
-    docs = results_collection.find({
-        **review_query,
-        "imported_athlete.first_name": build_name_candidate_query(first_name),
-        "imported_athlete.last_name": build_name_candidate_query(last_name),
-    })
-
-    reassigned = 0
-    async for doc in docs:
-        imported = doc.get("imported_athlete") or {}
-        decision = await decide_athlete_match(
-            first_name=imported.get("first_name", ""),
-            last_name=imported.get("last_name", ""),
-            birth_year=imported.get("birth_year"),
-            fscode=imported.get("fscode"),
-            team=doc.get("team"),
-        )
-        matched_athlete = decision.get("matched_athlete")
-        if not matched_athlete or matched_athlete["_id"] != athlete["_id"]:
-            continue
-
-        outcome = await results_collection.update_one(
-            {"_id": doc["_id"], **review_query},
-            {"$set": _assignment_fields(athlete["_id"], f"auto_reassigned_{decision['match_reason']}")},
-        )
-        reassigned += outcome.modified_count
-
-    return reassigned
+async def get_result_candidates(result_id: str) -> ReviewCandidatesResponse:
+    doc = await results_collection.find_one({"_id": _oid(result_id)})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Result not found")
+    decision = await _review_decision(doc, include_variants=True)
+    return ReviewCandidatesResponse(items=[
+        {
+            "athlete_id": str(candidate["profile"]["_id"]),
+            "first_name": candidate["profile"].get("first_name") or "",
+            "last_name": candidate["profile"].get("last_name") or "",
+            "birth_year": candidate["profile"].get("birth_year"),
+            "fs_codes": candidate["profile"]["fs_codes"],
+            "teams": candidate["profile"]["teams"],
+            **{key: candidate[key] for key in ("strong", "supporting", "conflicts")},
+        }
+        for candidate in decision["candidates"][:10]
+    ])
 
 
-async def import_results_from_files(files: list[UploadFile]) -> dict:
+async def verify_result_external_identity(
+    result_id: str, athlete_id: str, provider: str, person_id: str, *, admin_id: str,
+) -> dict:
+    doc = await results_collection.find_one({"_id": _oid(result_id)})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Result not found")
+    observation = _external_observation(doc)
+    athlete_oid = _oid(athlete_id)
+    if (not observation or doc.get("athlete") != athlete_oid
+            or (observation.provider, observation.person_id) != (provider, person_id)
+            or not (doc.get("match_reason") or "").startswith("manual_admin_")):
+        raise HTTPException(status_code=409, detail="Je třeba ručně potvrzený výsledek s externím ID ze zdroje.")
+    if not await athletes_collection.find_one(active_athlete_query({"_id": athlete_oid})):
+        raise HTTPException(status_code=409, detail="Profil už není aktivní.")
+    try:
+        await external_identities.insert_one({
+            "_id": observation.key, **observation.model_dump(), "athlete_id": athlete_oid,
+            "verified_from_result_id": doc["_id"], "verified_by": admin_id, "verified_at": datetime.now(UTC),
+        })
+    except DuplicateKeyError:
+        existing = await external_identities.find_one({"_id": observation.key})
+        if not existing or existing.get("athlete_id") != athlete_oid:
+            raise HTTPException(status_code=409, detail="Tento externí identifikátor už patří jinému profilu.")
+    return {"ok": True}
+
+
+async def import_results_from_files(
+    files: list[UploadFile], *, external_sidecar: ExternalIdentitySidecar | None = None,
+) -> dict:
     if not files:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Je potřeba vybrat alespoň jeden JSON soubor.",
         )
 
-    import json
-
+    if external_sidecar and len(files) != 1:
+        raise HTTPException(status_code=400, detail="Provenience se vztahuje k jedinému souboru s výsledky.")
     aggregated = AdminImportStats().model_dump()
 
     for file in files:
@@ -107,7 +169,7 @@ async def import_results_from_files(files: list[UploadFile]) -> dict:
             ) from exc
 
         importer = DataImporter()
-        stats = await importer.import_from_dict(data)
+        stats = await importer.import_from_dict(data, external_sidecar=external_sidecar)
         aggregated["files_processed"] += 1
         for key, value in stats.items():
             if key != "errors":
@@ -128,6 +190,12 @@ async def get_review_results() -> AdminReviewResponse:
         .sort("date", -1)
         .to_list(length=None)
     )
+
+    competition_ids = {doc["competition"] for doc in docs if doc.get("competition")}
+    names = {}
+    if competition_ids:
+        competitions = competitions_collection.find({"_id": {"$in": list(competition_ids)}}, {"name": 1})
+        names = {doc["_id"]: doc.get("name") async for doc in competitions}
 
     items: list[AdminReviewItem] = []
     needs_review_count = 0
@@ -150,6 +218,9 @@ async def get_review_results() -> AdminReviewResponse:
                 match_reason=doc.get("match_reason"),
                 team=doc.get("imported_team", doc.get("team")),
                 date=doc.get("date").isoformat() if doc.get("date") else None,
+                group_id=_group_key(doc),
+                competition_name=names.get(doc.get("competition")),
+                start_number=str(doc["start_number"]) if doc.get("start_number") is not None else None,
             )
         )
 
@@ -163,37 +234,58 @@ async def get_review_results() -> AdminReviewResponse:
     )
 
 
-async def assign_result_to_athlete(result_id: str, athlete_id: str) -> dict:
-    try:
-        result_oid = ObjectId(result_id)
-        athlete_oid = ObjectId(athlete_id)
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail="Invalid ID") from exc
-
-    athlete = await athletes_collection.find_one(active_athlete_query({"_id": athlete_oid}))
-    if not athlete:
+async def assign_result_to_athlete(result_id: str, athlete_id: str, *, admin_id: str | None = None) -> dict:
+    result_oid, athlete_oid = _oid(result_id), _oid(athlete_id)
+    if not await athletes_collection.find_one(active_athlete_query({"_id": athlete_oid})):
         raise HTTPException(status_code=404, detail="Athlete not found")
 
-    result_doc = await results_collection.find_one({"_id": result_oid})
-    if not result_doc:
+    doc = await results_collection.find_one({"_id": result_oid})
+    if not doc:
         raise HTTPException(status_code=404, detail="Result not found")
+    if doc.get("athlete") or doc.get("match_status") not in REVIEW_STATUSES:
+        raise HTTPException(status_code=409, detail="Výsledek už byl vyřešen.")
+    if not await _apply_result_assignment(doc, athlete_oid, match_reason="manual_admin_assignment", admin_id=admin_id):
+        raise HTTPException(status_code=409, detail="Výsledek byl mezitím změněn.")
+    return {"ok": True, "result_id": result_id, "athlete_id": athlete_id, "auto_reassigned": 0}
 
-    await _apply_result_assignment(
-        result_oid,
-        athlete_oid,
-        match_reason="manual_admin_assignment",
+
+async def assign_result_group(result_ids: list[str], athlete_id: str, *, admin_id: str) -> dict:
+    ids, athlete_oid = [_oid(value) for value in result_ids], _oid(athlete_id)
+    if len(set(ids)) != len(ids) or not 2 <= len(ids) <= 50:
+        raise HTTPException(status_code=400, detail="Vyber 2 až 50 různých výsledků.")
+    docs = await results_collection.find({"_id": {"$in": ids}}).to_list(len(ids))
+    groups = {_group_key(doc) for doc in docs}
+    if len(docs) != len(ids) or len(groups) != 1 or None in groups or any(
+        doc.get("athlete") or doc.get("match_status") not in REVIEW_STATUSES
+        or doc.get("match_reason") == "manual_admin_unassignment"
+        for doc in docs
+    ):
+        raise HTTPException(status_code=409, detail="Vybrané výsledky nejsou ve stejné skupině ke kontrole.")
+    # The grouping key includes every matching input, so this evidence applies to each selected row.
+    decision = await _review_decision(docs[0])
+    candidate = next((item for item in decision["candidates"] if item["profile"]["_id"] == athlete_oid), None)
+    other_identifier_owner = any(
+        item["profile"]["_id"] != athlete_oid and item["strong"] for item in decision["candidates"]
     )
-    auto_reassigned = await _rematch_review_results(athlete)
+    if (not candidate or candidate["conflicts"] or other_identifier_owner
+            or "exact_name" not in candidate["supporting"]
+            or not (candidate["strong"] or "birth_year" in candidate["supporting"])
+            or decision["match_reason"] in ("candidate_limit", "inactive_external_identity", "unverified_external_id", "invalid_fscode")):
+        raise HTTPException(status_code=409, detail="Rozpory nebo chybějící identifikace vyžadují jednotlivou kontrolu.")
 
-    return {
-        "ok": True,
-        "result_id": result_id,
-        "athlete_id": athlete_id,
-        "auto_reassigned": auto_reassigned,
-    }
+    if not candidate["strong"] and len({doc.get("competition") for doc in docs}) != len(docs):
+        raise HTTPException(status_code=409, detail="Bez potvrzeného kódu vybírej nejvýše jeden záznam na soutěž.")
+
+    assigned, skipped = [], []
+    for doc in docs:
+        changed = await _apply_result_assignment(
+            doc, athlete_oid, match_reason="manual_admin_bulk_assignment", admin_id=admin_id,
+        )
+        (assigned if changed else skipped).append(str(doc["_id"]))
+    return {"assigned": assigned, "skipped": skipped}
 
 
-async def create_athlete_from_result(result_id: str) -> dict:
+async def create_athlete_from_result(result_id: str, *, admin_id: str | None = None) -> dict:
     try:
         result_oid = ObjectId(result_id)
     except Exception as exc:
@@ -212,7 +304,7 @@ async def create_athlete_from_result(result_id: str) -> dict:
             detail="Importovaný záznam neobsahuje dost údajů pro vytvoření závodníka.",
         )
 
-    if result_doc.get("athlete"):
+    if result_doc.get("athlete") or result_doc.get("match_status") not in REVIEW_STATUSES:
         raise HTTPException(status_code=409, detail="Výsledek už je přiřazen závodníkovi.")
 
     code_query = build_fs_code_query(imported.get("fscode"))
@@ -228,24 +320,22 @@ async def create_athlete_from_result(result_id: str) -> dict:
         "teams": [team] if team else [],
         "is_active": True,
         "merged_into_athlete_id": None,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(UTC),
     }
 
     insert_result = await athletes_collection.insert_one(athlete_doc)
     athlete_id = str(insert_result.inserted_id)
 
-    await _apply_result_assignment(
-        result_oid,
-        insert_result.inserted_id,
-        match_reason="manual_admin_create_athlete",
-    )
-    auto_reassigned = await _rematch_review_results({**athlete_doc, "_id": insert_result.inserted_id})
+    if not await _apply_result_assignment(
+        result_doc, insert_result.inserted_id, match_reason="manual_admin_create_athlete", admin_id=admin_id,
+    ):
+        raise HTTPException(status_code=409, detail="Výsledek byl mezitím změněn.")
 
     return {
         "ok": True,
         "result_id": result_id,
         "athlete_id": athlete_id,
-        "auto_reassigned": auto_reassigned,
+        "auto_reassigned": 0,
     }
 
 
@@ -255,11 +345,17 @@ async def delete_review_results() -> dict:
             "$in": [MatchStatus.needs_review.value, MatchStatus.unmatched.value]
         }
     }
+    query.update({
+        "athlete": None,
+        "manual_identity_history": {"$exists": False},
+        "match_reason": {"$not": {"$regex": "^manual_admin_"}},
+        "external_identity": {"$exists": False},
+    })
     result = await results_collection.delete_many(query)
     return {"ok": True, "deleted_count": result.deleted_count}
 
 
-async def unassign_result_from_athlete(result_id: str) -> dict:
+async def unassign_result_from_athlete(result_id: str, *, admin_id: str | None = None) -> dict:
     try:
         result_oid = ObjectId(result_id)
     except Exception as exc:
@@ -269,31 +365,30 @@ async def unassign_result_from_athlete(result_id: str) -> dict:
     if not doc:
         raise HTTPException(status_code=404, detail="Result not found")
 
-    imported = doc.get("imported_athlete") or {}
-    match = await decide_athlete_match(
-        first_name=imported.get("first_name", ""),
-        last_name=imported.get("last_name", ""),
-        birth_year=imported.get("birth_year"),
-        fscode=imported.get("fscode"),
-        team=doc.get("team"),
-    )
+    if not doc.get("athlete"):
+        raise HTTPException(status_code=409, detail="Výsledek už je bez přiřazení.")
+    match = await _review_decision(doc)
+    record = _manual_record("manual_admin_unassignment", admin_id, doc.get("athlete"))
     next_status = (
         MatchStatus.unmatched.value
         if match["match_status"] == MatchStatus.matched
         else match["match_status"].value
     )
 
-    await results_collection.update_one(
-        {"_id": result_oid},
+    outcome = await results_collection.update_one(
+        _snapshot(doc),
         {
             "$unset": {"athlete": ""},
             "$set": {
                 "match_status": next_status,
-                "match_reason": "manual_admin_unassignment",
-                "updated_at": datetime.utcnow(),
+                "match_reason": record["reason"],
+                "updated_at": record["at"],
             },
+            "$push": {"manual_identity_history": record},
         },
     )
+    if outcome.modified_count != 1:
+        raise HTTPException(status_code=409, detail="Výsledek byl mezitím změněn.")
 
     return {"ok": True, "result_id": result_id, "match_status": next_status}
 

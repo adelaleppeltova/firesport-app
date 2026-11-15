@@ -333,10 +333,28 @@ export function useAdminImportResults() {
   });
 }
 
+export function useAdminResultCandidates(resultId) {
+  return useQuery({
+    queryKey: ["admin", "result-candidates", resultId],
+    enabled: Boolean(resultId),
+    queryFn: async () => {
+      const { data } = await api.get(`/v1/admin/results/${resultId}/candidates`);
+      return data;
+    },
+  });
+}
+
 export function useAdminAssignResultAthlete() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ resultId, athleteId }) => {
+    mutationFn: async ({ resultId, resultIds, athleteId }) => {
+      if (resultIds?.length > 1) {
+        const { data } = await api.post("/v1/admin/results/bulk-assign-athlete", {
+          result_ids: resultIds,
+          athlete_id: athleteId,
+        });
+        return data;
+      }
       const { data } = await api.post(
         `/v1/admin/results/${resultId}/assign-athlete`,
         { athlete_id: athleteId },

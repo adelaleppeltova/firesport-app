@@ -32,10 +32,12 @@ def _matches(doc, query):
             value = doc.get(key)
             if "$ne" in condition and value == condition["$ne"]:
                 return False
-            if "$in" in condition and not any(item in value for item in condition["$in"]):
+            if "$in" in condition and not any(item in (value or []) for item in condition["$in"]):
+                return False
+            if "$nin" in condition and value in condition["$nin"]:
                 return False
             if "$regex" in condition and not any(
-                re.search(condition["$regex"], item, re.I)
+                isinstance(item, str) and re.search(condition["$regex"], item, re.I)
                 for item in (value if isinstance(value, list) else [value])
             ):
                 return False
@@ -44,11 +46,22 @@ def _matches(doc, query):
     return True
 
 
+def mock_find(profiles):
+    def find(query):
+        docs = [doc for doc in profiles if _matches(doc, query)]
+        cursor = MagicMock()
+        cursor.sort.return_value = cursor
+        cursor.limit.return_value = cursor
+        cursor.to_list = AsyncMock(side_effect=lambda length: docs[:length])
+        return cursor
+    return find
+
+
 @pytest.mark.parametrize(
     "profiles, year, code, last, team, status, reason, expected_id",
     [
         ([_athlete(1, 2000), _athlete(2, 2001)], 2000, None, "Novák", None,
-         "matched", "name_plus_birth_year", 1),
+         "needs_review", "insufficient_identity", None),
         ([_athlete(1, 2000)], 2001, None, "Novák", "Lhota",
          "needs_review", "conflicting_birth_year", None),
         ([_athlete(1, 2000), _athlete(2, 2000)], 2000, None, "Novák", "Lhota",
@@ -56,7 +69,7 @@ def _matches(doc, query):
         ([_athlete(1, 2000)], None, None, "Novák", "Lhota",
          "needs_review", "insufficient_identity", None),
         ([_athlete(1, 2000)], 2000, None, "Novák", "Bukovice",
-         "matched", "name_plus_birth_year", 1),
+         "needs_review", "insufficient_identity", None),
         ([_athlete(1, 2000, [12345, "54321"])], None, "12345", "Novák", None,
          "matched", "name_plus_fscode", 1),
         ([_athlete(1, 2000, ["12345"]), _athlete(2, 2000)], 2000, "12345", "Novák", None,
@@ -72,25 +85,19 @@ def _matches(doc, query):
         ([_athlete(1, 2000)], None, None, "Novák", None, "needs_review", "insufficient_identity", None),
         ([_athlete(1, 2000), _athlete(2)], 2000, None, "Novák", None,
          "needs_review", "multiple_name_candidates", None),
-        ([_athlete(1, 2000)], 2000, None, "Novak", None, "needs_review", "insufficient_identity", None),
+        ([_athlete(1, 2000)], 2000, None, "Novak", None, "needs_review", "possible_name_variant", None),
         ([_athlete(1, 2000)], 2000, None, "Novka", None, "needs_review", "possible_name_variant", None),
         ([_athlete(1, 2000, ["12345"])], 2000, "12345", "Novak", None,
          "needs_review", "conflicting_fscode", None),
         ([_athlete(1, 2000), _athlete(2, 2000, active=False)], 2000, None, "Novák", None,
-         "matched", "name_plus_birth_year", 1),
-        ([_athlete(1, 2000, last="Novák Svoboda")], 2000, None, "NovákSvoboda", None,
          "needs_review", "insufficient_identity", None),
+        ([_athlete(1, 2000, last="Novák Svoboda")], 2000, None, "NovákSvoboda", None,
+         "needs_review", "possible_name_variant", None),
         ([], 2000, "12345", "Novák", None, "unmatched", "no_match", None),
     ],
 )
 def test_automatic_matching(profiles, year, code, last, team, status, reason, expected_id):
-    def find(query):
-        docs = [doc for doc in profiles if _matches(doc, query)]
-        cursor = MagicMock(to_list=AsyncMock(return_value=docs))
-        cursor.limit.return_value = cursor
-        return cursor
-
-    with patch("app.services.result_matching.athletes_collection.find", side_effect=find):
+    with patch("app.services.result_matching.athletes_collection.find", side_effect=mock_find(profiles)):
         result = asyncio.run(
             decide_athlete_match(first_name="Jan", last_name=last, birth_year=year, fscode=code, team=team)
         )

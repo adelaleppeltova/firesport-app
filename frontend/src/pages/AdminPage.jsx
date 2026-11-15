@@ -9,6 +9,7 @@ import {
   useAdminAthleteSearch,
   useAdminImportResults,
   useAdminImportReview,
+  useAdminResultCandidates,
   useAdminUnassignResultAthlete,
 } from "../hooks/useApi";
 
@@ -36,8 +37,27 @@ const matchReasons = {
   insufficient_identity: "Jméno a dostupné údaje k potvrzení identity nestačí.",
   possible_name_variant: "Podobný záznam může patřit existujícímu závodníkovi.",
   no_match: "Import nenašel odpovídající profil.",
+  invalid_fscode: "Zdroj uvádí neplatný formát FSCode.",
+  candidate_limit: "Příliš mnoho kandidátů pro jednoznačnou shodu.",
+  conflicting_identifiers: "Ověřené údaje ukazují na různé profily nebo jsou v rozporu.",
+  unverified_external_id: "Identifikátor ze zdroje dosud nemá potvrzeného vlastníka.",
+  inactive_external_identity: "Ověřený identifikátor ukazuje na neaktivní profil.",
   manual_admin_unassignment: "Přiřazení ručně odebral administrátor.",
 };
+
+const evidenceLabels = {
+  exact_name: "jméno a příjmení",
+  name_variant: "podobné jméno",
+  different_name: "odlišné jméno",
+  birth_year: "rok narození",
+  fscode: "FSCode",
+  verified_external_id: "ověřené externí ID",
+  historical_team: "historický tým",
+};
+
+function explainEvidence(labels) {
+  return labels.map((label) => evidenceLabels[label] ?? label).join(", ");
+}
 
 function formatImportedLabel(item) {
   const imported = item.imported_athlete;
@@ -60,6 +80,7 @@ export default function AdminPage() {
   const pageTopRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedResult, setSelectedResult] = useState(null);
+  const [groupSelection, setGroupSelection] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [importSummary, setImportSummary] = useState(null);
@@ -73,6 +94,7 @@ export default function AdminPage() {
   const deleteReviewMutation = useAdminDeleteReviewResults();
   const unassignMutation = useAdminUnassignResultAthlete();
   const athleteSearchQuery = useAdminAthleteSearch(debouncedSearchQuery);
+  const candidatesQuery = useAdminResultCandidates(selectedResult);
 
   const selectedReviewItem = useMemo(
     () =>
@@ -81,6 +103,14 @@ export default function AdminPage() {
       ) ?? null,
     [reviewQuery.data, selectedResult],
   );
+
+  const relatedResults = (reviewQuery.data?.items ?? []).filter(
+    (item) => selectedReviewItem?.group_id && item.group_id === selectedReviewItem.group_id
+      && item.result_id !== selectedResult && item.match_reason !== "manual_admin_unassignment",
+  );
+  const selectedGroupIds = relatedResults
+    .filter((item) => groupSelection.includes(item.result_id))
+    .map((item) => item.result_id);
 
   useEffect(() => {
     if (!selectedReviewItem) return;
@@ -104,6 +134,7 @@ export default function AdminPage() {
 
   const handleSelectReviewItem = (resultId) => {
     setSelectedResult(resultId);
+    setGroupSelection([]);
     pageTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -129,14 +160,19 @@ export default function AdminPage() {
 
   const handleAssign = async (athleteId) => {
     if (!selectedReviewItem || assignMutation.isPending) return;
+    const resultIds = [selectedReviewItem.result_id, ...selectedGroupIds];
+    if (resultIds.length > 1 && !window.confirm(`Potvrdit přiřazení ${resultIds.length} vybraných výsledků?`)) return;
     try {
-      await assignMutation.mutateAsync({
+      const response = await assignMutation.mutateAsync({
         resultId: selectedReviewItem.result_id,
+        resultIds,
         athleteId,
       });
       setMessage({
-        type: "success",
-        text: "Výsledek byl přiřazen k vybranému závodníkovi.",
+        type: response.skipped?.length ? "error" : "success",
+        text: response.assigned
+          ? `Přiřazeno ${response.assigned.length} výsledků. Mezitím změněno ${response.skipped.length}.`
+          : "Výsledek byl přiřazen k vybranému závodníkovi.",
       });
       setSelectedResult(null);
       setSearchQuery("");
@@ -323,7 +359,7 @@ export default function AdminPage() {
         </Card>
       </div>
 
-      <Card title="Vyhledání athlete pro ruční spojení">
+      <Card title="Ruční přiřazení závodníka">
         {!selectedReviewItem ? (
           <p className="admin-page__hint">
             Vyber v tabulce záznam, který chceš ručně přiřadit.
@@ -340,11 +376,62 @@ export default function AdminPage() {
                 className="btn admin-page__action-button admin-page__action-button--secondary admin-page__assignment-create"
                 onClick={handleCreateAthlete}
                 disabled={
-                  assignMutation.isPending || createAthleteMutation.isPending
+                  assignMutation.isPending || createAthleteMutation.isPending || selectedGroupIds.length > 0
                 }
               >
                 Vytvořit závodníka
               </button>
+            </div>
+
+            {relatedResults.length > 0 && selectedReviewItem.match_reason !== "manual_admin_unassignment" && (
+              <fieldset>
+                <legend>Další výsledky se stejnými údaji</legend>
+                {relatedResults.map((item) => (
+                  <div key={item.result_id}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={groupSelection.includes(item.result_id)}
+                        disabled={assignMutation.isPending
+                          || (selectedGroupIds.length >= 49 && !groupSelection.includes(item.result_id))}
+                        onChange={(event) => {
+                          const checked = event.target.checked;
+                          setGroupSelection((previous) => checked
+                            ? [...previous, item.result_id]
+                            : previous.filter((id) => id !== item.result_id));
+                        }}
+                      />
+                      {" "}{item.competition_name ?? formatImportedLabel(item)}
+                      {" · "}{item.date ? new Date(item.date).toLocaleDateString("cs-CZ") : "Datum neznámé"}
+                      {item.start_number && ` · Startovní číslo ${item.start_number}`}
+                    </label>
+                  </div>
+                ))}
+              </fieldset>
+            )}
+            <div className="admin-page__search-results">
+              {candidatesQuery.isPending && <p>Načítám návrhy…</p>}
+              {candidatesQuery.isError && <p>Návrhy se nepodařilo načíst.</p>}
+              {candidatesQuery.data?.items?.map((candidate) => (
+                <div className="admin-page__search-result" key={candidate.athlete_id}>
+                  <strong>{formatAthleteLabel(candidate)}</strong>
+                  {formatAthleteMeta(candidate) && (
+                    <span className="admin-page__candidate-meta">{formatAthleteMeta(candidate)}</span>
+                  )}
+                  {candidate.strong.length > 0 && <span>Identifikátory · {explainEvidence(candidate.strong)}</span>}
+                  {candidate.supporting.length > 0 && <span>Shody · {explainEvidence(candidate.supporting)}</span>}
+                  {candidate.conflicts.length > 0 && <span>Rozpory · {explainEvidence(candidate.conflicts)}</span>}
+                  <button
+                    type="button"
+                    className="btn admin-page__action-button"
+                    disabled={assignMutation.isPending || createAthleteMutation.isPending
+                      || (selectedGroupIds.length > 0 && candidate.conflicts.length > 0)}
+                    onClick={() => handleAssign(candidate.athlete_id)}
+                  >
+                    Přiřadit {selectedGroupIds.length > 0 ? `${selectedGroupIds.length + 1} výsledků` : "výsledek"}
+                  </button>
+                </div>
+              ))}
             </div>
 
             <label className="admin-page__field">
@@ -377,7 +464,7 @@ export default function AdminPage() {
                           onClick={() => handleAssign(athlete._id)}
                           disabled={
                             assignMutation.isPending ||
-                            createAthleteMutation.isPending
+                            createAthleteMutation.isPending || selectedGroupIds.length > 0
                           }
                         >
                           Přiřadit závodníka
