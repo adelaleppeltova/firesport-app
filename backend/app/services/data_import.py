@@ -18,6 +18,7 @@ from app.db.database import db
 from app.models.admin import ImportStats
 from app.models.result import MatchStatus
 from app.services.athlete_identity import normalize_fs_code
+from app.services.external_identity import ExternalIdentity, ExternalIdentitySidecar
 from app.services.quality_flag_service import compute_bounds_for_recompute, compute_quality_flag
 from app.services.result_matching import (
     decide_athlete_match,
@@ -139,7 +140,8 @@ class DataImporter:
 
 
     async def import_from_dict(
-        self, data: Dict[str, Any], *, verified_blocks: Optional[dict[int, str]] = None
+        self, data: Dict[str, Any], *, verified_blocks: Optional[dict[int, str]] = None,
+        external_sidecar: ExternalIdentitySidecar | None = None,
     ) -> Dict[str, Any]:
         """
         Importuje data ze slovníku (parsovaný JSON).
@@ -166,6 +168,8 @@ class DataImporter:
 
             competition_data = data.get("competition", {})
             categories = competition_data.get("categories", [])
+            if external_sidecar is not None:
+                external_sidecar.validate_for(data, categories)
             blocks = verified_blocks or {}
             if any(index not in range(len(categories)) or not isinstance(block, str) or not block.strip()
                    for index, block in blocks.items()):
@@ -188,9 +192,11 @@ class DataImporter:
             source_url = source._replace(fragment="").geturl() if source.scheme in ("http", "https") and source.netloc else None
             competition_id = await self._import_competition(competition_data, source_url=source_url)
 
+            external_rows = external_sidecar.categories if external_sidecar else {}
             for index, category_data in enumerate(categories):
                 await self._import_category_with_results(
-                    category_data, competition_id, block_id=blocks.get(index)
+                    category_data, competition_id, block_id=blocks.get(index),
+                    external_rows=external_rows.get(index),
                 )
 
             logger.info(f"Import dokončen: {self.stats}")
@@ -244,7 +250,8 @@ class DataImporter:
         return await self._import_competition(comp_data, source_url=source_url)
 
     async def _import_category_with_results(
-        self, category_data: Dict[str, Any], competition_id: str, *, block_id: Optional[str] = None
+        self, category_data: Dict[str, Any], competition_id: str, *, block_id: Optional[str] = None,
+        external_rows: dict[int, ExternalIdentity] | None = None
     ) -> None:
         """Importuje kategorii a její výsledky."""
         try:
@@ -257,7 +264,8 @@ class DataImporter:
             # Import výsledků
             results = category_data.get("results", [])
             row_counts = Counter(json.dumps(row, sort_keys=True) for row in results)
-            for result_data in results:
+            observations = external_rows or {}
+            for index, result_data in enumerate(results):
                 row_key = json.dumps(result_data, sort_keys=True)
                 if row_counts[row_key] > 1:
                     self.stats["errors"].append(
@@ -265,7 +273,8 @@ class DataImporter:
                     )
                     continue
                 await self._import_result(
-                    result_data, category_id, competition_id, block_id=block_id
+                    result_data, category_id, competition_id, block_id=block_id,
+                    external_identity=observations.get(index),
                 )
 
         except Exception as e:
@@ -306,7 +315,7 @@ class DataImporter:
 
     async def _import_result(
         self, result_data: Dict[str, Any], category_id: str, competition_id: str,
-        *, block_id: Optional[str] = None
+        *, block_id: Optional[str] = None, external_identity: ExternalIdentity | None = None,
     ) -> None:
         """Importuje nový řádek a existující výkon ponechá beze změny."""
         try:
@@ -317,10 +326,13 @@ class DataImporter:
             if await self._existing_result(row):
                 return
 
-            match = await decide_athlete_match(**imported_athlete, team=team)
+            match = await decide_athlete_match(
+                **imported_athlete, team=team, external_identity=external_identity,
+            )
             result_doc = {
                 "_id": _import_id("result", self._row_identity(row)),
                 **row,
+                **({"external_identity": external_identity.model_dump()} if external_identity else {}),
                 "date": competition.get("date") if competition else None,
                 "match_status": match["match_status"].value,
                 "match_reason": match["match_reason"],

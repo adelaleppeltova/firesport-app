@@ -9,6 +9,31 @@ class AssignAthleteRequest(BaseModel):
     athlete_id: str
 
 
+class VerifyExternalIdentityRequest(AssignAthleteRequest):
+    provider: str
+    person_id: str
+
+
+class BulkAssignmentRequest(AssignAthleteRequest):
+    result_ids: list[str] = Field(min_length=2, max_length=50)
+
+
+class ReviewCandidate(BaseModel):
+    athlete_id: str
+    first_name: str
+    last_name: str
+    birth_year: Optional[int] = None
+    fs_codes: list[str]
+    teams: list[str]
+    strong: list[str]
+    supporting: list[str]
+    conflicts: list[str]
+
+
+class ReviewCandidatesResponse(BaseModel):
+    items: list[ReviewCandidate]
+
+
 class AdminReviewItem(BaseModel):
     result_id: str
     imported_athlete: ImportedAthleteData
@@ -16,6 +41,9 @@ class AdminReviewItem(BaseModel):
     match_reason: Optional[str] = None
     team: Optional[str] = None
     date: Optional[str] = None
+    group_id: Optional[str] = None
+    competition_name: Optional[str] = None
+    start_number: Optional[str] = None
 
 
 class AdminReviewSummary(BaseModel):

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Optional
 
 from bson import ObjectId
 from fastapi import HTTPException, status
+from pymongo.errors import OperationFailure
 
 from app.db.database import db
 from app.models.admin import AthleteMergeCandidate, AthleteMergeCandidatesResponse
@@ -12,11 +13,13 @@ from app.services.athlete_identity import (
     active_athlete_query,
     normalize_athlete_document,
 )
+from app.services.external_identity import external_identities
 from app.services.search_utils import build_diacritic_fuzzy_regex
 
 athletes_collection = db["athletes"]
 results_collection = db["results"]
 users_collection = db["users"]
+anomaly_scores_collection = db["anomaly_scores"]
 
 
 def _parse_oid(value: str, field_name: str) -> ObjectId:
@@ -53,11 +56,24 @@ async def merge_athletes_service(source_athlete_id: str, target_athlete_id: str)
             detail="Source a target athlete musí být různí.",
         )
 
+    try:
+        async with await db.client.start_session() as session:
+            return await session.with_transaction(lambda transaction: _merge(source_oid, target_oid, transaction))
+    except OperationFailure as exc:
+        if exc.code == 20:
+            raise HTTPException(
+                status_code=503,
+                detail="Bezpečné sloučení vyžaduje MongoDB s podporou transakcí.",
+            ) from exc
+        raise
+
+
+async def _merge(source_oid: ObjectId, target_oid: ObjectId, session) -> dict:
     source = normalize_athlete_document(
-        await athletes_collection.find_one({"_id": source_oid})
+        await athletes_collection.find_one({"_id": source_oid}, session=session)
     )
     target = normalize_athlete_document(
-        await athletes_collection.find_one({"_id": target_oid})
+        await athletes_collection.find_one({"_id": target_oid}, session=session)
     )
 
     if not source:
@@ -76,49 +92,49 @@ async def merge_athletes_service(source_athlete_id: str, target_athlete_id: str)
         key=str.casefold,
     )
 
-    moved_results_response = await results_collection.update_many(
-        {"athlete": source_oid},
-        {
-            "$set": {
-                "athlete": target_oid,
-                "updated_at": datetime.utcnow(),
-            }
-        },
-    )
-
+    now = datetime.now(UTC)
     await athletes_collection.update_one(
         {"_id": target_oid},
-        {
-            "$set": {
-                "birth_year": birth_year,
-                "fs_codes": merged_fs_codes,
-                "teams": merged_teams,
-                "updated_at": datetime.utcnow(),
-            }
-        },
+        {"$set": {"birth_year": birth_year, "fs_codes": merged_fs_codes, "teams": merged_teams, "updated_at": now}},
+        session=session,
     )
-
     await athletes_collection.update_one(
         {"_id": source_oid},
-        {
-            "$set": {
-                "is_active": False,
-                "merged_into_athlete_id": str(target_oid),
-                "updated_at": datetime.utcnow(),
-                "merged_at": datetime.utcnow(),
-            }
-        },
+        {"$set": {
+            "is_active": False, "merged_into_athlete_id": str(target_oid), "updated_at": now, "merged_at": now,
+        }},
+        session=session,
     )
-
+    moved_results_response = await results_collection.update_many(
+        {"athlete": source_oid},
+        {"$set": {"athlete": target_oid, "updated_at": now}},
+        session=session,
+    )
     await users_collection.update_many(
         {"athlete_id": str(source_oid)},
         {"$set": {"athlete_id": str(target_oid)}},
+        session=session,
+    )
+    await anomaly_scores_collection.update_many(
+        {"athlete_id": source_oid},
+        {"$set": {"athlete_id": target_oid}},
+        session=session,
+    )
+    await external_identities.update_many(
+        {"athlete_id": source_oid},
+        {"$set": {"athlete_id": target_oid}},
+        session=session,
+    )
+    await athletes_collection.update_many(
+        {"merged_into_athlete_id": str(source_oid)},
+        {"$set": {"merged_into_athlete_id": str(target_oid), "updated_at": now}},
+        session=session,
     )
 
     return {
         "ok": True,
-        "source_athlete_id": source_athlete_id,
-        "target_athlete_id": target_athlete_id,
+        "source_athlete_id": str(source_oid),
+        "target_athlete_id": str(target_oid),
         "moved_results": moved_results_response.modified_count,
     }
 

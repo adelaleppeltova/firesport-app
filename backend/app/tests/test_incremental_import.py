@@ -79,6 +79,9 @@ def test_repeat_race_preserves_manual_assignment_and_quality_flag(import_collect
         assert original["imported_athlete"]["first_name"] == "JAN"
         original.update(athlete=ObjectId(), match_status="matched",
                         match_reason="manual_admin_assignment", quality_flag="suspicious")
+        original["manual_identity_history"] = [{
+            "reason": original["match_reason"], "athlete_id": original["athlete"], "admin_id": "offline-admin",
+        }]
         snapshot = deepcopy(docs)
         decide.reset_mock()
 
@@ -260,3 +263,34 @@ def test_same_name_two_people_with_independent_discriminators():
     row = imp.build_result_row(raw, cat, comp)
     other = imp.build_result_row({**raw, "start_number": 9, "birth_year": 1995}, cat, comp)
     assert imp.assess_result(row, [{**other, "_id": ObjectId()}]) == ("insert", [])
+
+
+def test_external_sidecar_preserves_duplicate_logic_and_source_observation(import_collections):
+    from app.services.external_identity import ExternalIdentitySidecar, payload_digest
+
+    race = _race()
+    sidecar = ExternalIdentitySidecar(
+        payload_sha256=payload_digest(race),
+        categories={0: {0: {"provider": "example.test", "person_id": "17",
+                             "evidence_url": "https://example.test/person/17"}}},
+    )
+    match = AsyncMock(return_value={
+        "match_status": MatchStatus.needs_review, "match_reason": "unverified_external_id", "matched_athlete": None,
+    })
+    with patch.object(data_import, "decide_athlete_match", match):
+        rejected = asyncio.run(data_import.DataImporter().import_from_dict(
+            {**race, "source_file": "https://example.test/races/456"}, external_sidecar=sidecar,
+        ))
+        assert rejected["errors"] and rejected["competitions_created"] == 0
+        stats = asyncio.run(data_import.DataImporter().import_from_dict(race, external_sidecar=sidecar))
+        assert stats["results_created"] == 2 and not stats["errors"]
+        assert match.await_args_list[0].kwargs["external_identity"].key == "example.test:17"
+        assert match.await_args_list[1].kwargs["external_identity"] is None
+        first, second = import_collections["results"].documents.values()
+        assert first["external_identity"]["person_id"] == "17"
+        assert first["imported_athlete"]["fscode"] is None
+        assert "external_identity" not in second
+        match.reset_mock()
+        repeated = asyncio.run(data_import.DataImporter().import_from_dict(race))
+    assert repeated["results_duplicates_skipped"] == 2
+    match.assert_not_awaited()
