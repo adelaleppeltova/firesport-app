@@ -131,8 +131,8 @@ Zpracování ostatních dokumentů pokračuje.
 - Převod používá geometrii tabulek a rozsahy sloupců. Ze samostatných tabulek
   a jednoznačně označených disciplín v přehledech vybírá individuální pokusy,
   výsledný čas a pořadí stovky podle toho, co zdroj skutečně publikuje. Sloupce
-  PHP, bodové součty a celková pořadí vícebojů se nepřenášejí. Přeškrtnutí jednoho
-  pokusu samo nenahrazuje sloupec výsledného času.
+  PHP, bodové součty a celková pořadí vícebojů se nepřenášejí. Odvození času
+  vyžaduje doložené pravidlo podle části Kontrola identity a výsledného času.
 - Týmová část může obsahovat žebříček jednotlivců. Tehdy se zachová zdrojová
   kategorie a přehled ji označí jako týmovou část. Souhrnné pořadí družstev
   nevytváří další individuální výsledky.
@@ -191,3 +191,56 @@ Současný databázový model má jen valid/invalid, číselné startovní čís
 normalizaci kategorií. Tento zdrojový kontrakt navíc uchovává missing,
 invalid_reason a přesné kategorie. Pro jejich bezeztrátové zpřístupnění v aplikaci
 je nutná samostatná změna databázového importu/API; CLI databázi samo neplní.
+
+## Kontrola identity a výsledného času
+
+Převod PDF uloží neúplná a nejednoznačná jména do reportu se zdrojovými buňkami,
+stránkou, tabulkou, číslem řádku a souřadnicemi. Celá dotčená listina čeká na
+ověření v diagnostice. Její `pending.json` obsahuje jen řádky s ověřenými jmény.
+Databázový importér nezávisle zkontroluje jména ve všech kategoriích vstupního
+dokumentu ještě před prvním zápisem nebo párováním. Chyba odmítne celý vstupní
+dokument.
+
+Pro závody, jejichž pravidla a disciplínu 100 m s překážkami lze doložit,
+může ověřovací soubor pro konkrétní SHA-256 obsahovat `best_attempt_rule`
+s citací nebo popisem pravidla. Pro krajské soutěže dorostu byl podkladem
+[SH ČMS, pravidlo 27 odst. 5 a 9](https://mladez.dh.cz/images/Dokumenty/mladez/dorost/smernice-dorost/smernice-dorostu-2022.pdf#page=63).
+Převod zachová zveřejněný čas a označí ho `published`. Nejlepší platný pokus
+doplní jen při chybějícím výsledném čase a doloženém pravidle. Doplněný čas má
+původ `derived_from_attempts`. Rozpor mezi publikovaným výsledkem a pokusy je
+v reportu. Při výslovně neplatném výkonu nebo dvou neplatných pokusech je stav
+`invalid`. Při nedostatku zveřejněných údajů je stav `missing`. V obou
+případech zůstane výsledný čas `null`. Starší soubory bez údaje o původu
+se dál načítají. Skript `fix_final_times.py` vypisuje kontrolu časů jako JSON
+na stdout.
+
+Osobní rekordy, časové průměry, trend a stabilita se počítají pro jednu
+disciplínu. API přijímá volitelný parametr `discipline`. Bez něj dává přednost
+100 m, potom 60 m. Starší výsledky bez disciplíny mohou vstoupit do samostatné
+řady jedné známé kategorie, pokud sportovec nemá disciplínu uvedenou. ML
+odděluje skupiny podle disciplíny a starší výsledky bez disciplíny podle ID
+kategorie. Výslovné stavy `invalid` a `missing` vylučují čas ze statistik
+i tehdy, když starší záznam obsahuje číselnou hodnotu.
+
+### Audit stávajících záznamů v MongoDB
+
+Použijte účet s oprávněním pro čtení a nastavte `AUDIT_MONGO_URL` v prostředí.
+Příkaz načte jen výsledky a odpovídající profily. Vytvoří nový lokální report
+s omezenými právy a ID záznamů, stavem vazeb a počty výsledků navázaných na
+dotčené profily.
+
+```sh
+PYTHONPATH=backend python backend/scripts/audit_result_names.py \
+  --database firesport --output .extraction-diagnostics/result-names-audit.json
+```
+
+1. Podle soutěže, kategorie, startovního čísla nebo pořadí dohledat příslušný
+   zdrojový řádek. Potvrdit jméno i příjmení a identitu doložit nezávisle,
+   například výslovným FSCode. Řádky bez dostatečného podkladu nechat k revizi.
+2. Pro každý potvrzený řádek připravit návrh se stejným ID výsledku a očekávanou
+   současnou hodnotou pole `imported_athlete` a vazby `athlete`. U navázaných
+   profilů předem prověřit ostatní výsledky a účty. Návrh změny vazby posoudit
+   odděleně od opravy přepisu jména.
+3. Před případným schváleným zápisem pořídit cílenou zálohu, porovnat návrh se
+   stavem databáze a při rozporu návrh zastavit. Po schválené opravě zopakovat
+   audit a podle dopadu přepočítat dotčené statistiky a ML výstupy.

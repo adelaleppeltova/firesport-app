@@ -1,36 +1,13 @@
 from __future__ import annotations
 
-import math
 from typing import Iterable, Optional
 
+from app.result_values import valid_final_time
 from app.models.athlete import (
     PerformanceIndicator,
     PerformanceIndicatorTrend,
     RecentResult,
 )
-
-
-def _parse_time(value: object, status: Optional[str]) -> Optional[float]:
-    status_raw = getattr(status, "value", status)
-    status_value = str(status_raw).lower() if status_raw is not None else ""
-    if status_value in {"invalid", "dnf"}:
-        return None
-    if value is None:
-        return None
-    if isinstance(value, str):
-        try:
-            value = float(value.replace(",", "."))
-        except ValueError:
-            return None
-    try:
-        time_value = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(time_value):
-        return None
-    if time_value >= 999:
-        return None
-    return time_value
 
 
 def _median(values: Iterable[float]) -> Optional[float]:
@@ -68,9 +45,7 @@ def calculate_performance_indicator(entries: list[dict]) -> PerformanceIndicator
     # Exclude invalid results (DNF, 999, null) before trend computation.
     valid_entries: list[dict] = []
     for entry in dated_entries:
-        time_value = _parse_time(
-            entry.get("final_time"), entry.get("final_time_status")
-        )
+        time_value = valid_final_time(entry)
         if time_value is None:
             continue
         valid_entries.append(

@@ -212,13 +212,14 @@ export function useAthletePerformanceInYear(athleteId, year) {
 }
 
 // GET /athletes/:id/anomalies
-export function useAthleteAnomalies(athleteId, runId) {
+export function useAthleteAnomalies(athleteId, runId, categoryGroup) {
   return useQuery({
-    queryKey: ["athletes", athleteId, "anomalies", runId ?? null],
+    queryKey: ["athletes", athleteId, "anomalies", runId ?? null, categoryGroup ?? null],
     queryFn: async () => {
-      const params = runId ? `?run_id=${encodeURIComponent(runId)}` : "";
+      const params = { run_id: runId };
+      if (categoryGroup) params.category_group = categoryGroup;
       const { data } = await api.get(
-        `/v1/athletes/${athleteId}/anomalies${params}`,
+        `/v1/athletes/${athleteId}/anomalies`, { params },
       );
       return data;
     },

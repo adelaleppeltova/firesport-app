@@ -156,6 +156,12 @@
                       ],
                       "minimum": 0
                     },
+                    "final_time_source": {
+                      "enum": [
+                        "published",
+                        "derived_from_attempts"
+                      ]
+                    },
                     "final_status": {
                       "enum": [
                         "valid",

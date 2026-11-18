@@ -19,14 +19,20 @@ const formatDate = (dateString) => {
   return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`;
 };
 
-const formatResultTime = (result) =>
-  (result.final_time ? `${result.final_time.toFixed(2)} s` : "") +
-  (result.final_time_status === "valid" ? "" : " NP");
-
 const getResultTimeParts = (result) => ({
-  time: result.final_time ? `${result.final_time.toFixed(2)} s` : null,
-  isInvalid: result.final_time_status !== "valid",
+  time: result.final_time_status === "valid" && result.final_time != null
+    ? `${result.final_time.toFixed(2)} s`
+    : null,
+  isInvalid: result.final_time_status === "invalid",
+  isDerived: result.final_time_status === "valid" &&
+    result.final_time_source === "derived_from_attempts",
 });
+
+const formatResultTime = (result) => {
+  const { time, isInvalid, isDerived } = getResultTimeParts(result);
+  if (isInvalid) return "NP";
+  return isDerived ? `${time} (z pokusů)` : time ?? "—";
+};
 
 const formatSeason = (dateString) => {
   if (!dateString) return "-";
@@ -109,7 +115,9 @@ export default function AthleteDetailPage() {
   if (error || !data)
     return <div className="athlete-detail-page">Chyba při načítání dat.</div>;
 
-  const { athlete, best_time, results } = data;
+  const {
+    athlete, best_time, results, performance_discipline, performance_category_id,
+  } = data;
   const selectedCategory = selectedCategoryId
     ? (availableCategories.find((c) => c.category_id === selectedCategoryId) ??
       null)
@@ -137,9 +145,13 @@ export default function AthleteDetailPage() {
   const lastResult = [...filteredResults].sort(
     (a, b) => getResultDateValue(b) - getResultDateValue(a),
   )[0];
-  const validResults = filteredResults.filter(
-    (result) =>
-      result.final_time_status === "valid" && result.final_time != null,
+  const comparableResults = selectedCategory
+    ? filteredResults
+    : filteredResults.filter((result) => performance_discipline
+      ? result.category?.discipline === performance_discipline
+      : performance_category_id && result.category?._id === performance_category_id);
+  const validResults = comparableResults.filter(
+    (result) => result.final_time_status === "valid" && result.final_time != null,
   );
   const averageValidTime =
     validResults.length > 0
@@ -147,7 +159,7 @@ export default function AthleteDetailPage() {
         validResults.length
       : null;
   const invalidResultsCount = filteredResults.filter(
-    (result) => result.final_time_status !== "valid",
+    (result) => result.final_time_status === "invalid",
   ).length;
   const lastCompetitionLabel = lastResult?.competition?.name
     ? `${lastResult.competition.name} • ${formatDate(lastResult.competition.date)}`
@@ -376,6 +388,9 @@ export default function AthleteDetailPage() {
                       <span className="athlete-detail-table__time-value">
                         {timeParts.time || "—"}
                       </span>
+                      {timeParts.isDerived && (
+                        <span className="athlete-detail-table__status-badge">Z pokusů</span>
+                      )}
                       {timeParts.isInvalid && (
                         <span className="athlete-detail-table__status-badge">NP</span>
                       )}
