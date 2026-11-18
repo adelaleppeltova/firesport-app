@@ -113,6 +113,58 @@ Chybějící metadata se označí null a warnings; neznámé rozložení se neod
 Nový formát se doplňuje v příslušném modulu a musí mít offline regresní fixture.
 CLI samo neprovádí Git operace; agent po úspěšné validaci vytvoří commit a PR.
 
+## Dávka místních krajských PDF s výsledky dorostu
+
+Spouští se z kořene repozitáře s nainstalovanými závislostmi z
+`backend/requirements-extraction.txt`. Vstup může obsahovat další podsložky.
+
+```sh
+PYTHONPATH=backend python -m app.extraction.youth_pdf /cesta/k/pdf \
+  --output data --diagnostics .extraction-diagnostics/youth-pdf --dry-run
+```
+
+Po kontrole spusťte stejný příkaz bez `--dry-run`. Výsledky připravené k uložení
+použijí stávající výsledkové schéma a ukládání do `data/{rok}/{závod}/`.
+Dávka vrací nenulový návratový kód, pokud některý dokument vyžaduje kontrolu.
+Zpracování ostatních dokumentů pokračuje.
+
+- Převod používá geometrii tabulek a rozsahy sloupců. Ze samostatných tabulek
+  a jednoznačně označených disciplín v přehledech vybírá individuální pokusy,
+  výsledný čas a pořadí stovky podle toho, co zdroj skutečně publikuje. Sloupce
+  PHP, bodové součty a celková pořadí vícebojů se nepřenášejí. Přeškrtnutí jednoho
+  pokusu samo nenahrazuje sloupec výsledného času.
+- Týmová část může obsahovat žebříček jednotlivců. Tehdy se zachová zdrojová
+  kategorie a přehled ji označí jako týmovou část. Souhrnné pořadí družstev
+  nevytváří další individuální výsledky.
+- `batch-report.json` odkazuje na report každého PDF. Report obsahuje původní
+  buňky, kategorii, čísla stránky, tabulky a řádku, souřadnice v PDF, případné
+  identifikační předpony a index výsledku v kategorii. Jsou v něm také doklady
+  metadat, normalizované kategorie, vyřazené položky a varování. Číselné předpony
+  bez výslovného označení FSCode zůstávají v reportu.
+- OCR vyžaduje Tesseract s modely `ces` a `eng`. Obrazové stránky a oblasti se
+  renderují na 300 DPI. Diagnostika zahrnuje obraz, TSV, souřadnice, spolehlivost
+  rozpoznaných slov a návrh jejich seskupení do řádků. Poškozený text a sloupce
+  se automaticky neopravují. Kandidáty z ověřitelných částí lze najít v
+  `pending.json` vedle reportu.
+
+Ověřený přepis obrazových oblastí lze opakovat pomocí `--review cesta.json`.
+Kořen tohoto souboru je objekt klíčovaný SHA-256 celého PDF z reportu. Položka
+může obsahovat zdrojem potvrzené `name_order` (`surname-first` nebo
+`given-first`) a objekt `regions`. Klíčem je `key` oblasti OCR z reportu.
+Každá ověřená oblast má `verified: true`, volitelné `metadata_lines` a
+`tables`. Tabulka uvádí `heading`, `category`, `bbox`, `rows` a případně
+`name_order`. Když záhlaví výslovně neuvádí jednotlivce, doplňte původní názvy
+jejich sloupců v `individual_columns`. Řádek má `bbox` v bodech PDF a
+`cells` s publikovanými řetězci `rank`, `bib`, `name`, `team`, `district`,
+`fscode`, `first`, `second` a `final`. Prázdný seznam tabulek potvrzuje
+vizuálně zkontrolovanou oblast bez cílových výsledků. Před potvrzením ověřte
+tituly disciplín, hranice sloupců a všechny řádky proti obrázku. Soubory
+ověření a diagnostiky s osobními údaji ukládejte mimo Git.
+
+Syntetické PDF v `app/tests/test_youth_pdf.py` se sestavují bez sítě.
+Pro integraci s původní 24stránkovou jihočeskou listinou nastavte
+`YOUTH_PDF_JIHOCESKY` na místní cestu k ní.
+
 ## Moduly a ověření
 
 `fetch.py`: HTTP/browser; `html.py`: tabulky, kategorie a audit;

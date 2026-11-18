@@ -5,13 +5,24 @@ import shutil
 import subprocess
 
 
-def recognize(page, directory, page_number):
-    if not shutil.which("tesseract"):
-        raise ValueError("Scanned PDF requires Tesseract with ces language data")
+def recognize(page, directory, page_number, *, clip=None, sparse=False):
     png = directory / f"page-{page_number}.png"
-    page.get_pixmap(dpi=300).save(png)
+    page.get_pixmap(dpi=300, clip=clip).save(png)
+    if not shutil.which("tesseract"):
+        raise ValueError("Scanned PDF requires Tesseract with ces+eng language data")
+    languages = subprocess.run(
+        ["tesseract", "--list-langs"],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=15,
+    )
+    if not {"ces", "eng"} <= set(languages.stdout.splitlines()):
+        raise ValueError("Tesseract requires both the ces and eng language data")
     completed = subprocess.run(
-        ["tesseract", str(png), "stdout", "-l", "ces+eng", "tsv"],
+        ["tesseract", str(png), "stdout", "-l", "ces+eng"]
+        + (["--psm", "11"] if sparse else [])
+        + ["tsv"],
         capture_output=True,
         text=True,
         check=True,
