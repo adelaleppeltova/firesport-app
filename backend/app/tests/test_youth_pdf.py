@@ -494,3 +494,43 @@ def test_damaged_heading_cannot_continue_previous_discipline(text_pdf, tmp_path)
     assert report["errors"]
     assert report["results"] == 1
     assert output["competition"]["categories"][0]["results"][0]["final_time"] == 18.58
+
+
+def test_ambiguous_pdf_name_prevents_publication_and_remains_in_row_report(
+    text_pdf, tmp_path, monkeypatch
+):
+    source = youth_pdf.extract_sections
+
+    def incomplete(*args):
+        sections, carry, lines = source(*args)
+        for section in sections:
+            if section.kind == "hurdles" and section.rows[0].cells["name"].startswith(
+                "55"
+            ):
+                section.rows[0].cells["name"] = "55 - Nováková Jana Anna"
+        return sections, carry, lines
+
+    monkeypatch.setattr(youth_pdf, "extract_sections", incomplete)
+    data_dir, diagnostics = tmp_path / "data", tmp_path / "diagnostics"
+    assert (
+        youth_pdf.main(
+            [
+                str(tmp_path),
+                "--output",
+                str(data_dir),
+                "--diagnostics",
+                str(diagnostics),
+            ]
+        )
+        == 1
+    )
+    assert not data_dir.exists()
+    (report_path,) = diagnostics.glob("*/report.json")
+    report = json.loads(report_path.read_text())
+    row = report["rows"][0]
+    assert row["excluded"] == "unverified_name"
+    assert row["source_name"] == "Nováková Jana Anna"
+    assert row["bbox"][3] > row["bbox"][1] and row["page"] == 1
+    pending = json.loads(report_path.with_name("pending.json").read_text())
+    (admitted,) = pending["competition"]["categories"][0]["results"]
+    assert admitted["last_name"] == "Černá"

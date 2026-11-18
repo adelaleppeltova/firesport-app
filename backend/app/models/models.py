@@ -10,3 +10,5 @@ class AthleteDetailPage(BaseModel):
     athlete: AthleteDetail
     results: List[ResultAthleteDetail]
     best_time: Optional[float] = None
+    performance_discipline: str | None = None
+    performance_category_id: str | None = None

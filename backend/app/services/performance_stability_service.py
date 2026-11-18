@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import math
 from typing import Any, Mapping, Optional, Sequence, TypedDict
+
+from app.result_values import valid_final_time
 
 
 class PerformanceStabilityResult(TypedDict):
@@ -22,42 +23,6 @@ _DEFAULT_RATING = "Velmi kolísavé výkony"
 def _normalize_status(value: object) -> str:
     raw = getattr(value, "value", value)
     return str(raw).strip().lower() if raw is not None else ""
-
-
-def _parse_time(
-    value: object,
-    status: object | None = None,
-    validity: object | None = None,
-) -> Optional[float]:
-    status_value = _normalize_status(status)
-    if status_value in {"invalid", "dnf"}:
-        return None
-
-    if validity is not None:
-        if isinstance(validity, bool):
-            if not validity:
-                return None
-        else:
-            validity_value = _normalize_status(validity)
-            if validity_value in {"invalid", "dnf", "false", "0"}:
-                return None
-
-    if value is None:
-        return None
-    if isinstance(value, str):
-        try:
-            value = float(value.replace(",", "."))
-        except ValueError:
-            return None
-    try:
-        time_value = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(time_value):
-        return None
-    if time_value >= 999:
-        return None
-    return time_value
 
 
 def _order_entries(
@@ -92,11 +57,9 @@ def evaluate_performance_stability(
     ordered = _order_entries(results)
     valid_times: list[float] = []
     for entry in ordered:
-        time_value = _parse_time(
-            entry.get("final_time"),
-            entry.get("final_time_status"),
-            entry.get("validity"),
-        )
+        if _normalize_status(entry.get("validity")) in {"invalid", "missing", "dnf", "false", "0"}:
+            continue
+        time_value = valid_final_time(entry)
         if time_value is None:
             continue
         valid_times.append(time_value)

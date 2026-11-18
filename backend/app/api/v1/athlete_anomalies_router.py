@@ -3,12 +3,15 @@ Athlete anomaly detection endpoints.
 """
 
 import logging
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from bson import ObjectId
 
 from app.db.database import get_db
+from app.ml.anomaly_config import category_performance_group
+from app.result_values import final_result_fields, measured_seconds, valid_final_time
 from app.models.anomaly import (
     AthleteAnomaliesResponse,
     AnomalyRunInfo,
@@ -20,6 +23,35 @@ from app.models.anomaly import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/athletes", tags=["anomalies"])
+
+
+def comparable_scores(scores, results, groups, requested_group=None):
+    """Suppress stored runs fitted across different disciplines or missing source rows."""
+    fitted_groups = defaultdict(set)
+    stale_groups = set()
+    normalized = []
+    for score in scores:
+        result_id = score.get("result_id")
+        group = groups.get(result_id)
+        stored_group = score.get("category_group")
+        fitted_groups[stored_group].add(group)
+        time = valid_final_time(results.get(result_id, {}))
+        if group is None or time is None or time != measured_seconds(score.get("final_time")):
+            stale_groups.add(stored_group)
+            continue
+        normalized.append((stored_group, {**score, "category_group": group, "final_time": time}))
+
+    compatible = [
+        score for stored_group, score in normalized
+        if stored_group not in stale_groups and fitted_groups[stored_group] == {score["category_group"]}
+    ]
+    if requested_group is None:
+        return compatible, None
+    aliases = fitted_groups.get(requested_group, set())
+    exact_exists = requested_group in groups.values()
+    target = next(iter(aliases)) if not exact_exists and len(aliases) == 1 else requested_group
+    target = target or requested_group
+    return [score for score in compatible if score["category_group"] == target], target
 
 
 # ------------------------------------------------------------------
@@ -154,8 +186,6 @@ async def get_athlete_anomalies(
         "run_id": resolved_run_id,
         "athlete_id": athlete_oid,
     }
-    if category_group is not None:
-        score_filter["category_group"] = category_group
 
     cursor = db["anomaly_scores"].find(
         score_filter,
@@ -174,56 +204,53 @@ async def get_athlete_anomalies(
 
     score_docs = await cursor.to_list(None)
 
-    # Derive per-athlete stats from scores when not available on summary
-    n_anomalies = summary.get("n_anomalies", sum(1 for s in score_docs if s.get("is_anomaly")))
-    median_time = summary.get("median_time")
-    if median_time is None and score_docs:
-        median_time = score_docs[0].get("median_time")
-
-    # Count valid and invalid results directly from the results collection
-    n_valid = 0
-    n_invalid = 0
-    window_start = window.get("start_date")
-    window_end = window.get("end_date")
+    window_start, window_end = window.get("start_date"), window.get("end_date")
+    scope = {"athlete": athlete_oid}
+    result_ids = [score["result_id"] for score in score_docs if score.get("result_id")]
     if window_start and window_end:
-        n_valid = await db["results"].count_documents(
-            {
-                "athlete": athlete_oid,
-                "final_time_status": "valid",
-                "date": {"$gte": window_start, "$lte": window_end},
-            }
-        )
-        n_invalid = await db["results"].count_documents(
-            {
-                "athlete": athlete_oid,
-                "final_time_status": {"$ne": "valid"},
-                "date": {"$gte": window_start, "$lte": window_end},
-            }
-        )
+        scope["$or"] = [
+            {"date": {"$gte": window_start, "$lte": window_end}},
+            {"_id": {"$in": result_ids}},
+        ]
     else:
-        # Fallback when window dates are not available
-        n_valid = summary.get("n_valid_results_in_window", len(score_docs))
+        scope["_id"] = {"$in": result_ids}
+    rows = await db["results"].find(scope, projection={
+        "category": 1, "competition": 1, "quality_flag": 1, "date": 1,
+        "final_time": 1, "final_time_status": 1,
+    }).to_list(None)
+    result_by_id = {row["_id"]: row for row in rows}
+    category_ids = list({row["category"] for row in rows if row.get("category")})
+    categories = {
+        cat["_id"]: cat for cat in await db["categories"].find(
+            {"_id": {"$in": category_ids}}, projection={"name": 1, "discipline": 1}
+        ).to_list(None)
+    } if category_ids else {}
+    groups = {
+        row["_id"]: category_performance_group(categories[row["category"]])
+        for row in rows if row.get("category") in categories
+    }
+    score_docs, selected_group = comparable_scores(score_docs, result_by_id, groups, category_group)
+    n_anomalies = sum(1 for score in score_docs if score.get("is_anomaly"))
+    medians = {measured_seconds(score.get("median_time")) for score in score_docs}
+    scored_groups = {score["category_group"] for score in score_docs}
+    median_time = next(iter(medians)) if len(scored_groups) == len(medians) == 1 else None
 
+    counted = [
+        row for row in rows if selected_group is None or groups.get(row["_id"]) == selected_group
+    ]
+    if window_start and window_end:
+        def timestamp(when):
+            return (when if when.tzinfo else when.replace(tzinfo=timezone.utc)).timestamp()
+        start, end = timestamp(window_start), timestamp(window_end)
+        counted = [
+            row for row in counted if isinstance(row.get("date"), datetime)
+            and start <= timestamp(row["date"]) <= end
+        ]
+    statuses = Counter(final_result_fields(row)["final_time_status"] for row in counted)
+    disciplines = {categories.get(row.get("category"), {}).get("discipline") for row in counted}
+    discipline_val = next(iter(disciplines)) if len(disciplines) == 1 else None
     model_doc = run.get("model") or {}
     model_params = model_doc.get("params") or {}
-
-    # Resolve discipline from the athlete's categories within the window
-    discipline_val: Optional[str] = None
-    if window_start and window_end:
-        cat_ids = await db["results"].distinct(
-            "category",
-            {
-                "athlete": athlete_oid,
-                "date": {"$gte": window_start, "$lte": window_end},
-            },
-        )
-        if cat_ids:
-            cat_doc = await db["categories"].find_one(
-                {"_id": {"$in": cat_ids}, "discipline": {"$exists": True, "$ne": None}},
-                projection={"discipline": 1},
-            )
-            if cat_doc:
-                discipline_val = cat_doc.get("discipline")
 
     contamination_mode: Optional[str] = (
         score_docs[0].get("contamination_mode")
@@ -236,8 +263,9 @@ async def get_athlete_anomalies(
         created_at=run["created_at"],
         window_start=window.get("start_date"),
         window_end=window.get("end_date"),
-        n_valid_results_in_window=n_valid,
-        n_invalid_results_in_window=n_invalid,
+        n_valid_results_in_window=statuses["valid"],
+        n_invalid_results_in_window=statuses["invalid"],
+        n_missing_results_in_window=statuses["missing"],
         n_anomalies=n_anomalies,
         median_time=median_time,
         status=AnomalyRunStatus(run.get("status", "success")),
@@ -260,31 +288,13 @@ async def get_athlete_anomalies(
             items=[],
         )
 
-    # Enrich with competition name/place and quality_flag via result_id join
-    result_ids = [doc["result_id"] for doc in score_docs if doc.get("result_id")]
-    results_map: dict = {}
-    if result_ids:
-        results_cursor = db["results"].find(
-            {"_id": {"$in": result_ids}},
-            projection={"_id": 1, "competition": 1, "quality_flag": 1},
-        )
-        results_docs = await results_cursor.to_list(None)
-        comp_ids = list({r["competition"] for r in results_docs if r.get("competition")})
-        competitions_map: dict = {}
-        if comp_ids:
-            comps_cursor = db["competitions"].find(
-                {"_id": {"$in": comp_ids}},
-                projection={"_id": 1, "name": 1, "place": 1},
-            )
-            comps = await comps_cursor.to_list(None)
-            competitions_map = {c["_id"]: c for c in comps}
-        for r in results_docs:
-            comp = competitions_map.get(r.get("competition"))
-            results_map[r["_id"]] = {
-                "name": comp.get("name") if comp else None,
-                "place": comp.get("place") if comp else None,
-                "quality_flag": r.get("quality_flag", "ok"),
-            }
+    selected_rows = [result_by_id[score["result_id"]] for score in score_docs]
+    comp_ids = list({row["competition"] for row in selected_rows if row.get("competition")})
+    competitions = {
+        comp["_id"]: comp for comp in await db["competitions"].find(
+            {"_id": {"$in": comp_ids}}, projection={"name": 1, "place": 1}
+        ).to_list(None)
+    } if comp_ids else {}
 
     # Build AnomalyItem list
     items = []
@@ -304,6 +314,8 @@ async def get_athlete_anomalies(
         except (ValueError, KeyError):
             direction = AnomalyDirection.none
 
+        source = result_by_id[result_id]
+        competition = competitions.get(source.get("competition"), {})
         items.append(
             AnomalyItem(
                 result_id=str(result_id),
@@ -312,9 +324,9 @@ async def get_athlete_anomalies(
                 score=score,
                 is_anomaly=is_anomaly,
                 direction=direction,
-                competition_name=results_map.get(result_id, {}).get("name"),
-                competition_place=results_map.get(result_id, {}).get("place"),
-                quality_flag=results_map.get(result_id, {}).get("quality_flag", "ok"),
+                competition_name=competition.get("name"),
+                competition_place=competition.get("place"),
+                quality_flag=source.get("quality_flag", "ok"),
                 category_group=item.get("category_group"),
             )
         )

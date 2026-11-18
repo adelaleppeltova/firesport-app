@@ -69,6 +69,16 @@ def get_category_group(category_name: str) -> str:
     return CATEGORY_GROUP_MAP.get(normalized, normalized)
 
 
+
+def category_performance_group(category: dict) -> str:
+    """Keep comparisons within the same discipline, including unknown legacy categories."""
+    discipline = category.get("discipline")
+    if not discipline:
+        return f"legacy:{category['_id']}"
+    group = get_category_group(category.get("name") or str(category["_id"]))
+    return group if discipline == "100m" else f"{discipline}:{group}"
+
+
 class AnomalyConfig(BaseModel):
     """Immutable configuration for one anomaly-detection run.
 

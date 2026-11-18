@@ -3,6 +3,8 @@ import math
 from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
 
+from app.result_values import best_valid_attempt, measured_seconds
+
 SCHEMA_PATH = Path(__file__).with_name("results.schema.json")
 
 
@@ -39,12 +41,24 @@ def validate(document, audit=None):
                     raise ValueError("Missing attempt must have null time")
             if row["final_status"] != "valid" and row["final_time"] is not None:
                 raise ValueError("Nonvalid final must have null time")
-            if row["final_status"] == "valid" and (
-                row["final_time"] is None
-                or not math.isfinite(row["final_time"])
-                or row["final_time"] in (998, 999, 999.99, 999990)
+            if (
+                row["final_status"] == "valid"
+                and measured_seconds(row["final_time"]) is None
             ):
                 raise ValueError("Valid final requires measured time")
+            source = row.get("final_time_source")
+            if source and row["final_status"] != "valid":
+                raise ValueError("Final time provenance requires a valid final time")
+            if source == "derived_from_attempts":
+                best = best_valid_attempt(row["times"])
+                if (
+                    category["discipline"] != "100m"
+                    or best is None
+                    or row["final_time"] != best
+                ):
+                    raise ValueError(
+                        "Derived final must match the best valid 100 m attempt"
+                    )
     if audit is not None:
         categories = document["competition"]["categories"]
         if len(audit) != len(categories):

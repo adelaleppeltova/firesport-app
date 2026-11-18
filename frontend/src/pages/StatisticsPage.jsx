@@ -216,7 +216,8 @@ function SummaryCard({ run }) {
   const nAnomalies = run.n_anomalies;
   const nValid = run.n_valid_results_in_window ?? 0;
   const nInvalid = run.n_invalid_results_in_window ?? 0;
-  const nTotal = nValid + nInvalid;
+  const nMissing = run.n_missing_results_in_window ?? 0;
+  const nTotal = nValid + nInvalid + nMissing;
   const anomalyShare =
     nValid > 0 ? Math.round((nAnomalies / nValid) * 100) : null;
   const periodShort = `${formatMonthYearShort(run.window_start)}–${formatMonthYearShort(run.window_end)}`;
@@ -248,8 +249,12 @@ function SummaryCard({ run }) {
               <span className="anomaly-summary__value">{nValid}</span>
             </div>
             <div className="anomaly-summary__item anomaly-summary__item--compact">
-              <span className="anomaly-summary__label">Vyřazené výsledky</span>
+              <span className="anomaly-summary__label">Neplatné výsledky</span>
               <span className="anomaly-summary__value">{nInvalid}</span>
+            </div>
+            <div className="anomaly-summary__item anomaly-summary__item--compact">
+              <span className="anomaly-summary__label">Chybějící časy</span>
+              <span className="anomaly-summary__value">{nMissing}</span>
             </div>
             <div className="anomaly-summary__item anomaly-summary__item--compact">
               <span className="anomaly-summary__label">Výsledky celkem</span>
@@ -857,6 +862,12 @@ export default function StatisticsPage() {
   });
 
   const { data: selectedAthleteDetail } = useAthleteDetail(selectedAthleteId);
+  const legacyCategoryNames = Object.fromEntries(
+    (selectedAthleteDetail?.results ?? [])
+      .map((result) => result.category)
+      .filter((category) => category?._id && category.name)
+      .map((category) => [category._id, category.name]),
+  );
 
   const handleSelectAthlete = (athleteId) => {
     const next = new URLSearchParams(searchParams);
@@ -872,6 +883,7 @@ export default function StatisticsPage() {
   const { data, isLoading, isError } = useAthleteAnomalies(
     selectedAthleteId,
     selectedRunId,
+    selectedCategoryGroup,
   );
 
   const run = data?.run ?? null;
@@ -927,6 +939,7 @@ export default function StatisticsPage() {
           ) : availableCategoryGroups.length > 0 ? (
             <CategoryGroupSelect
               groups={availableCategoryGroups}
+              legacyCategoryNames={legacyCategoryNames}
               value={selectedCategoryGroup}
               onChange={(value) => {
                 setSelectedCategoryGroup(value);

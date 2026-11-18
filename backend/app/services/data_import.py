@@ -17,6 +17,7 @@ from pymongo.errors import DuplicateKeyError
 from app.db.database import db
 from app.models.admin import ImportStats
 from app.models.result import MatchStatus
+from app.result_values import attempt_result_fields, best_valid_attempt, final_result_fields, invalid_name_fields
 from app.services.athlete_identity import normalize_fs_code
 from app.services.quality_flag_service import compute_bounds_for_recompute, compute_quality_flag
 from app.services.result_matching import (
@@ -164,6 +165,10 @@ class DataImporter:
 
             # Import soutěže
             competition_data = data.get("competition", {})
+            problems = self.preflight_results(competition_data)
+            if problems:
+                self.stats["errors"].extend(problems)
+                return self.stats
             source = urlsplit(data.get("source_file") or "")
             source_url = source._replace(fragment="").geturl() if source.scheme in ("http", "https") and source.netloc else None
             competition_id = await self._import_competition(competition_data, source_url=source_url)
@@ -182,6 +187,26 @@ class DataImporter:
             self.stats["errors"].append(str(e))
             return self.stats
 
+
+    @staticmethod
+    def preflight_results(competition: dict) -> list[str]:
+        """Check the entire input document before any matching or database access."""
+        problems = []
+        for category_number, category in enumerate(competition.get("categories", []), 1):
+            for row_number, row in enumerate(category.get("results", []), 1):
+                context = f"Kategorie {category_number} ({category.get('name')}), řádek {row_number}"
+                if invalid := invalid_name_fields(row):
+                    problems.append(f"{context}: neplatné jméno ({', '.join(invalid)}).")
+                    continue
+                if row.get("final_time_source") is not None:
+                    final = final_result_fields(row, status_key="final_status")
+                    if final["final_time_source"] is None:
+                        problems.append(f"{context}: neplatný původ výsledného času.")
+                    elif final["final_time_source"] == "derived_from_attempts":
+                        best = best_valid_attempt(row.get("times", []))
+                        if category.get("discipline") != "100m" or best != final["final_time"]:
+                            problems.append(f"{context}: odvozený čas nesouhlasí s platnými pokusy na 100 m.")
+        return problems
 
     async def _import_competition(
         self, comp_data: Dict[str, Any], *, source_url: Optional[str] = None
@@ -309,6 +334,8 @@ class DataImporter:
     ) -> None:
         """Importuje nový řádek a existující výkon ponechá beze změny."""
         try:
+            if invalid := invalid_name_fields(result_data):
+                raise ValueError(f"Neplatné jméno ({', '.join(invalid)}).")
             imported_team = result_data.get("team")
             raw_team = (imported_team or "").replace("SDH", "").strip()
             team = self._normalize_team_name(raw_team) if raw_team else None
@@ -323,19 +350,19 @@ class DataImporter:
                 "district": result_data.get("district"),
                 "imported_athlete": imported_athlete,
                 "start_number": start_number,
-                "final_time": result_data.get("final_time"),
-                "final_time_status": result_data.get("final_status", "invalid"),
+                **final_result_fields(result_data, status_key="final_status"),
                 "rank": result_data.get("rank"),
                 "times": [
                     {
                         "attempt": attempt.get("try"),
-                        "time": attempt.get("time"),
-                        "status": attempt.get("status", "invalid"),
+                        **attempt_result_fields(attempt),
                         **({"invalid_reason": attempt["invalid_reason"]} if attempt.get("invalid_reason") else {}),
                     }
                     for attempt in result_data.get("times", [])
                 ],
             }
+            if row["final_time_source"] is None:
+                del row["final_time_source"]
             if await self._existing_result(row):
                 return
 
@@ -384,6 +411,8 @@ class DataImporter:
         start_number = DataImporter._parse_start_number(row.get("start_number"))
         # Compare the representation written by both the old and new importer.
         team = re.sub(r"\bSDH\b", "", row.get("team") or "", flags=re.IGNORECASE)
+        final = final_result_fields(row)
+        times = [(attempt.get("attempt"), attempt_result_fields(attempt)) for attempt in row.get("times") or []]
         return {
             "competition": row["competition"],
             "category": row["category"],
@@ -396,13 +425,9 @@ class DataImporter:
             "fscode": normalize_fs_code(athlete.get("fscode")),
             "start_number": str(start_number) if start_number is not None else None,
             "rank": row.get("rank"),
-            "final_time": float(row["final_time"]) if row.get("final_time") is not None else None,
-            "final_time_status": row.get("final_time_status"),
-            "times": [
-                (attempt.get("attempt"), float(attempt["time"]) if attempt.get("time") is not None else None,
-                 attempt.get("status"))
-                for attempt in row.get("times") or []
-            ],
+            "final_time": final["final_time"],
+            "final_time_status": final["final_time_status"],
+            "times": [(number, value["time"], value["status"]) for number, value in times],
         }
 
     async def _existing_result(self, row: dict) -> bool:

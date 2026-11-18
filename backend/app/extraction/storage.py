@@ -56,24 +56,34 @@ def save(document, output, audit):
                 "Import would remove existing results/categories; review source corrections manually"
             )
 
-        def identities(category):
-            result = set()
-            for row in category["results"]:
-                if row["start_number"] is not None:
-                    result.add(("bib", row["start_number"]))
-                elif row["fscode"] is not None:
-                    result.add(("fscode", row["fscode"]))
-                else:
-                    result.add(
-                        ("name", row["first_name"], row["last_name"], row["rank"])
-                    )
-            return result
+        def identity(row):
+            if row["start_number"] is not None:
+                return ("bib", row["start_number"])
+            if row["fscode"] is not None:
+                return ("fscode", row["fscode"])
+            return ("name", row["first_name"], row["last_name"], row["rank"])
 
         current = {c["name"]: c for c in document["competition"]["categories"]}
         for category in previous["competition"]["categories"]:
-            if identities(category) - identities(current[category["name"]]):
+            existing_keys = {identity(row) for row in category["results"]}
+            new_rows = current[category["name"]]["results"]
+            if existing_keys - {identity(row) for row in new_rows}:
                 raise ValueError(
                     "Import would remove existing participant identities; review source corrections manually"
+                )
+            published = {
+                identity(row)
+                for row in category["results"]
+                if row.get("final_time") is not None
+                and row.get("final_time_source") != "derived_from_attempts"
+            }
+            if any(
+                row.get("final_time_source") == "derived_from_attempts"
+                and identity(row) in published
+                for row in new_rows
+            ):
+                raise ValueError(
+                    "Import would replace a published final time with a derived one"
                 )
         for category in previous["competition"]["categories"]:
             replacement = current[category["name"]]

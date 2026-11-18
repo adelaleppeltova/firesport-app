@@ -1,7 +1,8 @@
 from pydantic import BaseModel, Field, ConfigDict, model_validator
-from typing import Optional, List
+from typing import Literal, Optional, List
 from enum import Enum
 
+from app.result_values import attempt_result_fields
 from app.services.athlete_identity import normalize_athlete_identity
 
 
@@ -45,6 +46,9 @@ class AthleteBase(BaseModel):
             return data
 
         normalized = dict(data)
+        for field in ("first_name", "last_name"):
+            if normalized.get(field) is None:
+                normalized[field] = ""
         (
             normalized["fs_codes"],
             normalized["teams"],
@@ -135,16 +139,25 @@ class PerformanceByYear(BaseModel):
 class TimeAttemptOut(BaseModel):
     attempt: Optional[int] = None
     time: Optional[float] = None
-    status: str = "invalid"
+    status: Literal["valid", "invalid", "missing"] = "missing"
+    invalid_reason: Optional[str] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_attempt(cls, data):
+        return {**data, **attempt_result_fields(data)} if isinstance(data, dict) else data
+
 
 class RaceInYear(BaseModel):
     competition_id: Optional[str] = None
     competition_name: Optional[str] = None
     competition_place: Optional[str] = None
     category: Optional[str] = None
+    discipline: Optional[str] = None
     date: Optional[str] = None  # YYYY-MM-DD
     final_time: Optional[float] = None
     final_time_status: Optional[str] = None
+    final_time_source: Optional[Literal["published", "derived_from_attempts"]] = None
     rank: Optional[int] = None
     times: List[TimeAttemptOut] = Field(default_factory=list)
 

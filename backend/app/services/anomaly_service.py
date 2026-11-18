@@ -21,7 +21,8 @@ from app.models.anomaly import (
     SkipReasonCounts,
     WindowRecomputeSummary,
 )
-from app.ml.anomaly_config import AnomalyConfig, DEFAULT_CONFIG, get_category_group
+from app.result_values import VALID_FINAL_QUERY, valid_final_time
+from app.ml.anomaly_config import AnomalyConfig, DEFAULT_CONFIG, category_performance_group
 from app.ml.isolation_forest import compute_iforest_anomalies
 from app.services.windows import (
     window_for_anchor,
@@ -324,18 +325,16 @@ async def recompute_for_window(
 
         # 3) Načti mapu kategorie_id → skupina (jedno DB volání před smyčkou)
         category_group_map: Dict[str, str] = {}
-        async for cat_doc in db["categories"].find({}, projection={"_id": 1, "name": 1}):
-            cat_name = cat_doc.get("name") or ""
-            category_group_map[str(cat_doc["_id"])] = get_category_group(cat_name)
+        async for cat_doc in db["categories"].find({}, projection={"_id": 1, "name": 1, "discipline": 1}):
+            category_group_map[str(cat_doc["_id"])] = category_performance_group(cat_doc)
 
         # 4) Load all valid results in window (one DB round-trip)
         raw_results = await db["results"].find(
             {
-                "final_time_status": "valid",
-                "final_time": {"$ne": None},
+                **VALID_FINAL_QUERY,
                 "date": {"$gte": window_start, "$lte": window_end},
             },
-            projection={"_id": 1, "athlete": 1, "category": 1, "final_time": 1, "date": 1},
+            projection={"_id": 1, "athlete": 1, "category": 1, "final_time": 1, "final_time_status": 1, "date": 1},
         ).sort("date", 1).to_list(None)
 
         # 5) Group by (athlete_id, category_group)
@@ -343,11 +342,13 @@ async def recompute_for_window(
         #    nesrovnatelné kategorie jsou izolovány vlastní skupinou.
         athlete_group_results: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
         for r in raw_results:
-            aid = str(r["athlete"])
-            cat_oid = r.get("category")
-            cg = category_group_map.get(str(cat_oid), str(cat_oid)) if cat_oid is not None else "unknown"
-            key = (aid, cg)
-            athlete_group_results.setdefault(key, []).append(r)
+            time = valid_final_time(r)
+            athlete, category = r.get("athlete"), r.get("category")
+            cg = category_group_map.get(str(category))
+            if time is None or athlete is None or cg is None:
+                continue
+            key = (str(athlete), cg)
+            athlete_group_results.setdefault(key, []).append({**r, "final_time": time})
 
         all_score_docs: List[Dict[str, Any]] = []
 

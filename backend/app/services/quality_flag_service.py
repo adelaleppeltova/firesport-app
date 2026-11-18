@@ -17,6 +17,7 @@ import numpy as np
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.result_values import VALID_FINAL_QUERY, valid_final_time, valid_seconds
 from app.models.result import QualityFlag
 
 logger = logging.getLogger(__name__)
@@ -51,14 +52,13 @@ async def _load_valid_times_for_category(
     """Načte valid final_time hodnoty z DB pro danou kategorii."""
     cursor = db["results"].find(
         {
-            "final_time_status": "valid",
-            "final_time": {"$ne": None},
+            **VALID_FINAL_QUERY,
             "category": category_id,
         },
-        projection={"final_time": 1, "_id": 0},
+        projection={"final_time": 1, "final_time_status": 1, "_id": 0},
     )
     docs = await cursor.to_list(None)
-    return [d["final_time"] for d in docs if d.get("final_time") is not None]
+    return [time for d in docs if (time := valid_final_time(d)) is not None]
 
 
 async def _load_athlete_history(
@@ -71,20 +71,21 @@ async def _load_athlete_history(
     query: dict = {
         "athlete": athlete_id,
         "category": category_id,
-        "final_time_status": "valid",
-        "final_time": {"$ne": None},
+        **VALID_FINAL_QUERY,
     }
     if before_date is not None:
         query["date"] = {"$lt": before_date}
 
-    cursor = (
-        db["results"]
-        .find(query, projection={"final_time": 1, "_id": 0})
-        .sort("date", -1)
-        .limit(_MIN_HISTORY)
-    )
-    docs = await cursor.to_list(_MIN_HISTORY)
-    return [d["final_time"] for d in docs if d.get("final_time") is not None]
+    cursor = db["results"].find(
+        query, projection={"final_time": 1, "final_time_status": 1, "_id": 0}
+    ).sort("date", -1)
+    times = []
+    async for row in cursor:
+        if (time := valid_final_time(row)) is not None:
+            times.append(time)
+            if len(times) == _MIN_HISTORY:
+                break
+    return times
 
 
 def determine_quality_flag(
@@ -107,11 +108,7 @@ def determine_quality_flag(
     history_times:
         Časy posledních max. 5 validních výsledků sportovce ve stejné kategorii.
     """
-    # Status invalid → quality_flag neřešíme
-    if final_time_status != "valid":
-        return QualityFlag.ok
-
-    # Null čas → quality_flag neřešíme
+    time_seconds = valid_seconds(time_seconds, final_time_status)
     if time_seconds is None:
         return QualityFlag.ok
 
@@ -159,10 +156,8 @@ async def compute_quality_flag(
         Pokud None nebo category_id v cache chybí, spočítá se z DB a výsledek
         se do cache uloží (je-li cache dict).
     """
-    final_time: Optional[float] = result_doc.get("final_time")
-    final_time_status: str = result_doc.get("final_time_status", "invalid")
-
-    if final_time_status != "valid" or final_time is None:
+    final_time = valid_final_time(result_doc)
+    if final_time is None:
         return QualityFlag.ok
 
     # Zjistění category_id – povinné pro per-category výpočet
@@ -193,7 +188,7 @@ async def compute_quality_flag(
         )
 
     return determine_quality_flag(
-        final_time, final_time_status, low, high, history_times
+        final_time, "valid", low, high, history_times
     )
 
 
@@ -205,10 +200,9 @@ async def compute_bounds_for_recompute(
     Pro každou kategorii, která má alespoň jeden valid výsledek, spočítá
     percentilové hranice. Kategorie bez dat dostanou fallback (11.0, 45.0).
     """
-    # Distinct category_id z valid výsledků
     category_ids: list[ObjectId] = await db["results"].distinct(
         "category",
-        {"final_time_status": "valid", "final_time": {"$ne": None}},
+        VALID_FINAL_QUERY,
     )
 
     bounds: dict[ObjectId, tuple[float, float]] = {}

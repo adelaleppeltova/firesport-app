@@ -14,6 +14,8 @@ from pdfminer.pdfparser import PDFSyntaxError
 import pdfplumber
 import pymupdf
 
+from app.result_values import best_valid_attempt, invalid_name_fields
+
 from .metadata import norm, parse_date
 from .ocr import recognize
 from .participants import fscode, integer, split_name
@@ -173,9 +175,9 @@ def result_time(raw, warnings, context, *, attempt=None):
     return result
 
 
-def parse_result(source, location, warnings):
+def parse_result(source, location, warnings, *, best_attempt_rule=None):
     cells = source.cells
-    raw_name = cells.get("name", "")
+    raw_name = cells.get("name") or ""
     prefix = re.fullmatch(r"(\d+)\s*[-–—\u00ad]\s*(.+)", raw_name)
     if prefix:
         raw_name = prefix[2]
@@ -189,7 +191,7 @@ def parse_result(source, location, warnings):
         ):
             return None, "empty_slot"
         warnings.append(f"{context}: chybí skutečné jméno závodníka")
-        return None, "unresolved"
+        return None, "unverified_name"
     location["source_name"] = raw_name
 
     if cells.get("name_overflow"):
@@ -215,10 +217,48 @@ def parse_result(source, location, warnings):
         }
         for number, key in enumerate(("first", "second"), 1)
     ]
-    final = result_time(cells.get("final"), warnings, context)
-    measured = [a["time"] for a in attempts if a["status"] == "valid"]
-    if measured and final["status"] == "valid" and final["time"] != min(measured):
-        warnings.append(f"{context}: zveřejněný výsledný čas se liší od minima pokusů")
+    raw_final = cells.get("final")
+    final = result_time(raw_final if raw_final else None, warnings, context)
+    best = best_valid_attempt(attempts)
+    provenance = None
+    if final["status"] == "valid":
+        provenance = "published"
+        if best is not None and final["time"] != best:
+            warnings.append(
+                f"{context}: zveřejněný výsledný čas se liší od minima pokusů"
+            )
+            location["final_time_conflict"] = {
+                "published": final["time"],
+                "best_attempt": best,
+            }
+    elif final["status"] == "invalid":
+        location["final_time_reason"] = "published_invalid"
+        if best is not None:
+            warnings.append(
+                f"{context}: neplatný výsledný výkon má zveřejněný platný pokus"
+            )
+            location["final_time_conflict"] = {
+                "published_status": "invalid",
+                "best_attempt": best,
+            }
+    elif best is not None and best_attempt_rule:
+        final = {"time": best, "status": "valid"}
+        provenance = "derived_from_attempts"
+        location["final_time_rule"] = best_attempt_rule
+    elif best is not None:
+        location["final_time_reason"] = "best_attempt_rule_unverified"
+    elif all(attempt["status"] == "invalid" for attempt in attempts):
+        final["status"] = "invalid"
+        location["final_time_reason"] = "all_attempts_invalid"
+    else:
+        location["final_time_reason"] = "insufficient_published_attempts"
+
+    location["final_time"] = final["time"]
+    location["final_time_status"] = final["status"]
+    location["final_time_source"] = provenance
+    if invalid_name_fields({"first_name": first, "last_name": last}):
+        warnings.append(f"{context}: jméno nebo příjmení nelze ověřit: {raw_name!r}")
+        return None, "unverified_name"
     rank = integer(cells.get("rank"))
     if cells.get("rank") and not rank:
         warnings.append(f"{context}: neznámý formát pořadí {cells['rank']!r}")
@@ -238,12 +278,20 @@ def parse_result(source, location, warnings):
         "times": attempts,
         "final_time": final["time"],
         "final_status": final["status"],
+        **({"final_time_source": provenance} if provenance else {}),
     }, None
 
 
 def convert(path, diagnostics, review=None):
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     entry = (review or {}).get(digest, {})
+    best_attempt_rule = entry.get("best_attempt_rule")
+    if best_attempt_rule is not None and (
+        not isinstance(best_attempt_rule, str) or not best_attempt_rule.strip()
+    ):
+        raise ValueError(
+            "Pravidlo nejlepšího pokusu musí obsahovat odkaz nebo popis podkladu."
+        )
     name_order = entry.get("name_order")
     if name_order not in {"surname-first", "given-first", None}:
         raise ValueError("Neplatné ověřené pořadí jména.")
@@ -403,7 +451,9 @@ def convert(path, diagnostics, review=None):
                     warning_start = len(warnings)
                     if row.surname_first is None and name_order:
                         row.surname_first = name_order == "surname-first"
-                    parsed, reason = parse_result(row, loc, warnings)
+                    parsed, reason = parse_result(
+                        row, loc, warnings, best_attempt_rule=best_attempt_rule
+                    )
                     if any(
                         "unrecognized time" in warning or "invalid seconds" in warning
                         for warning in warnings[warning_start:]
@@ -416,9 +466,9 @@ def convert(path, diagnostics, review=None):
                     if reason:
                         loc["excluded"] = reason
                         excluded[reason] += 1
-                        if reason == "unresolved":
+                        if reason in {"unresolved", "unverified_name"}:
                             issues.append(
-                                f"Strana {page_number}, tabulka {table_number}, řádek {row_number}: chybí účastník."
+                                f"Strana {page_number}, tabulka {table_number}, řádek {row_number}: jméno účastníka vyžaduje ověření."
                             )
                         continue
                     current = categories.setdefault(row.category, [])
@@ -437,7 +487,7 @@ def convert(path, diagnostics, review=None):
             f"Datum v PDF ({info['date']}) se liší od roku složky ({folder_year})."
         )
     if report["rows"] and any(
-        loc.get("result_index") is not None and "final" not in loc["source_cells"]
+        loc.get("final_time_reason") == "best_attempt_rule_unverified"
         for loc in report["rows"]
     ):
         warnings.append(
@@ -458,13 +508,29 @@ def convert(path, diagnostics, review=None):
     report["hurdles_source_rows"] = source_rows
     accounted = count + sum(
         excluded[key]
-        for key in ("placeholder", "empty_slot", "duplicate_extraction", "unresolved")
+        for key in (
+            "placeholder",
+            "empty_slot",
+            "duplicate_extraction",
+            "unresolved",
+            "unverified_name",
+        )
     )
     if accounted != source_rows:
         issues.append(
             f"Zdrojových řádků {source_rows}, přiřazených nebo vyřazených {accounted}."
         )
     report["excluded"] = {reason: n for reason, n in excluded.items() if n}
+    report["final_times"] = dict(
+        Counter(
+            loc["final_time_source"] or loc["final_time_reason"]
+            for loc in report["rows"]
+            if "final_time_status" in loc
+        )
+    )
+    report["final_time_conflicts"] = sum(
+        "final_time_conflict" in loc for loc in report["rows"]
+    )
     if not categories:
         issues.append("Nebyla ověřena žádná individuální tabulka stovky.")
         return None, None, report
@@ -490,6 +556,11 @@ def convert(path, diagnostics, review=None):
         [
             f"Provenience řádků (index od 0 v rámci kategorie): {source_id(report['source'])}/report.json.",
             "Převedeny individuální výsledky běhu na 100 m s překážkami.",
+            *(
+                [f"Pravidlo nejlepšího platného pokusu: {best_attempt_rule}"]
+                if best_attempt_rule
+                else []
+            ),
         ],
         warnings,
     )
@@ -576,6 +647,8 @@ def main(argv=None):
                 "source": uri,
                 "results": report["results"],
                 "excluded": report.get("excluded", {}),
+                "final_times": report.get("final_times", {}),
+                "final_time_conflicts": report.get("final_time_conflicts", 0),
                 "ocr_pages": [p["page"] for p in report.get("pages", []) if p["ocr"]],
                 "errors": report["errors"],
                 "report": str(report_path),
