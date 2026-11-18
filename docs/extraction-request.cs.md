@@ -807,7 +807,13 @@ Nikdy automaticky nepočítej:
 
 `min(čas1, čas2)`
 
-Nevybírej nejrychlejší platný pokus vlastním výpočtem.
+Nevybírej nejrychlejší platný pokus vlastním výpočtem v běžné extrakci.
+
+Místní dávka ověřených PDF dorostu má výslovnou výjimku, pokud identifikace
+disciplíny 100 m s překážkami a pravidlo nejlepšího pokusu mají doložený zdroj.
+Použije ji pouze převodník `youth_pdf` po potvrzení pravidla pro konkrétní
+PDF. Sloupec se zveřejněným časem má přednost a `final_time_source` označuje
+původ číselné hodnoty. Podrobnosti uvádí [provozní dokumentace](extraction.cs.md).
 
 Je-li oficiální výsledný čas nedostupný, použij `null`.
 

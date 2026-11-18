@@ -11,7 +11,8 @@ from datetime import datetime
 from typing import List, Dict, Optional, Any, Set
 
 from app.models.models import AthleteDetailPage
-from app.ml.anomaly_config import get_category_group
+from app.ml.anomaly_config import category_performance_group
+from app.result_values import final_result_fields, select_performance_series, valid_final_time
 from app.services.athlete_identity import active_athlete_query, normalize_athlete_document
 from app.services.performance_indicator import calculate_performance_indicator
 from app.services.performance_stability_service import evaluate_performance_stability
@@ -23,6 +24,24 @@ athletes_collection = db["athletes"]
 results_collection = db["results"]
 competitions_collection = db["competitions"]
 categories_collection = db["categories"]
+
+
+async def performance_series(results, discipline):
+    category_ids = {
+        ObjectId(str(reference)) for row in results
+        if (reference := row.get("category")) is not None and ObjectId.is_valid(str(reference))
+    }
+    categories = {}
+    if category_ids:
+        docs = await categories_collection.find(
+            {"_id": {"$in": list(category_ids)}}, projection={"_id": 1, "discipline": 1}
+        ).to_list(length=None)
+        categories = {str(doc["_id"]): doc for doc in docs}
+    return select_performance_series(results, categories, discipline)
+
+
+def performance_times(rows):
+    return [time for row in rows if (time := valid_final_time(row)) is not None]
 
 
 async def list_athletes_service(
@@ -126,7 +145,7 @@ async def list_athletes_service(
         page_size=page_size,
     )
 
-async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
+async def get_athlete_overview_service(athlete_id: str, *, discipline: str | None = None) -> AthleteOverview:
     """Vrátí přehled výkonů atleta jako AthleteOverview."""
     try:
         athlete_oid = ObjectId(athlete_id)
@@ -157,7 +176,8 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
             recent_results=[],
         )
     
-    times = [r.get("final_time") for r in results if r.get("final_time") is not None]
+    series, _, _ = await performance_series(results, discipline)
+    times = performance_times(series)
     average_time = sum(times) / len(times) if times else None
     best_time = min(times) if times else None
 
@@ -196,7 +216,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         }
 
     indicator_entries = []
-    for r in results:
+    for r in series:
         comp_id = r.get("competition")
         comp_date = competition_dates.get(comp_id) if comp_id else None
         if comp_date is None:
@@ -220,8 +240,8 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
     best_performance_info = {}
     if best_time is not None:
         best_result = None
-        for r in results:
-            final_time = r.get("final_time")
+        for r in series:
+            final_time = valid_final_time(r)
             if final_time is not None and final_time == best_time:
                 best_result = r
                 break
@@ -252,7 +272,7 @@ async def get_athlete_overview_service(athlete_id: str) -> AthleteOverview:
         )
 
 
-async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
+async def get_athlete_detail_service(athlete_id: str, *, discipline: str | None = None) -> AthleteDetailPage:
 
     """Vrátí detail atleta jako AthleteDetail."""
     try:
@@ -273,16 +293,11 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
     athlete_payload["_id"] = str(athlete_payload.get("_id"))
 
     results: list = []
-    best_time: float | None = None
+    series, selected_discipline, legacy_category_id = await performance_series(results_raw, discipline)
+    best_time = min(performance_times(series), default=None)
     category_name: str | None = None
 
     for r in results_raw:
-        # compute best_time
-        final_time = r.get("final_time")
-        if final_time is not None:
-            if best_time is None or final_time < best_time:
-                best_time = final_time
-
         # resolve competition
         comp_payload = None
         if r.get("competition"):
@@ -323,8 +338,7 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
             "team": r.get("team"),
             "start_number": r.get("start_number"),
             "times": r.get("times", []),
-            "final_time": r.get("final_time"),
-            "final_time_status": r.get("final_time_status"),
+            **final_result_fields(r),
             "rank": r.get("rank"),
         }
 
@@ -346,7 +360,9 @@ async def get_athlete_detail_service(athlete_id: str) -> AthleteDetailPage:
     return AthleteDetailPage(
         athlete=athlete_detail,
         results=results,
-        best_time=best_time
+        best_time=best_time,
+        performance_discipline=selected_discipline,
+        performance_category_id=legacy_category_id,
     )
 
 
@@ -413,7 +429,7 @@ async def get_athlete_competition_count(oid: ObjectId) -> int:
     competition_count = len(competition_ids)
     return competition_count
 
-async def get_athlete_performance_by_year_service(athlete_id: str):
+async def get_athlete_performance_by_year_service(athlete_id: str, *, discipline: str | None = None):
     """
     Vrátí data pro graf vývoje výkonu po sezónách.
     Vrací výkonnostní data seřazená po jednotlivých letech.
@@ -440,6 +456,8 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
     if not results:
         return {"years": [], "data": {}}
     
+    results, _, _ = await performance_series(results, discipline)
+
     # Počet roků v datech
     competition_ids = {r.get("competition") for r in results if r.get("competition")}
     if not competition_ids:
@@ -461,7 +479,8 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
         comp_id = r.get("competition")
         comp_date = comp_dates.get(comp_id) if comp_id else None
         
-        if comp_date is None or r.get("final_time") is None:
+        time = valid_final_time(r)
+        if comp_date is None or time is None:
             continue
         
         year = comp_date.year
@@ -472,7 +491,7 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
         
         data_by_year[year].append({
             "date": comp_date.strftime("%Y-%m-%d"),
-            "time": r.get("final_time"),
+            "time": time,
             "rank": r.get("rank"),
             "place": comp_places.get(comp_id)
         })
@@ -486,7 +505,7 @@ async def get_athlete_performance_by_year_service(athlete_id: str):
     return {"years": years, "data": data_by_year}
 
 
-async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] = None) -> Dict[str, Any]:
+async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] = None, *, discipline: str | None = None) -> Dict[str, Any]:
     """
     Vrátí souhrn pro daný rok (nebo aktuální kalendářní rok):
     - average_time: průměrný platný final_time v roce
@@ -517,11 +536,17 @@ async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] 
             "races": [],
         }
 
+    series, _, _ = await performance_series(results, discipline)
+    comparable_ids = {id(row) for row in series}
+    if discipline is not None:
+        results = series
+
     # Home karta Season má vždy ukazovat aktuální kalendářní rok.
     target_year = year if year is not None else datetime.now().year
 
     # Filtrování výsledků na daný rok podle data soutěže
     filtered: List[Dict[str, Any]] = []
+    valid_times = []
     comp_ids: Set[ObjectId] = set()
     cat_ids: Set[ObjectId] = set()
 
@@ -539,6 +564,8 @@ async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] 
         comp_date = comp_doc["date"]
         if comp_date.year != target_year:
             continue
+        if id(r) in comparable_ids and (time := valid_final_time(r)) is not None:
+            valid_times.append(time)
         r_copy = dict(r)
         r_copy["_id"] = r_copy.get("_id", None)
         r_copy["competition_doc"] = comp_doc
@@ -571,7 +598,6 @@ async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] 
         cat_map = {c["_id"]: c for c in cats}
 
     # Výpočty metrik
-    valid_times = [r.get("final_time") for r in filtered if r.get("final_time") is not None]
     average_time = sum(valid_times) / len(valid_times) if valid_times else None
     best_time = min(valid_times) if valid_times else None
 
@@ -590,9 +616,9 @@ async def get_athlete_year_summary_service(athlete_id: str, year: Optional[int] 
             "competition_name": comp_doc.get("name"),
             "competition_place": comp_doc.get("place"),
             "category": cat_doc.get("name") if cat_doc else None,
+            "discipline": cat_doc.get("discipline") if cat_doc else None,
             "date": comp_date.strftime("%Y-%m-%d") if comp_date else None,
-            "final_time": r.get("final_time"),
-            "final_time_status": r.get("final_time_status"),
+            **final_result_fields(r),
             "rank": r.get("rank"),
             "times": r.get("times", []),
         })
@@ -621,14 +647,13 @@ async def get_athlete_category_stats_service(athlete_id: str) -> AthleteCategory
 
     # 1) Sestav mapu category_id (str) → category_group
     category_group_map: Dict[str, str] = {}
-    async for cat_doc in categories_collection.find({}, projection={"_id": 1, "name": 1}):
-        cat_name = cat_doc.get("name") or ""
-        category_group_map[str(cat_doc["_id"])] = get_category_group(cat_name)
+    async for cat_doc in categories_collection.find({}, projection={"_id": 1, "name": 1, "discipline": 1}):
+        category_group_map[str(cat_doc["_id"])] = category_performance_group(cat_doc)
 
     # 2) Načti všechny výsledky závodníka (bez jakéhokoliv filtru)
     raw_results = await results_collection.find(
         {"athlete": athlete_oid},
-        projection={"_id": 0, "category": 1, "final_time": 1},
+        projection={"_id": 0, "category": 1, "final_time": 1, "final_time_status": 1},
     ).to_list(None)
 
     # 3) Agreguj po skupinách
@@ -637,9 +662,10 @@ async def get_athlete_category_stats_service(athlete_id: str) -> AthleteCategory
 
     for r in raw_results:
         cat_oid = r.get("category")
-        cg = category_group_map.get(str(cat_oid), str(cat_oid)) if cat_oid is not None else "unknown"
+        group = category_group_map.get(str(cat_oid))
+        cg = group or "unknown"
         totals[cg] = totals.get(cg, 0) + 1
-        ft = r.get("final_time")
+        ft = valid_final_time(r) if group else None
         if ft is not None:
             if best_times.get(cg) is None or ft < best_times[cg]:
                 best_times[cg] = ft
@@ -670,7 +696,7 @@ async def get_athlete_per_category_stats_service(athlete_id: str) -> AthletePerC
     # 2) Načti všechny výsledky závodníka
     raw_results = await results_collection.find(
         {"athlete": athlete_oid},
-        projection={"_id": 0, "category": 1, "final_time": 1},
+        projection={"_id": 0, "category": 1, "final_time": 1, "final_time_status": 1},
     ).to_list(None)
 
     # 3) Agreguj po konkrétní kategorii
@@ -683,7 +709,7 @@ async def get_athlete_per_category_stats_service(athlete_id: str) -> AthletePerC
             continue
         cat_id = str(cat_oid)
         totals[cat_id] = totals.get(cat_id, 0) + 1
-        ft = r.get("final_time")
+        ft = valid_final_time(r) if cat_id in category_name_map else None
         if ft is not None:
             if best_times.get(cat_id) is None or ft < best_times[cat_id]:
                 best_times[cat_id] = ft
@@ -703,7 +729,7 @@ async def get_athlete_per_category_stats_service(athlete_id: str) -> AthletePerC
     return AthletePerCategoryStatsResponse(categories=categories)
 
 
-async def get_athlete_profile_service(athlete_id: str) -> AthleteProfile:
+async def get_athlete_profile_service(athlete_id: str, *, discipline: str | None = None) -> AthleteProfile:
     """Vrátí základní profil atleta (jméno, tým, nejlepší čas, počet závodů)."""
     try:
         athlete_oid = ObjectId(athlete_id)
@@ -716,7 +742,8 @@ async def get_athlete_profile_service(athlete_id: str) -> AthleteProfile:
 
     results = await results_collection.find({"athlete": athlete_oid}).to_list(length=None)
 
-    times = [r.get("final_time") for r in results if r.get("final_time") is not None]
+    series, _, _ = await performance_series(results, discipline)
+    times = performance_times(series)
     best_time = min(times) if times else None
 
     total_competitions = await get_athlete_competition_count(athlete_oid)
@@ -738,6 +765,7 @@ async def get_athlete_profile_service(athlete_id: str) -> AthleteProfile:
 async def get_athlete_performance_history_service(
     athlete_id: str,
     year: Optional[int] = None,
+    *, discipline: str | None = None,
 ) -> AthletePerformanceHistoryResponse:
     """Vrátí indikátor výkonnosti (trend) pro atleta."""
     try:
@@ -766,8 +794,9 @@ async def get_athlete_performance_history_service(
             if c.get("date") is not None
         }
 
+    series, _, _ = await performance_series(results, discipline)
     indicator_entries = []
-    for r in results:
+    for r in series:
         comp_id = r.get("competition")
         comp_date = competition_dates.get(comp_id) if comp_id else None
         if comp_date is None:
@@ -776,8 +805,7 @@ async def get_athlete_performance_history_service(
             continue
         indicator_entries.append({
             "competition_date": comp_date,
-            "final_time": r.get("final_time"),
-            "final_time_status": r.get("final_time_status"),
+            **final_result_fields(r),
             "rank": r.get("rank"),
         })
 
@@ -791,6 +819,7 @@ async def get_athlete_performance_history_service(
 async def get_athlete_performance_stability_service(
     athlete_id: str,
     year: Optional[int] = None,
+    *, discipline: str | None = None,
 ) -> AthletePerformanceStabilityResponse:
     """Vrátí data o stabilitě výkonu atleta + průměrný čas v aktuální sezóně."""
     try:
@@ -821,8 +850,9 @@ async def get_athlete_performance_stability_service(
 
     target_year = year if year is not None else datetime.now().year
 
+    series, _, _ = await performance_series(results, discipline)
     indicator_entries = []
-    for r in results:
+    for r in series:
         comp_id = r.get("competition")
         comp_date = competition_dates.get(comp_id) if comp_id else None
         if comp_date is None:
@@ -831,15 +861,14 @@ async def get_athlete_performance_stability_service(
             continue
         indicator_entries.append({
             "competition_date": comp_date,
-            "final_time": r.get("final_time"),
-            "final_time_status": r.get("final_time_status"),
+            **final_result_fields(r),
             "rank": r.get("rank"),
         })
 
     stability_info = evaluate_performance_stability(indicator_entries)
 
     # Průměrný čas v cílové sezóně
-    year_summary = await get_athlete_year_summary_service(athlete_id, year=target_year)
+    year_summary = await get_athlete_year_summary_service(athlete_id, year=target_year, discipline=discipline)
     average_time_in_year = year_summary.get("average_time") if isinstance(year_summary, dict) else None
 
     return AthletePerformanceStabilityResponse(

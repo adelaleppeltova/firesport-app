@@ -7,7 +7,7 @@ import formatCategoryName from "../utils/formatCategoryName";
 // Pomocná funkce pro zobrazení času
 function renderTime(time, status) {
   if (status === "invalid") return "NP";
-  if (time == null) return "";
+  if (status !== "valid" || time == null) return "—";
   return time;
 }
 
@@ -189,6 +189,7 @@ export default function ResultsPage() {
                     </td>
                     <td className="results-table__final-time">
                       {renderTime(r.final_time, r.final_time_status)}
+                      {r.final_time_source === "derived_from_attempts" && " (z pokusů)"}
                     </td>
                     <td className="results-table__rank">{r.rank}</td>
                   </tr>

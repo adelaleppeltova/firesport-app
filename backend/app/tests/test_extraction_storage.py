@@ -258,7 +258,9 @@ def test_unrelated_zero_byte_placeholder_in_same_year_is_preserved(tmp_path):
     "folder, content",
     [("chomutov", b""), ("vyrovice", b"{")],
 )
-def test_ambiguous_or_nonempty_invalid_document_blocks_same_year(tmp_path, folder, content):
+def test_ambiguous_or_nonempty_invalid_document_blocks_same_year(
+    tmp_path, folder, content
+):
     placeholder = tmp_path / "2022" / folder / "komplet.json"
     placeholder.parent.mkdir(parents=True)
     placeholder.write_bytes(content)
@@ -267,3 +269,23 @@ def test_ambiguous_or_nonempty_invalid_document_blocks_same_year(tmp_path, folde
     with pytest.raises(StorageConflict, match="Cannot inspect"):
         save(data, tmp_path, audit)
     assert list(tmp_path.rglob("*.json")) == [placeholder]
+
+
+def test_same_source_reimport_cannot_replace_published_time_with_derived(tmp_path):
+    data, audit = result()
+    saved = save(data, tmp_path, audit)
+    old_bytes = saved.read_bytes()
+    group = next(
+        c for c in data["competition"]["categories"] if c["discipline"] == "100m"
+    )
+    row = next(
+        r
+        for r in group["results"]
+        if r["final_status"] == "valid"
+        and any(t["status"] == "valid" for t in r["times"])
+    )
+    row["final_time"] = min(t["time"] for t in row["times"] if t["status"] == "valid")
+    row["final_time_source"] = "derived_from_attempts"
+    with pytest.raises(ValueError, match="replace a published final time"):
+        save(data, tmp_path, audit)
+    assert saved.read_bytes() == old_bytes

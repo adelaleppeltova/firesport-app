@@ -49,6 +49,7 @@ class AnomalyRunInfo(BaseModel):
     window_end: datetime
     n_valid_results_in_window: int
     n_invalid_results_in_window: int = 0
+    n_missing_results_in_window: int = 0
     n_anomalies: int
     median_time: Optional[float] = None
     status: AnomalyRunStatus
