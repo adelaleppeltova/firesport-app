@@ -240,3 +240,30 @@ def test_event_only_empty_folder_is_not_duplicated_automatically(tmp_path):
     data, audit = result()
     with pytest.raises(StorageConflict, match="Ambiguous"):
         save(data, tmp_path, audit)
+
+
+def test_unrelated_zero_byte_placeholder_in_same_year_is_preserved(tmp_path):
+    placeholder = tmp_path / "2022/vyrovice/komplet.json"
+    placeholder.parent.mkdir(parents=True)
+    placeholder.touch()
+
+    data, audit = result(date="2022-09-19")
+    path = save(data, tmp_path, audit)
+
+    assert path.parent != placeholder.parent
+    assert placeholder.read_bytes() == b""
+
+
+@pytest.mark.parametrize(
+    "folder, content",
+    [("chomutov", b""), ("vyrovice", b"{")],
+)
+def test_ambiguous_or_nonempty_invalid_document_blocks_same_year(tmp_path, folder, content):
+    placeholder = tmp_path / "2022" / folder / "komplet.json"
+    placeholder.parent.mkdir(parents=True)
+    placeholder.write_bytes(content)
+    data, audit = result(date="2022-09-19")
+
+    with pytest.raises(StorageConflict, match="Cannot inspect"):
+        save(data, tmp_path, audit)
+    assert list(tmp_path.rglob("*.json")) == [placeholder]

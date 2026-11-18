@@ -33,7 +33,9 @@ data a místa závodu v existujících JSON. Samotné místo nestačí. Prázdno
 složku lze převzít jen při jednoznačné shodě rozlišujícího názvu soutěže i místa;
 například `chomutov-stimax`. Existující názvy složek se nemění. Nejednoznačná
 shoda a existující neidentifikovatelný JSON v cílovém roce ukládání zastaví.
-Nesouvisející nečitelný historický soubor z jiného roku výběr cílové složky neovlivní.
+Výjimkou je prokazatelně prázdný soubor ve složce bez shody názvu či místa.
+Složka s takovým souborem zůstává obsazená. Nesouvisející nečitelný soubor
+z jiného roku výběr cílové složky neovlivní.
 
 Nová složka a název souboru používají lowercase ASCII a pomlčky. Soubor má formát
 `YYYY-MM-DD-{nazev-zavodu}-{misto}.json`, například
@@ -81,6 +83,15 @@ chybějících identifikátorů, warnings a chyb validace. Neúspěšný import 
   umožňují věkové mapování disciplín. Profily ze stejné domény se načítají kvůli
   roku narození, nikoliv pro odhad FSCode z ID profilu. Minimálně 0,3 s mezi
   požadavky, timeout 30 s, limit 30 MB, cache během běhu.
+- Kompaktní týmové tabulky na pozarnisporty.cz se sloupci Název, Výsledný čas
+  a Čas 1/2 (P/N) zachovávají oficiální časy a pořadí družstva. Rozbalovací
+  soupiska nemá vlastní výkony. Čas 00:00:00.00 je v tomto formátu zástupná
+  hodnota. U požárního útoku se samostatnými proudy se ukládá oficiální výsledný
+  čas a poznámky k proudům zůstávají v upozorněních. Čas celého pokusu se z proudů
+  nedopočítává. Tabulky celkových bodů za víc disciplín vyžadují vlastní adaptér.
+- Týmové tabulky ZHVB se sloupci pro časy a kontrolní stanoviště zachovávají
+  oficiální výsledný čas a pořadí. Časy startu a cíle, mezičasy, body na stanovištích
+  a rozbalovací soupisky nejsou pokusy. Disciplína zůstává null.
 - Obecné HTML s rozeznatelnými záhlavími a oficiální kategorií v caption/h2/h3/h4.
   Samostatné sloupce jména a příjmení mají přednost. U společného jména musí být
   pořadí zdroje doložené (`data-name-order="surname-first"`) nebo použita čárka.
@@ -101,6 +112,58 @@ chybějících identifikátorů, warnings a chyb validace. Neúspěšný import 
 Chybějící metadata se označí null a warnings; neznámé rozložení se neodhaduje.
 Nový formát se doplňuje v příslušném modulu a musí mít offline regresní fixture.
 CLI samo neprovádí Git operace; agent po úspěšné validaci vytvoří commit a PR.
+
+## Dávka místních krajských PDF s výsledky dorostu
+
+Spouští se z kořene repozitáře s nainstalovanými závislostmi z
+`backend/requirements-extraction.txt`. Vstup může obsahovat další podsložky.
+
+```sh
+PYTHONPATH=backend python -m app.extraction.youth_pdf /cesta/k/pdf \
+  --output data --diagnostics .extraction-diagnostics/youth-pdf --dry-run
+```
+
+Po kontrole spusťte stejný příkaz bez `--dry-run`. Výsledky připravené k uložení
+použijí stávající výsledkové schéma a ukládání do `data/{rok}/{závod}/`.
+Dávka vrací nenulový návratový kód, pokud některý dokument vyžaduje kontrolu.
+Zpracování ostatních dokumentů pokračuje.
+
+- Převod používá geometrii tabulek a rozsahy sloupců. Ze samostatných tabulek
+  a jednoznačně označených disciplín v přehledech vybírá individuální pokusy,
+  výsledný čas a pořadí stovky podle toho, co zdroj skutečně publikuje. Sloupce
+  PHP, bodové součty a celková pořadí vícebojů se nepřenášejí. Přeškrtnutí jednoho
+  pokusu samo nenahrazuje sloupec výsledného času.
+- Týmová část může obsahovat žebříček jednotlivců. Tehdy se zachová zdrojová
+  kategorie a přehled ji označí jako týmovou část. Souhrnné pořadí družstev
+  nevytváří další individuální výsledky.
+- `batch-report.json` odkazuje na report každého PDF. Report obsahuje původní
+  buňky, kategorii, čísla stránky, tabulky a řádku, souřadnice v PDF, případné
+  identifikační předpony a index výsledku v kategorii. Jsou v něm také doklady
+  metadat, normalizované kategorie, vyřazené položky a varování. Číselné předpony
+  bez výslovného označení FSCode zůstávají v reportu.
+- OCR vyžaduje Tesseract s modely `ces` a `eng`. Obrazové stránky a oblasti se
+  renderují na 300 DPI. Diagnostika zahrnuje obraz, TSV, souřadnice, spolehlivost
+  rozpoznaných slov a návrh jejich seskupení do řádků. Poškozený text a sloupce
+  se automaticky neopravují. Kandidáty z ověřitelných částí lze najít v
+  `pending.json` vedle reportu.
+
+Ověřený přepis obrazových oblastí lze opakovat pomocí `--review cesta.json`.
+Kořen tohoto souboru je objekt klíčovaný SHA-256 celého PDF z reportu. Položka
+může obsahovat zdrojem potvrzené `name_order` (`surname-first` nebo
+`given-first`) a objekt `regions`. Klíčem je `key` oblasti OCR z reportu.
+Každá ověřená oblast má `verified: true`, volitelné `metadata_lines` a
+`tables`. Tabulka uvádí `heading`, `category`, `bbox`, `rows` a případně
+`name_order`. Když záhlaví výslovně neuvádí jednotlivce, doplňte původní názvy
+jejich sloupců v `individual_columns`. Řádek má `bbox` v bodech PDF a
+`cells` s publikovanými řetězci `rank`, `bib`, `name`, `team`, `district`,
+`fscode`, `first`, `second` a `final`. Prázdný seznam tabulek potvrzuje
+vizuálně zkontrolovanou oblast bez cílových výsledků. Před potvrzením ověřte
+tituly disciplín, hranice sloupců a všechny řádky proti obrázku. Soubory
+ověření a diagnostiky s osobními údaji ukládejte mimo Git.
+
+Syntetické PDF v `app/tests/test_youth_pdf.py` se sestavují bez sítě.
+Pro integraci s původní 24stránkovou jihočeskou listinou nastavte
+`YOUTH_PDF_JIHOCESKY` na místní cestu k ní.
 
 ## Moduly a ověření
 

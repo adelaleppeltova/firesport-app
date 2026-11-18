@@ -535,3 +535,152 @@ def test_empty_legacy_category_is_not_a_participant():
     competition, _, _, audit = parse_html(html, "https://pozarnisporty.cz/races/1239")
     assert competition["categories"][0]["results"] == []
     assert audit[0]["rows"] == 0
+
+
+def test_compact_team_timing_uses_published_results_and_ignores_roster(tmp_path):
+    from app.extraction.__main__ import extract
+
+    url = "https://pozarnisporty.cz/races/927"
+    data = FIXTURE.with_name("compact-team-results.html").read_bytes()
+    fetcher = Mock()
+    fetcher.get.return_value = (data, url)
+    competition, notes, warnings, audit = extract(url, fetcher, tmp_path)
+    validate(document(url, competition, notes, warnings), audit)
+    category, = competition["categories"]
+    assert category["name"] == "přípravka"
+    first, second = category["results"]
+    assert first["team"] == "Rokytnice nad Rokytnou 11 (Třebíč) [54]"
+    assert all(first[field] is None for field in ("first_name", "last_name", "start_number", "district"))
+    assert first["final_time"] == 78.71
+    assert first["times"][1]["time"] == 87.58
+    assert second["rank"] == 3
+    assert second["final_time"] is None
+    assert second["times"] == [
+        {"try": 1, "status": "invalid", "time": None, "invalid_reason": "N-kužel"},
+        {"try": 2, "status": "invalid", "time": None},
+    ]
+
+
+def test_compact_team_timing_rejects_mixed_layout():
+    from app.extraction.team_html import parse_team_html
+
+    data = FIXTURE.with_name("compact-team-results.html").read_bytes()
+    data = data.replace(b"</main>", b"<table><tr><th>Po&#345;.</th><th>Body</th></tr></table></main>")
+    with pytest.raises(ValueError, match="Mixed or unsupported team table"):
+        parse_team_html(data)
+
+
+def test_compact_team_timing_rejects_whole_minutes_encoding_rank():
+    from app.extraction.team_html import parse_team_html
+
+    data = FIXTURE.with_name("compact-team-results.html").read_bytes()
+    start = data.index(b"<tbody>")
+    end = data.index(b"</tbody>", start)
+    rows = "".join(
+        f"<tr><td>{i}.</td><td>Team {i}</td><td>00:00:00.00</td>"
+        f"<td>00:0{i}:00.00 (P)</td><td></td><td>00:00:00.00 (P)</td><td></td><td>0</td></tr>"
+        for i in range(1, 4)
+    )
+    shaped = data[:start] + b"<tbody>" + rows.encode() + data[end:]
+    with pytest.raises(ValueError, match="encode rank"):
+        parse_team_html(shaped)
+
+
+def test_site_zero_times_are_unmeasured_placeholders():
+    html = b"""
+    <main><div class="text-normal">TFA</div>
+    <table><caption>Muzi</caption>
+    <tr><th>Po&#345;.</th><th>Jm&eacute;no</th><th>V&yacute;sl. &#269;as</th><th>&#268;as 1</th></tr>
+    <tr><td>4.</td><td>Novak Jan</td><td>00:00.00</td><td>00:00.00</td></tr>
+    </table></main>
+    """
+    competition, _, warnings, _ = parse_html(html, URL)
+    row = competition["categories"][0]["results"][0]
+    assert row["rank"] == 4
+    assert row["final_time"] is None and row["final_status"] == "invalid"
+    assert row["times"][0]["time"] is None
+    assert any("site zero time placeholder" in warning for warning in warnings)
+
+
+def test_compact_team_timing_excludes_unscored_registration():
+    from app.extraction.team_html import parse_team_html
+
+    fixture = FIXTURE.with_name("compact-team-results.html").read_bytes()
+    registration = (
+        b"<tr><td></td><td>Unscored team</td><td>00:00:00.00</td><td>00:00:00.00 (P)</td>"
+        b"<td></td><td>00:00:00.00 (P)</td><td></td><td>0</td></tr>"
+    )
+    competition, _, _, audit = parse_team_html(fixture.replace(b"</tbody>", registration + b"</tbody>"))
+    assert len(competition["categories"][0]["results"]) == audit[0]["rows"] == 2
+
+
+def test_checkpoint_timing_keeps_official_finish_and_leaves_attempts_missing(tmp_path):
+    from app.extraction.__main__ import extract
+
+    url = "https://pozarnisporty.cz/races/1188"
+    fetcher = Mock()
+    fetcher.get.return_value = (FIXTURE.with_name("checkpoint-results.html").read_bytes(), url)
+    competition, notes, warnings, audit = extract(url, fetcher, tmp_path)
+    validate(document(url, competition, notes, warnings), audit)
+    category, = competition["categories"]
+    assert category["name"] == "MLADŠÍ" and category["discipline"] is None
+    first, second = category["results"]
+    assert first["final_time"] == 2118 and first["rank"] == 1
+    assert first["times"] == [
+        {"try": 1, "status": "missing", "time": None},
+        {"try": 2, "status": "missing", "time": None},
+    ]
+    assert first["start_number"] is None and first["district"] is None
+    assert second["final_time"] is None and second["rank"] == 4
+
+
+def test_team_stream_times_do_not_become_overall_attempts(tmp_path):
+    from app.extraction.__main__ import extract
+
+    url = "https://pozarnisporty.cz/races/1075"
+    fetcher = Mock()
+    fetcher.get.return_value = (FIXTURE.with_name("stream-results.html").read_bytes(), url)
+    competition, notes, warnings, audit = extract(url, fetcher, tmp_path)
+    validate(document(url, competition, notes, warnings), audit)
+    category, = competition["categories"]
+    assert category["discipline"] == "PU"
+    first, second = category["results"]
+    assert first["rank"] == 2 and first["final_time"] == 23.10
+    assert first["times"] == second["times"] == [
+        {"try": 1, "status": "missing", "time": None},
+        {"try": 2, "status": "missing", "time": None},
+    ]
+    assert second["final_time"] is None and second["final_status"] == "invalid"
+    assert any("left stream note for try 1: N-nesestříknuto" in w for w in warnings)
+
+
+def test_compact_team_timing_skips_ranked_zero_time_roster():
+    from app.extraction.team_html import parse_team_html
+
+    fixture = FIXTURE.with_name("compact-team-results.html").read_bytes()
+    start = fixture.index(b"<tbody>")
+    end = fixture.index(b"</tbody>", start)
+    ranked_placeholder = (
+        b"<tr><td>1.</td><td>Team</td><td>-----</td><td>00:00:00.00 (N)</td>"
+        b"<td></td><td>00:00:00.00 (P)</td><td></td><td>0</td></tr>"
+    )
+    with pytest.raises(ValueError, match="No published compact team results"):
+        parse_team_html(fixture[:start] + b"<tbody>" + ranked_placeholder + fixture[end:])
+
+
+def test_implausible_published_birth_year_is_retained_as_null():
+    html = b"""
+    <main><div class="text-normal">TFA</div>
+    <div id="start"><div>Start:</div><div>06.09.2026</div></div>
+    <table><caption>Muzi</caption>
+    <tr><th>Po&#345;.</th><th>Jm&eacute;no</th><th>Rok narozen&iacute;</th><th>V&yacute;sl. &#269;as</th><th>&#268;as 1</th></tr>
+    <tr><td>4.</td><td>Novak Jan</td><td>7777</td><td>18.36</td><td>00:00.00
+ P</td></tr>
+    </table></main>
+    """
+    competition, _, warnings, _ = parse_html(html, URL)
+    row = competition["categories"][0]["results"][0]
+    assert row["birth_year"] is None
+    assert row["times"][0]["time"] is None
+    assert row["final_time"] == 18.36
+    assert any("implausible published birth year 7777" in warning for warning in warnings)

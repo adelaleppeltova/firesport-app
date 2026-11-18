@@ -3,11 +3,13 @@
 import argparse
 import json
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 from bs4 import BeautifulSoup
+from .checkpoint_html import has_checkpoint_table, parse_checkpoint_html
 from .fetch import Fetcher, source_type, render_html
 from .html import parse_html
 from .pdf import parse_pdf
+from .team_html import has_compact_team_table, parse_team_html
 from .storage import source_id, document, save, summary
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -20,11 +22,19 @@ def extract(url, fetcher, diagnostics, browser=False):
     (diagnostics / f"source.{kind}").write_bytes(data)
     if kind == "pdf":
         return parse_pdf(data, resolved, diagnostics)
+    soup = BeautifulSoup(data, "html.parser")
+    if urlsplit(resolved).hostname in {
+        "pozarnisporty.cz",
+        "www.pozarnisporty.cz",
+    }:
+        if has_checkpoint_table(soup):
+            return parse_checkpoint_html(data)
+        if has_compact_team_table(soup):
+            return parse_team_html(data)
     try:
         return parse_html(data, resolved, fetcher)
     except ValueError as original:
         # Only select linked PDFs when no result table exists, never hide failed HTML parses.
-        soup = BeautifulSoup(data, "html.parser")
         if soup.find("table"):
             if browser:
                 return parse_html(render_html(resolved), resolved, fetcher)
