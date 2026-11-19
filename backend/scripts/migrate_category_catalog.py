@@ -284,8 +284,11 @@ def validate_standings_references(results, competitions, catalog):
     for event, competition in competitions.items():
         for team in competition.get("team_results") or []:
             category = BY_ID.get(team.get("category"))
+            number = team.get("source_number")
             if (category is None or category.type != "team" or category.id not in catalog
-                    or team["_id"] in teams or team["_id"] != team_entry_id(event, category.id, team["source_number"])):
+                    or (number is None and not label_key(team.get("name")))
+                    or team["_id"] in teams
+                    or team["_id"] != team_entry_id(event, category.id, number, team.get("name"))):
                 raise ValueError("Neplatný odkaz týmového výsledku.")
             teams[team["_id"]] = event, category.id
     for row in results.values():

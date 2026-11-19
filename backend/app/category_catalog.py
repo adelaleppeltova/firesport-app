@@ -55,6 +55,8 @@ CATEGORIES = (
     Category("100m-girls-team", "Dorostenky - družstvo", "100m", "female", 13, 18, "team"),
     Category("60m-boys-preparatory", "Přípravka chlapci", "60m", "male", 0, 5),
     Category("60m-girls-preparatory", "Přípravka dívky", "60m", "female", 0, 5),
+    Category("60m-boys-preparatory-5-6", "Přípravka chlapci 5–6", "60m", "male", 5, 6),
+    Category("60m-girls-preparatory-5-6", "Přípravka dívky 5–6", "60m", "female", 5, 6),
     Category("60m-girls-younger", "Mladší dívky", "60m", "female", 6, 10, age_system="general"),
     Category("60m-boys-younger", "Mladší chlapci", "60m", "male", 6, 10, age_system="general"),
     Category("60m-girls-older", "Starší dívky", "60m", "female", 10, 15, age_system="general"),

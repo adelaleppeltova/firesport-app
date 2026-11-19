@@ -65,8 +65,25 @@ MCR_TEAM_MEMBER_LISTS = {
 MCR_SOURCE_ROOT = "https://mladez.dh.cz/index.php/sportovni-cinnost/mcr-plamen-a-dorostu/"
 
 
+REGIONAL_2026_ROOT = (
+    "https://mladez.dh.cz/images/Dokumenty/mladez/MCR-Plamen-dorost/2026/vysledky-krajskych-kol/"
+)
+REGIONAL_TEAM_MEMBER_LISTS = {
+    ("2026-06-06", "11-jihomoravsky-dorost.pdf"): {"dorci", "dorky"},
+    ("2026-06-07", "14-moravskoslezsky-dorost.pdf"): {"dorostenci", "dorostenky"},
+    ("2026-06-13", "03-jihocesky-dorost.pdf"): {"dorci", "dorky"},
+}
+
+
 def team_member_source(key: str, discipline: str, competition: dict) -> str | None:
-    if discipline == "100m" and key in {"dorostenci", "dorostenky"}:
+    if discipline != "100m":
+        return None
+    source = competition.get("source_url") or ""
+    if source.startswith(REGIONAL_2026_ROOT):
+        filename = source.removeprefix(REGIONAL_2026_ROOT)
+        if key in REGIONAL_TEAM_MEMBER_LISTS.get((event_identity(competition)[0], filename), ()):
+            return source
+    if key in {"dorostenci", "dorostenky"}:
         if source := MCR_TEAM_MEMBER_LISTS.get(event_identity(competition)):
             return MCR_SOURCE_ROOT + source
     return None
@@ -141,4 +158,20 @@ def organizer_label(key: str, discipline: str, competition: dict) -> tuple[str, 
                       "dorost chlapci muzi nad 17 let": "Dorost chlapci + muži 17–100"}
             if key in labels:
                 return labels[key], STIMAX_2023_CHOMUTOV
+    return None
+
+
+def published_combined_category(key: str, discipline: str, competition: dict) -> tuple[str, str] | None:
+    """Use one canonical category for each explicitly combined Chomutov list."""
+    url = urlsplit(competition.get("source_url") or "")
+    if (discipline != "100m" or event_identity(competition)[0] != "2026-09-19"
+            or url.scheme != "https" or url.netloc not in RACE_HOSTS
+            or url.path.rstrip("/") != "/races/1034"):
+        return None
+    labels = {
+        "dorost chlapci muzi 17 100 let": "Muži a starší dorostenci",
+        "dorost divky zeny 17 100 let": "Ženy a starší dorostenky",
+    }
+    if label := labels.get(re.sub(r"^\d+ ", "", key)):
+        return label, "https://pozarnisport.hasicovo.cz/races/1034"
     return None
