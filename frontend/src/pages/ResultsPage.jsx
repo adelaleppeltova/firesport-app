@@ -146,7 +146,7 @@ export default function ResultsPage() {
                   isTeam ? r.team || "—" : (
                     athlete.firstName && athlete.lastName
                       ? `${athlete.firstName} ${athlete.lastName}`
-                      : r.source_full_name || "Jméno nezjištěno"
+                      : r.source_full_name ? `Zdrojový zápis: ${r.source_full_name}` : "Jméno nezjištěno"
                   );
 
                 return (

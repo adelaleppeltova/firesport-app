@@ -4,12 +4,14 @@ import argparse
 from collections import Counter, defaultdict
 from hashlib import sha256
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from bson import json_util
 
 from app.extraction.html import parse_html
 from app.extraction.storage import canonical_url, source_id
 from app.person_names import NAME_FIELDS, missing_name, normalize_person_name
+from app.services.result_review import in_review_queue
 from scripts.migrate_category_catalog import fingerprint, load_snapshot, private_file
 from scripts.recover_source_names import key
 
@@ -53,7 +55,8 @@ def original_index(source_dir, urls):
         for category in race["categories"]:
             for entry in category["results"]:
                 scope = key(category["name"], category["discipline"], entry, source=True)
-                results[scope].append((entry, refs.get(id(entry))))
+                ref = refs.get(id(entry))
+                results[scope].append((entry, (urlsplit(url).hostname, ref) if ref else None))
         originals[url] = {"results": results, "date": race["date"], "evidence": evidence}
     return originals
 
@@ -96,31 +99,65 @@ def event_day(snapshot, row):
     return date.date().isoformat() if hasattr(date, "date") else date
 
 
-def make_plan(snapshot, source_dir, supplemental=()):
+def verified_pdf_rows(proofs):
+    indexed = {}
+    for proof in proofs:
+        identifier = proof["id"]
+        names = pair(proof)
+        if (identifier in indexed or not all(names) or not proof["url"].startswith("https://")
+                or type(proof["page"]) is not int or proof["page"] < 1 or not proof["note"]
+                or not proof["source_row_sha256"] or not proof["published_name"]):
+            raise ValueError("Neúplný nebo duplicitní doklad řádku PDF.")
+        contents = Path(proof["file"]).read_bytes()
+        if not contents.startswith(b"%PDF-") or sha256(contents).hexdigest() != proof["sha256"]:
+            raise ValueError("Ověřený soubor PDF se změnil.")
+        indexed[identifier] = proof
+    return indexed
+
+
+def pdf_row_proof(proof, row, url, scope, detail):
+    if (canonical_url(proof["url"]) != url or row.get("source_full_name") != proof["stored_source_full_name"]
+            or fingerprint(row.get("source_row")) != proof["source_row_sha256"]
+            or scope[3] is None or scope[3] != str(proof["bib"]) or scope[0] != proof["category_key"]):
+        return "verified_pdf_locator_conflict"
+    detail["published_name"] = proof["published_name"]
+    detail["proof_type"] = "verified_pdf_name_cell"
+    detail["original"] = {field: proof[field] for field in ("url", "file", "sha256", "page", "bib", "note")}
+    detail["supporting"] = []
+    detail["after"] = dict(zip(NAME_FIELDS, pair(proof), strict=True))
+    return "repairable"
+
+
+def make_plan(snapshot, source_dir, supplemental=(), verified_results=()):
     rows = snapshot["results"]
     targets = {
-        identifier: row for identifier, row in rows.items()
+        identifier: row for identifier, row in sorted(rows.items(), key=lambda item: str(item[0]))
         if missing_name(row.get("imported_athlete") or {}) and row.get("result_type") != "team"
     }
+    verified = verified_pdf_rows(verified_results)
     urls = {identifier: source_url(snapshot, row) for identifier, row in targets.items()}
     originals = original_index(source_dir, set(urls.values()))
     support = supporting_names(snapshot, supplemental)
     links = defaultdict(list)
     located = {}
     matching_database_rows = Counter()
-    for identifier, row in targets.items():
-        url = urls[identifier]
+    for identifier, row in sorted(rows.items(), key=lambda item: str(item[0])):
+        url = source_url(snapshot, row)
+        if url not in originals and identifier not in targets:
+            continue
         source = originals.get(url, {"error": "source_url_missing"})
         category = row.get("source_category") or {}
         scope = key(category.get("name"), category.get("discipline"), row)
         match = original_match(source, scope, event_day(snapshot, row))
-        located[identifier] = (source, scope, match)
+        if identifier in targets:
+            located[identifier] = (source, scope, match)
         if match:
             matching_database_rows[url, id(match[0])] += 1
             published, ref = match
             person = row.get("imported_athlete") or {}
             identity = provenance_key(published.get("source_full_name"), person.get("birth_year"), published.get("team"))
-            if ref and identity and support.get(identity):
+            published_year = published.get("birth_year")
+            if ref and identity and support.get(identity) and published_year in (None, identity[1]):
                 links[ref].append((identity[:2], support[identity], url))
     updates, details = [], []
     counts = Counter()
@@ -130,10 +167,14 @@ def make_plan(snapshot, source_dir, supplemental=()):
         old_name = row.get("source_full_name")
         detail = {"id": identifier, "source_url": urls[identifier], "locator": scope, "source_name": old_name,
                   "birth_year": person.get("birth_year"), "team": row.get("team"),
-                  "classification": row.get("classification_status"), "before": {f: person.get(f) for f in NAME_FIELDS}}
+                  "classification": row.get("classification_status"), "in_admin_queue": in_review_queue(row),
+                  "source_person_name": row.get("source_person_name"),
+                  "source_full_name": old_name, "before": {f: person.get(f) for f in NAME_FIELDS}}
         if source.get("evidence"):
             detail["original"] = source["evidence"]
-        if match is None:
+        if identifier in verified:
+            reason = pdf_row_proof(verified[identifier], row, urls[identifier], scope, detail)
+        elif match is None:
             reason = source.get("error", "original_row_unverified")
             detail["original_error"] = source.get("detail")
             alternatives = []
@@ -170,7 +211,7 @@ def make_plan(snapshot, source_dir, supplemental=()):
             detail["supporting"] = [proof for _, proof in corroborations]
             if not raw:
                 reason = "name_unpublished"
-            elif old_name and clean(raw) != clean(old_name):
+            elif old_name is not None and clean(raw) != clean(old_name):
                 reason = "source_text_conflict"
             elif published.get("birth_year") not in (None, person.get("birth_year")) and person.get("birth_year") is not None:
                 reason = "source_year_conflict"
@@ -178,37 +219,28 @@ def make_plan(snapshot, source_dir, supplemental=()):
                 reason = "segmentation_conflict" if choices else "ambiguous_segmentation"
             else:
                 names = next(iter(choices))
-                if any(value and value != candidate for value, candidate in zip(pair(person), names)):
-                    reason = "stored_name_conflict"
-                else:
-                    reason = "repairable"
-                    detail["after"] = dict(zip(NAME_FIELDS, names, strict=True))
+                reason = "repairable"
+                detail["after"] = dict(zip(NAME_FIELDS, names, strict=True))
+                detail["proof_type"] = (
+                    "published_name_fields" if names == pair(published) else "corroborated_name_fields"
+                )
         change = {}
+        if reason == "repairable" and any(
+            value and value != detail["after"][field] for field, value in zip(NAME_FIELDS, pair(person), strict=True)
+        ):
+            reason = "stored_name_conflict"
         if reason == "repairable":
             for field, value in detail["after"].items():
                 if not normalize_person_name(person.get(field)):
                     change[f"imported_athlete.{field}"] = value
-        raw = detail.get("published_name")
-        if raw and not old_name and reason != "source_year_conflict":
-            change["source_full_name"] = raw
-        manual = (row.get("match_reason") or "").startswith("manual_admin_")
-        if row.get("athlete") is None and not manual and row.get("match_status") != "matched":
-            status = "needs_review"
-            match_reason = (
-                "source_name_restored_identity_unverified" if reason == "repairable"
-                else "name_segmentation_review" if old_name or raw else "missing_name"
-            )
-            for field, value in (("match_status", status), ("match_reason", match_reason)):
-                if row.get(field) != value:
-                    change[field] = value
         if change:
             updates.append({"id": identifier, "document_sha256": fingerprint(row), "set": change,
-                            "previous": {
-                                field: {"present": field.rsplit(".", 1)[-1] in owner,
-                                        "value": owner.get(field.rsplit(".", 1)[-1])}
-                                for field in change
-                                for owner in (person if field.startswith("imported_athlete.") else row,)
-                            }})
+                            "reason": detail["proof_type"],
+                            "evidence": {k: detail[k] for k in
+                                         ("original", "locator", "published_name", "supporting")},
+                            "previous": {f"imported_athlete.{field}": {
+                                "present": field in person, "value": person.get(field)
+                            } for field in NAME_FIELDS if f"imported_athlete.{field}" in change}})
         detail["reason"] = reason
         details.append(detail)
         counts[reason] += 1
@@ -218,6 +250,7 @@ def make_plan(snapshot, source_dir, supplemental=()):
             "results": len(rows), "profiles": len(snapshot["athletes"]),
             "profiles_with_missing_name": sum(missing_name(p) for p in snapshot["athletes"].values()),
             "incomplete_individual_or_unclassified": len(targets),
+            "admin_queue_missing_name": sum(in_review_queue(row) for row in targets.values()),
             "literal_null_names": {
                 field: sum(field in person and person[field] is None
                            for row in targets.values() for person in (row.get("imported_athlete") or {},))
@@ -227,7 +260,6 @@ def make_plan(snapshot, source_dir, supplemental=()):
                                         for r in rows.values()),
             "repairable": counts["repairable"], "to_review": len(targets) - counts["repairable"],
             "original_rows_verified": sum("published_name" in detail for detail in details),
-            "source_text_to_add": sum("source_full_name" in op["set"] for op in updates),
             "updates": len(updates), "unchanged": unchanged, "outcomes": dict(counts),
             "original_urls": len(originals), "originals_parsed": sum("results" in item for item in originals.values()),
         },
@@ -242,9 +274,11 @@ def main():
     for argument in ("snapshot", "sources", "report"):
         parser.add_argument(f"--{argument}", type=Path, required=True)
     parser.add_argument("--supporting", type=Path)
+    parser.add_argument("--verified-results", type=Path)
     args = parser.parse_args()
     supplemental = json_util.loads(args.supporting.read_text(encoding="utf-8")) if args.supporting else ()
-    plan = make_plan(load_snapshot(args.snapshot), args.sources, supplemental)
+    verified = json_util.loads(args.verified_results.read_text(encoding="utf-8")) if args.verified_results else ()
+    plan = make_plan(load_snapshot(args.snapshot), args.sources, supplemental, verified)
     with private_file(args.report) as report:
         report.write(json_util.dumps(plan, ensure_ascii=False, indent=2))
     print(plan["counts"], plan["plan_sha256"])

@@ -30,7 +30,7 @@ function formatAthleteMeta(athlete) {
 const matchReasons = {
   source_name_restored_identity_unverified: "Jméno doloženo, vazba na profil k ověření",
   name_segmentation_review: "Rozdělení jména vyžaduje kontrolu",
-  missing_name: "Ve zdroji chybí jméno nebo příjmení.",
+  missing_name: "Chybí interpretované jméno nebo příjmení.",
   shared_fscode: "FSCode sdílí více aktivních profilů.",
   conflicting_fscode: "FSCode je v rozporu se jménem nebo rokem narození.",
   unrecognized_fscode: "Profil má evidované jiné FSCode.",
@@ -64,9 +64,27 @@ const categoryReviewReasons = {
 
 function formatImportedLabel(item) {
   const imported = item.imported_athlete;
-  return imported.first_name && imported.last_name
-    ? `${imported.first_name} ${imported.last_name}`
-    : item.source_full_name || "Jméno nezjištěno";
+  return `${imported.first_name || "—"} / ${imported.last_name || "—"}`;
+}
+
+function SourceNameDetails({ item }) {
+  return (
+    <details>
+      <summary>Původní hodnoty ze zdroje</summary>
+      <div>
+        Celý text jména{" "}
+        <span style={{ whiteSpace: "pre-wrap" }}>{item.source_full_name ?? "Neuloženo"}</span>
+      </div>
+      <div>
+        Jméno ze zdrojového pole{" "}
+        <code>{JSON.stringify(item.source_person_name?.first_name) ?? "Neuloženo"}</code>
+      </div>
+      <div>
+        Příjmení ze zdrojového pole{" "}
+        <code>{JSON.stringify(item.source_person_name?.last_name) ?? "Neuloženo"}</code>
+      </div>
+    </details>
+  );
 }
 
 function formatSelectedImportedLabel(item) {
@@ -245,7 +263,7 @@ export default function AdminPage() {
 
   const allReviewItems = reviewQuery.data?.items ?? [];
   const reviewItems = nameProblemsOnly
-    ? allReviewItems.filter((item) => item.name_issues?.length)
+    ? allReviewItems.filter((item) => item.missing_name)
     : allReviewItems;
   const summary = reviewQuery.data?.summary ?? {
     total: 0,
@@ -395,7 +413,7 @@ export default function AdminPage() {
           <div className="admin-page__assignment">
             <div className="admin-page__assignment-header">
               <p className="admin-page__hint">
-                Vybraný záznam:{" "}
+                Interpretované jméno a příjmení{" "}
                 <strong>{formatSelectedImportedLabel(selectedReviewItem)}</strong>
               </p>
               <button
@@ -404,7 +422,7 @@ export default function AdminPage() {
                 onClick={handleCreateAthlete}
                 disabled={
                   assignMutation.isPending || createAthleteMutation.isPending ||
-                  ["missing_name", "name_segmentation_review"].includes(selectedReviewItem.match_reason)
+                  selectedReviewItem.missing_name
                 }
               >
                 Vytvořit závodníka
@@ -481,7 +499,7 @@ export default function AdminPage() {
           <label>
             <input type="checkbox" checked={nameProblemsOnly}
               onChange={(event) => setNameProblemsOnly(event.target.checked)} />
-            Pouze záznamy s problémem ve jménu
+            Chybí jméno nebo příjmení ({summary.missing_name ?? 0})
           </label>
           <table className="table table--compact admin-review-table">
             <colgroup>
@@ -494,7 +512,7 @@ export default function AdminPage() {
             </colgroup>
             <thead>
               <tr>
-                <th>Importovaný závodník</th>
+                <th>Interpretované jméno a příjmení</th>
                 <th>Stav</th>
                 <th>Rok narození</th>
                 <th>FSCode</th>
@@ -523,12 +541,8 @@ export default function AdminPage() {
                   >
                     <td>
                       <strong>{formatImportedLabel(item)}</strong>
-                      {(!!item.name_issues?.length || item.source_full_name) && (
-                        <details>
-                          <summary>Původní hodnoty jména</summary>
-                          {item.source_full_name && <div>{item.source_full_name}</div>}
-                          <div>{JSON.stringify(item.source_person_name)}</div>
-                        </details>
+                      {(item.missing_name || item.source_person_name || item.source_full_name != null) && (
+                        <SourceNameDetails item={item} />
                       )}
                       {item.source_url?.startsWith("https://") && (
                         <a href={item.source_url}>Zdroje výsledku</a>

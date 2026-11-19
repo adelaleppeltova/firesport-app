@@ -345,6 +345,7 @@ class DataImporter:
         start_number = self._parse_start_number(result_data.get("start_number"))
         imported_athlete = self._extract_imported_athlete_data(result_data)
         source_name = result_data.get("source_full_name")
+        source_person_name = {field: result_data[field] for field in NAME_FIELDS if field in result_data}
         return {
             "competition": ObjectId(competition_id),
             **({"source_full_name": source_name} if isinstance(source_name, str) and source_name.strip() else {}),
@@ -354,9 +355,7 @@ class DataImporter:
             "imported_team": imported_team,
             "district": result_data.get("district"),
             "imported_athlete": imported_athlete,
-            **({"source_person_name": {field: result_data.get(field) for field in NAME_FIELDS}}
-               if (any(result_data.get(field) != imported_athlete[field] for field in NAME_FIELDS)
-                   or not source_name and any(imported_athlete[field] for field in NAME_FIELDS)) else {}),
+            **({"source_person_name": source_person_name} if source_person_name else {}),
             "start_number": start_number,
             "final_time": result_data.get("final_time"),
             "final_time_status": result_data.get("final_status", "invalid"),
@@ -506,10 +505,12 @@ class DataImporter:
         action, ids = self.assess_result(row, candidates)
         if action == "duplicate":
             original = next(doc for doc in candidates if doc["_id"] == ids[0])
-            if (row.get("source_full_name") and not original.get("source_full_name")
+            if (row.get("source_full_name") and "source_full_name" not in original
+                    and "source_full_name" not in (original.get("source_row") or {})
                     and self._row_identity(row) == self._row_identity(original)):
                 await results_collection.update_one(
-                    {"_id": original["_id"], "source_full_name": None, **{
+                    {"_id": original["_id"], "source_full_name": {"$exists": False},
+                     "source_row.source_full_name": {"$exists": False}, **{
                         field: original.get(field) for field in (
                             "imported_athlete", "source_category", "rank", "start_number",
                             "times", "final_time", "final_time_status", "team",

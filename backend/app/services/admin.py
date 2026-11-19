@@ -9,7 +9,8 @@ from app.category_catalog import active_results
 from app.db.database import db
 from app.models.admin import AdminImportStats, AdminReviewItem, AdminReviewResponse, AdminReviewSummary, AdminSourceNameDetail
 from app.models.result import ImportedAthleteData, MatchStatus
-from app.person_names import NAME_FIELDS, missing_name, name_issues
+from app.person_names import missing_name, name_issues
+from app.services.result_review import review_results_query
 from app.services.athlete_identity import active_athlete_query, build_fs_code_query
 from app.services.athlete_merge import (
     merge_athletes_service,
@@ -121,14 +122,8 @@ async def import_results_from_files(files: list[UploadFile]) -> dict:
 
 
 async def get_review_results() -> AdminReviewResponse:
-    query = {
-        **active_results(individual=True),
-        "match_status": {
-            "$in": [MatchStatus.needs_review.value, MatchStatus.unmatched.value]
-        }
-    }
     docs = (
-        await results_collection.find(query)
+        await results_collection.find(review_results_query())
         .sort("date", -1)
         .to_list(length=None)
     )
@@ -136,12 +131,18 @@ async def get_review_results() -> AdminReviewResponse:
     items: list[AdminReviewItem] = []
     needs_review_count = 0
     unmatched_count = 0
+    missing_name_count = 0
 
     for doc in docs:
         imported = doc.get("imported_athlete") or {}
         incomplete = missing_name(imported)
+        missing_name_count += incomplete
         source_name = doc.get("source_full_name")
-        reason = ("name_segmentation_review" if source_name else "missing_name") if incomplete else doc.get("match_reason")
+        reason = doc.get("match_reason")
+        if incomplete:
+            reason = "name_segmentation_review" if source_name else "missing_name"
+        elif reason in {"missing_name", "name_segmentation_review"}:
+            reason = "insufficient_identity"
         status_value = MatchStatus.needs_review.value if incomplete else doc.get("match_status", MatchStatus.unmatched.value)
         if status_value == MatchStatus.needs_review.value:
             needs_review_count += 1
@@ -156,7 +157,8 @@ async def get_review_results() -> AdminReviewResponse:
                 match_reason=reason,
                 source_full_name=source_name,
                 name_issues=name_issues(imported),
-                source_person_name=doc.get("source_person_name") or {field: imported.get(field) for field in NAME_FIELDS},
+                missing_name=incomplete,
+                source_person_name=doc.get("source_person_name"),
                 source_url=(doc.get("source_category") or {}).get("source_url"),
                 team=doc.get("imported_team", doc.get("team")),
                 date=doc.get("date").isoformat() if doc.get("date") else None,
@@ -168,6 +170,7 @@ async def get_review_results() -> AdminReviewResponse:
             total=len(items),
             needs_review=needs_review_count,
             unmatched=unmatched_count,
+            missing_name=missing_name_count,
         ),
         items=items,
     )
@@ -177,16 +180,20 @@ async def get_source_name_detail(result_id: str) -> AdminSourceNameDetail:
     if not ObjectId.is_valid(result_id):
         raise HTTPException(status_code=400, detail="Neplatné ID výsledku.")
     row = await results_collection.find_one(
-        {"_id": ObjectId(result_id), "source_full_name": {"$type": "string"}},
+        {"_id": ObjectId(result_id), "$or": [
+            {"source_full_name": {"$type": "string"}},
+            {"source_person_name": {"$type": "object"}},
+        ]},
         {"classification_status": 1, "imported_athlete": 1, "source_full_name": 1,
-         "source_name_evidence.segmentation": 1},
+         "source_person_name": 1, "source_name_evidence.segmentation": 1},
     )
     if not row:
         raise HTTPException(status_code=404, detail="Výsledek se zdrojovým jménem nebyl nalezen.")
     return AdminSourceNameDetail(
         result_id=result_id, classification_status=row.get("classification_status"),
         imported_athlete=ImportedAthleteData.model_validate(row.get("imported_athlete") or {}),
-        source_full_name=row["source_full_name"],
+        source_full_name=row.get("source_full_name"),
+        source_person_name=row.get("source_person_name"),
         segmentation=(row.get("source_name_evidence") or {}).get("segmentation"),
     )
 

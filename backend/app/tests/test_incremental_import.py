@@ -360,7 +360,10 @@ def test_reimport_backfills_only_source_name_of_exact_legacy_result(import_colle
 
     async def update(filter_, update):
         stored = import_collections["results"].documents[filter_["_id"]]
-        assert all(stored.get(field) == value for field, value in filter_.items())
+        assert filter_["source_full_name"] == filter_["source_row.source_full_name"] == {"$exists": False}
+        assert "source_full_name" not in stored and "source_full_name" not in (stored.get("source_row") or {})
+        assert all(stored.get(field) == value for field, value in filter_.items()
+                   if field not in {"source_full_name", "source_row.source_full_name"})
         stored.update(update["$set"])
 
     import_collections["results"].update_one = AsyncMock(side_effect=update)

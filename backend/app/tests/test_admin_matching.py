@@ -100,3 +100,21 @@ def test_review_queue_includes_unresolved_import_with_original_identity_and_reas
     assert response.items[0].imported_athlete.fscode == "12345"
     assert response.items[0].match_reason == "no_match"
     assert response.items[0].team == "SDH LHOTA"
+    assert response.items[0].source_person_name is None
+    assert response.items[0].name_issues
+    assert response.summary.missing_name == 0
+
+
+def test_review_reports_only_missing_components_and_returns_exact_source_fields():
+    source_parts = {"first_name": None, "last_name": "  Novák "}
+    doc = _result(imported_athlete={"first_name": " \u00a0", "last_name": "Novák"},
+                  source_person_name=source_parts, source_full_name="Novák  Jan")
+    with patch.object(admin, "results_collection") as results:
+        results.find.return_value.sort.return_value.to_list = AsyncMock(return_value=[doc])
+        response = asyncio.run(admin.get_review_results())
+
+    item = response.items[0]
+    assert item.missing_name and response.summary.missing_name == 1
+    assert item.imported_athlete.first_name == ""
+    assert item.source_person_name == source_parts
+    assert item.source_full_name == "Novák  Jan"

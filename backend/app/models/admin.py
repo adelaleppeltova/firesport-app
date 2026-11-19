@@ -15,7 +15,8 @@ class AdminReviewItem(BaseModel):
     match_status: MatchStatus
     match_reason: Optional[str] = None
     name_issues: list[str] = Field(default_factory=list)
-    source_person_name: dict[str, Optional[str]] = Field(default_factory=dict)
+    missing_name: bool = False
+    source_person_name: dict[str, Optional[str]] | None = None
     source_url: Optional[str] = None
     source_full_name: Optional[str] = None
     team: Optional[str] = None
@@ -26,7 +27,8 @@ class AdminSourceNameDetail(BaseModel):
     result_id: str
     classification_status: str | None = None
     imported_athlete: ImportedAthleteData
-    source_full_name: str
+    source_full_name: str | None = None
+    source_person_name: dict[str, Optional[str]] | None = None
     segmentation: dict | None = None
 
 
@@ -34,6 +36,7 @@ class AdminReviewSummary(BaseModel):
     total: int
     needs_review: int = 0
     unmatched: int = 0
+    missing_name: int = 0
 
 
 class AdminReviewResponse(BaseModel):
