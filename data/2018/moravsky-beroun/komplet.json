@@ -4,7 +4,7 @@
   "competition": {
     "name": "Stovkování pod Slunečnou",
     "place": "Moravský Beroun",
-    "date": "2018-07",
+    "date": "2018-08-18",
     "league": null,
     "categories": [
       {
@@ -2152,6 +2152,54 @@
             "final_time": null,
             "final_status": "invalid",
             "rank": 25
+          },
+          {
+            "start_number": "55",
+            "fscode": null,
+            "first_name": "Ondřej",
+            "last_name": "Kahánek",
+            "birth_year": null,
+            "team": "Závišice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 25
+          },
+          {
+            "start_number": "59",
+            "fscode": null,
+            "first_name": "Michal",
+            "last_name": "Brodacký",
+            "birth_year": null,
+            "team": "Trusovice",
+            "district": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid"
+              }
+            ],
+            "final_time": null,
+            "final_status": "invalid",
+            "rank": 25
           }
         ]
       }
@@ -2181,6 +2229,8 @@
     "Muži – Martin Kučera (řádek 33): zástupné časy 99.99 ve sloupcích pokusů nebo výsledného času byly označeny jako neplatné (null).",
     "Muži – Miroslav Arvai (řádek 34): zástupné časy 99.99 ve sloupcích pokusů nebo výsledného času byly označeny jako neplatné (null).",
     "Muži – Jiří Plíhal (řádek 35): zástupné časy 99.99 ve sloupcích pokusů nebo výsledného času byly označeny jako neplatné (null).",
+    "Muži – Ondřej Kahánek (řádek 36): zástupné časy 99.99 ve sloupcích pokusů nebo výsledného času byly označeny jako neplatné (null).",
+    "Muži – Michal Brodacký (řádek 37): zástupné časy 99.99 ve sloupcích pokusů nebo výsledného času byly označeny jako neplatné (null).",
     "Muži: sedm závodníků má shodné oficiální pořadí 25; hodnoty rank = 25 byly převzaty beze změny.",
     "Ženy: na konci výsledkové listiny je neobsazený řádek s pořadím 17 a nulovým výsledkem; přeskočen.",
     "Zkratky kategorií v sešitě nejsou úplné standardní názvy (např. „dorky“); pro JSON byly normalizovány na povolené názvy."

@@ -14,8 +14,9 @@ import PageContextNav from "../components/PageContextNav";
 import { useAuth } from "../context/AuthContext";
 
 const formatDate = (dateString) => {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
+  const dateValue = Date.parse(dateString);
+  if (!Number.isFinite(dateValue)) return "-";
+  const date = new Date(dateValue);
   return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`;
 };
 
@@ -34,8 +35,30 @@ const formatSeason = (dateString) => {
   return Number.isNaN(date.getTime()) ? "-" : `${date.getFullYear()}`;
 };
 
-const getResultDateValue = (result) =>
-  new Date(result?.competition?.date || 0).getTime();
+const RESULT_COLUMNS = [
+  {
+    key: "date",
+    label: "Datum",
+    value: (result) => Date.parse(result.competition?.date),
+  },
+  { key: "competition", label: "Závod", value: (result) => result.competition?.name },
+  { key: "place", label: "Místo", value: (result) => result.competition?.place },
+  { key: "category", label: "Kategorie", value: (result) => result.category?.name },
+  { key: "team", label: "Sbor", value: (result) => result.team },
+  { key: "time", label: "Výsledný čas", value: (result) => result.final_time },
+];
+const DATE_COLUMN = RESULT_COLUMNS[0];
+const resultCollator = new Intl.Collator("cs", { numeric: true });
+
+function compareResultValues(a, b, direction) {
+  const isMissing = (value) =>
+    typeof value === "number" ? !Number.isFinite(value) : !value?.trim();
+  if (isMissing(a)) return isMissing(b) ? 0 : 1;
+  if (isMissing(b)) return -1;
+
+  const comparison = typeof a === "number" ? a - b : resultCollator.compare(a, b);
+  return direction === "asc" ? comparison : -comparison;
+}
 
 const getResultKey = (result) =>
   result?._id ??
@@ -72,6 +95,10 @@ export default function AthleteDetailPage() {
 
   const [discipline, setDiscipline] = useState("100m");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [resultSort, setResultSort] = useState({
+    column: DATE_COLUMN,
+    direction: "desc",
+  });
   const [mergeSearch, setMergeSearch] = useState("");
   const [submittedMergeSearch, setSubmittedMergeSearch] = useState("");
   const [mergeMessage, setMergeMessage] = useState(null);
@@ -115,10 +142,23 @@ export default function AthleteDetailPage() {
     ? (availableCategories.find((c) => c.category_id === selectedCategoryId) ??
       null)
     : null;
-  const filteredResults = (results ?? []).filter(
-    (result) => result.discipline === discipline &&
-      (!selectedCategory || result.category?._id === selectedCategoryId),
-  );
+  const filteredResults = (results ?? [])
+    .filter(
+      (result) => result.discipline === discipline &&
+        (!selectedCategory || result.category?._id === selectedCategoryId),
+    )
+    .sort((a, b) =>
+      compareResultValues(DATE_COLUMN.value(a), DATE_COLUMN.value(b), "desc"),
+    );
+  const lastResult = filteredResults[0];
+  const { column: sortColumn, direction: sortDirection } = resultSort;
+  const isAscending = sortDirection === "asc";
+  const sortedResults =
+    sortColumn === DATE_COLUMN && !isAscending
+      ? filteredResults
+      : [...filteredResults].sort((a, b) =>
+          compareResultValues(sortColumn.value(a), sortColumn.value(b), sortDirection),
+        );
   const summaryTitleLabel = selectedCategory?.category_name ?? "Všechny kategorie";
   const summaryTotalRaces = selectedCategory
     ? selectedCategory.total_races ?? null
@@ -134,9 +174,6 @@ export default function AthleteDetailPage() {
   ].filter(Boolean);
   const athleteTeams = athlete.teams ?? [];
   const athleteFsCodes = athlete.fs_codes ?? [];
-  const lastResult = [...filteredResults].sort(
-    (a, b) => getResultDateValue(b) - getResultDateValue(a),
-  )[0];
   const validResults = filteredResults.filter(
     (result) =>
       result.final_time_status === "valid" && result.final_time != null,
@@ -171,6 +208,20 @@ export default function AthleteDetailPage() {
     },
   ];
   const mergeCandidates = mergeCandidatesQuery.data?.items ?? [];
+
+  const handleResultSort = (column) => {
+    setResultSort((current) => ({
+      column,
+      direction:
+        current.column === column && current.direction === "asc" ? "desc" : "asc",
+    }));
+  };
+  const getSortButtonLabel = (column) => {
+    const nextDirection = sortColumn === column && isAscending ? "sestupně" : "vzestupně";
+    return `Seřadit podle sloupce ${column.label} ${nextDirection}`;
+  };
+  const activeSortIcon = isAscending ? "fa-sort-up" : "fa-sort-down";
+  const ariaSortDirection = isAscending ? "ascending" : "descending";
 
   const handleMergeSearchSubmit = (event) => {
     event.preventDefault();
@@ -330,17 +381,32 @@ export default function AthleteDetailPage() {
           </colgroup>
           <thead>
             <tr>
-              <th className="athlete-detail-table__date-heading">Datum</th>
-              <th>Závod</th>
-              <th>Místo</th>
-              <th>Kategorie</th>
-              <th>Sbor</th>
-              <th className="athlete-detail-table__time-heading">Výsledný čas</th>
+              {RESULT_COLUMNS.map((column) => {
+                const isActive = sortColumn === column;
+                return (
+                  <th
+                    key={column.key}
+                    scope="col"
+                    className={isActive ? "sortable-th sortable-th--active" : "sortable-th"}
+                    aria-sort={isActive ? ariaSortDirection : "none"}
+                  >
+                    <button
+                      type="button"
+                      className="sortable-th__button"
+                      onClick={() => handleResultSort(column)}
+                      aria-label={getSortButtonLabel(column)}
+                    >
+                      <span className="sortable-th__label">{column.label}</span>
+                      <i className={`fa-solid ${isActive ? activeSortIcon : "fa-sort"}`} aria-hidden="true" />
+                    </button>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
             {hasResults ? (
-              filteredResults.map((r) => {
+              sortedResults.map((r) => {
                 const competitionName = r.competition?.name || "Neznámý závod";
                 const competitionPlace = r.competition?.place || "-";
                 const competitionDate = formatDate(r.competition?.date);
@@ -401,8 +467,31 @@ export default function AthleteDetailPage() {
       </div>
 
       <div className="athlete-results-mobile-list">
+        {hasResults && (
+          <div className="athlete-results-mobile-sort">
+            <label htmlFor="athlete-result-sort">Seřadit podle</label>
+            <select
+              id="athlete-result-sort"
+              value={sortColumn.key}
+              onChange={(event) =>
+                handleResultSort(RESULT_COLUMNS.find((column) => column.key === event.target.value))
+              }
+            >
+              {RESULT_COLUMNS.map((column) => (
+                <option key={column.key} value={column.key}>{column.label}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => handleResultSort(sortColumn)}
+              aria-label={getSortButtonLabel(sortColumn)}
+            >
+              <i className={`fa-solid ${activeSortIcon}`} aria-hidden="true" />
+            </button>
+          </div>
+        )}
         {hasResults ? (
-          filteredResults.map((r) => {
+          sortedResults.map((r) => {
             const competitionName = r.competition?.name || "Neznámý závod";
             const competitionDate = formatDate(r.competition?.date);
             const competitionPlace = r.competition?.place || "-";

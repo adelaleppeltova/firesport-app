@@ -17,6 +17,7 @@ from pymongo.errors import DuplicateKeyError
 from app.category_catalog import CATEGORY_COLLECTION, CATEGORIES
 from app.db.database import db
 from app.extraction.metadata import TEAM_TABLE_NOTE
+from app.extraction.times import final_attempt_issue
 from app.services.category_normalization import (
     group_metadata, label_key, resolve_category, source_discipline, source_performance_issue,
 )
@@ -337,6 +338,10 @@ class DataImporter:
                     match["match_status"] = MatchStatus.matched
             identity = self._row_identity(row)
             index_identity = {key: value for key, value in identity.items() if key != "source_group"}
+            attempt_issue = (
+                individual and row["final_time_status"] == "valid" and row["final_time"] is not None
+                and final_attempt_issue(row["final_time"], row["times"])
+            )
             result_doc = {
                 "_id": _import_id("result", index_identity),
                 **row,
@@ -344,7 +349,7 @@ class DataImporter:
                 "match_status": match["match_status"].value,
                 "match_reason": match["match_reason"],
                 "created_at": datetime.now(),
-                "quality_flag": "ok",
+                "quality_flag": "suspicious" if attempt_issue else "ok",
             }
             if match["matched_athlete"]:
                 result_doc["athlete"] = ObjectId(match["matched_athlete"]["_id"])

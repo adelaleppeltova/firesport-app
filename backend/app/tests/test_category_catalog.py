@@ -25,21 +25,31 @@ def resolve(name, discipline, birth_year=None, year=2026, **kwargs):
                             person(birth_year), **kwargs)
 
 
-def test_catalog_is_a_fixed_22_category_whitelist():
+def test_catalog_is_a_fixed_26_category_whitelist():
     assert set(DISCIPLINES) == {"100m", "60m"}
-    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 22
+    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 26
     assert Counter((c.discipline, c.type, c.age_system) for c in CATEGORIES) == {
-        ("100m", "individual", "age_group"): 8, ("100m", "team", "age_group"): 2,
-        ("60m", "individual", "age_group"): 8, ("60m", "individual", "general"): 4,
+        ("100m", "individual", "age_group"): 8, ("100m", "individual", "general"): 2, ("100m", "team", "age_group"): 2,
+        ("60m", "individual", "age_group"): 10, ("60m", "individual", "general"): 4,
     }
     for discipline, kind, intervals in (
-        ("100m", "individual", {(13, 14), (15, 16), (17, 18), (19, 100)}),
+        ("100m", "individual", {(13, 14), (15, 16), (17, 18), (17, 100), (19, 100)}),
         ("100m", "team", {(13, 18)}),
-        ("60m", "individual", {(6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
+        ("60m", "individual", {(0, 5), (6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
     ):
         for gender in ("male", "female"):
             assert {(c.min_age, c.max_age) for c in CATEGORIES
                     if (c.discipline, c.type, c.gender) == (discipline, kind, gender)} == intervals
+
+
+@pytest.mark.parametrize(("label", "key"), [
+    ("Muži a starší dorostenci", "100m-men-17-100"),
+    ("Ženy a starší dorostenky", "100m-women-17-100"),
+])
+def test_published_combined_group_keeps_its_own_category(label, key):
+    assert resolve(label, "100m", None).category.key == key
+    assert resolve(label + " – věk: 17–100 let", "100m", 2009).category.key == key
+    assert resolve(label, "100m", 2010).reason == "outside_canonical_age_range"
 
 
 @pytest.mark.parametrize(("age", "key"), [
@@ -118,9 +128,9 @@ def test_personal_records_use_official_valid_individual_times_and_cross_age_grou
     ])
     assert records == {"100m": 16.85, "60m": 12.43}
     offered = asyncio.run(get_catalog("60m"))
-    assert len(offered["categories"]) == 12
+    assert len(offered["categories"]) == 14
     assert {cat.discipline for cat in offered["categories"]} == {"60m"}
-    assert len(active_results(discipline="100m", individual=True)["category"]["$in"]) == 8
+    assert len(active_results(discipline="100m", individual=True)["category"]["$in"]) == 10
 
 
 def fixture_snapshot():
@@ -160,8 +170,8 @@ def test_dry_run_only_reads_and_migration_preserves_official_result_and_referenc
         assert [call[0] for call in collection.method_calls] == ["find"]
         collection.find.return_value.sort.assert_called_once_with("_id", 1)
     assert snapshot == before
-    assert report["counts"]["active"] == 1
-    assert report["counts"]["review"] == 1
+    assert report["counts"]["active"] == 2
+    assert report["counts"]["review"] == 0
     assert report["counts"]["historical_60m"] == 1
     assert report["counts"]["unsupported_by_discipline"] == {"vez": 1}
     assert report["counts"]["reference_issues"] == 0

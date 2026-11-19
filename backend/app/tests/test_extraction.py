@@ -73,10 +73,10 @@ def test_final_is_never_calculated():
     assert final_time("16", attempts, warnings)["time"] == 16
     assert warnings
     assert (
-        final_time("30:00.00", [parse_time("NP", [])] * 2, [], placeholder=True)["time"]
+        final_time("30:00.00", [parse_time("NP", [])] * 2, [], placeholders=("30:00.00",))["time"]
         is None
     )
-    assert final_time("30:00.00", attempts, [], placeholder=False)["time"] == 1800
+    assert final_time("30:00.00", attempts, [])["time"] == 1800
 
 
 @pytest.mark.parametrize(
@@ -220,6 +220,28 @@ def test_unoccupied_and_final_block():
     assert rows[0]["rank"] == 7
     assert rows[0]["times"][1]["invalid_reason"] == "nenastoupil"
     assert audit[0]["rows"] == 1
+
+
+@pytest.mark.parametrize(("url", "first", "third", "expected"), [
+    (URL, "00:20.00 N", None, (None, "invalid")),
+    (URL, "59:00.00 P", None, (3540, "valid")),
+    (URL, "00:20.00 N", "59:00.00 P", (3540, "valid")),
+    ("https://example.org/race", "00:20.00 N", None, (3540, "valid")),
+])
+def test_html_59_minute_placeholder_is_source_specific(url, first, third, expected):
+    page = minimal_table(
+        rows=f"<tr><td>7.</td><td>Jana</td><td>Nová</td><td>{first}</td>"
+             "<td>00:23.00 N</td><td>59:00.00</td><td></td></tr>"
+    )
+    if third is not None:
+        page = page.replace("<th>Výsl. čas</th>", "<th>Čas 3</th><th>Výsl. čas</th>")
+        page = page.replace("<td>59:00.00</td>", f"<td>{third}</td><td>59:00.00</td>")
+    competition, _, _, _ = parse_html(page, url)
+    [row] = competition["categories"][0]["results"]
+
+    assert (row["final_time"], row["final_status"]) == expected
+    assert row["rank"] == 7
+    assert [attempt["try"] for attempt in row["times"]] == [1, 2]
 
 
 def test_advertised_unloaded_category_blocks_publication():

@@ -7,6 +7,8 @@ quality_flag = "suspicious" pokud:
    U 60 m se použijí percentily bez absolutních hranic pro 100 m.
 2) Relativní skok: aktuální čas je o více než 25 % horší než medián
    posledních 5 validních výsledků sportovce *ve stejné kategorii*.
+3) Platný finální čas neodpovídá žádnému dostupnému platnému pokusu
+   nebo jsou všechny uložené pokusy neplatné.
 """
 
 import logging
@@ -19,6 +21,7 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.category_catalog import BY_ID, VALID_FINAL_TIME_FILTER, active_results
+from app.extraction.times import final_attempt_issue
 from app.models.result import QualityFlag
 
 logger = logging.getLogger(__name__)
@@ -171,6 +174,9 @@ async def compute_quality_flag(
     if final_time_status != "valid" or final_time is None:
         return QualityFlag.ok
 
+    if final_attempt_issue(final_time, result_doc.get("times") or []):
+        return QualityFlag.suspicious
+
     # Zjistění category_id – povinné pro per-category výpočet
     category_oid = _parse_object_id(result_doc.get("category"))
     if category_oid is None:
@@ -248,7 +254,7 @@ async def recompute_quality_flags(db: AsyncIOMotorDatabase) -> dict:
     cursor = db["results"].find(
         active_results(individual=True),
         projection={"_id": 1, "final_time": 1, "final_time_status": 1,
-                    "athlete": 1, "date": 1, "category": 1, "discipline": 1},
+                    "athlete": 1, "date": 1, "category": 1, "discipline": 1, "times": 1},
     )
     docs = await cursor.to_list(None)
 

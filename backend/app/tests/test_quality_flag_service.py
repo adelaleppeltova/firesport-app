@@ -18,6 +18,7 @@ import asyncio
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
+import pytest
 from bson import ObjectId
 
 from app.models.result import QualityFlag
@@ -26,6 +27,28 @@ from app.services.quality_flag_service import (
     compute_quality_flag,
     determine_quality_flag,
 )
+
+
+@pytest.mark.parametrize(("attempts", "expected"), [
+    ([{"time": 18.0, "status": "valid"}, {"time": 20.0, "status": "valid"}], QualityFlag.ok),
+    ([{"time": 18.0, "status": "valid"}, {"time": 20.0, "status": "invalid"}], QualityFlag.suspicious),
+    ([{"time": None, "status": "invalid"}, {"time": None, "status": "invalid"}], QualityFlag.suspicious),
+    ([{"time": None, "status": "invalid"}, {"time": None, "status": "missing"}], QualityFlag.ok),
+    ([], QualityFlag.ok),
+])
+def test_official_final_compared_with_available_attempts(attempts, expected):
+    category = ObjectId()
+    row = {
+        "category": category,
+        "final_time": 20.0,
+        "final_time_status": "valid",
+        "times": attempts,
+    }
+    db = MagicMock()
+
+    assert asyncio.run(compute_quality_flag(db, row, {category: (14.0, 40.0)})) == expected
+    assert row["final_time"] == 20.0
+    db.__getitem__.assert_not_called()
 
 
 # ---------------------------------------------------------------------------

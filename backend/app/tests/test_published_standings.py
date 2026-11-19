@@ -109,7 +109,7 @@ def test_historical_ranges_need_exact_source_evidence_and_individual_row_proof_d
     assert historical_fields("60m", "noncanonical_60m_age_range", {"min_age": 7, "max_age": 11}) == {}
     source = {"classification_evidence": [{"kind": "organizer_category", "label": "Chlapci 6–8 let"}]}
     assert historical_fields("60m", "noncanonical_60m_age_range", source)["historical_age_range"] == [6, 8]
-    assert len(CATEGORIES) == 22 and set(DISCIPLINES) == {"100m", "60m"}
+    assert len(CATEGORIES) == 26 and set(DISCIPLINES) == {"100m", "60m"}
 
     event = {"date": "2024-01-01"}
     person = {"birth_year": 2008, "first_name": "", "last_name": ""}

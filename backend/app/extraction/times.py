@@ -18,6 +18,20 @@ INVALID = {
 }
 
 
+def final_attempt_issue(final, attempts):
+    """Compare a valid official final with the stored evidence from the attempts."""
+    valid_times = [
+        attempt["time"]
+        for attempt in attempts
+        if attempt.get("status") == "valid" and attempt.get("time") is not None
+    ]
+    if valid_times and final not in valid_times:
+        return "final_differs_from_valid_attempts"
+    if attempts and all(attempt.get("status") == "invalid" for attempt in attempts):
+        return "all_attempts_invalid"
+    return None
+
+
 def parse_time(raw, warnings, context="", *, absent=False):
     if absent:
         return {"time": None, "status": "missing"}
@@ -50,11 +64,12 @@ def parse_time(raw, warnings, context="", *, absent=False):
     return {"time": round(number, 3), "status": "invalid" if trailing else "valid"}
 
 
-def final_time(raw, attempts, warnings, context="", *, placeholder=False, absent=False):
+def final_time(raw, attempts, warnings, context="", *, placeholders=(), absent=False):
     result = parse_time(raw, warnings, context, absent=absent)
     if (
-        placeholder
-        and str(raw).strip() == "30:00.00"
+        not absent
+        and str(raw).strip() in placeholders
+        and len(attempts) == 2
         and all(t["status"] == "invalid" for t in attempts)
     ):
         return {"time": None, "status": "invalid"}

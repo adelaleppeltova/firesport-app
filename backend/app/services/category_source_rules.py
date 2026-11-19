@@ -1,4 +1,5 @@
 """Organizer evidence scoped to exact race identifiers and dates."""
+import re
 from datetime import date
 from urllib.parse import urlsplit
 
@@ -25,6 +26,26 @@ OLDER_GENERAL = {
     ("248", "2023-05-27"): "https://pozarnisport.hasicovo.cz/races/248",
 }
 RACE_HOSTS = {"pozarnisporty.cz", "www.pozarnisporty.cz", "pozarnisport.hasicovo.cz"}
+PRAGUE_MEMORIAL = "https://www.hasicovo.cz/cs/zpravy/nejvetsi-sportovni-udalost-memorial-marty-habadove-zna-sve-viteze"
+BOROVANY_STANDINGS = "https://www.sdhborovany.cz/wp-content/uploads/2024/05/2024_Boro60_vysledky.pdf"
+PASEKY_STANDINGS = (
+    "https://oshpisek.hasicovo.cz/file/edee/ms-osh/osh-pisek/2025/08/celkove-vysledky-ps-2025-20250813-082557.pdf"
+)
+POLABI_RULES = "https://sdhpiskovalhota.cz/2026/Polabske-sedesatkovani-propozice.pdf"
+
+YOUTH_STANDINGS = {
+    ("161", "2022-11-06"): (PRAGUE_MEMORIAL, {"6 11": "Mladší"}),
+    ("162", "2022-11-05"): (PRAGUE_MEMORIAL, {"11 15": "Starší"}),
+    ("335", "2024-05-08"): (BOROVANY_STANDINGS, {"7 11": "Mladší", "12 15": "Starší"}),
+    ("771", "2025-08-09"): (PASEKY_STANDINGS, {"3 5": "Přípravka", "6 11": "Mladší", "12 15": "Starší"}),
+}
+POLABI_AGE_GROUPS = {
+    ("mladsi", "i"): ("Mladší", "7–8"),
+    ("mladsi", "ii"): ("Mladší", "9–11"),
+    ("starsi", "i"): ("Starší", "12–13"),
+    ("starsi", "ii"): ("Starší", "14–15"),
+}
+YOUTH_GENDER_LABEL = {"divky": "dívky", "chlapci": "chlapci"}
 
 
 def event_identity(competition: dict) -> tuple:
@@ -94,6 +115,18 @@ def organizer_label(key: str, discipline: str, competition: dict) -> tuple[str, 
     }
     older = {"divky vek 11 15": "Starší dívky", "chlapci vek 11 15": "Starší chlapci"}
     if discipline == "60m":
+        general_group = re.fullmatch(r"(divky|chlapci) vek (\d+ \d+)", key)
+        if race in YOUTH_STANDINGS and general_group:
+            source, groups = YOUTH_STANDINGS[race]
+            gender, ages = general_group.groups()
+            if division := groups.get(ages):
+                return f"{division} {YOUTH_GENDER_LABEL[gender]}", source
+        if race == ("1180", "2026-09-20"):
+            group = re.fullmatch(r"(mladsi|starsi) (divky|chlapci) (i|ii)", key)
+            if group:
+                division, gender, number = group.groups()
+                label, ages = POLABI_AGE_GROUPS[division, number]
+                return f"{label} {YOUTH_GENDER_LABEL[gender]} {ages} let", POLABI_RULES
         if race in YOUNGER_STIMAX and key in younger:
             return younger[key], YOUNGER_STIMAX[race]
         if race in OLDER_GENERAL and key in older:

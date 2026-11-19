@@ -43,6 +43,39 @@ def test_oldest_unsplit_group_and_adult_standings_preserve_published_rules():
     )
 
 
+@pytest.mark.parametrize(("race", "date", "label", "target"), [
+    ("161", "2022-11-06", "dívky - věk: 6 - 11", "60m-girls-younger"),
+    ("162", "2022-11-05", "chlapci - věk: 11 - 15", "60m-boys-older"),
+    ("335", "2024-05-08", "dívky - věk: 7 - 11", "60m-girls-younger"),
+    ("335", "2024-05-08", "chlapci - věk: 12 - 15", "60m-boys-older"),
+    ("771", "2025-08-09", "chlapci - věk: 6 - 11", "60m-boys-younger"),
+    ("771", "2025-08-09", "dívky - věk: 12 - 15", "60m-girls-older"),
+    ("1180", "2026-09-20", "mladší DÍVKY I.", "60m-girls-7-8"),
+    ("1180", "2026-09-20", "mladší CHLAPCI II.", "60m-boys-9-11"),
+    ("1180", "2026-09-20", "starší CHLAPCI I.", "60m-boys-12-13"),
+    ("1180", "2026-09-20", "starší DÍVKY II.", "60m-girls-14-15"),
+])
+def test_organizer_youth_groups_are_scoped_to_the_exact_race_and_date(race, date, label, target):
+    event = {"date": date, "source_url": f"https://pozarnisporty.cz/races/{race}"}
+    person = {"first_name": "Jana", "last_name": "Nová"}
+    resolved = resolve_category(label, "60m", event, person)
+    assert resolved.category.key == target
+    assert resolved.evidence["kind"] == "organizer_category"
+    assert resolve_category(label, "60m", {**event, "date": "2026-01-01"}, person).category is None
+    assert resolve_category(label, "60m", event, {}, team="Lhota").category is None
+
+
+def test_polabi_and_paseky_preparation_groups_require_age_below_six_when_known():
+    polabi = {"date": "2026-09-20", "source_url": "https://pozarnisporty.cz/races/1180"}
+    paseky = {"date": "2025-08-09", "source_url": "https://pozarnisporty.cz/races/771"}
+    assert resolve_category("přípravka DÍVKY", "60m", polabi, {"birth_year": 2020}).category is None
+    assert resolve_category("přípravka DÍVKY", "60m", polabi, {"birth_year": 2021}).category.key == (
+        "60m-girls-preparatory"
+    )
+    assert resolve_category("chlapci - věk: 3 - 5", "60m", paseky, {}).category.key == "60m-boys-preparatory"
+    assert resolve_category("mladší DÍVKY II", "60m", polabi, {"birth_year": 2019}).category is None
+
+
 def test_scoped_bzucany_and_chomutov_source_overrides():
     person = {"first_name": "Jan", "last_name": "Nový", "birth_year": 2006}
     event = {"date": "2023-09-30", "source_url": "https://pozarnisporty.cz/races/227"}

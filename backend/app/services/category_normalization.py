@@ -151,6 +151,8 @@ def _resolve_category(
         return Resolution(discipline, reason="unverified_team_or_progression")
 
     if discipline == "60m":
+        if direct and key in {"pripravka chlapci", "pripravka divky"}:
+            return _validated(direct, age, person, competition)
         # Explicit subdivisions and conflicting age intervals never become general groups.
         key = key.replace("stasi ", "starsi ")
         youth = "younger" if "mladsi" in key.split() else "older" if "starsi" in key.split() else None
@@ -193,6 +195,12 @@ def _resolve_category(
     if direct:
         return _validated(direct, age, person, competition)
 
+    if age_range == (17, 100):
+        group = re.sub(r" (?:vek )?17 100(?: let)?$", "", key)
+        combined_category = CANONICAL_NAME.get((discipline, group))
+        if combined_category and combined_category.age_system == "general":
+            return _validated(combined_category, age, person, competition)
+
     # Recognized 100 m aliases and combined groups. Exact numeric ranges restrict
     # the eligible targets, even when an adult label is used for youth starts.
     base = re.sub(r"\s+(?:(?:vek|nad)\s+)?\d.*", "", key)
@@ -223,7 +231,7 @@ def _resolve_category(
 
     candidates = [
         c for c in CATEGORIES if c.discipline == discipline and c.gender == gender and c.type == "individual"
-        and c.min_age <= bounds[1] and c.max_age >= bounds[0]
+        and c.age_system == "age_group" and c.min_age <= bounds[1] and c.max_age >= bounds[0]
     ]
     if len(candidates) == 1 and bounds == (candidates[0].min_age, candidates[0].max_age):
         return _validated(candidates[0], age, person, competition)

@@ -65,7 +65,9 @@ Závod se identifikuje podle zdrojového URL a úplných metadat, kategorie podl
 
 ### Quality flag
 
-Při importu se do `results.quality_flag` ukládá `ok` nebo `suspicious`. Kontrola používá validní finální časy ve stejné konkrétní kategorii: čas mimo hranice odvozené z 1. a 99. percentilu, omezené absolutním intervalem 11–45 s, je podezřelý. Druhé pravidlo označí čas, který je více než o 25 % horší než medián posledních pěti dřívějších validních výsledků stejného atleta ve stejné kategorii. Invalidní nebo chybějící finální čas dostává `ok`. Quality flag lze také hromadně přepočítat službou `recompute_quality_flags`.
+Při importu se do `results.quality_flag` ukládá `ok` nebo `suspicious`. Kontrola označuje časy mimo hranice 1. a 99. percentilu stejné kategorie. U 100 m se tyto hranice omezují intervalem 11–45 s. Příznak dostane také čas, který je více než o 25 % horší než medián posledních pěti dřívějších platných výsledků stejného atleta ve stejné kategorii, nebo platný finální čas, který se neshoduje s žádným uloženým platným pokusem, případně má všechny uložené pokusy neplatné. Příznak označuje výsledek k ověření a zachovává oficiální čas i pokusy. Quality flag lze hromadně přepočítat službou `recompute_quality_flags`.
+
+Audit zdrojových souborů spustíte z adresáře `backend` příkazem `python -m scripts.audit_result_times`. Výstup uvádí cestu k souboru, pozici řádku, zdroj a důvody k ověření. Volba `--verify-html` porovná dohledatelné řádky s listinami z PožárníSporty.cz. Použije archivované HTML, případně veřejnou stránku závodu. Ostatní formáty jsou v přehledu označené k ručnímu ověření.
 
 ## Počty v lokální databázi
 

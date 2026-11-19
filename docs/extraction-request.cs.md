@@ -762,6 +762,10 @@ Zároveň však nevytvářej univerzální pravidlo, že každý dlouhý čas je
 
 Ověřuj význam podle kontextu konkrétního výsledkového systému a stavu pokusů.
 
+V individuálních listinách pozarnisporty.cz je doložen také zástupný čas
+`59:00.00`. Použij `null` a `invalid`, pokud listina obsahuje právě dva pokusy
+a oba jsou neplatné. Zachovej zveřejněné pořadí.
+
 ### 9.6 Neprovedený nebo prázdný pokus
 
 Příklad zdroje:

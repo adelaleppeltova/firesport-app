@@ -1,6 +1,6 @@
 {
   "source_file": "mladsi_dorostenky.pdf",
-  "generated_at": "2026-02-19T00:00:00Z",
+  "generated_at": "2026-11-19T18:35:34Z",
   "competition": {
     "name": "Stovkování pod Slunečnou",
     "place": "Moravský Beroun",
@@ -915,6 +915,7 @@
     "Sloupec okres/district v tabulce chybí (district=null u všech).",
     "Rok narození se v tabulce nevyskytuje (birth_year=null u všech).",
     "U záznamu rank 37 je výsledný čas '999,999' považován za neplatný a uložen jako final_time=null, final_status=invalid.",
-    "V textu je prázdný/rozbitý řádek u pořadí 14; interpretováno jako pokračování záznamu pro start_number 32."
+    "V textu je prázdný/rozbitý řádek u pořadí 14; interpretováno jako pokračování záznamu pro start_number 32.",
+    "Viktorie Švachová, Neplachovice, st. č. 34: originál Beroun 2022 uvádí FSCode 77002. Historický údaj je zachován. Pro párování Švachové používat 72002, doložený v Berouně 2023 (https://stovky.cz/ostatni/beroun/2023/stredni_dorostenky.pdf). FSCode 77002 patří Jolaně Šmejkalové podle listiny z Kamence 2026 (https://www.obec-kamenec.cz/soutez/2026/stovky/dorostenky_stredni.pdf)."
   ]
 }

@@ -267,13 +267,18 @@
     }
 
     th {
-      white-space: nowrap;
       padding-top: 0.75rem;
       padding-bottom: 0.75rem;
       font-size: 0.82rem;
       letter-spacing: 0.03em;
       text-transform: uppercase;
       color: variables.$gray-dark;
+    }
+
+    .sortable-th__button {
+      letter-spacing: inherit;
+      text-transform: inherit;
+      white-space: normal;
     }
 
     tbody tr {
@@ -312,9 +317,7 @@
   }
 
   .athlete-detail-table__date,
-  .athlete-detail-table__date-heading,
-  .athlete-detail-table__time,
-  .athlete-detail-table__time-heading {
+  .athlete-detail-table__time {
     white-space: nowrap;
   }
 
@@ -696,6 +699,26 @@
       display: flex;
       flex-direction: column;
       gap: 0.85rem;
+    }
+
+    .athlete-results-mobile-sort {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+
+      select,
+      button {
+        @include mixins.field-input;
+        min-height: 2.75rem;
+        padding: 0.45rem 0.65rem;
+      }
+
+      button {
+        min-width: 2.75rem;
+        color: variables.$color-background-dark;
+        cursor: pointer;
+      }
     }
 
     .athlete-results-mobile-card__details {

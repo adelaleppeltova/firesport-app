@@ -184,7 +184,7 @@ def parse_team_html(data):
                     final["time"] = None
             else:
                 final = final_time(
-                    _time(values[2]), attempts, warnings, context, placeholder=True
+                    _time(values[2]), attempts, warnings, context, placeholders=("30:00.00",)
                 )
             results.append(
                 {
