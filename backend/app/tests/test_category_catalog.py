@@ -25,17 +25,17 @@ def resolve(name, discipline, birth_year=None, year=2026, **kwargs):
                             person(birth_year), **kwargs)
 
 
-def test_catalog_is_a_fixed_32_category_whitelist():
+def test_catalog_is_a_fixed_35_category_whitelist():
     assert set(DISCIPLINES) == {"100m", "60m"}
-    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 32
+    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 35
     assert Counter((c.discipline, c.type, c.age_system) for c in CATEGORIES) == {
         ("100m", "individual", "age_group"): 8, ("100m", "individual", "general"): 4, ("100m", "team", "age_group"): 2,
-        ("60m", "individual", "age_group"): 14, ("60m", "individual", "general"): 4,
+        ("60m", "individual", "age_group"): 17, ("60m", "individual", "general"): 4,
     }
     for discipline, kind, intervals in (
         ("100m", "individual", {(13, 14), (13, 16), (15, 16), (17, 18), (17, 100), (19, 100)}),
         ("100m", "team", {(13, 18)}),
-        ("60m", "individual", {(0, 5), (3, 7), (5, 6), (6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
+        ("60m", "individual", {(0, 5), (3, 6), (3, 7), (5, 6), (6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
     ):
         for gender in ("male", "female"):
             assert {(c.min_age, c.max_age) for c in CATEGORIES
@@ -143,7 +143,7 @@ def test_personal_records_use_official_valid_individual_times_and_cross_age_grou
     ])
     assert records == {"100m": 16.85, "60m": 12.43}
     offered = asyncio.run(get_catalog("60m"))
-    assert len(offered["categories"]) == 18
+    assert len(offered["categories"]) == 21
     assert {cat.discipline for cat in offered["categories"]} == {"60m"}
     assert len(active_results(discipline="100m", individual=True)["category"]["$in"]) == 12
 
@@ -271,3 +271,41 @@ def test_beloves_2022_uses_one_published_individual_group_for_ages_13_to_16():
     assert resolve_category("Dorostenky", "100m", event, person(2005)).reason == "outside_canonical_age_range"
     previous_event = {**event, "date": "2019-06-02"}
     assert resolve_category("Dorostenci", "100m", previous_event, person(None)).category is None
+
+
+@pytest.mark.parametrize(("number", "date", "caption", "category"), [
+    ("224", "2023-04-22", "Muži - věk: 17 - 100", "100m-men-17-100"),
+    ("227", "2023-09-30", "Dorost dívky + ženy nad 17 let", "100m-women-17-100"),
+    ("370", "2024-09-28", "Dorost chlapci", "100m-boys-13-16"),
+    ("658", "2025-09-27", "Dorost dívky", "100m-girls-13-16"),
+    ("1032", "2026-05-09", "9) dorost dívky – 13 – 16 let", "100m-girls-13-16"),
+])
+def test_stimax_uses_the_published_combined_category(number, date, caption, category):
+    event = {"source_url": f"https://pozarnisporty.cz/races/{number}", "date": date}
+    result = resolve_category(caption, "100m", event, person(None))
+    assert result.category == BY_KEY[category]
+    assert result.evidence["kind"] == "organizer_category"
+    assert resolve_category(caption, "100m", {**event, "date": None}, person(None)).category is None
+
+
+@pytest.mark.parametrize(("number", "date", "caption", "key"), [
+    ("926", "2026-05-08", "přípravka", "60m-mixed-preparatory-3-6"),
+    ("1143", "2026-08-16", "přípravka", "60m-mixed-preparatory-3-6"),
+    ("848", "2026-08-08", "chlapci - věk: 3 - 6", "60m-boys-preparatory-3-6"),
+    ("1180", "2026-09-20", "přípravka dívky", "60m-girls-preparatory-3-6"),
+    ("721", "2025-05-25", "přípravka - dívky - 5 a 6 let", "60m-girls-preparatory-5-6"),
+])
+def test_preparatory_uses_the_separate_published_standings(number, date, caption, key):
+    event = {"source_url": f"https://pozarnisporty.cz/races/{number}", "date": date}
+    result = resolve_category(caption, "60m", event, person(None))
+    assert result.category == BY_KEY[key]
+    assert result.evidence["url"] == event["source_url"]
+    assert resolve_category(caption, "60m", event, person(2017)).reason == "outside_canonical_age_range"
+
+
+def test_mixed_preparatory_category_is_exposed_by_the_catalog():
+    offered = asyncio.run(get_catalog("60m"))["categories"]
+    mixed = [category for category in offered if category.gender == "mixed"]
+    assert [(category.key, category.min_age, category.max_age) for category in mixed] == [
+        ("60m-mixed-preparatory-3-6", 3, 6),
+    ]
