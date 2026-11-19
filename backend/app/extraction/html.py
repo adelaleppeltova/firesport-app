@@ -157,8 +157,12 @@ def parse_html(data, url, fetcher=None):
         notes.append(
             f"{name}: columns {columns}; discipline={disc}; category from caption/heading/source banner."
         )
-        if "try3" in columns or "try4" in columns:
+        additional_tries = "try3" in columns or "try4" in columns
+        if additional_tries:
             notes.append(f"{name}: try 3/4 columns ignored; first two retained.")
+        placeholders = ("30:00.00",) if site else ()
+        if site and not additional_tries:
+            placeholders += ("59:00.00",)
         results, reasons_count, source_count = [], 0, 0
         for row in rows[header_index + 1 :]:
             cells = row.find_all(["td", "th"], recursive=False)
@@ -242,7 +246,7 @@ def parse_html(data, url, fetcher=None):
                 attempts,
                 warnings,
                 context,
-                placeholder=site,
+                placeholders=placeholders,
                 absent="final" not in columns,
             )
             year = birth_year(get("birth_year"))
