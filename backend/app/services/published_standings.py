@@ -4,7 +4,7 @@ from hashlib import sha256
 from bson import ObjectId
 
 from app.category_catalog import BY_KEY
-from app.services.category_normalization import source_age
+from app.services.category_normalization import label_key, source_age
 
 TEAM_MEMBER = "team_member"
 HISTORICAL = "historical"
@@ -39,6 +39,9 @@ def historical_fields(discipline, reason, source) -> dict:
     return {}
 
 
-def team_entry_id(competition: ObjectId, category: ObjectId, source_number: int) -> ObjectId:
-    key = f"firesport/team-entry/{competition}/{category}/{source_number}"
+def team_entry_id(
+    competition: ObjectId, category: ObjectId, source_number: int | None, name: str | None = None,
+) -> ObjectId:
+    identity = source_number if source_number is not None else f"name/{label_key(name)}"
+    key = f"firesport/team-entry/{competition}/{category}/{identity}"
     return ObjectId(sha256(key.encode()).digest()[:12])

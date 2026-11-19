@@ -24,7 +24,7 @@ class PublishedTeam(BaseModel):
     category_id: str
     category_name: str
     name: str | None
-    source_number: int
+    source_number: int | None
     rank: int | None
     total_time: float | None
     total_status: TimeStatus

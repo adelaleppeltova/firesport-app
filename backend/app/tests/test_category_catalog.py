@@ -25,17 +25,17 @@ def resolve(name, discipline, birth_year=None, year=2026, **kwargs):
                             person(birth_year), **kwargs)
 
 
-def test_catalog_is_a_fixed_26_category_whitelist():
+def test_catalog_is_a_fixed_28_category_whitelist():
     assert set(DISCIPLINES) == {"100m", "60m"}
-    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 26
+    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 28
     assert Counter((c.discipline, c.type, c.age_system) for c in CATEGORIES) == {
         ("100m", "individual", "age_group"): 8, ("100m", "individual", "general"): 2, ("100m", "team", "age_group"): 2,
-        ("60m", "individual", "age_group"): 10, ("60m", "individual", "general"): 4,
+        ("60m", "individual", "age_group"): 12, ("60m", "individual", "general"): 4,
     }
     for discipline, kind, intervals in (
         ("100m", "individual", {(13, 14), (15, 16), (17, 18), (17, 100), (19, 100)}),
         ("100m", "team", {(13, 18)}),
-        ("60m", "individual", {(0, 5), (6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
+        ("60m", "individual", {(0, 5), (5, 6), (6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
     ):
         for gender in ("male", "female"):
             assert {(c.min_age, c.max_age) for c in CATEGORIES
@@ -60,6 +60,21 @@ def test_combined_100m_follows_competition_year(age, key):
     decision = resolve("Dorost chlapci + muži", "100m", 2026 - age)
     assert decision.category.key == key
     assert decision.per_result
+
+
+def test_chomutov_official_combined_list_has_one_category_regardless_of_birth_year():
+    event = {"date": "2026-09-19", "source_url": "https://pozarnisporty.cz/races/1034"}
+    name = "10) Dorost dívky + ženy – 17 – 100 let"
+    for year in (None, 2008, 2000):
+        result = resolve_category(name, "100m", event, person(year))
+        assert result.category.key == "100m-women-17-100"
+        assert not result.per_result
+
+
+def test_explicit_preparatory_5_6_group_keeps_separate_category():
+    for year in (None, 2020, 2021):
+        assert resolve("Přípravka dívky 5-6", "60m", year).category.key == "60m-girls-preparatory-5-6"
+    assert resolve("Přípravka dívky 5-6", "60m", 2022).status == "review"
 
 
 @pytest.mark.parametrize(("name", "age", "key"), [
@@ -128,7 +143,7 @@ def test_personal_records_use_official_valid_individual_times_and_cross_age_grou
     ])
     assert records == {"100m": 16.85, "60m": 12.43}
     offered = asyncio.run(get_catalog("60m"))
-    assert len(offered["categories"]) == 14
+    assert len(offered["categories"]) == 16
     assert {cat.discipline for cat in offered["categories"]} == {"60m"}
     assert len(active_results(discipline="100m", individual=True)["category"]["$in"]) == 10
 
