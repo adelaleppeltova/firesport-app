@@ -32,6 +32,12 @@ PASEKY_STANDINGS = (
     "https://oshpisek.hasicovo.cz/file/edee/ms-osh/osh-pisek/2025/08/celkove-vysledky-ps-2025-20250813-082557.pdf"
 )
 POLABI_RULES = "https://sdhpiskovalhota.cz/2026/Polabske-sedesatkovani-propozice.pdf"
+BV_PREPARATORY_RACES = {
+    ("406", "2024-06-15"), ("444", "2024-08-11"), ("464", "2024-09-07"), ("469", "2024-09-22"),
+    ("473", "2024-07-27"), ("604", "2025-06-14"), ("608", "2025-06-22"), ("641", "2025-04-26"),
+    ("642", "2025-09-06"), ("643", "2025-08-24"), ("695", "2025-07-26"),
+}
+BELOVES_2022_RULES = "https://oshnachod.cz/uploads/plates/310/Belovesky%20kilo%202022%20%28propozice%29.pdf"
 
 YOUTH_STANDINGS = {
     ("161", "2022-11-06"): (PRAGUE_MEMORIAL, {"6 11": "Mladší"}),
@@ -105,6 +111,27 @@ def published_adult_group(key: str, event: tuple) -> tuple[str, str] | None:
         return f"{label} 17–100", f"https://stovky.cz/trebic/2020/{stem}.pdf"
     if event == ("2023-08-12", "Otevřené MČR v běhu na 100m s překážkami", "Praha - Hostivař"):
         return f"{label} 15–100", "https://pozarnisporty.cz/races/271"
+    return None
+
+
+def legacy_preparatory_label(key: str, competition: dict) -> tuple[str, str] | None:
+    """Interpret generic labels only for documented 3–7 standings."""
+    gender = {"pripravka chlapci": "chlapci", "pripravka divky": "dívky"}.get(key)
+    if gender is None:
+        return None
+    url = urlsplit(competition.get("source_url") or "")
+    if url.scheme != "https" or url.netloc not in RACE_HOSTS:
+        return None
+    match = re.fullmatch(r"/races/(\d+)/?", url.path)
+    if match is None or (match[1], event_identity(competition)[0]) not in BV_PREPARATORY_RACES:
+        return None
+    return f"Přípravka {gender} 3–7 let", f"https://{url.netloc}/races/{match[1]}"
+
+
+def beloves_2022_category(key: str, competition: dict) -> tuple[str, str] | None:
+    if (event_identity(competition) == ("2022-06-05", "Běloveský kilo", "Náchod - Hamra")
+            and key in {"dorostenci", "dorostenky"}):
+        return f"Mladší a střední {key}", BELOVES_2022_RULES
     return None
 
 

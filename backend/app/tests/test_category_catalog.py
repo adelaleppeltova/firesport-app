@@ -25,17 +25,17 @@ def resolve(name, discipline, birth_year=None, year=2026, **kwargs):
                             person(birth_year), **kwargs)
 
 
-def test_catalog_is_a_fixed_28_category_whitelist():
+def test_catalog_is_a_fixed_32_category_whitelist():
     assert set(DISCIPLINES) == {"100m", "60m"}
-    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 28
+    assert len(BY_ID) == len(BY_KEY) == len(CATEGORIES) == 32
     assert Counter((c.discipline, c.type, c.age_system) for c in CATEGORIES) == {
-        ("100m", "individual", "age_group"): 8, ("100m", "individual", "general"): 2, ("100m", "team", "age_group"): 2,
-        ("60m", "individual", "age_group"): 12, ("60m", "individual", "general"): 4,
+        ("100m", "individual", "age_group"): 8, ("100m", "individual", "general"): 4, ("100m", "team", "age_group"): 2,
+        ("60m", "individual", "age_group"): 14, ("60m", "individual", "general"): 4,
     }
     for discipline, kind, intervals in (
-        ("100m", "individual", {(13, 14), (15, 16), (17, 18), (17, 100), (19, 100)}),
+        ("100m", "individual", {(13, 14), (13, 16), (15, 16), (17, 18), (17, 100), (19, 100)}),
         ("100m", "team", {(13, 18)}),
-        ("60m", "individual", {(0, 5), (5, 6), (6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
+        ("60m", "individual", {(0, 5), (3, 7), (5, 6), (6, 10), (10, 15), (7, 8), (9, 11), (12, 13), (14, 15)}),
     ):
         for gender in ("male", "female"):
             assert {(c.min_age, c.max_age) for c in CATEGORIES
@@ -143,9 +143,9 @@ def test_personal_records_use_official_valid_individual_times_and_cross_age_grou
     ])
     assert records == {"100m": 16.85, "60m": 12.43}
     offered = asyncio.run(get_catalog("60m"))
-    assert len(offered["categories"]) == 16
+    assert len(offered["categories"]) == 18
     assert {cat.discipline for cat in offered["categories"]} == {"60m"}
-    assert len(active_results(discipline="100m", individual=True)["category"]["$in"]) == 10
+    assert len(active_results(discipline="100m", individual=True)["category"]["$in"]) == 12
 
 
 def fixture_snapshot():
@@ -244,3 +244,30 @@ def test_personal_record_requires_identity_for_incomplete_imported_names():
                 "imported_athlete": {"first_name": "", "last_name": " "}}
     assert personal_records([nameless])["100m"] is None
     assert personal_records([{**nameless, "match_reason": "manual_admin_assignment"}])["100m"] == 15
+
+
+def test_preparatory_3_to_7_requires_an_explicit_label_or_documented_race():
+    event = {"date": "2025-07-26", "source_url": "https://pozarnisporty.cz/races/695"}
+    five_year_old = person(2020)
+    grouped = resolve_category("přípravka dívky", "60m", event, five_year_old)
+    assert grouped.category == BY_KEY["60m-girls-preparatory-3-7"]
+    assert grouped.evidence["url"] == "https://pozarnisporty.cz/races/695"
+    assert resolve_category("Přípravka chlapci 3–7 let", "60m", event, person(2018)).category == (
+        BY_KEY["60m-boys-preparatory-3-7"]
+    )
+    assert resolve_category("přípravka dívky", "60m", event, person(2017)).reason == "outside_canonical_age_range"
+    different_date = {**event, "date": "2025-07-27"}
+    assert resolve_category("přípravka dívky", "60m", different_date, five_year_old).category == (
+        BY_KEY["60m-girls-preparatory"]
+    )
+
+
+def test_beloves_2022_uses_one_published_individual_group_for_ages_13_to_16():
+    event = {"name": "Běloveský kilo", "place": "Náchod - Hamra", "date": "2022-06-05"}
+    grouped = resolve_category("Dorostenci", "100m", event, person(None))
+    assert grouped.category == BY_KEY["100m-boys-13-16"]
+    assert "310/Belovesky" in grouped.evidence["url"]
+    assert resolve_category("Dorostenky", "100m", event, person(2006)).category == BY_KEY["100m-girls-13-16"]
+    assert resolve_category("Dorostenky", "100m", event, person(2005)).reason == "outside_canonical_age_range"
+    previous_event = {**event, "date": "2019-06-02"}
+    assert resolve_category("Dorostenci", "100m", previous_event, person(None)).category is None
