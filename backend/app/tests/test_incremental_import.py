@@ -49,7 +49,7 @@ def import_collections(monkeypatch):
         return MagicMock(find=find, find_one=AsyncMock(side_effect=find_one),
                          insert_one=AsyncMock(side_effect=insert), documents=documents)
 
-    collections = {name: collection() for name in ("competitions", "categories", "results")}
+    collections = {name: collection() for name in ("competitions", "categories", "results", "athletes")}
     collections["categories"].documents.update({category.id: category.document() for category in CATEGORIES})
     for name, mock in collections.items():
         monkeypatch.setattr(data_import, f"{name}_collection", mock)
@@ -106,6 +106,45 @@ def test_repeat_race_preserves_manual_assignment_and_quality_flag(import_collect
     assert len(import_collections["competitions"].documents) == 1
     assert docs == snapshot
     decide.assert_not_awaited()
+
+
+def test_import_creates_and_reuses_profile_for_different_team(import_collections, monkeypatch):
+    from bson import ObjectId
+
+    from app.services import result_matching
+
+    race = _race()
+    del race["competition"]["categories"][0]["results"][1:]
+    original_id = ObjectId()
+    original = {
+        "_id": original_id, "first_name": "Jan", "last_name": "Novák",
+        "birth_year": 2000, "teams": ["Bukovice"], "fs_codes": ["12345"],
+    }
+    profiles = import_collections["athletes"].documents
+    profiles[original_id] = original
+    race["competition"]["categories"][0]["results"][0]["fscode"] = "12345"
+
+    async def candidates(query, **options):
+        return [original] if "first_name" not in query else list(profiles.values())
+
+    monkeypatch.setattr(result_matching, "_find_athletes", candidates)
+    monkeypatch.setattr(data_import, "compute_bounds_for_recompute", AsyncMock(return_value={}))
+    monkeypatch.setattr(data_import, "compute_quality_flag", AsyncMock(return_value=MagicMock(value="ok")))
+    first = asyncio.run(data_import.DataImporter().import_from_dict(race))
+    repeat = asyncio.run(data_import.DataImporter().import_from_dict(race))
+    race["source_file"] += "4"
+    race["competition"]["date"] = "2026-08-02"
+    second = asyncio.run(data_import.DataImporter().import_from_dict(race))
+
+    assert first["errors"] == repeat["errors"] == second["errors"] == []
+    assert first["athletes_created_new"] == first["results_matched"] == 1
+    assert first["athletes_existing_matched"] == 0
+    assert repeat["results_duplicates_skipped"] == 1
+    assert second["athletes_created_new"] == 0 and second["athletes_existing_matched"] == 1
+    new_id, = set(profiles) - {original_id}
+    assert profiles[new_id]["teams"] == ["Lhota"]
+    assert profiles[new_id]["fs_codes"] == [] and profiles[original_id]["fs_codes"] == ["12345"]
+    assert {result["athlete"] for result in import_collections["results"].documents.values()} == {new_id}
 
 
 def test_corrected_result_is_reported_as_conflict_and_existing_document_is_preserved(import_collections):

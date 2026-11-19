@@ -15,6 +15,14 @@ from app.services.athlete_identity import (
 from app.services.search_utils import build_diacritic_fuzzy_regex
 
 athletes_collection = db["athletes"]
+DIFFERENT_TEAM = "name_birth_year_different_team"
+
+
+def team_key(team: str | None) -> str:
+    key = " ".join(unicodedata.normalize("NFC", team or "").lower().split())
+    if key in {"sdh", "bez klubu", "bez sboru", "neznámý", "neznamy", "neuvedeno", "nezadáno", "null", "none", "n/a"}:
+        return ""
+    return key if any(char.isalpha() for char in key) else ""
 
 
 def build_name_candidate_query(value: str) -> dict:
@@ -37,6 +45,28 @@ def _decision(status: MatchStatus, reason: str, athlete: Optional[dict] = None) 
     return {"match_status": status, "match_reason": reason, "matched_athlete": athlete}
 
 
+def decide_team_match(candidates: list[dict], team: str | None) -> dict | None:
+    """Resolve the club among profiles with an exact name and birth year."""
+    key = team_key(team)
+    if not key:
+        return None
+
+    matching = []
+    known_team = False
+    for candidate in candidates:
+        teams = {team_key(value) for value in candidate.get("teams", [])} - {""}
+        known_team |= bool(teams)
+        if key in teams:
+            matching.append(candidate)
+    if len(matching) == 1:
+        return _decision(MatchStatus.matched, "name_birth_year_team", matching[0])
+    if matching:
+        return _decision(MatchStatus.needs_review, "multiple_name_candidates")
+    if known_team:
+        return _decision(MatchStatus.needs_review, DIFFERENT_TEAM)
+    return None
+
+
 async def decide_athlete_match(
     *,
     first_name: str,
@@ -52,9 +82,6 @@ async def decide_athlete_match(
 
     code_query = build_fs_code_query(fscode)
     code_matches = await _find_athletes(code_query, limit=2) if code_query else []
-    if len(code_matches) > 1:
-        return _decision(MatchStatus.needs_review, "shared_fscode")
-
     first_pattern, last_pattern = build_name_candidate_query(first_name), build_name_candidate_query(last_name)
     name_matches = await _find_athletes({"first_name": first_pattern, "last_name": last_pattern})
     exact_name_ids = {
@@ -66,6 +93,17 @@ async def decide_athlete_match(
         athlete for athlete in name_matches
         if birth_year is None or athlete.get("birth_year") in (None, birth_year)
     ]
+
+    if type(birth_year) is int and birth_year >= 1900:
+        same_year = [
+            athlete for athlete in compatible
+            if athlete["_id"] in exact_name_ids and athlete.get("birth_year") == birth_year
+        ]
+        if team_match := decide_team_match(same_year, team):
+            return team_match
+
+    if len(code_matches) > 1:
+        return _decision(MatchStatus.needs_review, "shared_fscode")
 
     if code_matches:
         owner = code_matches[0]

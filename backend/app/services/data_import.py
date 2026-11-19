@@ -22,13 +22,15 @@ from app.services.category_normalization import (
 )
 from app.models.admin import ImportStats
 from app.models.result import MatchStatus
-from app.services.athlete_identity import normalize_fs_code
+from app.services.athlete_identity import normalize_athlete_document, normalize_fs_code
 from app.services.quality_flag_service import compute_bounds_for_recompute, compute_quality_flag
 from app.services.published_standings import historical_fields
 from app.person_names import NAME_FIELDS, missing_name
 from app.services.result_matching import (
+    DIFFERENT_TEAM,
     decide_athlete_match,
     normalize_person_name,
+    team_key,
 )
 
 logger = logging.getLogger(__name__)
@@ -52,6 +54,23 @@ async def _insert_import_document(collection, document: dict) -> bool:
 categories_collection = db[CATEGORY_COLLECTION]
 competitions_collection = db["competitions"]
 results_collection = db["results"]
+athletes_collection = db["athletes"]
+
+
+def different_team_profile(person: dict, team: str) -> dict:
+    first = normalize_person_name(person["first_name"])
+    last = normalize_person_name(person["last_name"])
+    year = person["birth_year"]
+    return {
+        "_id": _import_id(DIFFERENT_TEAM, first.casefold(), last.casefold(), year, team_key(team)),
+        "first_name": first,
+        "last_name": last,
+        "birth_year": year,
+        "teams": [team],
+        "fs_codes": [],
+        "is_active": True,
+        "merged_into_athlete_id": None,
+    }
 
 
 class DataImporter:
@@ -297,6 +316,25 @@ class DataImporter:
                 match = await decide_athlete_match(**imported_athlete, team=team)
             else:
                 match = {"match_status": MatchStatus.unmatched, "match_reason": None, "matched_athlete": None}
+            created_profile = False
+            if match["match_reason"] == DIFFERENT_TEAM:
+                profile = different_team_profile(imported_athlete, team)
+                created_profile = await _insert_import_document(
+                    athletes_collection, {**profile, "created_at": datetime.now()}
+                )
+                if not created_profile:
+                    stored = await athletes_collection.find_one({"_id": profile["_id"]})
+                    if stored and stored.get("is_active") is not False and not stored.get("merged_into_athlete_id"):
+                        stored = normalize_athlete_document(stored)
+                        if different_team_profile(stored, team)["_id"] == profile["_id"] and any(
+                            team_key(value) == team_key(team) for value in stored["teams"]
+                        ):
+                            match["matched_athlete"] = stored
+                if created_profile:
+                    self.stats["athletes_created_new"] += 1
+                    match["matched_athlete"] = profile
+                if match["matched_athlete"]:
+                    match["match_status"] = MatchStatus.matched
             identity = self._row_identity(row)
             index_identity = {key: value for key, value in identity.items() if key != "source_group"}
             result_doc = {
@@ -328,7 +366,7 @@ class DataImporter:
             self.stats["total_imported"] += 1
             self.stats["results_created"] += 1
             if individual:
-                self._increment_match_stats(match["match_status"])
+                self._increment_match_stats(match["match_status"], created_profile=created_profile)
             elif row["classification_status"] in {"review", "unsupported"}:
                 self.stats["classification_review_required"] += 1
         except Exception as exc:
@@ -536,10 +574,11 @@ class DataImporter:
             "birth_year": result_data.get("birth_year") or None,
         }
 
-    def _increment_match_stats(self, match_status: MatchStatus) -> None:
+    def _increment_match_stats(self, match_status: MatchStatus, *, created_profile: bool = False) -> None:
         if match_status == MatchStatus.matched:
             self.stats["results_matched"] += 1
-            self.stats["athletes_existing_matched"] += 1
+            if not created_profile:
+                self.stats["athletes_existing_matched"] += 1
         elif match_status == MatchStatus.needs_review:
             self.stats["results_needs_review"] += 1
             self.stats["review_required"] += 1
