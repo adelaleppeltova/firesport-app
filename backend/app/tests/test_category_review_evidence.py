@@ -65,12 +65,12 @@ def test_organizer_youth_groups_are_scoped_to_the_exact_race_and_date(race, date
     assert resolve_category(label, "60m", event, {}, team="Lhota").category is None
 
 
-def test_polabi_and_paseky_preparation_groups_require_age_below_six_when_known():
+def test_polabi_and_paseky_preparation_groups_have_separate_source_ranges():
     polabi = {"date": "2026-09-20", "source_url": "https://pozarnisporty.cz/races/1180"}
     paseky = {"date": "2025-08-09", "source_url": "https://pozarnisporty.cz/races/771"}
-    assert resolve_category("přípravka DÍVKY", "60m", polabi, {"birth_year": 2020}).category is None
-    assert resolve_category("přípravka DÍVKY", "60m", polabi, {"birth_year": 2021}).category.key == (
-        "60m-girls-preparatory"
+    assert resolve_category("přípravka DÍVKY", "60m", polabi, {"birth_year": 2019}).category is None
+    assert resolve_category("přípravka DÍVKY", "60m", polabi, {"birth_year": 2020}).category.key == (
+        "60m-girls-preparatory-3-6"
     )
     assert resolve_category("chlapci - věk: 3 - 5", "60m", paseky, {}).category.key == "60m-boys-preparatory"
     assert resolve_category("mladší DÍVKY II", "60m", polabi, {"birth_year": 2019}).category is None
@@ -80,7 +80,7 @@ def test_scoped_bzucany_and_chomutov_source_overrides():
     person = {"first_name": "Jan", "last_name": "Nový", "birth_year": 2006}
     event = {"date": "2023-09-30", "source_url": "https://pozarnisporty.cz/races/227"}
     out = resolve_category("Dorost chlapci + muži (nad 17 let)", "100m", event, person)
-    assert out.category.key == "100m-boys-17-18" and "clanek_STIMAX" in out.evidence["url"]
+    assert out.category.key == "100m-men-17-100" and "stimax-cup-2023-propozice.pdf" in out.evidence["url"]
     event = {"date": "2023-07-30", "source_url": "https://pozarnisporty.cz/races/196"}
     assert resolve_category("Střední dorost", "100m", event, {}).category.key == "100m-boys-15-16"
 

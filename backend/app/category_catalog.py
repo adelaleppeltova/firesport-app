@@ -26,7 +26,7 @@ class Category:
     key: str
     name: str
     discipline: Discipline
-    gender: Literal["male", "female"]
+    gender: Literal["male", "female", "mixed"]
     min_age: int
     max_age: int
     type: Literal["individual", "team"] = "individual"
@@ -51,10 +51,17 @@ CATEGORIES = (
     Category("100m-girls-13-14", "Mladší dorostenky", "100m", "female", 13, 14),
     Category("100m-men-17-100", "Muži a starší dorostenci", "100m", "male", 17, 100, age_system="general"),
     Category("100m-women-17-100", "Ženy a starší dorostenky", "100m", "female", 17, 100, age_system="general"),
+    Category("100m-boys-13-16", "Mladší a střední dorostenci", "100m", "male", 13, 16, age_system="general"),
+    Category("100m-girls-13-16", "Mladší a střední dorostenky", "100m", "female", 13, 16, age_system="general"),
     Category("100m-boys-team", "Dorostenci - družstvo", "100m", "male", 13, 18, "team"),
     Category("100m-girls-team", "Dorostenky - družstvo", "100m", "female", 13, 18, "team"),
     Category("60m-boys-preparatory", "Přípravka chlapci", "60m", "male", 0, 5),
     Category("60m-girls-preparatory", "Přípravka dívky", "60m", "female", 0, 5),
+    Category("60m-boys-preparatory-3-7", "Přípravka chlapci 3–7 let", "60m", "male", 3, 7),
+    Category("60m-girls-preparatory-3-7", "Přípravka dívky 3–7 let", "60m", "female", 3, 7),
+    Category("60m-boys-preparatory-3-6", "Přípravka chlapci 3–6 let", "60m", "male", 3, 6),
+    Category("60m-girls-preparatory-3-6", "Přípravka dívky 3–6 let", "60m", "female", 3, 6),
+    Category("60m-mixed-preparatory-3-6", "Přípravka smíšená 3–6 let", "60m", "mixed", 3, 6),
     Category("60m-boys-preparatory-5-6", "Přípravka chlapci 5–6", "60m", "male", 5, 6),
     Category("60m-girls-preparatory-5-6", "Přípravka dívky 5–6", "60m", "female", 5, 6),
     Category("60m-girls-younger", "Mladší dívky", "60m", "female", 6, 10, age_system="general"),

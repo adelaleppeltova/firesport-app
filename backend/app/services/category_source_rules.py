@@ -7,10 +7,6 @@ KSH = "https://kshusti.hasicovo.cz/file/edee/ms-ksh/ksh-usteckeho-kraje/"
 STIMAX_2024 = KSH + "2024/03/stimax-cup-2024-propozice.pdf"
 STIMAX_2025 = KSH + "2025/02/stimax-cup-2025-propozice.pdf"
 STIMAX_2023_DECIN = KSH + "2024/03/clanek-stimax-cup-2023-3.-kolo-decin-2.-9.pdf"
-STIMAX_2023_CHOMUTOV = (
-    "https://mladez.dh.cz/images/Dokumenty/mladez/souteze/2023/"
-    "2023_-_clanek_STIMAX_CUP_2023_-_4_kolo_Chomutov_-_30_9__celkove_vysledky.pdf"
-)
 YOUNGER_STIMAX = {
     ("226", "2023-09-02"): STIMAX_2023_DECIN,
     ("367", "2024-05-05"): STIMAX_2024,
@@ -32,6 +28,12 @@ PASEKY_STANDINGS = (
     "https://oshpisek.hasicovo.cz/file/edee/ms-osh/osh-pisek/2025/08/celkove-vysledky-ps-2025-20250813-082557.pdf"
 )
 POLABI_RULES = "https://sdhpiskovalhota.cz/2026/Polabske-sedesatkovani-propozice.pdf"
+BV_PREPARATORY_RACES = {
+    ("406", "2024-06-15"), ("444", "2024-08-11"), ("464", "2024-09-07"), ("469", "2024-09-22"),
+    ("473", "2024-07-27"), ("604", "2025-06-14"), ("608", "2025-06-22"), ("641", "2025-04-26"),
+    ("642", "2025-09-06"), ("643", "2025-08-24"), ("695", "2025-07-26"),
+}
+BELOVES_2022_RULES = "https://oshnachod.cz/uploads/plates/310/Belovesky%20kilo%202022%20%28propozice%29.pdf"
 
 YOUTH_STANDINGS = {
     ("161", "2022-11-06"): (PRAGUE_MEMORIAL, {"6 11": "Mladší"}),
@@ -108,6 +110,50 @@ def published_adult_group(key: str, event: tuple) -> tuple[str, str] | None:
     return None
 
 
+PREPARATORY_RACE_LABELS = {
+    ("926", "2026-05-08"): {"pripravka": "Přípravka smíšená 3–6 let"},
+    ("1143", "2026-08-16"): {"pripravka": "Přípravka smíšená 3–6 let"},
+    ("848", "2026-08-08"): {
+        "divky vek 3 6": "Přípravka dívky 3–6 let",
+        "chlapci vek 3 6": "Přípravka chlapci 3–6 let",
+    },
+    ("1180", "2026-09-20"): {
+        "pripravka divky": "Přípravka dívky 3–6 let",
+        "pripravka chlapci": "Přípravka chlapci 3–6 let",
+    },
+    ("721", "2025-05-25"): {
+        "pripravka divky 5 a 6 let": "Přípravka dívky 5–6",
+        "pripravka chlapci 5 a 6 let": "Přípravka chlapci 5–6",
+    },
+}
+
+
+def legacy_preparatory_label(key: str, competition: dict) -> tuple[str, str] | None:
+    """Resolve preparatory ranges only where the race list publishes them."""
+    url = urlsplit(competition.get("source_url") or "")
+    if url.scheme != "https" or url.netloc not in RACE_HOSTS:
+        return None
+    match = re.fullmatch(r"/races/([0-9]+)/?", url.path)
+    if match is None:
+        return None
+    race = match[1], event_identity(competition)[0]
+    label = PREPARATORY_RACE_LABELS.get(race, {}).get(key)
+    if race in BV_PREPARATORY_RACES:
+        gender = {"pripravka chlapci": "chlapci", "pripravka divky": "dívky"}.get(key)
+        if gender:
+            label = f"Přípravka {gender} 3–7 let"
+    if label:
+        return label, f"https://{url.netloc}/races/{match[1]}"
+    return None
+
+
+def beloves_2022_category(key: str, competition: dict) -> tuple[str, str] | None:
+    if (event_identity(competition) == ("2022-06-05", "Běloveský kilo", "Náchod - Hamra")
+            and key in {"dorostenci", "dorostenky"}):
+        return f"Mladší a střední {key}", BELOVES_2022_RULES
+    return None
+
+
 def organizer_label(key: str, discipline: str, competition: dict) -> tuple[str, str] | None:
     """Return a verified interpretation plus a source URL. Source captions remain intact."""
     event = event_identity(competition)
@@ -153,25 +199,51 @@ def organizer_label(key: str, discipline: str, competition: dict) -> tuple[str, 
             labels = {"mladsi dorost": "Mladší dorostenci", "stredni dorost": "Střední dorostenci"}
             if key in labels:
                 return labels[key], "https://pozarnisport.hasicovo.cz/races/196"
-        if race == ("227", "2023-09-30"):
-            labels = {"dorost divky zeny nad 17 let": "Dorost dívky + ženy 17–100",
-                      "dorost chlapci muzi nad 17 let": "Dorost chlapci + muži 17–100"}
-            if key in labels:
-                return labels[key], STIMAX_2023_CHOMUTOV
     return None
 
 
+STIMAX_ROUNDS = {
+    ("224", "2023-04-22"), ("225", "2023-05-13"), ("226", "2023-09-02"), ("227", "2023-09-30"),
+    ("367", "2024-05-05"), ("368", "2024-05-11"), ("369", "2024-08-31"), ("370", "2024-09-28"),
+    ("654", "2025-04-26"), ("655", "2025-05-10"), ("656", "2025-08-30"), ("658", "2025-09-27"),
+    ("1031", "2026-04-26"), ("1032", "2026-05-09"), ("1033", "2026-08-29"), ("1034", "2026-09-19"),
+}
+STIMAX_RULES = {
+    "2023": KSH + "2023/03/stimax-cup-2023-propozice.pdf",
+    "2024": STIMAX_2024,
+    "2025": STIMAX_2025,
+}
+STIMAX_GROUPS = {
+    "Muži a starší dorostenci": {
+        "muzi vek 17 100", "dorostenci muzi", "dorost chlapci muzi", "dorost chlapci muzi 17 100 let",
+        "dorost chlapci muzi nad 17 let",
+    },
+    "Ženy a starší dorostenky": {
+        "zeny vek 17 100", "dorostenky zeny", "dorost divky zeny", "dorost divky zeny 17 100 let",
+        "dorost divky zeny nad 17 let",
+    },
+    "Mladší a střední dorostenci": {
+        "dorostenci vek 13 16", "dorostenci", "dorost chlapci", "dorost chlapci 13 16 let",
+    },
+    "Mladší a střední dorostenky": {
+        "dorostenky vek 13 16", "dorostenky", "dorost divky", "dorost divky 13 16 let",
+    },
+}
+
+
 def published_combined_category(key: str, discipline: str, competition: dict) -> tuple[str, str] | None:
-    """Use one canonical category for each explicitly combined Chomutov list."""
-    url = urlsplit(competition.get("source_url") or "")
-    if (discipline != "100m" or event_identity(competition)[0] != "2026-09-19"
-            or url.scheme != "https" or url.netloc not in RACE_HOSTS
-            or url.path.rstrip("/") != "/races/1034"):
+    """Keep each documented STIMAX 100 m standings group together."""
+    if discipline != "100m":
         return None
-    labels = {
-        "dorost chlapci muzi 17 100 let": "Muži a starší dorostenci",
-        "dorost divky zeny 17 100 let": "Ženy a starší dorostenky",
-    }
-    if label := labels.get(re.sub(r"^\d+ ", "", key)):
-        return label, "https://pozarnisport.hasicovo.cz/races/1034"
+    url = urlsplit(competition.get("source_url") or "")
+    if url.scheme != "https" or url.netloc not in RACE_HOSTS:
+        return None
+    match = re.fullmatch(r"/races/([0-9]+)/?", url.path)
+    when = event_identity(competition)[0]
+    if match is None or (match[1], when) not in STIMAX_ROUNDS:
+        return None
+    key = re.sub(r"^[0-9]+ ", "", key)
+    for label, aliases in STIMAX_GROUPS.items():
+        if key in aliases:
+            return label, STIMAX_RULES.get(when[:4], f"https://pozarnisport.hasicovo.cz/races/{match[1]}")
     return None

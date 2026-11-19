@@ -7,7 +7,7 @@ class CategoryBase(BaseModel):
     name: str
     discipline: Optional[Discipline] = None
     key: Optional[str] = None
-    gender: Optional[Literal["male", "female"]] = None
+    gender: Optional[Literal["male", "female", "mixed"]] = None
     min_age: Optional[int] = None
     max_age: Optional[int] = None
     type: Optional[Literal["individual", "team"]] = None

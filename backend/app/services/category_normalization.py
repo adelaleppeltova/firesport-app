@@ -5,7 +5,9 @@ from datetime import date
 
 from app.category_catalog import CATEGORIES, DISCIPLINES, FINAL_TIME_SENTINELS, Category, Discipline
 from app.extraction.metadata import norm
-from app.services.category_source_rules import organizer_label, published_combined_category, team_member_source
+from app.services.category_source_rules import (
+    beloves_2022_category, legacy_preparatory_label, organizer_label, published_combined_category, team_member_source,
+)
 
 def label_key(value: str | None) -> str:
     return re.sub(r"[^a-z0-9]+", " ", norm(value)).strip()
@@ -102,10 +104,13 @@ def resolve_category(
             return Resolution(original.discipline, reason="team_member_result_requires_separate_treatment",
                               evidence={"kind": "team_member_standing", "url": team_source},
                               per_result=original.per_result)
-    combined = published_combined_category(key, original.discipline, competition)
-    if original.category and combined is None:
+    published = (
+        legacy_preparatory_label(key, competition) if original.discipline == "60m"
+        else beloves_2022_category(key, competition) or published_combined_category(key, original.discipline, competition)
+    )
+    if original.category and published is None:
         return original
-    verified = combined or organizer_label(key, original.discipline, competition)
+    verified = published or organizer_label(key, original.discipline, competition)
     if verified is None:
         return original
     official_label, source_url = verified
