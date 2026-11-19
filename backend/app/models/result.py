@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field, ConfigDict, model_validator
 from typing import Optional
 from enum import Enum
 
+from app.person_names import NAME_FIELDS, normalize_person_name
+from app.category_catalog import Discipline
 from app.models.athlete import AthleteInDB
 from app.models.competition import CompetitionInDB
 from app.models.category import CategoryInDB
@@ -38,6 +40,8 @@ class ImportedAthleteData(BaseModel):
             return data
 
         normalized = dict(data)
+        for field in NAME_FIELDS:
+            normalized[field] = normalize_person_name(normalized.get(field))
         fscode = normalized.get("fscode")
         if fscode is not None:
             value = str(fscode).strip()
@@ -51,14 +55,25 @@ class TimeAttempt(BaseModel):
     status: TimeStatus
     invalid_reason: Optional[str] = None
 
+class SourceCategory(BaseModel):
+    name: str
+    min_age: Optional[int] = None
+    max_age: Optional[int] = None
+    affiliation: Optional[str] = None
+
+
 class ResultBase(BaseModel):
     athlete: Optional[AthleteInDB] = None
     competition: CompetitionInDB
     category: CategoryInDB
+    result_list_id: Optional[str] = None
+    discipline: Optional[Discipline] = None
+    source_category: Optional[SourceCategory] = None
 
     date: datetime
     team: Optional[str]
     imported_athlete: ImportedAthleteData = Field(default_factory=ImportedAthleteData)
+    source_full_name: Optional[str] = None
     match_status: MatchStatus = MatchStatus.matched
     match_reason: Optional[str] = None
 
@@ -81,8 +96,12 @@ class ResultInDB(ResultBase):
     )
 
 class ResultAthleteDetail(BaseModel):
+    id: Optional[str] = Field(default=None, alias="_id")
     competition: CompetitionInDB
     category: CategoryInDB
+    result_list_id: Optional[str] = None
+    discipline: Optional[Discipline] = None
+    source_category: Optional[SourceCategory] = None
 
     date: datetime
     team: Optional[str] = None

@@ -2,7 +2,8 @@ from pydantic import BaseModel, Field, ConfigDict, model_validator
 from typing import Optional, List
 from enum import Enum
 
-from app.services.athlete_identity import normalize_athlete_identity
+from app.category_catalog import Discipline
+from app.services.athlete_identity import normalize_athlete_document
 
 
 class PerformanceIndicatorTrend(str, Enum):
@@ -44,15 +45,7 @@ class AthleteBase(BaseModel):
         if not isinstance(data, dict):
             return data
 
-        normalized = dict(data)
-        (
-            normalized["fs_codes"],
-            normalized["teams"],
-        ) = normalize_athlete_identity(
-            fs_codes=normalized.get("fs_codes"),
-            teams=normalized.get("teams"),
-        )
-        return normalized
+        return normalize_athlete_document(data)
 
 class AthleteInDB(AthleteBase):
     id: str = Field(..., alias="_id")
@@ -68,6 +61,7 @@ class AthleteOverview(AthleteInDB):
     last_active: Optional[str] = None
     total_competitions: int = 0
     best_time: Optional[float] = None
+    personal_records: dict[Discipline, Optional[float]] = Field(default_factory=dict)
     average_time: Optional[float] = None
     performance_indicator: Optional[PerformanceIndicator] = Field(
         default_factory=PerformanceIndicator
@@ -85,6 +79,7 @@ class AthleteProfile(BaseModel):
     last_name: str
     birth_year: Optional[int] = None
     team: Optional[str] = None
+    personal_records: dict[Discipline, Optional[float]] = Field(default_factory=dict)
     best_time: Optional[float] = None
     total_competitions: int = 0
 
@@ -142,6 +137,7 @@ class RaceInYear(BaseModel):
     competition_name: Optional[str] = None
     competition_place: Optional[str] = None
     category: Optional[str] = None
+    discipline: Optional[Discipline] = None
     date: Optional[str] = None  # YYYY-MM-DD
     final_time: Optional[float] = None
     final_time_status: Optional[str] = None
@@ -172,6 +168,7 @@ class AthletePerCategoryStats(BaseModel):
     """Statistiky závodů v jedné konkrétní kategorii z DB."""
     category_id: str
     category_name: str
+    discipline: Optional[Discipline] = None
     total_races: int
     best_time: Optional[float] = None
 

@@ -1,5 +1,5 @@
 export const CATEGORY_GROUP_LABELS = {
-  muz: "Muži / Dorostenci družstva / Starší dorostenci",
+  muz: "Muži / Starší dorostenci",
   zena: "Ženy / Dorostenky",
   mladsi_dorostenci: "Mladší / Střední dorostenci",
 };

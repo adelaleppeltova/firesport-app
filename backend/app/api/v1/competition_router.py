@@ -1,8 +1,11 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
 
+from app.category_catalog import Discipline
 from app.models.competition import CompetitionDetail, CompetitionsPage
 from app.models.result import ResultInDB
+from app.models.standings import SupplementalStandings
+from app.services.supplemental_standings import get_supplemental_standings
 from app.services.competitions import (
     get_competition_detail_service,
     get_competitions_service,
@@ -26,22 +29,34 @@ async def get_competitions(
     page: int = Query(1, ge=1, description="Číslo stránky"),
     page_size: int = Query(25, ge=1, le=100, description="Počet záznamů na stránku"),
     sort_key: str = Query("date", description="Klíč řazení (date, name, place)"),
+    discipline: Optional[Discipline] = Query(None),
     sort_dir: str = Query("desc", description="Směr řazení (asc, desc)"),
 ):
     """Vrátí stránkovaný seznam soutěží."""
     return await get_competitions_service(
         search=q, page=page, page_size=page_size,
-        sort_key=sort_key, sort_dir=sort_dir,
+        sort_key=sort_key, sort_dir=sort_dir, discipline=discipline,
     )
 
 
 @router.get("/{competition_id}/results/{category_id}", response_model=List[ResultInDB])
-async def get_results_for_category(competition_id: str, category_id: str):
+async def get_results_for_category(
+    competition_id: str, category_id: str, result_list_id: Optional[str] = Query(None, min_length=1)
+):
     """Vrátí výsledky pro danou soutěž a kategorii jako seznam ResultInDB."""
 
     try:
-        return await get_results_for_category_service(competition_id, category_id)
+        return await get_results_for_category_service(
+            competition_id, category_id, result_list_id=result_list_id
+        )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
     
+
+@router.get("/{competition_id}/published-standings", response_model=SupplementalStandings)
+async def get_published_standings(competition_id: str):
+    try:
+        return await get_supplemental_standings(competition_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc

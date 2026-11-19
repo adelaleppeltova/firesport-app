@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Query, UploadFile
 
 from app.dependencies import require_admin
 from app.models.admin import (
@@ -10,6 +10,7 @@ from app.models.admin import (
     AdminResultAssignmentResponse,
     AdminResultUnassignmentResponse,
     AdminReviewResponse,
+    AdminSourceNameDetail,
     AthleteMergeCandidatesResponse,
     AthleteMergeResponse,
 )
@@ -19,6 +20,8 @@ from app.services.admin import (
     create_athlete_from_result,
     delete_review_results,
     get_review_results,
+    get_category_review,
+    get_source_name_detail,
     import_results_from_files,
     merge_athletes_for_admin,
     search_athletes_for_admin,
@@ -42,6 +45,16 @@ async def admin_import_results(files: list[UploadFile] = File(...)):
 @router.get("/import/review", response_model=AdminReviewResponse)
 async def admin_import_review():
     return await get_review_results()
+
+
+@router.get("/import/source-names/{result_id}", response_model=AdminSourceNameDetail)
+async def admin_source_name_detail(result_id: str):
+    return await get_source_name_detail(result_id)
+
+
+@router.get("/import/category-review")
+async def admin_category_review(page: int = Query(1, ge=1), page_size: int = Query(25, ge=1, le=100)):
+    return await get_category_review(page, page_size)
 
 
 @router.delete("/import/review", response_model=AdminDeleteReviewResponse)

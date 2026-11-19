@@ -7,6 +7,7 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, Depends, Query
 
+from app.category_catalog import CATALOG_VERSION
 from app.db.database import get_db
 from app.models.anomaly import (
     WindowListItem,
@@ -62,7 +63,7 @@ async def get_detection_windows(
             athlete_run_ids: set = set(
                 await db["anomaly_scores"].distinct(
                     "run_id",
-                    {"athlete_id": athlete_oid},
+                    {"athlete_id": athlete_oid, "catalog_version": CATALOG_VERSION},
                 )
             )
             raw_windows = [w for w in raw_windows if w["run_id"] in athlete_run_ids]

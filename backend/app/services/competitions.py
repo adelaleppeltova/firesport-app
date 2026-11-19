@@ -1,14 +1,16 @@
 from typing import List, Optional, Dict, Any
 from bson import ObjectId
+from app.category_catalog import BY_ID, CATEGORY_COLLECTION, Discipline, active_results
 from app.db.database import db
 from app.models.competition import CompetitionInDB, CompetitionDetail, CompetitionCategorySummary, CompetitionsPage
 from app.models.result import ResultInDB
 from app.services.search_utils import build_diacritic_fuzzy_regex
+from app.services.supplemental_standings import standalone_filters
 import re
 from datetime import datetime, timedelta
 
 competitions_collection = db["competitions"]
-categories_collection = db["categories"]
+categories_collection = db[CATEGORY_COLLECTION]
 results_collection = db["results"]
 athletes_collection = db["athletes"]
 
@@ -26,7 +28,7 @@ async def get_competition_detail_service(competition_id: str) -> CompetitionDeta
 	# Na detailu závodu chceme kompletní startovní / výsledkovou listinu,
 	# tedy i výsledky bez propojeného athlete záznamu.
 	all_results = await results_collection.find(
-		{"competition": comp_oid}
+		{"competition": comp_oid, **active_results()}
 	).to_list(length=None)
 	
 	# Group results by category
@@ -49,11 +51,14 @@ async def get_competition_detail_service(competition_id: str) -> CompetitionDeta
 		cat = await categories_collection.find_one({"_id": cat_oid})
 		if cat:
 			competitor_count = len(results_in_cat)
-			total_athlete_count += competitor_count
+			if cat["type"] == "individual":
+				total_athlete_count += competitor_count
 			categories_summaries.append(
 				CompetitionCategorySummary(
 					id=category_id_str,
 					name=cat.get("name", ""),
+					discipline=cat["discipline"],
+					type=cat["type"],
 					competitors_count=competitor_count,
 				)
 			)
@@ -74,9 +79,13 @@ async def get_competitions_service(
 	page_size: int = 25,
 	sort_key: str = "date",
 	sort_dir: str = "desc",
+	discipline: Optional[Discipline] = None,
 ) -> CompetitionsPage:
 	"""Vrátí stránkovaný seznam soutěží s volitelným vyhledáváním."""
-	query: Dict[str, Any] = {}
+	active_competitions = await results_collection.distinct(
+		"competition", {"$or": [active_results(discipline=discipline), standalone_filters(discipline=discipline)]}
+	)
+	query: Dict[str, Any] = {"_id": {"$in": active_competitions}}
 	if search and search.strip():
 		raw = search.strip()
 		# Zachovej data (2024-01-15, 15.01.2024) jako celek
@@ -150,7 +159,9 @@ async def get_competitions_service(
 		page_size=page_size,
 	)
 
-async def get_results_for_category_service(competition_id: str, category_id: str) -> List[ResultInDB]:
+async def get_results_for_category_service(
+	competition_id: str, category_id: str, *, result_list_id: Optional[str] = None
+) -> List[ResultInDB]:
 	"""Vrátí výsledky pro danou soutěž a kategorii jako seznam ResultInDB."""
 
 	try:
@@ -159,9 +170,13 @@ async def get_results_for_category_service(competition_id: str, category_id: str
 	except Exception:
 		raise ValueError("Invalid competition_id or category_id")
 	
-	results_raw = await results_collection.find(
-		{"competition": comp_oid, "category": cat_oid}
-	).to_list(length=None)
+	category = BY_ID.get(cat_oid)
+	if category is None:
+		raise ValueError("Invalid category_id")
+	query = {**active_results(discipline=category.discipline), "competition": comp_oid, "category": cat_oid}
+	if result_list_id is not None:
+		query["result_list_id"] = result_list_id
+	results_raw = await results_collection.find(query).to_list(length=None)
 
 	# Helper function to resolve and embed reference
 	async def resolve_ref(collection, ref_id_str):

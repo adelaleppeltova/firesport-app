@@ -6,10 +6,11 @@ import {
   getHistoryTrendModifier,
 } from "./cardModifiers";
 
-export default function History({ athleteId, year, onTrendChange }) {
+export default function History({ athleteId, discipline, year, onTrendChange }) {
   const { data, isLoading, error } = useAthletePerformanceHistory(
     athleteId,
     year,
+    discipline,
   );
 
   const trendKey = data?.performance_indicator?.trend;

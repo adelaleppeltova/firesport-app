@@ -21,6 +21,7 @@ from app.models.anomaly import (
     SkipReasonCounts,
     WindowRecomputeSummary,
 )
+from app.category_catalog import BY_ID, CATALOG_VERSION, VALID_FINAL_TIME_FILTER, active_results
 from app.ml.anomaly_config import AnomalyConfig, DEFAULT_CONFIG, get_category_group
 from app.ml.isolation_forest import compute_iforest_anomalies
 from app.services.windows import (
@@ -74,6 +75,7 @@ async def list_detection_windows(
         {
             "$match": {
                 "window_type": window_type,
+                "catalog_version": CATALOG_VERSION,
                 "is_superseded": {"$ne": True},
                 # Do výpisu patří jen window-level runy, které mají "stats".
                 "stats": {"$exists": True},
@@ -179,6 +181,7 @@ async def _supersede_existing_window_run(
     existing = await db["anomaly_runs"].find_one(
         {
             "window_type": window_type,
+            "catalog_version": CATALOG_VERSION,
             "window.end_date": anchor_dt,
             "is_superseded": {"$ne": True},
             # Supersedujeme pouze window-level runy.
@@ -217,6 +220,7 @@ def _build_window_run_doc(
     """Assemble the single ``anomaly_runs`` document for a window-level run."""
     return {
         "run_id": run_id,
+        "catalog_version": CATALOG_VERSION,
         "created_at": created_at,
         "window_type": window_type,
         "window": {
@@ -322,17 +326,12 @@ async def recompute_for_window(
         # 2) Idempotence: supersede previous run for this window if any
         await _supersede_existing_window_run(db, window_type, anchor_dt)
 
-        # 3) Načti mapu kategorie_id → skupina (jedno DB volání před smyčkou)
-        category_group_map: Dict[str, str] = {}
-        async for cat_doc in db["categories"].find({}, projection={"_id": 1, "name": 1}):
-            cat_name = cat_doc.get("name") or ""
-            category_group_map[str(cat_doc["_id"])] = get_category_group(cat_name)
-
         # 4) Load all valid results in window (one DB round-trip)
         raw_results = await db["results"].find(
             {
-                "final_time_status": "valid",
-                "final_time": {"$ne": None},
+                **active_results(individual=True),
+                "athlete": {"$type": "objectId"},
+                **VALID_FINAL_TIME_FILTER,
                 "date": {"$gte": window_start, "$lte": window_end},
             },
             projection={"_id": 1, "athlete": 1, "category": 1, "final_time": 1, "date": 1},
@@ -344,8 +343,7 @@ async def recompute_for_window(
         athlete_group_results: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
         for r in raw_results:
             aid = str(r["athlete"])
-            cat_oid = r.get("category")
-            cg = category_group_map.get(str(cat_oid), str(cat_oid)) if cat_oid is not None else "unknown"
+            cg = get_category_group(BY_ID[r["category"]])
             key = (aid, cg)
             athlete_group_results.setdefault(key, []).append(r)
 
@@ -389,6 +387,8 @@ async def recompute_for_window(
             for i, result in enumerate(results):
                 all_score_docs.append({
                     "run_id": run_id,
+                    "catalog_version": CATALOG_VERSION,
+                    "discipline": BY_ID[result["category"]].discipline,
                     "created_at": created_at,
                     "athlete_id": athlete_oid,
                     "result_id": result["_id"],
@@ -483,6 +483,7 @@ async def get_results_date_range(db: AsyncIOMotorDatabase) -> tuple[datetime, da
         If no results exist yet in the collection.
     """
     pipeline = [
+        {"$match": active_results(individual=True)},
         {
             "$group": {
                 "_id": None,
@@ -581,6 +582,7 @@ async def recompute_yearly_batch(
         cursor = db["anomaly_runs"].find(
             {
                 "window_type": window_type,
+                "catalog_version": CATALOG_VERSION,
                 "is_superseded": {"$ne": True},
                 "stats": {"$exists": True},
             },

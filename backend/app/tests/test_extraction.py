@@ -684,3 +684,15 @@ def test_implausible_published_birth_year_is_retained_as_null():
     assert row["times"][0]["time"] is None
     assert row["final_time"] == 18.36
     assert any("implausible published birth year 7777" in warning for warning in warnings)
+
+
+def test_preserve_source_full_name_when_html_order_does_not_resolve_multiple_words():
+    page = (minimal_table()
+            .replace("<th>Křestní jméno</th><th>Příjmení</th>", "<th>Jméno</th>")
+            .replace("<td>Jana</td><td>Nová</td>", "<td>Souček Stanislav Gabriel</td>"))
+    competition, notes, warnings, audit = parse_html(page, URL)
+    data = document(URL, competition, notes, warnings)
+    validate(data, audit)
+    row = competition["categories"][0]["results"][0]
+    assert row["source_full_name"] == "Souček Stanislav Gabriel"
+    assert row["first_name"] is None and row["last_name"] is None

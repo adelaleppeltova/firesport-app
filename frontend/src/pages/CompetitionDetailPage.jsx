@@ -1,10 +1,12 @@
+import { useState } from "react";
+import PublishedCompetitionStandings from "../components/PublishedCompetitionStandings";
+import DisciplineSelect from "../components/DisciplineSelect";
 import { useParams, Link } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import { useCompetitionDetail } from "../hooks/useApi";
 import Card from "../components/Card";
 import PageContextNav from "../components/PageContextNav";
 import api from "../api/axios";
-import formatCategoryName from "../utils/formatCategoryName";
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -37,12 +39,14 @@ const formatBestTime = (results) => {
 
 export default function CompetitionDetailPage() {
   const { id } = useParams();
+  const [discipline, setDiscipline] = useState("");
   const { data, isLoading, error } = useCompetitionDetail(id);
   const { name, date, place, league, athlete_count, categories } = data ?? {};
   const formattedCategories =
-    categories?.map((category) => ({
+    categories?.filter((category) => !discipline || category.discipline === discipline).map((category) => ({
       id: category.id,
-      name: formatCategoryName(category.name),
+      name: `${category.discipline} · ${category.name}`,
+      type: category.type,
     })) ?? [];
   const formattedDate = formatDate(date);
   const competitionSummary =
@@ -155,6 +159,8 @@ export default function CompetitionDetailPage() {
         </div>
       </section>
 
+      <DisciplineSelect value={discipline} onChange={setDiscipline} all />
+
       <section
         className="competition-overview-section"
         aria-labelledby="competition-overview-title"
@@ -208,10 +214,10 @@ export default function CompetitionDetailPage() {
 
       <hr className="competition-detail-divider" />
 
-      <h2>Výsledkové listiny</h2>
+      <h2>Kanonické výsledkové listiny</h2>
       <div className="competition-detail-results-grid">
-        {categories && categories.length > 0 ? (
-          categories.map((cat) => (
+        {formattedCategories.length > 0 ? (
+          formattedCategories.map((cat) => (
             <Link
               key={cat.id}
               to={`/zavody/${id}/vysledky/${encodeURIComponent(cat.id)}`}
@@ -221,7 +227,7 @@ export default function CompetitionDetailPage() {
                 <div className="competition-detail-results-card-row__content">
                   <div className="competition-detail-results-card-row__main">
                     <strong className="competition-detail-results-card-row__title">
-                      {formatCategoryName(cat.name)}
+                      {cat.name}
                     </strong>
                     <span className="competition-detail-results-card-row__subtitle">
                       Zobrazit výsledky kategorie
@@ -231,7 +237,7 @@ export default function CompetitionDetailPage() {
                   {categoryStatsById.get(cat.id) && (
                     <div className="competition-detail-results-card-row__stats">
                       <span className="competition-detail-results-card-row__stat">
-                        Závodníků:{" "}
+                        {cat.type === "team" ? "Družstev" : "Závodníků"}:{" "}
                         <strong>
                           {categoryStatsById.get(cat.id)?.isLoading
                             ? "…"
@@ -270,9 +276,10 @@ export default function CompetitionDetailPage() {
             </Link>
           ))
         ) : (
-          <div>Výsledky nejsou k dispozici.</div>
+          <div>Kanonické výsledkové listiny nejsou k dispozici.</div>
         )}
       </div>
+      <PublishedCompetitionStandings competitionId={id} discipline={discipline} />
     </div>
   );
 }

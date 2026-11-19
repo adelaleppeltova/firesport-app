@@ -9,6 +9,17 @@ import { useMemo } from "react";
 import api from "../api/axios";
 export { useResultsByCategory } from "./useResultsByCategory";
 
+export function useCategoryCatalog() {
+  return useQuery({
+    queryKey: ["category-catalog"],
+    queryFn: async () => {
+      const { data } = await api.get("/v1/results/catalog");
+      return data;
+    },
+    staleTime: Infinity,
+  });
+}
+
 // GET /competitions/:id/detail
 export function useCompetitionDetail(id) {
   return useQuery({
@@ -71,11 +82,11 @@ export function useAthleteProfile(athleteId) {
 }
 
 // GET /athletes/:id/performance-history – trend výkonnosti pro History
-export function useAthletePerformanceHistory(athleteId, year) {
+export function useAthletePerformanceHistory(athleteId, year, discipline = "100m") {
   return useQuery({
-    queryKey: ["athletes", athleteId, "performance-history", year ?? null],
+    queryKey: ["athletes", athleteId, "performance-history", year ?? null, discipline],
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ discipline });
       if (year != null) params.set("year", String(year));
       const suffix = params.size ? `?${params.toString()}` : "";
       const { data } = await api.get(
@@ -88,11 +99,11 @@ export function useAthletePerformanceHistory(athleteId, year) {
 }
 
 // GET /athletes/:id/performance-stability – stabilita výkonu pro PerformanceStability
-export function useAthletePerformanceStability(athleteId, year) {
+export function useAthletePerformanceStability(athleteId, year, discipline = "100m") {
   return useQuery({
-    queryKey: ["athletes", athleteId, "performance-stability", year ?? null],
+    queryKey: ["athletes", athleteId, "performance-stability", year ?? null, discipline],
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ discipline });
       if (year != null) params.set("year", String(year));
       const suffix = params.size ? `?${params.toString()}` : "";
       const { data } = await api.get(
@@ -155,6 +166,7 @@ export function useCompetitions({
   pageSize = 25,
   sortKey = "date",
   sortDir = "desc",
+  discipline,
 } = {}) {
   return useQuery({
     queryKey: [
@@ -165,6 +177,7 @@ export function useCompetitions({
       pageSize,
       sortKey,
       sortDir,
+      discipline,
     ],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -173,6 +186,7 @@ export function useCompetitions({
       params.set("page_size", String(pageSize));
       params.set("sort_key", sortKey);
       params.set("sort_dir", sortDir);
+      if (discipline) params.set("discipline", discipline);
       const { data } = await api.get(`/v1/competitions?${params.toString()}`);
       return data;
     },
@@ -181,12 +195,12 @@ export function useCompetitions({
 }
 
 // GET /athletes/:id/performance-by-year
-export function useAthletePerformanceByYear(athleteId) {
+export function useAthletePerformanceByYear(athleteId, discipline = "100m") {
   return useQuery({
-    queryKey: ["athletes", athleteId, "performance-by-year"],
+    queryKey: ["athletes", athleteId, "performance-by-year", discipline],
     queryFn: async () => {
       const { data } = await api.get(
-        `/v1/athletes/${athleteId}/performance-by-year`,
+        `/v1/athletes/${athleteId}/performance-by-year`, { params: { discipline } },
       );
       return data;
     },
@@ -195,11 +209,11 @@ export function useAthletePerformanceByYear(athleteId) {
 }
 
 // GET /athletes/:id/performance-in-year
-export function useAthletePerformanceInYear(athleteId, year) {
+export function useAthletePerformanceInYear(athleteId, year, discipline = "100m") {
   return useQuery({
-    queryKey: ["athletes", athleteId, "performance-in-year", year ?? null],
+    queryKey: ["athletes", athleteId, "performance-in-year", year ?? null, discipline],
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ discipline });
       if (year != null) params.set("year", String(year));
       const suffix = params.size ? `?${params.toString()}` : "";
       const { data } = await api.get(
@@ -212,14 +226,12 @@ export function useAthletePerformanceInYear(athleteId, year) {
 }
 
 // GET /athletes/:id/anomalies
-export function useAthleteAnomalies(athleteId, runId) {
+export function useAthleteAnomalies(athleteId, runId, categoryGroup) {
   return useQuery({
-    queryKey: ["athletes", athleteId, "anomalies", runId ?? null],
+    queryKey: ["athletes", athleteId, "anomalies", runId ?? null, categoryGroup ?? null],
     queryFn: async () => {
-      const params = runId ? `?run_id=${encodeURIComponent(runId)}` : "";
-      const { data } = await api.get(
-        `/v1/athletes/${athleteId}/anomalies${params}`,
-      );
+      const params = { run_id: runId, category_group: categoryGroup ?? undefined };
+      const { data } = await api.get(`/v1/athletes/${athleteId}/anomalies`, { params });
       return data;
     },
     enabled: !!athleteId && !!runId,
@@ -229,7 +241,7 @@ export function useAthleteAnomalies(athleteId, runId) {
 // Fetch items from ALL windows for an athlete, deduplicated by result_id.
 // Returns { items, runIdsByCategory } where runIdsByCategory is a
 // Map<category_group, Set<run_id>> used to filter windows by category.
-export function useAllAthleteAnomalyItems(athleteId, windows) {
+export function useAllAthleteAnomalyItems(athleteId, windows, discipline) {
   const windowList = windows ?? [];
 
   const queries = useQueries({
@@ -255,6 +267,7 @@ export function useAllAthleteAnomalyItems(athleteId, windows) {
     for (let i = 0; i < queries.length; i++) {
       const runId = windowList[i]?.run_id;
       for (const item of queries[i].data?.items ?? []) {
+        if (discipline && item.discipline !== discipline) continue;
         // Build category → run_id mapping (before dedup so all windows counted)
         if (item.category_group && runId) {
           if (!runIdsByCategory.has(item.category_group)) {
@@ -269,9 +282,9 @@ export function useAllAthleteAnomalyItems(athleteId, windows) {
         }
       }
     }
-    return { items: combined, runIdsByCategory };
+    return { items: combined, runIdsByCategory, loading: queries.some((query) => query.isLoading) };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queries]);
+  }, [queries, discipline]);
 }
 
 // GET /ml/windows?type=yearly_3y[&athlete_id=...]
@@ -314,6 +327,16 @@ export function useAdminImportReview() {
   });
 }
 
+export function useAdminCategoryReview(page) {
+  return useQuery({
+    queryKey: ["admin", "category-review", page],
+    queryFn: async () => {
+      const { data } = await api.get("/v1/admin/import/category-review", { params: { page } });
+      return data;
+    },
+  });
+}
+
 export function useAdminImportResults() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -328,6 +351,7 @@ export function useAdminImportResults() {
       return data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "category-review"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "import-review"] });
     },
   });

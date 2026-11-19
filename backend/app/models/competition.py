@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import datetime
+from app.category_catalog import Discipline
 
 class CompetitionBase(BaseModel):
     name: str
@@ -19,6 +20,8 @@ class CompetitionCategorySummary(BaseModel):
     id: str
     name: str
     competitors_count: int
+    discipline: Optional[Discipline] = None
+    type: Optional[str] = None
 
     model_config = ConfigDict(
         populate_by_name=True,

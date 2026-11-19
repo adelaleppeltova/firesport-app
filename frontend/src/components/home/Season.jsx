@@ -1,12 +1,12 @@
 import { useAthletePerformanceInYear } from "../../hooks/useApi";
 import CardState from "./CardState";
 
-export default function Season({ athleteId, year }) {
+export default function Season({ athleteId, discipline, year }) {
   const {
     data: performanceInYear,
     isLoading,
     error,
-  } = useAthletePerformanceInYear(athleteId, year);
+  } = useAthletePerformanceInYear(athleteId, year, discipline);
 
   if (isLoading) return <div className="skeleton skeleton--sm" />;
   if (error) return <CardState type="error" />;

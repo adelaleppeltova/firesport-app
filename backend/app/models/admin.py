@@ -14,8 +14,20 @@ class AdminReviewItem(BaseModel):
     imported_athlete: ImportedAthleteData
     match_status: MatchStatus
     match_reason: Optional[str] = None
+    name_issues: list[str] = Field(default_factory=list)
+    source_person_name: dict[str, Optional[str]] = Field(default_factory=dict)
+    source_url: Optional[str] = None
+    source_full_name: Optional[str] = None
     team: Optional[str] = None
     date: Optional[str] = None
+
+
+class AdminSourceNameDetail(BaseModel):
+    result_id: str
+    classification_status: str | None = None
+    imported_athlete: ImportedAthleteData
+    source_full_name: str
+    segmentation: dict | None = None
 
 
 class AdminReviewSummary(BaseModel):
@@ -35,6 +47,7 @@ class ImportStats(BaseModel):
     athletes_created_new: int = 0
     athletes_existing_matched: int = 0
     categories_created: int = 0
+    classification_review_required: int = 0
     competitions_created: int = 0
     results_created: int = 0
     results_matched: int = 0

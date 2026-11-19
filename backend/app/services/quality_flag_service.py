@@ -1,9 +1,10 @@
-"""Service pro výpočet quality_flag výsledků (100m překážek).
+"""Service pro výpočet quality_flag individuálních výsledků.
 
 quality_flag = "suspicious" pokud:
 1) Absolutní hranice: time_seconds < low nebo > high
    kde low = max(11.0, Q01) a high = min(45.0, Q99)
    z distribuce valid časů *ve stejné kategorii* (results.category).
+   U 60 m se použijí percentily bez absolutních hranic pro 100 m.
 2) Relativní skok: aktuální čas je o více než 25 % horší než medián
    posledních 5 validních výsledků sportovce *ve stejné kategorii*.
 """
@@ -17,6 +18,7 @@ import numpy as np
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.category_catalog import BY_ID, VALID_FINAL_TIME_FILTER, active_results
 from app.models.result import QualityFlag
 
 logger = logging.getLogger(__name__)
@@ -32,13 +34,17 @@ _RELATIVE_THRESHOLD = 1.25
 _MIN_HISTORY = 5
 
 
-def _compute_percentile_bounds(times: list[float]) -> tuple[float, float]:
+def _compute_percentile_bounds(times: list[float], *, short_course: bool = False) -> tuple[float, float]:
     """Z dat spočítá Q01 a Q99 a vrátí (low, high) s absolutními pojistkami."""
+    if short_course and len(times) < 2:
+        return 0.0, float("inf")
     if not times:
         return _ABS_LOW, _ABS_HIGH
     arr = np.array(times, dtype=float)
     q01 = float(np.percentile(arr, 1))
     q99 = float(np.percentile(arr, 99))
+    if short_course:
+        return q01, q99
     low = max(_ABS_LOW, q01)
     high = min(_ABS_HIGH, q99)
     return low, high
@@ -51,9 +57,9 @@ async def _load_valid_times_for_category(
     """Načte valid final_time hodnoty z DB pro danou kategorii."""
     cursor = db["results"].find(
         {
-            "final_time_status": "valid",
-            "final_time": {"$ne": None},
+            **VALID_FINAL_TIME_FILTER,
             "category": category_id,
+            "classification_status": "active", "duplicate_of": None,
         },
         projection={"final_time": 1, "_id": 0},
     )
@@ -71,8 +77,8 @@ async def _load_athlete_history(
     query: dict = {
         "athlete": athlete_id,
         "category": category_id,
-        "final_time_status": "valid",
-        "final_time": {"$ne": None},
+        "classification_status": "active", "duplicate_of": None,
+        **VALID_FINAL_TIME_FILTER,
     }
     if before_date is not None:
         query["date"] = {"$lt": before_date}
@@ -179,7 +185,7 @@ async def compute_quality_flag(
         low, high = bounds_cache[category_oid]
     else:
         cat_times = await _load_valid_times_for_category(db, category_oid)
-        low, high = _compute_percentile_bounds(cat_times)
+        low, high = _compute_percentile_bounds(cat_times, short_course=result_doc.get("discipline") == "60m")
         if bounds_cache is not None:
             bounds_cache[category_oid] = (low, high)
 
@@ -208,7 +214,7 @@ async def compute_bounds_for_recompute(
     # Distinct category_id z valid výsledků
     category_ids: list[ObjectId] = await db["results"].distinct(
         "category",
-        {"final_time_status": "valid", "final_time": {"$ne": None}},
+        {**active_results(individual=True), **VALID_FINAL_TIME_FILTER},
     )
 
     bounds: dict[ObjectId, tuple[float, float]] = {}
@@ -216,7 +222,7 @@ async def compute_bounds_for_recompute(
         if cat_id is None:
             continue
         times = await _load_valid_times_for_category(db, cat_id)
-        bounds[cat_id] = _compute_percentile_bounds(times)
+        bounds[cat_id] = _compute_percentile_bounds(times, short_course=BY_ID[cat_id].discipline == "60m")
 
     lows = [v[0] for v in bounds.values()]
     highs = [v[1] for v in bounds.values()]
@@ -240,9 +246,9 @@ async def recompute_quality_flags(db: AsyncIOMotorDatabase) -> dict:
     bounds: dict[ObjectId, tuple[float, float]] = await compute_bounds_for_recompute(db)
 
     cursor = db["results"].find(
-        {},
+        active_results(individual=True),
         projection={"_id": 1, "final_time": 1, "final_time_status": 1,
-                    "athlete": 1, "date": 1, "category": 1},
+                    "athlete": 1, "date": 1, "category": 1, "discipline": 1},
     )
     docs = await cursor.to_list(None)
 

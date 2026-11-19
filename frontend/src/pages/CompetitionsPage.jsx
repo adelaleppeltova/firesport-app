@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useCompetitions } from "../hooks/useApi";
+import DisciplineSelect from "../components/DisciplineSelect";
 import PrimaryButton from "../components/PrimaryButton";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { scrollPageToTop } from "../components/ScrollToTop";
@@ -21,6 +22,7 @@ export default function CompetitionsPage() {
   const [page, setPage] = useState(initialPage);
   const [sortKey, setSortKey] = useState(initialSortKey);
   const [sortDir, setSortDir] = useState(initialSortDir);
+  const [discipline, setDiscipline] = useState(searchParams.get("discipline") || "");
 
   // Sync stavu do URL (přes ref, aby nezpůsoboval refire efektů)
   const updateUrl = useCallback(
@@ -30,9 +32,10 @@ export default function CompetitionsPage() {
       if (p > 1) params.set("page", String(p));
       if (sk !== "date") params.set("sort", sk);
       if (sd !== "desc") params.set("dir", sd);
+      if (discipline) params.set("discipline", discipline);
       setSearchParams(params, { replace: true });
     },
-    [setSearchParams],
+    [setSearchParams, discipline],
   );
   const updateUrlRef = useRef(updateUrl);
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function CompetitionsPage() {
   useEffect(() => {
     updateUrlRef.current(debouncedSearch, page, sortKey, sortDir);
     scrollPageToTop();
-  }, [page, sortKey, sortDir, debouncedSearch]);
+  }, [page, sortKey, sortDir, debouncedSearch, discipline]);
 
   const { data, isLoading, error, isFetching } = useCompetitions({
     search: debouncedSearch,
@@ -63,6 +66,7 @@ export default function CompetitionsPage() {
     pageSize: PAGE_SIZE,
     sortKey,
     sortDir,
+    discipline,
   });
 
   const competitions = data?.items || [];
@@ -116,6 +120,10 @@ export default function CompetitionsPage() {
 
   return (
     <div className="competitions-page page">
+      <DisciplineSelect value={discipline} onChange={(value) => {
+        setDiscipline(value);
+        setPage(1);
+      }} all />
       <div className="competitions-page__header">
         <h1>Závody</h1>
         <div className="competitions-page__toolbar">

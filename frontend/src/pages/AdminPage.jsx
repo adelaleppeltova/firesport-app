@@ -6,6 +6,7 @@ import {
   useAdminAssignResultAthlete,
   useAdminCreateAthleteFromResult,
   useAdminDeleteReviewResults,
+  useAdminCategoryReview,
   useAdminAthleteSearch,
   useAdminImportResults,
   useAdminImportReview,
@@ -27,6 +28,8 @@ function formatAthleteMeta(athlete) {
 }
 
 const matchReasons = {
+  source_name_restored_identity_unverified: "Jméno doloženo, vazba na profil k ověření",
+  name_segmentation_review: "Rozdělení jména vyžaduje kontrolu",
   missing_name: "Ve zdroji chybí jméno nebo příjmení.",
   shared_fscode: "FSCode sdílí více aktivních profilů.",
   conflicting_fscode: "FSCode je v rozporu se jménem nebo rokem narození.",
@@ -39,15 +42,34 @@ const matchReasons = {
   manual_admin_unassignment: "Přiřazení ručně odebral administrátor.",
 };
 
+const categoryReviewReasons = {
+  unsupported_discipline: "Nepodporovaná disciplína",
+  missing_discipline: "Chybí doložená disciplína",
+  conflicting_result_discipline: "Disciplína výsledku a kategorie se liší",
+  missing_verified_individual_or_birth_year: "Chybí potvrzený ročník nebo individuální řádek",
+  unverified_60m_category: "Je potřeba ověřit rozdělení kategorií 60 m",
+  noncanonical_60m_age_range: "Publikované rozmezí neodpovídá schválené kategorii",
+  possible_duplicate_official_row: "Možná duplicitní výsledková listina",
+  outside_canonical_age_range: "Ročník je mimo schválené věkové rozmezí",
+  missing_100m_age_range_or_gender: "Chybí věkové rozmezí nebo doložené pohlaví",
+  outside_source_or_canonical_age_range: "Věk neodpovídá publikovanému rozmezí",
+  team_member_result_requires_separate_treatment: "Publikovaný běh člena družstva vyžaduje samostatné zařazení",
+  unverified_team_or_progression: "Družstvo nebo postupovou soutěž je potřeba ověřit",
+  possible_placeholder_final_time: "Výsledný čas může být zástupná hodnota",
+  missing_or_invalid_official_final_time: "Chybí platný oficiální čas",
+};
+
 function formatImportedLabel(item) {
   const imported = item.imported_athlete;
-  return `${imported.first_name} ${imported.last_name}`.trim();
+  return imported.first_name && imported.last_name
+    ? `${imported.first_name} ${imported.last_name}`
+    : item.source_full_name || "Jméno nezjištěno";
 }
 
 function formatSelectedImportedLabel(item) {
   const imported = item.imported_athlete;
   return [
-    `${imported.first_name} ${imported.last_name}`.trim(),
+    formatImportedLabel(item),
     imported.birth_year ?? null,
     imported.fscode ?? null,
     item.team || null,
@@ -59,6 +81,7 @@ function formatSelectedImportedLabel(item) {
 export default function AdminPage() {
   const pageTopRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [nameProblemsOnly, setNameProblemsOnly] = useState(false);
   const [selectedResult, setSelectedResult] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -67,6 +90,8 @@ export default function AdminPage() {
   const debounceRef = useRef(null);
 
   const reviewQuery = useAdminImportReview();
+  const [categoryReviewPage, setCategoryReviewPage] = useState(1);
+  const categoryReview = useAdminCategoryReview(categoryReviewPage);
   const importMutation = useAdminImportResults();
   const assignMutation = useAdminAssignResultAthlete();
   const createAthleteMutation = useAdminCreateAthleteFromResult();
@@ -215,7 +240,10 @@ export default function AdminPage() {
     }
   };
 
-  const reviewItems = reviewQuery.data?.items ?? [];
+  const allReviewItems = reviewQuery.data?.items ?? [];
+  const reviewItems = nameProblemsOnly
+    ? allReviewItems.filter((item) => item.name_issues?.length)
+    : allReviewItems;
   const summary = reviewQuery.data?.summary ?? {
     total: 0,
     needs_review: 0,
@@ -309,6 +337,10 @@ export default function AdminPage() {
               <strong>{importStatus.duplicates}</strong>
             </div>
             <div className="admin-page__summary-item">
+              <span>Zařazení ke kontrole</span>
+              <strong>{importSummary?.classification_review_required ?? 0}</strong>
+            </div>
+            <div className="admin-page__summary-item">
               <span>Chyby a konflikty</span>
               <strong>{importStatus.errors.length}</strong>
             </div>
@@ -322,6 +354,34 @@ export default function AdminPage() {
           )}
         </Card>
       </div>
+
+      <Card title="Kategorie a disciplíny ke kontrole">
+        {categoryReview.isError ? <p>Kontrolu se nepodařilo načíst.</p> : (
+          <>
+            <p>{categoryReview.data?.total ?? "—"} výsledků mimo veřejné statistiky.</p>
+            <ul>
+              {categoryReview.data?.items.map((item) => (
+                <li key={item.result_id}>
+                  {item.date?.slice(0, 10)} · {item.discipline ?? "Neznámá disciplína"} ·{" "}
+                  {item.category || "Kategorie neuvedena"} ·{" "}
+                  {categoryReviewReasons[item.reason] ?? "Ověřit údaje ve výsledkové listině"}
+                  {item.rank != null && ` · pořadí ${item.rank}`}
+                  {" · "}<small>ID {item.result_id}</small>
+                  {/^https?:\/\//i.test(item.source_url ?? "") && (
+                    <> · <a href={item.source_url}>Zdroj</a></>
+                  )}
+                </li>
+              ))}
+            </ul>
+            {categoryReviewPage > 1 && (
+              <button type="button" onClick={() => setCategoryReviewPage(categoryReviewPage - 1)}>Předchozí</button>
+            )}
+            {categoryReviewPage * 25 < categoryReview.data?.total && (
+              <button type="button" onClick={() => setCategoryReviewPage(categoryReviewPage + 1)}>Další</button>
+            )}
+          </>
+        )}
+      </Card>
 
       <Card title="Vyhledání athlete pro ruční spojení">
         {!selectedReviewItem ? (
@@ -340,7 +400,8 @@ export default function AdminPage() {
                 className="btn admin-page__action-button admin-page__action-button--secondary admin-page__assignment-create"
                 onClick={handleCreateAthlete}
                 disabled={
-                  assignMutation.isPending || createAthleteMutation.isPending
+                  assignMutation.isPending || createAthleteMutation.isPending ||
+                  ["missing_name", "name_segmentation_review"].includes(selectedReviewItem.match_reason)
                 }
               >
                 Vytvořit závodníka
@@ -414,6 +475,11 @@ export default function AdminPage() {
           </button>
         </div>
         <div className="admin-page__table-wrapper">
+          <label>
+            <input type="checkbox" checked={nameProblemsOnly}
+              onChange={(event) => setNameProblemsOnly(event.target.checked)} />
+            Pouze záznamy s problémem ve jménu
+          </label>
           <table className="table table--compact admin-review-table">
             <colgroup>
               <col className="admin-review-table__col admin-review-table__col--imported" />
@@ -454,6 +520,16 @@ export default function AdminPage() {
                   >
                     <td>
                       <strong>{formatImportedLabel(item)}</strong>
+                      {(!!item.name_issues?.length || item.source_full_name) && (
+                        <details>
+                          <summary>Původní hodnoty jména</summary>
+                          {item.source_full_name && <div>{item.source_full_name}</div>}
+                          <div>{JSON.stringify(item.source_person_name)}</div>
+                        </details>
+                      )}
+                      {item.source_url?.startsWith("https://") && (
+                        <a href={item.source_url}>Zdroje výsledku</a>
+                      )}
                       <div className="admin-review-table__meta">
                         {item.date
                           ? new Date(item.date).toLocaleDateString("cs-CZ")
@@ -464,7 +540,7 @@ export default function AdminPage() {
                       <span
                         className={`admin-badge admin-badge--${item.match_status}`}
                       >
-                        {item.match_status}
+                        {item.match_status === "needs_review" ? "Vyžaduje kontrolu" : "Bez propojení s profilem"}
                       </span>
                       {item.match_reason && (
                         <div className="admin-review-table__meta">

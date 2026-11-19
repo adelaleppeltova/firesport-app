@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from app.person_names import NAME_FIELDS, normalize_person_name
+
 
 def normalize_fs_code(value: Any) -> Optional[str]:
     if value is None:
@@ -68,6 +70,9 @@ def normalize_athlete_document(doc: Optional[dict]) -> Optional[dict]:
         return None
 
     normalized = dict(doc)
+    for field in NAME_FIELDS:
+        if field in normalized:
+            normalized[field] = normalize_person_name(normalized[field])
     (
         normalized["fs_codes"],
         normalized["teams"],

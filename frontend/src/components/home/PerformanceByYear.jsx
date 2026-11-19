@@ -18,12 +18,12 @@ const YEAR_STYLES = [
   { color: "#b26a1f", tone: "warning" },
 ];
 
-export default function PerformanceByYear({ athleteId }) {
+export default function PerformanceByYear({ athleteId, discipline }) {
   const {
     data: performanceData,
     isLoading,
     error,
-  } = useAthletePerformanceByYear(athleteId);
+  } = useAthletePerformanceByYear(athleteId, discipline);
   const [view, setView] = useState("current"); // "current" | "recent"
   const autoSwitchedRef = useRef(false);
 

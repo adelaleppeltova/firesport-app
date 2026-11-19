@@ -4,7 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from .metadata import category_discipline, competition_metadata, norm
+from .metadata import TEAM_TABLE_NOTE, category_discipline, competition_metadata, norm
 from .participants import integer
 from .times import final_time, parse_time
 
@@ -81,9 +81,7 @@ def has_compact_team_table(soup):
 
 def parse_team_html(data):
     soup = BeautifulSoup(data, "html.parser")
-    notes = [
-        "Source: HTML compact team timing tables; team labels copied verbatim. Expandable team rosters are not result rows."
-    ]
+    notes = [TEAM_TABLE_NOTE]
     warnings, categories, audit = [], [], []
     competition = competition_metadata(soup, warnings, site=True)
     has_performance = False

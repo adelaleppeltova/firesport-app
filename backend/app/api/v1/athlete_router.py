@@ -1,5 +1,6 @@
 from typing import Optional, Literal
 from fastapi import APIRouter, Query, HTTPException, Depends
+from app.category_catalog import Discipline
 from app.models.athlete import (
     AthletesSearch, AthletesPage, AthleteOverview,
     PerformanceByYear, PerformanceInYear, AthleteProfile,
@@ -57,10 +58,10 @@ async def search_athletes(q: str):
     return await search_athletes_service(q)
 
 @router.get("/{athlete_id}/overview", response_model=AthleteOverview)
-async def get_athlete_overview(athlete_id: str, user=Depends(get_current_user)):
+async def get_athlete_overview(athlete_id: str, discipline: Discipline = Query("100m"), user=Depends(get_current_user)):
     """Vrátí přehled výkonů atleta."""
     try:
-        return await get_athlete_overview_service(athlete_id)
+        return await get_athlete_overview_service(athlete_id, discipline=discipline)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -73,10 +74,10 @@ async def get_athlete_detail(athlete_id: str):
         raise HTTPException(status_code=404, detail=str(e))
 
 @router.get("/{athlete_id}/performance-by-year", response_model=PerformanceByYear)
-async def get_athlete_performance_by_year(athlete_id: str, user=Depends(get_current_user)):
+async def get_athlete_performance_by_year(athlete_id: str, discipline: Discipline = Query("100m"), user=Depends(get_current_user)):
     """Vrátí data vývoje výkonu atleta po jednotlivých sezónách pro graf."""
     try:
-        return await get_athlete_performance_by_year_service(athlete_id)
+        return await get_athlete_performance_by_year_service(athlete_id, discipline=discipline)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     
@@ -84,11 +85,12 @@ async def get_athlete_performance_by_year(athlete_id: str, user=Depends(get_curr
 async def get_athlete_performance_in_year(
     athlete_id: str,
     year: Optional[int] = Query(None, description="Kalendářní rok pro souhrn sezóny"),
+    discipline: Discipline = Query("100m"),
     user=Depends(get_current_user),
 ):
     """Vrátí data vývoje výkonu atleta po jednotlivých sezónách pro graf."""
     try:
-        return await get_athlete_year_summary_service(athlete_id, year=year)
+        return await get_athlete_year_summary_service(athlete_id, year=year, discipline=discipline)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -104,11 +106,12 @@ async def get_athlete_profile(athlete_id: str, user=Depends(get_current_user)):
 async def get_athlete_performance_history(
     athlete_id: str,
     year: Optional[int] = Query(None, description="Kalendářní rok pro výpočet trendu"),
+    discipline: Discipline = Query("100m"),
     user=Depends(get_current_user),
 ):
     """Vrátí indikátor výkonnosti (trend) pro atleta."""
     try:
-        return await get_athlete_performance_history_service(athlete_id, year=year)
+        return await get_athlete_performance_history_service(athlete_id, year=year, discipline=discipline)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -116,11 +119,12 @@ async def get_athlete_performance_history(
 async def get_athlete_performance_stability(
     athlete_id: str,
     year: Optional[int] = Query(None, description="Kalendářní rok pro výpočet stability"),
+    discipline: Discipline = Query("100m"),
     user=Depends(get_current_user),
 ):
     """Vrátí data o stabilitě výkonu atleta."""
     try:
-        return await get_athlete_performance_stability_service(athlete_id, year=year)
+        return await get_athlete_performance_stability_service(athlete_id, year=year, discipline=discipline)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 

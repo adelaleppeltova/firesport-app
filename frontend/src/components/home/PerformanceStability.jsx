@@ -7,10 +7,11 @@ const EMPTY_STABILITY_CONFIG = getStabilityConfig();
 
 export default function PerformanceStability({
   athleteId,
+  discipline,
   year,
   onStabilityChange,
 }) {
-  const { data, isLoading, error } = useStabilityData(athleteId, year);
+  const { data, isLoading, error } = useStabilityData(athleteId, year, discipline);
   const ratingText = data?.stability_rating || "Nedostatek dat";
   const config = data ? getStabilityConfig(ratingText) : EMPTY_STABILITY_CONFIG;
 

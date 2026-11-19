@@ -32,6 +32,10 @@ async def ensure_indexes():
         [("athlete", 1), ("final_time_status", 1), ("date", 1)],
         name="idx_results_athlete_status_date",
     )
+    await db["results"].create_index(
+        [("classification_status", 1), ("discipline", 1), ("category", 1), ("competition", 1)],
+        name="idx_results_catalog_competition",
+    )
     await db["results"].create_index("match_status", name="idx_results_match_status")
     await db["results"].create_index(
         [

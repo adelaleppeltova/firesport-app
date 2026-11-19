@@ -9,9 +9,9 @@ import {
 import AthleteDetailCategoryCard, {
   CategorySelect,
 } from "../components/athlete/AthleteDetailCategoryCard";
+import DisciplineSelect from "../components/DisciplineSelect";
 import PageContextNav from "../components/PageContextNav";
 import { useAuth } from "../context/AuthContext";
-import formatCategoryName from "../utils/formatCategoryName";
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -56,7 +56,7 @@ const getResultLink = (result, athleteId) => {
     return null;
   }
 
-  return `/zavody/${competitionId}/vysledky/${categoryId}#${athleteId}`;
+  return `/zavody/${competitionId}/vysledky/${categoryId}#${result._id ?? athleteId}`;
 };
 
 const formatIdentityList = (items = []) =>
@@ -70,6 +70,7 @@ export default function AthleteDetailPage() {
   const { data: perCategoryData } = useAthletePerCategoryStats(id);
   const isAdmin = user?.role === "admin";
 
+  const [discipline, setDiscipline] = useState("100m");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [mergeSearch, setMergeSearch] = useState("");
   const [submittedMergeSearch, setSubmittedMergeSearch] = useState("");
@@ -78,8 +79,8 @@ export default function AthleteDetailPage() {
 
   const availableCategories = useMemo(() => {
     if (!perCategoryData?.categories) return [];
-    return perCategoryData.categories;
-  }, [perCategoryData]);
+    return perCategoryData.categories.filter((category) => category.discipline === discipline);
+  }, [perCategoryData, discipline]);
 
   useEffect(() => {
     if (
@@ -109,23 +110,22 @@ export default function AthleteDetailPage() {
   if (error || !data)
     return <div className="athlete-detail-page">Chyba při načítání dat.</div>;
 
-  const { athlete, best_time, results } = data;
+  const { athlete, personal_records, results } = data;
   const selectedCategory = selectedCategoryId
     ? (availableCategories.find((c) => c.category_id === selectedCategoryId) ??
       null)
     : null;
-  const filteredResults = selectedCategoryId
-    ? (results ?? []).filter(
-        (result) => result.category?._id === selectedCategoryId,
-      )
-    : results ?? [];
+  const filteredResults = (results ?? []).filter(
+    (result) => result.discipline === discipline &&
+      (!selectedCategory || result.category?._id === selectedCategoryId),
+  );
   const summaryTitleLabel = selectedCategory?.category_name ?? "Všechny kategorie";
   const summaryTotalRaces = selectedCategory
     ? selectedCategory.total_races ?? null
     : filteredResults.length;
   const summaryBestTime = selectedCategory
     ? selectedCategory.best_time ?? null
-    : best_time ?? null;
+    : personal_records?.[discipline] ?? null;
   const hasResults = filteredResults.length > 0;
   const athleteName = `${athlete.first_name} ${athlete.last_name}`;
   const athleteMeta = [
@@ -153,10 +153,10 @@ export default function AthleteDetailPage() {
     ? `${lastResult.competition.name} • ${formatDate(lastResult.competition.date)}`
     : null;
   const profileStats = [
-    {
-      label: "Nejlepší čas",
-      value: summaryBestTime != null ? `${summaryBestTime.toFixed(2)} s` : "—",
-    },
+    ...Object.entries(personal_records ?? {}).map(([key, time]) => ({
+      label: `Osobní rekord ${key}`,
+      value: time != null ? `${time.toFixed(2)} s` : "—",
+    })),
     {
       label: "Počet výsledků",
       value: summaryTotalRaces != null ? `${summaryTotalRaces}` : "—",
@@ -293,6 +293,11 @@ export default function AthleteDetailPage() {
           </p>
         </div>
 
+        <DisciplineSelect value={discipline} onChange={(value) => {
+          setDiscipline(value);
+          setSelectedCategoryId("");
+        }} />
+
         {availableCategories.length > 0 && (
           <CategorySelect
             categories={availableCategories}
@@ -339,7 +344,8 @@ export default function AthleteDetailPage() {
                 const competitionName = r.competition?.name || "Neznámý závod";
                 const competitionPlace = r.competition?.place || "-";
                 const competitionDate = formatDate(r.competition?.date);
-                const categoryName = formatCategoryName(r.category?.name) || "-";
+                const categoryName = r.category?.name || "-";
+                const sourceCategory = r.source_category?.name;
                 const resultLink = getResultLink(r, athlete?._id);
                 const timeParts = getResultTimeParts(r);
 
@@ -368,7 +374,8 @@ export default function AthleteDetailPage() {
                   </td>
                   <td className="athlete-detail-table__place">{competitionPlace}</td>
                   <td className="athlete-detail-table__category">
-                    {categoryName}
+                    {r.discipline} · {categoryName}
+                    {sourceCategory && sourceCategory !== categoryName && <small> ({sourceCategory})</small>}
                   </td>
                   <td className="athlete-detail-table__team">{r.team || "-"}</td>
                   <td className="athlete-detail-table__time">
@@ -399,7 +406,8 @@ export default function AthleteDetailPage() {
             const competitionName = r.competition?.name || "Neznámý závod";
             const competitionDate = formatDate(r.competition?.date);
             const competitionPlace = r.competition?.place || "-";
-            const categoryName = formatCategoryName(r.category?.name) || "-";
+            const categoryName = r.category?.name || "-";
+            const sourceCategory = r.source_category?.name;
             const resultLink = getResultLink(r, athlete?._id);
 
             return (
@@ -435,7 +443,10 @@ export default function AthleteDetailPage() {
                   </div>
                   <div className="athlete-results-mobile-card__detail">
                     <dt>Kategorie</dt>
-                    <dd>{categoryName}</dd>
+                    <dd>
+                      {r.discipline} · {categoryName}
+                      {sourceCategory && sourceCategory !== categoryName && <small> ({sourceCategory})</small>}
+                    </dd>
                   </div>
                   <div className="athlete-results-mobile-card__detail">
                     <dt>Sbor</dt>

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from app.category_catalog import Discipline
 from typing import Optional
 from datetime import datetime
 from enum import Enum
@@ -39,6 +40,7 @@ class AnomalyItem(BaseModel):
     competition_place: Optional[str] = None
     quality_flag: QualityFlag = QualityFlag.ok
     category_group: Optional[str] = None
+    discipline: Optional[Discipline] = None
 
 
 class AnomalyRunInfo(BaseModel):

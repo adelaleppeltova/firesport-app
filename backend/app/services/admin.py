@@ -5,9 +5,11 @@ from datetime import datetime
 from bson import ObjectId
 from fastapi import HTTPException, UploadFile, status
 
+from app.category_catalog import active_results
 from app.db.database import db
-from app.models.admin import AdminImportStats, AdminReviewItem, AdminReviewResponse, AdminReviewSummary
+from app.models.admin import AdminImportStats, AdminReviewItem, AdminReviewResponse, AdminReviewSummary, AdminSourceNameDetail
 from app.models.result import ImportedAthleteData, MatchStatus
+from app.person_names import NAME_FIELDS, missing_name, name_issues
 from app.services.athlete_identity import active_athlete_query, build_fs_code_query
 from app.services.athlete_merge import (
     merge_athletes_service,
@@ -41,6 +43,7 @@ async def _apply_result_assignment(
 
 async def _rematch_review_results(athlete: dict) -> int:
     review_query = {
+        **active_results(individual=True),
         "match_status": {"$in": [MatchStatus.needs_review.value, MatchStatus.unmatched.value]},
         "athlete": None,
         "match_reason": {"$not": {"$regex": "^manual_admin_"}},
@@ -119,6 +122,7 @@ async def import_results_from_files(files: list[UploadFile]) -> dict:
 
 async def get_review_results() -> AdminReviewResponse:
     query = {
+        **active_results(individual=True),
         "match_status": {
             "$in": [MatchStatus.needs_review.value, MatchStatus.unmatched.value]
         }
@@ -134,20 +138,26 @@ async def get_review_results() -> AdminReviewResponse:
     unmatched_count = 0
 
     for doc in docs:
-        status_value = doc.get("match_status", MatchStatus.unmatched.value)
+        imported = doc.get("imported_athlete") or {}
+        incomplete = missing_name(imported)
+        source_name = doc.get("source_full_name")
+        reason = ("name_segmentation_review" if source_name else "missing_name") if incomplete else doc.get("match_reason")
+        status_value = MatchStatus.needs_review.value if incomplete else doc.get("match_status", MatchStatus.unmatched.value)
         if status_value == MatchStatus.needs_review.value:
             needs_review_count += 1
         else:
             unmatched_count += 1
-
-        imported = doc.get("imported_athlete") or {}
 
         items.append(
             AdminReviewItem(
                 result_id=str(doc["_id"]),
                 imported_athlete=ImportedAthleteData.model_validate(imported),
                 match_status=status_value,
-                match_reason=doc.get("match_reason"),
+                match_reason=reason,
+                source_full_name=source_name,
+                name_issues=name_issues(imported),
+                source_person_name=doc.get("source_person_name") or {field: imported.get(field) for field in NAME_FIELDS},
+                source_url=(doc.get("source_category") or {}).get("source_url"),
                 team=doc.get("imported_team", doc.get("team")),
                 date=doc.get("date").isoformat() if doc.get("date") else None,
             )
@@ -163,6 +173,48 @@ async def get_review_results() -> AdminReviewResponse:
     )
 
 
+async def get_source_name_detail(result_id: str) -> AdminSourceNameDetail:
+    if not ObjectId.is_valid(result_id):
+        raise HTTPException(status_code=400, detail="Neplatné ID výsledku.")
+    row = await results_collection.find_one(
+        {"_id": ObjectId(result_id), "source_full_name": {"$type": "string"}},
+        {"classification_status": 1, "imported_athlete": 1, "source_full_name": 1,
+         "source_name_evidence.segmentation": 1},
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Výsledek se zdrojovým jménem nebyl nalezen.")
+    return AdminSourceNameDetail(
+        result_id=result_id, classification_status=row.get("classification_status"),
+        imported_athlete=ImportedAthleteData.model_validate(row.get("imported_athlete") or {}),
+        source_full_name=row["source_full_name"],
+        segmentation=(row.get("source_name_evidence") or {}).get("segmentation"),
+    )
+
+
+async def get_category_review(page: int, page_size: int) -> dict:
+    query = {"classification_status": {"$in": ["review", "unsupported"]}}
+    cursor = results_collection.find(query, {
+        "competition": 1, "source_category": 1, "classification_reason": 1,
+        "classification_status": 1, "date": 1, "rank": 1,
+    }).sort("_id", 1).skip((page - 1) * page_size).limit(page_size)
+    documents = await cursor.to_list(page_size)
+    items = []
+    for document in documents:
+        source = document.get("source_category") or {}
+        items.append({
+            "result_id": str(document["_id"]),
+            "competition_id": str(document["competition"]) if document.get("competition") else None,
+            "date": document.get("date"),
+            "rank": document.get("rank"),
+            "category": source.get("name"),
+            "discipline": source.get("discipline"),
+            "source_url": source.get("source_url"),
+            "status": document["classification_status"],
+            "reason": document.get("classification_reason"),
+        })
+    return {"total": await results_collection.count_documents(query), "items": items}
+
+
 async def assign_result_to_athlete(result_id: str, athlete_id: str) -> dict:
     try:
         result_oid = ObjectId(result_id)
@@ -174,7 +226,7 @@ async def assign_result_to_athlete(result_id: str, athlete_id: str) -> dict:
     if not athlete:
         raise HTTPException(status_code=404, detail="Athlete not found")
 
-    result_doc = await results_collection.find_one({"_id": result_oid})
+    result_doc = await results_collection.find_one({"_id": result_oid, **active_results(individual=True)})
     if not result_doc:
         raise HTTPException(status_code=404, detail="Result not found")
 
@@ -199,13 +251,13 @@ async def create_athlete_from_result(result_id: str) -> dict:
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Invalid result_id") from exc
 
-    result_doc = await results_collection.find_one({"_id": result_oid})
+    result_doc = await results_collection.find_one({"_id": result_oid, **active_results(individual=True)})
     if not result_doc:
         raise HTTPException(status_code=404, detail="Result not found")
 
     imported = result_doc.get("imported_athlete") or {}
-    first_name = (imported.get("first_name") or "").strip()
-    last_name = (imported.get("last_name") or "").strip()
+    first_name = normalize_person_name(imported.get("first_name"))
+    last_name = normalize_person_name(imported.get("last_name"))
     if not first_name or not last_name:
         raise HTTPException(
             status_code=400,
@@ -251,6 +303,9 @@ async def create_athlete_from_result(result_id: str) -> dict:
 
 async def delete_review_results() -> dict:
     query = {
+        **active_results(individual=True),
+        "imported_athlete.first_name": {"$regex": r"\S"},
+        "imported_athlete.last_name": {"$regex": r"\S"},
         "match_status": {
             "$in": [MatchStatus.needs_review.value, MatchStatus.unmatched.value]
         }
@@ -265,7 +320,7 @@ async def unassign_result_from_athlete(result_id: str) -> dict:
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Invalid result_id") from exc
 
-    doc = await results_collection.find_one({"_id": result_oid})
+    doc = await results_collection.find_one({"_id": result_oid, **active_results(individual=True)})
     if not doc:
         raise HTTPException(status_code=404, detail="Result not found")
 

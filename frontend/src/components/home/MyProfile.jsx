@@ -27,14 +27,14 @@ export default function MyProfile({ athleteId }) {
       </div>
 
       <div className="my-profile__stats">
-        <div className="my-profile__stat">
-          <span className="my-profile__stat-label">Nejlepší čas</span>
-          <span className="my-profile__stat-value">
-            {profile.best_time != null
-              ? `${profile.best_time.toFixed(2)} s`
-              : "—"}
-          </span>
-        </div>
+        {Object.entries(profile.personal_records ?? {}).map(([discipline, time]) => (
+          <div className="my-profile__stat" key={discipline}>
+            <span className="my-profile__stat-label">Osobní rekord {discipline}</span>
+            <span className="my-profile__stat-value">
+              {time != null ? `${time.toFixed(2)} s` : "—"}
+            </span>
+          </div>
+        ))}
         <div className="my-profile__stat">
           <span className="my-profile__stat-label">Celkem závodů</span>
           <span className="my-profile__stat-value">

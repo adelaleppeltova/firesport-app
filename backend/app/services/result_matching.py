@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 from app.db.database import db
 from app.models.result import MatchStatus
+from app.person_names import normalize_person_name
 from app.services.athlete_identity import (
     active_athlete_query,
     build_fs_code_query,
@@ -14,10 +15,6 @@ from app.services.athlete_identity import (
 from app.services.search_utils import build_diacritic_fuzzy_regex
 
 athletes_collection = db["athletes"]
-
-
-def normalize_person_name(value: Optional[str]) -> str:
-    return " ".join(unicodedata.normalize("NFC", value or "").split())
 
 
 def build_name_candidate_query(value: str) -> dict:
@@ -50,14 +47,13 @@ async def decide_athlete_match(
 ) -> dict[str, Any]:
     first_name = normalize_person_name(first_name)
     last_name = normalize_person_name(last_name)
+    if not first_name or not last_name:
+        return _decision(MatchStatus.needs_review, "missing_name")
+
     code_query = build_fs_code_query(fscode)
     code_matches = await _find_athletes(code_query, limit=2) if code_query else []
     if len(code_matches) > 1:
         return _decision(MatchStatus.needs_review, "shared_fscode")
-
-    if not first_name or not last_name:
-        status = MatchStatus.needs_review if code_matches else MatchStatus.unmatched
-        return _decision(status, "missing_name")
 
     first_pattern, last_pattern = build_name_candidate_query(first_name), build_name_candidate_query(last_name)
     name_matches = await _find_athletes({"first_name": first_pattern, "last_name": last_pattern})

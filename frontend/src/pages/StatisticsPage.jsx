@@ -10,6 +10,7 @@ import {
   Tooltip,
   ReferenceLine,
 } from "recharts";
+import DisciplineSelect from "../components/DisciplineSelect";
 import Card from "../components/Card";
 import ModelInfoCard from "../components/statistics/ModelInfoCard";
 import { CategoryGroupSelect } from "../components/athlete/CategorySummaryCard";
@@ -736,6 +737,7 @@ function AthleteSearchCard({
 export default function StatisticsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedAthleteId = searchParams.get("athlete_id") || null;
+  const [discipline, setDiscipline] = useState("");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const debounceRef = useRef(null);
@@ -754,9 +756,10 @@ export default function StatisticsPage() {
     [windows],
   );
 
-  const { runIdsByCategory } = useAllAthleteAnomalyItems(
+  const { runIdsByCategory, loading: groupLoading } = useAllAthleteAnomalyItems(
     selectedAthleteId,
     sortedWindows,
+    discipline,
   );
 
   const availableCategoryGroups = useMemo(() => {
@@ -872,6 +875,7 @@ export default function StatisticsPage() {
   const { data, isLoading, isError } = useAthleteAnomalies(
     selectedAthleteId,
     selectedRunId,
+    selectedCategoryGroup,
   );
 
   const run = data?.run ?? null;
@@ -882,13 +886,7 @@ export default function StatisticsPage() {
     return allItems.filter((it) => it.category_group === selectedCategoryGroup);
   }, [allItems, selectedCategoryGroup]);
 
-  const categoriesLoading =
-    windowsLoading ||
-    (!!selectedAthleteId &&
-      !windowsError &&
-      !!windows?.length &&
-      availableCategoryGroups.length === 0);
-
+  const categoriesLoading = windowsLoading || groupLoading;
   const searchResults = athletesData?.items ?? [];
   const categoryHelperText =
     categoryWasAutoSelected && availableCategoryGroups.length > 1
@@ -922,6 +920,11 @@ export default function StatisticsPage() {
       {/* Select kategorie + Select období – jeden wrapper pro responzivní layout */}
       {selectedAthleteId && (
         <div className="statistics-page__filters">
+          <DisciplineSelect value={discipline} onChange={(value) => {
+            setDiscipline(value);
+            setSelectedCategoryGroup(null);
+            setSelectedRunId(null);
+          }} all />
           {categoriesLoading ? (
             <div className="window-select__skeleton skeleton" />
           ) : availableCategoryGroups.length > 0 ? (
@@ -957,13 +960,15 @@ export default function StatisticsPage() {
           <i className="fa-solid fa-user-magnifying-glass" />
           <p>Vyberte závodníka pro zobrazení analýzy.</p>
         </div>
-      ) : windowsLoading ? (
+      ) : categoriesLoading ? (
         <>
           <div className="skeleton" style={{ height: 120, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 200 }} />
         </>
-      ) : !windowsError && windows?.length === 0 ? (
+      ) : windowsError || isError ? (
+        <p className="empty-state">Nepodařilo se načíst data. Zkuste to prosím znovu.</p>
+      ) : !availableCategoryGroups.length ? (
         <div className="anomaly-no-athlete">
           <i className="fa-solid fa-chart-line" />
           <p>
@@ -983,10 +988,6 @@ export default function StatisticsPage() {
           <div className="skeleton" style={{ height: 300, marginBottom: 16 }} />
           <div className="skeleton" style={{ height: 200 }} />
         </>
-      ) : isError ? (
-        <p className="empty-state">
-          Nepodařilo se načíst data. Zkuste to prosím znovu.
-        </p>
       ) : (
         <>
           <SummaryCard run={run} />

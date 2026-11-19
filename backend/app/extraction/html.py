@@ -182,8 +182,12 @@ def parse_html(data, url, fetcher=None):
             def get(field):
                 return values[columns[field]] if field in columns else None
 
-            raw_name = (
-                get("name") or f"{get('last_name') or ''} {get('first_name') or ''}"
+            name_columns = sorted(columns[field] for field in ("first_name", "last_name") if field in columns)
+            raw_name = get("name") or " ".join(values[index] for index in name_columns if values[index])
+            name_link = cells[columns["name"]].find("a", href=True) if site and "name" in columns else None
+            participant_text = (
+                name_link.get_text(" ", strip=True)
+                if name_link and "/user/card/" in name_link["href"] else raw_name.strip()
             )
             context = f"{name} / {raw_name} / rank {get('rank')}"
             if "first_name" in columns and "last_name" in columns:
@@ -275,6 +279,7 @@ def parse_html(data, url, fetcher=None):
                 "fscode": fscode(get("fscode"), warnings, context),
                 "first_name": first,
                 "last_name": last,
+                **({"source_full_name": participant_text} if participant_text and any(c.isalpha() for c in participant_text) else {}),
                 "birth_year": year,
                 "team": get("team") or None,
                 "district": get("district") or None,

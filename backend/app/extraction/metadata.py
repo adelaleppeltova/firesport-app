@@ -3,6 +3,12 @@ import unicodedata
 from datetime import date
 
 
+TEAM_TABLE_NOTE = (
+    "Source: HTML compact team timing tables; team labels copied verbatim. "
+    "Expandable team rosters are not result rows."
+)
+
+
 def norm(value):
     value = unicodedata.normalize("NFKD", str(value or "").lower())
     return re.sub(
@@ -30,23 +36,32 @@ def parse_date(text):
 
 def discipline(text):
     text = norm(text)
-    for pattern, value in [
-        (r"4\s*[x×]\s*100", "4x100m"),
-        (r"100\s*m\s*(?:php|p)\b", "100mPHP"),
+    found = set()
+    # Consume specific variants first so their distances cannot also match 100m.
+    for pattern, value in (
+        (r"\b4\s*[x×]\s*100\s*m?\b", "4x100m"),
+        (r"\b100\s*m\s*(?:php|p)\b", "100mPHP"),
         (r"\b60\s*m\b|sedesatk", "60m"),
         (r"\b100\s*m\b|stovk", "100m"),
         (r"pozarni utok|\bpu\b", "PU"),
         (r"\bvez\b", "vez"),
-    ]:
-        if re.search(pattern, text):
-            return value
-    return None
+    ):
+        text, count = re.subn(pattern, " ", text)
+        if count:
+            found.add(value)
+    if re.search(r"\b\d+\s*m\b", text):
+        return None
+    return next(iter(found)) if len(found) == 1 else None
 
 
 def category_discipline(name, explicit, document):
-    result = discipline(explicit) or discipline(name)
+    if explicit and str(explicit).strip():
+        return discipline(explicit)
+    result = discipline(name)
     if result:
         return result
+    if re.search(r"\b\d+\s*m\b", norm(name)):
+        return None
     # Only use age mapping if the organizer explicitly defines both groups.
     text = norm(document)
     if (

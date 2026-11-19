@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { useResultsByCategory, useCompetitionDetail } from "../hooks/useApi";
 import PageContextNav from "../components/PageContextNav";
-import formatCategoryName from "../utils/formatCategoryName";
+import groupResultLists from "../utils/groupResultLists";
 
 // Pomocná funkce pro zobrazení času
 function renderTime(time, status) {
@@ -31,7 +31,7 @@ function getAthleteDisplayData(result) {
 }
 
 function getResultRowId(result) {
-  return result?.athlete?._id ?? result?._id;
+  return result?._id;
 }
 
 export default function ResultsPage() {
@@ -51,7 +51,8 @@ export default function ResultsPage() {
     const hash = location.hash;
     if (hash) {
       const targetId = hash.replace("#", "");
-      const row = document.getElementById(`row-${targetId}`);
+      const row = document.getElementById(`row-${targetId}`) ??
+        document.querySelector(`[data-athlete-id="${CSS.escape(targetId)}"]`);
       if (row) {
         row.scrollIntoView({ behavior: "smooth", block: "center" });
       }
@@ -60,22 +61,10 @@ export default function ResultsPage() {
 
   // compute highlight id to apply class in render
   const highlightedId = location.hash ? location.hash.replace("#", "") : null;
-  const sortedResults = [...(results ?? [])].sort((a, b) => {
-    const aRank = a?.rank;
-    const bRank = b?.rank;
-
-    if (aRank == null && bRank == null) return 0;
-    if (aRank == null) return 1;
-    if (bRank == null) return -1;
-
-    return aRank - bRank;
-  });
-  const categoryName =
-    formatCategoryName(
-      competition?.categories?.find(
-        (cat) => String(cat.id) === String(categoryId),
-      )?.name,
-    ) || "Neznámá kategorie";
+  const category = competition?.categories?.find((cat) => String(cat.id) === String(categoryId));
+  const categoryName = category?.name ?? "Neznámá kategorie";
+  const isTeam = category?.type === "team";
+  const lists = groupResultLists(results ?? [], categoryName);
 
   if (isLoading || isCompLoading) return <div>Načítání...</div>;
   if (error) return <div>Chyba při načítání výsledků.</div>;
@@ -109,7 +98,7 @@ export default function ResultsPage() {
               : "Datum neznámé"}
           </p>
         </div>
-        <p className="results-page__category">{categoryName}</p>
+        <p className="results-page__category">{category?.discipline} · {categoryName}</p>
       </header>
       <div className="results-table-wrapper">
         <table className="results-table">
@@ -127,7 +116,7 @@ export default function ResultsPage() {
           <thead>
             <tr>
               <th className="results-table__start-number-heading">Číslo</th>
-              <th>Závodník</th>
+              <th>{isTeam ? "Družstvo" : "Závodník"}</th>
               <th className="results-table__birth-year-heading">
                 Rok narození
               </th>
@@ -141,21 +130,32 @@ export default function ResultsPage() {
               <th className="results-table__rank-heading">Pořadí</th>
             </tr>
           </thead>
-          <tbody>
-            {sortedResults.length > 0 ? (
-              sortedResults.map((r) => {
+          {lists.map((list) => (
+            <tbody key={list.id}>
+              {(lists.length > 1 || list.name !== categoryName) && (
+                <tr>
+                  <th colSpan={9} scope="rowgroup">
+                    {list.name}{list.block && ` · ${list.block}`}
+                  </th>
+                </tr>
+              )}
+              {list.results.map((r) => {
                 const athlete = getAthleteDisplayData(r);
                 const rowId = getResultRowId(r);
                 const athleteName =
-                  `${athlete.firstName} ${athlete.lastName}`.trim() ||
-                  "Neznámý závodník";
+                  isTeam ? r.team || "—" : (
+                    athlete.firstName && athlete.lastName
+                      ? `${athlete.firstName} ${athlete.lastName}`
+                      : r.source_full_name || "Jméno nezjištěno"
+                  );
 
                 return (
                   <tr
                     id={`row-${rowId}`}
                     key={rowId}
+                    data-athlete-id={athlete.id ?? undefined}
                     className={
-                      highlightedId === String(athlete.id) ? "highlight" : ""
+                      highlightedId === rowId || highlightedId === athlete.id ? "highlight" : ""
                     }
                   >
                     <td className="results-table__start-number">
@@ -193,13 +193,10 @@ export default function ResultsPage() {
                     <td className="results-table__rank">{r.rank}</td>
                   </tr>
                 );
-              })
-            ) : (
-              <tr>
-                <td colSpan={9}>Žádné výsledky</td>
-              </tr>
-            )}
-          </tbody>
+              })}
+            </tbody>
+          ))}
+          {!lists.length && <tbody><tr><td colSpan={9}>Žádné výsledky</td></tr></tbody>}
         </table>
       </div>
     </div>

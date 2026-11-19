@@ -2,19 +2,21 @@ from typing import List, Dict, Any
 from bson import ObjectId
 import logging
 
+from app.category_catalog import BY_ID, CATEGORY_COLLECTION, Discipline, active_results
 from app.db.database import db
 from app.models.result import ResultInDB
 
 results_collection = db["results"]
 athletes_collection = db["athletes"]
 competitions_collection = db["competitions"]
-categories_collection = db["categories"]
+categories_collection = db[CATEGORY_COLLECTION]
 
 logger = logging.getLogger(__name__)
 
 
 PUBLIC_RESULTS_FILTER = {
     "$or": [
+        {"result_type": "team"},
         {"match_status": "matched"},
         {"match_status": {"$exists": False}},
     ]
@@ -61,7 +63,9 @@ async def get_result_detail_service(result_id: str) -> ResultInDB:
     except Exception:
         raise ValueError("Invalid result_id")
 
-    doc = await results_collection.find_one({"_id": oid})
+    doc = await results_collection.find_one({
+        "_id": oid, "$and": [active_results(), PUBLIC_RESULTS_FILTER],
+    })
     if not doc:
         raise ValueError("Result not found")
 
@@ -144,6 +148,7 @@ async def list_results_service(
     competition_id: str | None = None,
     category_id: str | None = None,
     limit: int = 1000,
+    discipline: Discipline | None = None,
 ) -> List[ResultInDB]:
     """
     Vrátí seznam výsledků jako ResultInDB, volitelně filtrováno
@@ -154,7 +159,11 @@ async def list_results_service(
         competition_id=competition_id,
         category_id=category_id,
     )
-    query.update(PUBLIC_RESULTS_FILTER)
+    if category_id is not None:
+        category = BY_ID.get(query["category"])
+        if category is None or discipline and category.discipline != discipline:
+            raise ValueError("Kategorie nepatří do zvolené disciplíny.")
+    query["$and"] = [active_results(discipline=discipline), PUBLIC_RESULTS_FILTER]
 
     cursor = results_collection.find(query).limit(limit)
     docs = await cursor.to_list(length=limit)

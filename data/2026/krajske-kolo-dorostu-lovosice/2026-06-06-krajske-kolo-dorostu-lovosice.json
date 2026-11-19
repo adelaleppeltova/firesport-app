@@ -1,0 +1,711 @@
+{
+  "source_file": "file:///Users/adelaleppeltova/Downloads/vysledky/2026/dorost-postupovky/ustecky/mladez.dh.cz_images_Dokumenty_mladez_MCR-Plamen-dorost_2026_vysledky-krajskych-kol_06-ustecky-dorost.pdf",
+  "generated_at": "2026-11-18T12:44:43Z",
+  "competition": {
+    "name": "KRAJSKÉ KOLO DOROSTU",
+    "date": "2026-06-06",
+    "place": "LOVOSICE",
+    "league": null,
+    "categories": [
+      {
+        "name": "DORCI MLADŠÍ",
+        "discipline": "100m",
+        "results": [
+          {
+            "rank": 1,
+            "start_number": "1",
+            "first_name": "Ondřej",
+            "last_name": "Oliva",
+            "team": "Cítoliby",
+            "district": "LN",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              },
+              {
+                "try": 2,
+                "time": 20.9,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.9,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 2,
+            "start_number": "2",
+            "first_name": "Oliver",
+            "last_name": "Brůna",
+            "team": "Modlany",
+            "district": "TP",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.53,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.26,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.53,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 3,
+            "start_number": "3",
+            "first_name": "Štěpán",
+            "last_name": "Branke",
+            "team": "Černice",
+            "district": "MO",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 39.42,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 27.96,
+                "status": "valid"
+              }
+            ],
+            "final_time": 27.96,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          }
+        ]
+      },
+      {
+        "name": "DORCI STŘEDNÍ",
+        "discipline": "100m",
+        "results": [
+          {
+            "rank": 4,
+            "start_number": "1",
+            "first_name": "Adam",
+            "last_name": "Kollmann",
+            "team": "Nepomyšl",
+            "district": "LN",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              }
+            ],
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "rank": 1,
+            "start_number": "3",
+            "first_name": "Tadeáš",
+            "last_name": "Vachulka",
+            "team": "Žitenice-Pohořany",
+            "district": "LT",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              },
+              {
+                "try": 2,
+                "time": 18.77,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.77,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 2,
+            "start_number": "4",
+            "first_name": "Filip",
+            "last_name": "Kučera",
+            "team": "Duchcov",
+            "district": "TP",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.18,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              }
+            ],
+            "final_time": 20.18,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 3,
+            "start_number": "5",
+            "first_name": "Jakub",
+            "last_name": "Pachner",
+            "team": "Blatno",
+            "district": "CV",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 25.98,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 34.69,
+                "status": "valid"
+              }
+            ],
+            "final_time": 25.98,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          }
+        ]
+      },
+      {
+        "name": "DORCI STARŠÍ",
+        "discipline": "100m",
+        "results": [
+          {
+            "rank": 3,
+            "start_number": "1",
+            "first_name": "Pavel",
+            "last_name": "Kosma",
+            "team": "Stradonice",
+            "district": "LN",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 23.42,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 23.22,
+                "status": "valid"
+              }
+            ],
+            "final_time": 23.22,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 5,
+            "start_number": "2",
+            "first_name": "Mikuláš",
+            "last_name": "Grund",
+            "team": "Terezín",
+            "district": "LT",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              },
+              {
+                "try": 2,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              }
+            ],
+            "final_time": null,
+            "final_status": "invalid"
+          },
+          {
+            "rank": 1,
+            "start_number": "3",
+            "first_name": "Štěpán",
+            "last_name": "Šafránek",
+            "team": "Modlany",
+            "district": "TP",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.89,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.89,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.89,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 2,
+            "start_number": "4",
+            "first_name": "Matěj",
+            "last_name": "Rejzek",
+            "team": "Jirkov",
+            "district": "CV",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.87,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 23.79,
+                "status": "valid"
+              }
+            ],
+            "final_time": 22.87,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 4,
+            "start_number": "5",
+            "first_name": "Samuel",
+            "last_name": "Kopecký",
+            "team": "Rybniště",
+            "district": "DC",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 33.75,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 23.45,
+                "status": "valid"
+              }
+            ],
+            "final_time": 23.45,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          }
+        ]
+      },
+      {
+        "name": "DORKY MLADŠÍ",
+        "discipline": "100m",
+        "results": [
+          {
+            "rank": 4,
+            "start_number": "1",
+            "first_name": "Adéla",
+            "last_name": "Vydrová",
+            "team": "Klapý",
+            "district": "LT",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              },
+              {
+                "try": 2,
+                "time": 25.37,
+                "status": "valid"
+              }
+            ],
+            "final_time": 25.37,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 2,
+            "start_number": "2",
+            "first_name": "Vendula",
+            "last_name": "Jaskóová",
+            "team": "Cítoliby",
+            "district": "LN",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": null,
+                "status": "invalid",
+                "invalid_reason": "NP"
+              },
+              {
+                "try": 2,
+                "time": 21.47,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.47,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 1,
+            "start_number": "3",
+            "first_name": "Alžběta",
+            "last_name": "Mertlová",
+            "team": "Lhenice",
+            "district": "TP",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.55,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 18.35,
+                "status": "valid"
+              }
+            ],
+            "final_time": 18.35,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 3,
+            "start_number": "4",
+            "first_name": "Barbora",
+            "last_name": "Hlávková",
+            "team": "Království",
+            "district": "DC",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.29,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.59,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.59,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          }
+        ]
+      },
+      {
+        "name": "DORKY STŘEDNÍ",
+        "discipline": "100m",
+        "results": [
+          {
+            "rank": 4,
+            "start_number": "1",
+            "first_name": "Kristýna",
+            "last_name": "Špirochová",
+            "team": "Černice",
+            "district": "MO",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 24.96,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 25.02,
+                "status": "valid"
+              }
+            ],
+            "final_time": 24.96,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 2,
+            "start_number": "2",
+            "first_name": "Ella",
+            "last_name": "Ungerová",
+            "team": "Klapý",
+            "district": "LT",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.06,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.94,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.94,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 5,
+            "start_number": "4",
+            "first_name": "Anna",
+            "last_name": "Popovičová",
+            "team": "Modlany",
+            "district": "TP",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 26.96,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 45.88,
+                "status": "valid"
+              }
+            ],
+            "final_time": 26.96,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 1,
+            "start_number": "5",
+            "first_name": "Denisa",
+            "last_name": "Bílková",
+            "team": "Chuderov",
+            "district": "UL",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.04,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.2,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.04,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 3,
+            "start_number": "6",
+            "first_name": "Tereza",
+            "last_name": "Hokešová",
+            "team": "Pětipsy",
+            "district": "CV",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 23.85,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 27.38,
+                "status": "valid"
+              }
+            ],
+            "final_time": 23.85,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          }
+        ]
+      },
+      {
+        "name": "DORKY STARŠÍ",
+        "discipline": "100m",
+        "results": [
+          {
+            "rank": 4,
+            "start_number": "1",
+            "first_name": "Pavla",
+            "last_name": "Hauptvoglová",
+            "team": "Klapý",
+            "district": "LT",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 21.74,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 21.54,
+                "status": "valid"
+              }
+            ],
+            "final_time": 21.54,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 5,
+            "start_number": "2",
+            "first_name": "Michaela",
+            "last_name": "Brhelová",
+            "team": "Lenešice",
+            "district": "LN",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 22.73,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 22.81,
+                "status": "valid"
+              }
+            ],
+            "final_time": 22.73,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 1,
+            "start_number": "3",
+            "first_name": "Emma",
+            "last_name": "Diewocková",
+            "team": "Duchcov",
+            "district": "TP",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 19.72,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 23.3,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.72,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 3,
+            "start_number": "4",
+            "first_name": "Miluše",
+            "last_name": "Hlávková",
+            "team": "Království",
+            "district": "DC",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.3,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 20.34,
+                "status": "valid"
+              }
+            ],
+            "final_time": 20.3,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          },
+          {
+            "rank": 2,
+            "start_number": "5",
+            "first_name": "Anežka",
+            "last_name": "Bobková",
+            "team": "Telnice",
+            "district": "UL",
+            "birth_year": null,
+            "fscode": null,
+            "times": [
+              {
+                "try": 1,
+                "time": 20.93,
+                "status": "valid"
+              },
+              {
+                "try": 2,
+                "time": 19.96,
+                "status": "valid"
+              }
+            ],
+            "final_time": 19.96,
+            "final_status": "valid",
+            "final_time_source": "derived_from_attempts"
+          }
+        ]
+      }
+    ]
+  },
+  "parsing_notes": [
+    "Provenience řádků (index od 0 v rámci kategorie): 4129c8ffc5f91869/report.json.",
+    "Převedeny individuální výsledky běhu na 100 m s překážkami.",
+    "Pravidlo nejlepšího platného pokusu: SH ČMS, Směrnice celoroční činnosti dorostu, pravidlo 27 odst. 5 a 9. https://mladez.dh.cz/images/Dokumenty/mladez/dorost/smernice-dorost/smernice-dorostu-2022.pdf#page=63"
+  ],
+  "warnings": []
+}
