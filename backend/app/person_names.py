@@ -6,6 +6,8 @@ NAME_FIELDS = ("first_name", "last_name")
 
 def normalize_person_name(value: str | None) -> str:
     text = " ".join(unicodedata.normalize("NFC", value if isinstance(value, str) else "").split())
+    if text.isupper():
+        return text.title()
     if len(text) > 1 and text.isalpha() and text.islower():
         return text[0].upper() + text[1:]
     return text

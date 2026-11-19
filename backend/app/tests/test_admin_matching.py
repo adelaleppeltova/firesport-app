@@ -87,6 +87,7 @@ def test_manual_profile_creation_retains_admin_assignment():
 def test_review_queue_includes_unresolved_import_with_original_identity_and_reason():
     doc = _result(
         imported_athlete={"first_name": "JAN", "last_name": "Novák", "birth_year": 2000, "fscode": "12345"},
+        source_person_name={"first_name": "JAN", "last_name": "Novák"},
         match_reason="no_match",
         imported_team="SDH LHOTA",
     )
@@ -96,11 +97,11 @@ def test_review_queue_includes_unresolved_import_with_original_identity_and_reas
 
     assert results.find.call_args.args[0]["match_status"] == {"$in": ["needs_review", "unmatched"]}
     assert response.summary.unmatched == 1
-    assert response.items[0].imported_athlete.first_name == "JAN"
+    assert response.items[0].imported_athlete.first_name == "Jan"
     assert response.items[0].imported_athlete.fscode == "12345"
     assert response.items[0].match_reason == "no_match"
     assert response.items[0].team == "SDH LHOTA"
-    assert response.items[0].source_person_name is None
+    assert response.items[0].source_person_name == {"first_name": "JAN", "last_name": "Novák"}
     assert response.items[0].name_issues
     assert response.summary.missing_name == 0
 

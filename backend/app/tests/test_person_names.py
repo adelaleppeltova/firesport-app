@@ -9,7 +9,14 @@ def test_name_format_keeps_diacritics_particles_and_mixed_case():
     assert normalize_person_name("  van   der Meer ") == "van der Meer"
     assert normalize_person_name("McDonald") == "McDonald"
     assert normalize_person_name("Černá-Nováková") == "Černá-Nováková"
-    assert name_issues({"first_name": "Jan", "last_name": "NOVÁK"}) == ["verify_last_name"]
+    assert name_issues({"first_name": "Jan", "last_name": "NOVÁK"}) == ["format_last_name"]
+
+
+def test_name_format_normalizes_uppercase_only_in_interpreted_fields():
+    assert normalize_person_name("MARIE ANNA") == "Marie Anna"
+    assert normalize_person_name("ČERNÁ-NOVÁKOVÁ") == "Černá-Nováková"
+    assert normalize_person_name("VELASCO HUERTA") == "Velasco Huerta"
+    assert normalize_person_name("Savic´") == "Savic´"
 
 
 def test_source_segmentation_keeps_ambiguity_and_api_accepts_explicit_null():

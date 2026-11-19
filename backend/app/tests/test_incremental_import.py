@@ -91,7 +91,8 @@ def test_repeat_race_preserves_manual_assignment_and_quality_flag(import_collect
         docs = import_collections["results"].documents
         original = next(iter(docs.values()))
         assert "athlete" not in original
-        assert original["imported_athlete"]["first_name"] == "JAN"
+        assert original["imported_athlete"]["first_name"] == "Jan"
+        assert original["source_person_name"]["first_name"] == "JAN"
         original.update(athlete=ObjectId(), match_status="matched",
                         match_reason="manual_admin_assignment", quality_flag="suspicious")
         snapshot = deepcopy(docs)
@@ -313,7 +314,7 @@ def test_import_uses_shared_categories_and_preserves_historical_and_unsupported_
 def test_import_name_quality_preserves_source_and_reimport_identity(import_collections):
     race = _race()
     rows = race["competition"]["categories"][0]["results"]
-    rows[0].update(first_name="  petr ", last_name="juřina")
+    rows[0].update(first_name="  petr ", last_name="JUŘINA")
     rows[1].update(first_name=None, last_name="  ", final_time=17, final_status="valid")
     with patch.object(data_import, "decide_athlete_match", wraps=data_import.decide_athlete_match):
         with patch("app.services.result_matching._find_athletes", AsyncMock(return_value=[])):
@@ -324,7 +325,8 @@ def test_import_name_quality_preserves_source_and_reimport_identity(import_colle
     assert again["results_duplicates_skipped"] == 2
     named, incomplete = import_collections["results"].documents.values()
     assert named["imported_athlete"]["last_name"] == "Juřina"
-    assert named["source_person_name"] == {"first_name": "  petr ", "last_name": "juřina"}
+    assert named["source_person_name"] == {"first_name": "  petr ", "last_name": "JUŘINA"}
+    assert named["source_row"]["last_name"] == "JUŘINA"
     assert named["match_status"] == "unmatched"
     assert incomplete["source_person_name"] == {"first_name": None, "last_name": "  "}
     assert incomplete["match_status"] == "needs_review" and incomplete["match_reason"] == "missing_name"

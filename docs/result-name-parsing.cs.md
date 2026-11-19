@@ -1,6 +1,6 @@
 # Jména závodníků ve výsledcích
 
-Import zachovává přesný text `source_full_name` a každé přítomné oddělené pole ukládá beze změny do `source_person_name`. Chybějící klíč v původních polích se liší od hodnoty `null` nebo prázdného řetězce. `imported_athlete.first_name` a `imported_athlete.last_name` obsahují interpretované hodnoty. Každá může obsahovat více slov. Administrace ukazuje interpretovaná pole a původní hodnoty s vlastními popisky.
+Import zachovává přesný text `source_full_name` a každé přítomné oddělené pole ukládá beze změny do `source_person_name`. Chybějící klíč v původních polích se liší od hodnoty `null` nebo prázdného řetězce. `imported_athlete.first_name` a `imported_athlete.last_name` obsahují interpretované hodnoty. Každá může obsahovat více slov. Pokud je celé pole ve verzálkách, dostane každá část jména počáteční velké písmeno. Administrace ukazuje interpretovaná pole a původní hodnoty s vlastními popisky.
 
 Hranici jména dokládají oddělené sloupce, jednoznačný oddělovač nebo pravidlo doložené pro konkrétní formát listiny, například výslovně označené příjmení verzálkami. Doložené pořadí pomáhá u dvou jmenných částí. U víceslovného zápisu bez doložené hranice zůstávají nerozlišené položky prázdné a ukládá se původní text. Výsledek s chybějícím jménem nebo příjmením jde ke kontrole. Při párování musí být shoda úplná v obou polích. Částečný zápis může upozornit na možného kandidáta.
 
