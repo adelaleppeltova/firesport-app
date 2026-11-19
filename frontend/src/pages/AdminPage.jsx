@@ -39,6 +39,9 @@ const matchReasons = {
   insufficient_identity: "Jméno a dostupné údaje k potvrzení identity nestačí.",
   possible_name_variant: "Podobný záznam může patřit existujícímu závodníkovi.",
   no_match: "Import nenašel odpovídající profil.",
+  name_quality_review: "Zápis jména nebo příjmení vyžaduje ověření ve zdroji.",
+  conflicting_source_identity: "Výsledkové listiny uvádějí nejednoznačné údaje o závodníkovi.",
+  same_result_list_conflict: "K profilu by se přiřadilo více různých výkonů ze stejné listiny.",
   manual_admin_unassignment: "Přiřazení ručně odebral administrátor.",
 };
 
