@@ -494,3 +494,17 @@ def test_damaged_heading_cannot_continue_previous_discipline(text_pdf, tmp_path)
     assert report["errors"]
     assert report["results"] == 1
     assert output["competition"]["categories"][0]["results"][0]["final_time"] == 18.58
+
+
+def test_youth_pdf_preserves_source_order_and_spacing_for_explicit_name_columns():
+    from app.extraction.youth_pdf import parse_result
+    from app.extraction.youth_pdf_tables import SourceRow
+
+    cells = {"first_name": "Anna  Marie", "last_name": "Nováková  Svobodová",
+             "source_full_name": "Nováková  Svobodová Anna  Marie",
+             "rank": "1", "first": "18.11", "second": "-", "final": "18.11"}
+    row, warning = parse_result(SourceRow("Mladší dorostenky", cells, None, (0, 0, 0, 0)),
+                                {"page": 1, "table": 1, "row": 1}, [])
+    assert warning is None
+    assert (row["first_name"], row["last_name"]) == ("Anna Marie", "Nováková Svobodová")
+    assert row["source_full_name"] == cells["source_full_name"]

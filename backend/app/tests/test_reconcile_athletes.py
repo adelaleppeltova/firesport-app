@@ -193,3 +193,11 @@ def test_audit_counts_unreadable_files_and_compares_each_result(tmp_path):
         "path": "2024/zavod/zavod.json", "category": 1, "row": 2,
         "reason": "source_row_needs_comparison", "candidates": [],
     }]
+
+
+def test_partial_given_names_are_reviewed_when_birth_year_and_surname_match():
+    runner = athlete(first="Anna Marie", last="Nováková")
+    row = result(first="Anna", last="Nováková")
+    plan = build_plan(state([row], [runner]))
+    assert not linked(plan) and not plan["creates"]
+    assert reasons(plan)[row["_id"]] == "possible_name_variant"

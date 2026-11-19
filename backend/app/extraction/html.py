@@ -9,17 +9,23 @@ from .participants import (
     fscode,
     birth_year,
     split_name,
+    name_part,
     profile_year,
     split_team_times,
 )
 from .times import parse_time, final_time
 from .penalties import assign_reasons
 
+NAME_ORDER = {
+    "prijmeni a jmeno": True, "prijmeni, jmeno": True, "surname and given name": True,
+    "last name, first name": True, "jmeno a prijmeni": False, "jmeno, prijmeni": False,
+    "given name and surname": False, "first name, last name": False,
+}
 ALIASES = {
     "rank": ["or.", "poradi", "por.", "rank", "umisteni"],
-    "name": ["jmeno", "zavodnik", "name"],
-    "first_name": ["krestni jmeno", "first name"],
-    "last_name": ["prijmeni", "last name"],
+    "name": ["jmeno", "zavodnik", "name", *NAME_ORDER],
+    "first_name": ["krestni jmeno", "krestni jmena", "first name", "given name", "given names"],
+    "last_name": ["prijmeni", "last name", "surname", "family name"],
     "start_number": [
         "startovni cislo",
         "start. c.",
@@ -55,6 +61,9 @@ def column_map(headers):
         m = re.fullmatch(r"(?:cas|pokus|try)\s*([1-4])\.?", key)
         if m:
             result[f"try{m[1]}"] = i
+    if "last_name" in result and "first_name" not in result and "name" in result:
+        if norm(headers[result["name"]]) in {"jmeno", "name"}:
+            result["first_name"] = result.pop("name")
     return result
 
 
@@ -101,7 +110,7 @@ def _site_time(value):
     return value
 
 
-def parse_html(data, url, fetcher=None):
+def parse_html(data, url, fetcher=None, *, observe_name=None):
     soup = BeautifulSoup(data, "html.parser")
     site = urlsplit(url).hostname in {"pozarnisporty.cz", "www.pozarnisporty.cz"}
     warnings, notes, categories, audit = (
@@ -182,23 +191,35 @@ def parse_html(data, url, fetcher=None):
             def get(field):
                 return values[columns[field]] if field in columns else None
 
+            structured = {"first_name", "last_name"} <= columns.keys()
             name_columns = sorted(columns[field] for field in ("first_name", "last_name") if field in columns)
+            name_cell = cells[columns["name"]] if "name" in columns else None
+            name_link = name_cell.find("a", href=True) if site and name_cell else None
             raw_name = get("name") or " ".join(values[index] for index in name_columns if values[index])
-            name_link = cells[columns["name"]].find("a", href=True) if site and "name" in columns else None
-            participant_text = (
-                name_link.get_text(" ", strip=True)
-                if name_link and "/user/card/" in name_link["href"] else raw_name.strip()
-            )
-            context = f"{name} / {raw_name} / rank {get('rank')}"
-            if "first_name" in columns and "last_name" in columns:
-                first, last = get("first_name") or None, get("last_name") or None
+            link = urlsplit(urljoin(url, name_link["href"])) if name_link else None
+            participant_ref = (link.path if link and link.hostname == urlsplit(url).hostname
+                               and re.fullmatch(r"/user/card/[0-9]+/?", link.path) else None)
+            if participant_ref:
+                participant_text = name_link.get_text().strip()
+            elif name_cell is not None:
+                participant_text = name_cell.get_text().strip()
             else:
+                participant_text = " ".join(cells[index].get_text().strip() for index in name_columns if values[index])
+            context = f"{name} / {raw_name} / rank {get('rank')}"
+            if structured:
+                first, last = name_part(get("first_name")), name_part(get("last_name"))
+                if not first or not last:
+                    warnings.append(f"{context}: missing or invalid explicit name field: {participant_text!r}")
+            else:
+                order = NAME_ORDER.get(norm(headers[columns["name"]]))
+                if order is None:
+                    order = {"surname-first": True, "given-first": False}.get(table.get("data-name-order"))
+                if order is None and site:
+                    order = True
                 first, last = split_name(
-                    raw_name,
-                    warnings,
-                    context,
-                    surname_first=site
-                    or table.get("data-name-order") == "surname-first",
+                    participant_text, warnings, context, surname_first=order,
+                    surname_uppercase=table.get("data-surname-style") == "uppercase",
+                    site_suffix=site and not participant_ref,
                 )
             start = get("start_number") or None
             if start is None and site:
@@ -293,6 +314,8 @@ def parse_html(data, url, fetcher=None):
                 source_count -= 1
                 reasons_count -= sum("invalid_reason" in t for t in attempts)
                 continue
+            if observe_name is not None:
+                observe_name(result, participant_ref)
             results.append(result)
         container = (table.parent.parent or table.parent).get_text(" ", strip=True)
         declared = re.search(

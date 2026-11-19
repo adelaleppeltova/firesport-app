@@ -138,7 +138,7 @@ def test_fs_code(raw, expected):
     ],
 )
 def test_names(raw, expected):
-    assert split_name(raw, [], "test", surname_first=True) == expected
+    assert split_name(raw, [], "test", surname_first=True, site_suffix=True) == expected
 
 
 @pytest.mark.parametrize(
@@ -696,3 +696,47 @@ def test_preserve_source_full_name_when_html_order_does_not_resolve_multiple_wor
     row = competition["categories"][0]["results"][0]
     assert row["source_full_name"] == "Souček Stanislav Gabriel"
     assert row["first_name"] is None and row["last_name"] is None
+
+
+def test_grounded_multi_part_names_and_ambiguous_text():
+    warnings = []
+    assert split_name("Hudousková, Anna Marie", warnings, "test") == ("Anna Marie", "Hudousková")
+    assert split_name("Anna Marie, Hudousková", warnings, "test", surname_first=False) == ("Anna Marie", "Hudousková")
+    assert split_name("VAN DER BERG Anna Marie", warnings, "test", surname_first=True,
+                      surname_uppercase=True) == ("Anna Marie", "VAN DER BERG")
+    assert split_name("Anna Marie NOVÁKOVÁ SVOBODOVÁ", warnings, "test", surname_first=False,
+                      surname_uppercase=True) == ("Anna Marie", "NOVÁKOVÁ SVOBODOVÁ")
+    assert split_name("Hudousková Anna Marie", warnings, "test", surname_first=True) == (None, None)
+    assert split_name("Jan Novák", warnings, "test") == (None, None)
+    assert split_name(None, warnings, "test", surname_first=True) == (None, None)
+    assert "Hudousková Anna Marie" in warnings[0]
+
+
+def test_structured_result_headers_preserve_original_name_text_and_null():
+    html = """
+    <table data-discipline="100m"><caption>Ženy</caption>
+    <tr><th>Pořadí</th><th>Příjmení</th><th>Jméno</th><th>Výsledný čas</th></tr>
+    <tr><td>1</td><td>Nováková  Svobodová</td><td>Anna   Marie</td><td>16,00</td></tr>
+    <tr><td>2</td><td>Hudousková</td><td></td><td>17,00</td></tr>
+    </table>
+    """
+    race, _, warnings, _ = parse_html(html, "https://example.com/results")
+    first, second = race["categories"][0]["results"]
+    assert (first["first_name"], first["last_name"]) == ("Anna Marie", "Nováková Svobodová")
+    assert first["source_full_name"] == "Nováková  Svobodová Anna   Marie"
+    assert (second["first_name"], second["last_name"]) == (None, "Hudousková")
+    assert second["source_full_name"] == "Hudousková"
+    assert any("missing or invalid explicit name field" in w for w in warnings)
+
+
+def test_linked_participant_text_ignores_comment_outside_link():
+    html = """
+    <table data-discipline="100m"><caption>Ženy</caption>
+    <tr><th>Pořadí</th><th>Jméno</th><th>Výsledný čas</th></tr>
+    <tr><td>1</td><td><a href="/user/card/8">Přerostová  Elena</a> (náhrada)</td><td>16,00</td></tr>
+    </table>
+    """
+    race, _, _, _ = parse_html(html, URL)
+    row, = race["categories"][0]["results"]
+    assert row["source_full_name"] == "Přerostová  Elena"
+    assert (row["first_name"], row["last_name"]) == ("Elena", "Přerostová")

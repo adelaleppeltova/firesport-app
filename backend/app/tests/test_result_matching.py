@@ -99,3 +99,24 @@ def test_automatic_matching(profiles, year, code, last, team, status, reason, ex
     assert result["match_reason"] == reason
     athlete = result["matched_athlete"]
     assert (athlete["_id"] if athlete else None) == expected_id
+
+
+@pytest.mark.parametrize(("first", "last", "code", "status"), [
+    ("Anna Marie", "Nováková Svobodová", None, MatchStatus.matched),
+    ("Anna", "Nováková Svobodová", None, MatchStatus.needs_review),
+    ("Anna Marie", "Nováková", "12345", MatchStatus.needs_review),
+    (None, "Nováková Svobodová", "12345", MatchStatus.needs_review),
+])
+def test_matching_keeps_full_name_boundary(first, last, code, status):
+    profile = _athlete(1, 2000, ["12345"], first="Anna Marie", last="Nováková Svobodová")
+
+    def find(query):
+        docs = [profile] if _matches(profile, query) else []
+        cursor = MagicMock(to_list=AsyncMock(return_value=docs))
+        cursor.limit.return_value = cursor
+        return cursor
+
+    with patch("app.services.result_matching.athletes_collection.find", side_effect=find):
+        result = asyncio.run(decide_athlete_match(first_name=first, last_name=last, birth_year=2000, fscode=code))
+    assert result["match_status"] == status
+    assert (result["matched_athlete"] is not None) == (status == MatchStatus.matched)

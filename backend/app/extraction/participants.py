@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from .metadata import norm
 
 
@@ -18,22 +19,45 @@ def fscode(raw, warnings, context):
     return int(value)
 
 
-def split_name(raw, warnings, context, *, surname_first=False):
-    text = re.sub(r"\s*\([^)]*\)", "", raw).strip()
-    if "," in text:
-        last, first = text.split(",", 1)
-        if last.strip() and first.strip():
-            return first.strip(), last.strip()
+def name_part(raw):
+    """Return a name field for parsing while leaving its source text to the caller."""
+    text = " ".join(unicodedata.normalize("NFC", raw if isinstance(raw, str) else "").split())
+    lexical = re.sub(r" (?:ml|st)\.$", "", text, flags=re.I)
+    if (any(c.isalpha() for c in lexical)
+            and all(c.isalpha() or unicodedata.category(c).startswith("M") or c in " -‐‑'’" for c in lexical)):
+        return text
+    return None
+
+
+SITE_NAME_SUFFIX = re.compile(
+    r"\s+\((?:[0-9]+|Praha|Středočeský|Jihočeský|Plzeňský|Karlovarský|Ústecký|Liberecký|"
+    r"Královéhradecký|Pardubický|Vysočina|Jihomoravský|Olomoucký|Zlínský|Moravskoslezský|)\)$"
+)
+
+
+def split_name(raw, warnings, context, *, surname_first=None, surname_uppercase=False, site_suffix=False):
+    text = " ".join((raw or "").split())
+    if site_suffix:
+        while (cleaned := SITE_NAME_SUFFIX.sub("", text)) != text:
+            text = cleaned
+    if text.count(",") == 1:
+        left, right = map(name_part, text.split(","))
+        if left and right:
+            return (left, right) if surname_first is False else (right, left)
     parts = text.split()
-    if surname_first and len(parts) == 2:
-        return parts[1], parts[0]
-    # Recognizable surname particles, using the source's surname-first convention.
-    if (
-        surname_first
-        and len(parts) >= 4
-        and norm(" ".join(parts[:2])) in {"van de", "van der", "von der"}
-    ):
-        return " ".join(parts[3:]), " ".join(parts[:3])
+    if surname_first is not None and len(parts) == 2 and all(name_part(part) for part in parts):
+        return (parts[1], parts[0]) if surname_first else tuple(parts)
+    if surname_first and len(parts) >= 4 and norm(" ".join(parts[:2])) in {"van de", "van der", "von der"}:
+        last, first = name_part(" ".join(parts[:3])), name_part(" ".join(parts[3:]))
+        if last and first:
+            return first, last
+    if surname_uppercase and parts and all(name_part(part) for part in parts):
+        styles = [part.isupper() for part in parts]
+        boundaries = [i for i in range(1, len(styles)) if styles[i] != styles[i - 1]]
+        if len(boundaries) == 1 and (surname_first is None or surname_first == styles[0]):
+            boundary = boundaries[0]
+            left, right = " ".join(parts[:boundary]), " ".join(parts[boundary:])
+            return (right, left) if styles[0] else (left, right)
     warnings.append(f"{context}: ambiguous name segmentation: {raw!r}")
     return None, None
 

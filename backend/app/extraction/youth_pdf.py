@@ -16,7 +16,7 @@ import pymupdf
 
 from .metadata import norm, parse_date
 from .ocr import recognize
-from .participants import fscode, integer, split_name
+from .participants import fscode, integer, name_part, split_name
 from .paths import resolve_path
 from .storage import document, save, source_id
 from .times import parse_time
@@ -175,7 +175,8 @@ def result_time(raw, warnings, context, *, attempt=None):
 
 def parse_result(source, location, warnings):
     cells = source.cells
-    raw_name = cells.get("name", "")
+    source_text = cells.get("source_full_name") or cells.get("name", "")
+    raw_name = cells.get("name", source_text)
     prefix = re.fullmatch(r"(\d+)\s*[-–—\u00ad]\s*(.+)", raw_name)
     if prefix:
         raw_name = prefix[2]
@@ -190,23 +191,21 @@ def parse_result(source, location, warnings):
             return None, "empty_slot"
         warnings.append(f"{context}: chybí skutečné jméno závodníka")
         return None, "unresolved"
-    location["source_name"] = raw_name
+    location["source_name"] = source_text
 
     if cells.get("name_overflow"):
         first = last = None
         warnings.append(f"{context}: text přesahuje buňku jména; ověřte podle PDF")
+    elif "first_name" in cells and "last_name" in cells:
+        first, last = name_part(cells["first_name"]), name_part(cells["last_name"])
+        if not first or not last:
+            warnings.append(f"{context}: chybí nebo je neplatné samostatné jmenné pole")
     else:
-        ordered = source.surname_first
-        if ordered is None and len(raw_name.split()) == 2:
-            a, b = raw_name.split()
-            if a.isupper() != b.isupper():
-                ordered = a.isupper()
-        if ordered is None:
-            first, last = split_name(raw_name, warnings, context)
-        elif not ordered and len(raw_name.split()) == 2:
-            first, last = raw_name.split()
-        else:
-            first, last = split_name(raw_name, warnings, context, surname_first=ordered)
+        first, last = split_name(
+            raw_name, warnings, context, surname_first=source.surname_first,
+            surname_uppercase=source.surname_first is None and len(raw_name.split()) == 2,
+        )
+
 
     attempts = [
         {
@@ -231,7 +230,7 @@ def parse_result(source, location, warnings):
         "start_number": bib or None,
         "first_name": first,
         "last_name": last,
-        "source_full_name": raw_name,
+        "source_full_name": source_text,
         "team": cells.get("team") or None,
         "district": cells.get("district") or None,
         "birth_year": None,

@@ -76,7 +76,12 @@ def scope(row):
 
 
 def close_spelling(a, b):
-    if a == b or min(len(a), len(b)) < 3 or abs(len(a) - len(b)) > 1:
+    if a == b or min(len(a), len(b)) < 3:
+        return False
+    shorter, longer = sorted((a, b), key=len)
+    if longer.startswith(shorter + " ") or longer.endswith(" " + shorter):
+        return True
+    if abs(len(a) - len(b)) > 1:
         return False
     if len(a) == len(b):
         changes = [i for i, ch in enumerate(a) if ch != b[i]]

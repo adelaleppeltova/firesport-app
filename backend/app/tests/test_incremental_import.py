@@ -375,3 +375,17 @@ def test_reimport_backfills_only_source_name_of_exact_legacy_result(import_colle
     third = asyncio.run(data_import.DataImporter().import_from_dict(race))
     assert third["errors"] and third["total_imported"] == 0
     assert saved["source_full_name"] == "Souček Stanislav Gabriel"
+
+
+def test_reparsed_full_name_does_not_duplicate_an_unranked_stored_result():
+    from bson import ObjectId
+    from app.services.data_import import DataImporter
+
+    importer = DataImporter()
+    race, category = str(ObjectId()), str(ObjectId())
+    source = {"source_full_name": "Nováková  Anna Marie", "final_time": 16.0, "final_status": "valid"}
+    pending = importer.build_result_row(source, category, race)
+    pending.update(_id=ObjectId(), source_category={"key": "zeny", "discipline": "100m"})
+    parsed = importer.build_result_row({**source, "first_name": "Anna Marie", "last_name": "Nováková"}, category, race)
+    parsed["source_category"] = pending["source_category"]
+    assert importer.assess_result(parsed, [pending]) == ("review", [pending["_id"]])

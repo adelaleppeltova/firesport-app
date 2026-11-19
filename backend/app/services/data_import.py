@@ -355,7 +355,8 @@ class DataImporter:
             "district": result_data.get("district"),
             "imported_athlete": imported_athlete,
             **({"source_person_name": {field: result_data.get(field) for field in NAME_FIELDS}}
-               if any(result_data.get(field) != imported_athlete[field] for field in NAME_FIELDS) else {}),
+               if (any(result_data.get(field) != imported_athlete[field] for field in NAME_FIELDS)
+                   or not source_name and any(imported_athlete[field] for field in NAME_FIELDS)) else {}),
             "start_number": start_number,
             "final_time": result_data.get("final_time"),
             "final_time_status": result_data.get("final_status", "invalid"),
@@ -469,6 +470,13 @@ class DataImporter:
                 "duplicate" if exact_identity and identity == stored
                 else self._result_relationship(identity, stored)
             )
+            if relationship is None and (not all(identity["name"]) or not all(stored["name"])):
+                source_name = row.get("source_full_name")
+                saved_name = existing.get("source_full_name") or (existing.get("source_row") or {}).get("source_full_name")
+                evidence = ("source_group", "discipline", "team", "rank", "final_time", "final_time_status", "times")
+                if (source_name and saved_name and " ".join(source_name.split()) == " ".join(saved_name.split())
+                        and all(identity.get(field) == stored.get(field) for field in evidence)):
+                    relationship = "review"
             if relationship and bool(identity["result_list_id"]) != bool(stored["result_list_id"]):
                 relationship = "review"
             if relationship == "duplicate" and not all(identity["name"]):

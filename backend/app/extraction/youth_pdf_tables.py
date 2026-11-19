@@ -118,6 +118,10 @@ def direct_columns(row):
             "prijmeni, jmeno",
         }:
             keys["name"] = index
+        elif key in {"krestni jmeno", "krestni jmena"}:
+            keys["first_name"] = index
+        elif key == "prijmeni":
+            keys["last_name"] = index
         elif key in {"sdh", "kolektiv", "druzstvo"}:
             keys["team"] = index
         elif key == "okres":
@@ -130,7 +134,11 @@ def direct_columns(row):
             keys["second"] = index
         elif key in {"vysledny cas", "finalni cas"}:
             keys["final"] = index
-    return keys if {"rank", "name", "first", "second", "final"} <= keys.keys() else None
+    if "last_name" in keys and "first_name" not in keys and "name" in keys:
+        if norm(row[keys["name"]]) == "jmeno":
+            keys["first_name"] = keys.pop("name")
+    has_name = "name" in keys or {"first_name", "last_name"} <= keys.keys()
+    return keys if has_name and {"rank", "first", "second", "final"} <= keys.keys() else None
 
 
 def crop_text(page, box):
@@ -146,7 +154,16 @@ def header_column_bounds(row, mapping):
 
 
 def read_columns(page, y0, y1, bounds):
-    return {key: crop_text(page, (x0, y0, x1, y1)) for key, (x0, x1) in bounds.items()}
+    values = {}
+    for key, (x0, x1) in bounds.items():
+        text = (page.crop((x0, y0, x1, y1)).extract_text(x_tolerance=1) or "").strip()
+        values[key] = text if key in {"name", "first_name", "last_name"} else clean(text)
+    if "name" in values:
+        values["source_full_name"] = values["name"]
+    elif {"first_name", "last_name"} <= values.keys():
+        keys = sorted(("first_name", "last_name"), key=lambda key: bounds[key][0])
+        values["source_full_name"] = " ".join(values[key] for key in keys if values[key])
+    return values
 
 
 def read_direct(page, table, start, bounds, category, surname_first):
@@ -341,6 +358,7 @@ def horizontal_summary(page, lines, table, cells):
             overflowing_bib = re.fullmatch(r"(\d+)([^\W\d_]+)", clean(values[0]))
         if mapping and (bib is not None or overflowing_bib):
             data = {key: clean(values[col]) for key, col in mapping.items()}
+            data["source_full_name"] = (values[mapping["name"]] or "").strip()
             label = data.pop("category", category)
             if "source_affiliation" in data:
                 # Flag text crossing the nominal name boundary for review.
@@ -353,6 +371,7 @@ def horizontal_summary(page, lines, table, cells):
                 if overflowing_bib:
                     data["bib"] = overflowing_bib[1]
                     data["name"] = overflowing_bib[2] + data["name"]
+                    data["source_full_name"] = overflowing_bib[2] + data["source_full_name"]
                     data["name_overflow"] = True
                 data["surname_first"] = True
             rows.append(
