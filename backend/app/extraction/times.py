@@ -50,11 +50,12 @@ def parse_time(raw, warnings, context="", *, absent=False):
     return {"time": round(number, 3), "status": "invalid" if trailing else "valid"}
 
 
-def final_time(raw, attempts, warnings, context="", *, placeholder=False, absent=False):
+def final_time(raw, attempts, warnings, context="", *, placeholders=(), absent=False):
     result = parse_time(raw, warnings, context, absent=absent)
     if (
-        placeholder
-        and str(raw).strip() == "30:00.00"
+        not absent
+        and str(raw).strip() in placeholders
+        and len(attempts) == 2
         and all(t["status"] == "invalid" for t in attempts)
     ):
         return {"time": None, "status": "invalid"}
