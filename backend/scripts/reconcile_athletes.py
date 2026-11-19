@@ -120,9 +120,9 @@ def build_plan(snapshot):
                 aliases[key].add(aid)
                 profile = active[aid]
                 year, known_year = person.get("birth_year"), profile.get("birth_year")
-                code, known_codes = code_of(person), historical_codes(profile)
+                code = code_of(person)
                 if (key != name_key(profile) or year is not None and known_year not in (None, year)
-                        or code and known_codes and code not in known_codes):
+                        or code and code_profiles[code] - {aid}):
                     issues.append({"reason": "linked_identity_discrepancy", "result_id": rid, "athlete_id": aid})
             if is_individual(row):
                 occupied[aid, scope(row)].append(rid)
@@ -140,7 +140,12 @@ def build_plan(snapshot):
             variants[0, key[0]].append(key)
             variants[1, key[1]].append(key)
 
+    linked_codes = {
+        code: {rows[rid]["athlete"] for rid in ids if rows[rid].get("athlete") is not None}
+        for code, ids in source_codes.items()
+    }
     review, proposals, new_groups = {}, {}, defaultdict(list)
+    proposed_codes = {}
 
     def leave(rid, reason, candidates=()):
         review[rid] = {"reason": reason, "athlete_ids": sorted(candidates)}
@@ -201,7 +206,6 @@ def build_plan(snapshot):
         elif code and any(
             (all(name_key(other)) and name_key(other) != key)
             or (year is not None and other.get("birth_year") not in (None, year))
-            or rows[other_id].get("athlete") is not None and rows[other_id]["athlete"] not in owners
             for other_id in source_codes[code]
             if (other := source_identity(rows[other_id]))
         ):
@@ -213,7 +217,8 @@ def build_plan(snapshot):
             if profile.get("birth_year") is not None:
                 observed_years.add(profile["birth_year"])
             competing = {p for p in peers - owners if year is not None and active[p].get("birth_year") == year}
-            if (exact_name(profile) != exact_name(person) or len(observed_years) > 1
+            if (linked_codes.get(code, set()) - owners
+                    or exact_name(profile) != exact_name(person) or len(observed_years) > 1
                     or year is not None and observed_years - {year}
                     or profile.get("birth_year") is None and competing):
                 leave(rid, "conflicting_fscode", peers | owners)
@@ -227,19 +232,20 @@ def build_plan(snapshot):
                 aid, = compatible
                 profile = active[aid]
                 if exact_name(profile) == exact_name(person) and year is not None and year == profile.get("birth_year"):
-                    other_codes = set(historical_codes(profile))
-                    peer_codes = {code_of(source_identity(rows[i])) for i in source_names[key]
-                                  if source_identity(rows[i]).get("birth_year") == year} - {None}
-                    if len(peer_codes) > 1 or other_codes and peer_codes - other_codes:
-                        leave(rid, "unrecognized_fscode", compatible)
+                    if code and linked_codes.get(code, set()) - {aid}:
+                        leave(rid, "conflicting_fscode", compatible)
                     elif potential_variant(key, person, row, ignore_profile=aid):
                         leave(rid, "possible_name_variant", compatible)
                     else:
                         propose_existing(rid, aid, "batch_name_plus_birth_year")
+                        if code:
+                            proposed_codes[rid] = code
                 else:
                     leave(rid, "insufficient_identity", compatible)
             else:
                 leave(rid, "conflicting_birth_year", peers)
+        elif code and linked_codes.get(code):
+            leave(rid, "conflicting_fscode")
         elif potential_variant(key, person, row):
             leave(rid, "possible_name_variant")
         else:
@@ -253,7 +259,8 @@ def build_plan(snapshot):
         codes = {code_of(p) for p in evidence} - {None}
         spellings = {exact_name(p) for p in evidence}
         genders = {BY_ID[rows[i]["category"]].gender for i in source_ids if is_individual(rows[i])}
-        unsafe = (len(years) > 1 or len(codes) > 1 or len(spellings) > 1 or len(genders) > 1
+        unsafe = (len(years) > 1 or len(spellings) > 1 or len(genders) > 1
+                  or any(code_profiles[c] or linked_codes.get(c) for c in codes)
                   or any(is_manual(rows[i]) for i in source_ids))
         if unsafe:
             for rid in ids:
@@ -267,10 +274,11 @@ def build_plan(snapshot):
             continue
         chosen_years = {source_identity(rows[i]).get("birth_year") for i in chosen} - {None}
         chosen_codes = {code_of(source_identity(rows[i])) for i in chosen} - {None}
-        # A code-only row and a year-only row need shared evidence.
-        if chosen_years and chosen_codes and not any(
-            source_identity(rows[i]).get("birth_year") and code_of(source_identity(rows[i])) for i in chosen
-        ):
+        # Each additional code requires a row carrying the common birth year.
+        year_backed_codes = {code_of(source_identity(rows[i])) for i in chosen
+                             if source_identity(rows[i]).get("birth_year") is not None}
+        if ((chosen_years and chosen_codes - year_backed_codes)
+                or (not chosen_years and len(chosen_codes) > 1)):
             for rid in chosen:
                 leave(rid, "conflicting_source_identity")
             continue
@@ -280,15 +288,17 @@ def build_plan(snapshot):
                 leave(rid, "same_result_list_conflict")
             continue
         birth_year = next(iter(chosen_years), None)
-        code = next(iter(chosen_codes), None)
+        codes_to_store = sorted(chosen_codes)
+        # Preserve IDs for the previous single-code and no-code profile shapes.
+        code_key = codes_to_store if len(codes_to_store) > 1 else next(iter(codes_to_store), None)
         identity = exact_name(source_identity(rows[min(chosen)]))
-        aid = _import_id("athlete-reconciliation-v1", identity, birth_year, code)
+        aid = _import_id("athlete-reconciliation-v1", identity, birth_year, code_key)
         if aid in profiles or aid in planned_profiles:
             raise ValueError("Kolize ID nového profilu.")
         first, last = name_fields(source_identity(rows[min(chosen)]))
         planned_profiles[aid] = {
             "_id": aid, "first_name": first, "last_name": last, "birth_year": birth_year,
-            "fs_codes": [code] if code else [], "teams": normalize_teams([rows[i].get("team") for i in sorted(chosen)]),
+            "fs_codes": codes_to_store, "teams": normalize_teams([rows[i].get("team") for i in sorted(chosen)]),
             "is_active": True, "merged_into_athlete_id": None,
         }
         for rid in chosen:
@@ -296,6 +306,7 @@ def build_plan(snapshot):
 
     proposed_scopes = Counter((aid, scope(rows[rid])) for rid, (aid, _) in proposals.items())
     creates, updates = {}, {}
+    extra_codes = defaultdict(set)
     for rid, (aid, reason) in proposals.items():
         slot = aid, scope(rows[rid])
         if occupied[slot] or proposed_scopes[slot] > 1:
@@ -304,6 +315,12 @@ def build_plan(snapshot):
         if aid in planned_profiles:
             creates[aid] = planned_profiles[aid]
         updates[rid] = {"athlete": aid, "match_status": "matched", "match_reason": reason}
+        if rid in proposed_codes:
+            extra_codes[aid].add(proposed_codes[rid])
+    profile_updates = [
+        {"_id": aid, "set": {"fs_codes": normalize_fs_codes(historical_codes(profiles[aid]), sorted(extra_codes[aid]))}}
+        for aid in sorted(extra_codes)
+    ]
     for rid, item in review.items():
         row = rows[rid]
         if not is_manual(row) and (row.get("match_status"), row.get("match_reason")) != ("needs_review", item["reason"]):
@@ -312,6 +329,7 @@ def build_plan(snapshot):
     queue = sum(is_individual(row) and row.get("match_status") in {"needs_review", "unmatched"} for row in rows.values())
     return {
         "creates": [creates[i] for i in sorted(creates)],
+        "profile_updates": profile_updates,
         "updates": [{"_id": i, "set": updates[i]} for i in sorted(updates)],
         "review": [{"_id": i, **review[i]} for i in sorted(review)],
         "issues": sorted(issues, key=fingerprint),
@@ -319,6 +337,7 @@ def build_plan(snapshot):
             "profiles_before": len(profiles), "results_before": len(rows),
             "admin_before": queue,
             "new_profiles": len(creates),
+            "profiles_with_added_codes": len(profile_updates),
             "assignments": dict(Counter(u["match_reason"] for u in updates.values() if "athlete" in u)),
             "review_reasons": dict(Counter(r["reason"] for r in review.values())),
             "status_updates": sum("athlete" not in u for u in updates.values()),
@@ -330,6 +349,9 @@ def expected_state(snapshot, plan, timestamp):
     after = {**snapshot, "athletes": dict(snapshot["athletes"]), "results": dict(snapshot["results"])}
     for profile in plan["creates"]:
         after["athletes"][profile["_id"]] = {**profile, "created_at": timestamp}
+    for update in plan.get("profile_updates", []):
+        aid = update["_id"]
+        after["athletes"][aid] = {**after["athletes"][aid], **update["set"], "updated_at": timestamp}
     for update in plan["updates"]:
         rid = update["_id"]
         after["results"][rid] = {**after["results"][rid], **update["set"], "updated_at": timestamp}
@@ -350,22 +372,23 @@ def apply_plan(database, before, plan, timestamp):
                 if identifier not in current["athletes"]]
     if profiles:
         database["athletes"].with_options(write_concern=concern).insert_many(profiles)
-    results = database["results"].with_options(write_concern=concern)
-    pending = []
-    for op in plan["updates"]:
-        rid = op["_id"]
-        old = before["results"][rid]
-        if current["results"][rid] == after["results"][rid]:
-            continue
-        guard = {key: {"$eq": value} for key, value in old.items()}
-        for key in ("athlete", "match_status", "match_reason", "updated_at"):
-            if key not in old:
-                guard[key] = {"$exists": False}
-        pending.append(UpdateOne(guard, {"$set": {**op["set"], "updated_at": timestamp}}))
-    for index in range(0, len(pending), 500):
-        batch = pending[index:index + 500]
-        if results.bulk_write(batch).matched_count != len(batch):
-            raise ValueError("Výsledek byl souběžně upraven.")
+    for name, operations in (("athletes", plan.get("profile_updates", [])), ("results", plan["updates"])):
+        collection = database[name].with_options(write_concern=concern)
+        pending = []
+        for op in operations:
+            identifier = op["_id"]
+            old = before[name][identifier]
+            if current[name][identifier] == after[name][identifier]:
+                continue
+            guard = {key: {"$eq": value} for key, value in old.items()}
+            for key in op["set"].keys() | {"updated_at"}:
+                if key not in old:
+                    guard[key] = {"$exists": False}
+            pending.append(UpdateOne(guard, {"$set": {**op["set"], "updated_at": timestamp}}))
+        for index in range(0, len(pending), 500):
+            batch = pending[index:index + 500]
+            if collection.bulk_write(batch).matched_count != len(batch):
+                raise ValueError(f"Souběžná změna dokumentu v kolekci {name}.")
     if read_database(database) != after:
         raise ValueError("Kontrolní export neodpovídá plánu.")
     return after

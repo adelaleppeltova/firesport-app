@@ -110,12 +110,42 @@ def test_near_name_manual_unassignment_and_archival_rows_go_untouched():
     assert [item["_id"] for item in plan["updates"]] == [typo["_id"]]
 
 
-def test_name_year_match_checks_all_codes_reported_for_that_identity():
-    jan = athlete()
+def test_multiple_codes_can_be_added_to_one_existing_profile():
+    jan = athlete(codes=["4720"])
     first, second = result(code="4721"), result(code="4722")
-    plan = build_plan(state([first, second], [jan]))
-    assert not linked(plan)
-    assert set(reasons(plan).values()) == {"unrecognized_fscode"}
+    data = state([first, second], [jan])
+    plan = build_plan(data)
+    assert linked(plan) == {first["_id"]: jan["_id"], second["_id"]: jan["_id"]}
+    assert plan["profile_updates"] == [{"_id": jan["_id"], "set": {"fs_codes": ["4720", "4721", "4722"]}}]
+    after = expected_state(data, plan, datetime(2026, 11, 19))
+    assert build_plan(after)["profile_updates"] == []
+
+
+def test_new_multi_code_profile_requires_shared_birth_year_for_each_code():
+    first, second, repeat = result(code="4721"), result(code="4722"), result(code="4722", year=None)
+    plan = build_plan(state([first, second, repeat]))
+    assert len(plan["creates"]) == 1
+    assert plan["creates"][0]["fs_codes"] == ["4721", "4722"]
+    assert len(linked(plan)) == 3
+
+    unsupported = result(code="4723", year=None)
+    plan = build_plan(state([first, second, unsupported]))
+    assert not plan["creates"] and not linked(plan)
+
+
+def test_code_owned_by_other_profile_and_null_name_do_not_create_or_append():
+    jan = athlete(codes=["4720"])
+    petr = athlete(first="Petr", codes=["4721"])
+    conflicting = result(code="4721")
+    incomplete = result(first=None, code="4722")
+    missing_surname = result(last=None, code="4723")
+    plan = build_plan(state([conflicting, incomplete, missing_surname], [jan, petr]))
+    assert not plan["creates"] and not plan["profile_updates"] and not linked(plan)
+    assert reasons(plan) == {
+        conflicting["_id"]: "conflicting_fscode",
+        incomplete["_id"]: "missing_name",
+        missing_surname["_id"]: "missing_name",
+    }
 
 
 def test_new_profile_does_not_weaken_typo_check_on_a_second_run():
