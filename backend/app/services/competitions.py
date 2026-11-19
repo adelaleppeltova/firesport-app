@@ -150,7 +150,9 @@ async def get_competitions_service(
 		page_size=page_size,
 	)
 
-async def get_results_for_category_service(competition_id: str, category_id: str) -> List[ResultInDB]:
+async def get_results_for_category_service(
+	competition_id: str, category_id: str, *, result_list_id: Optional[str] = None
+) -> List[ResultInDB]:
 	"""Vrátí výsledky pro danou soutěž a kategorii jako seznam ResultInDB."""
 
 	try:
@@ -159,9 +161,10 @@ async def get_results_for_category_service(competition_id: str, category_id: str
 	except Exception:
 		raise ValueError("Invalid competition_id or category_id")
 	
-	results_raw = await results_collection.find(
-		{"competition": comp_oid, "category": cat_oid}
-	).to_list(length=None)
+	query = {"competition": comp_oid, "category": cat_oid}
+	if result_list_id is not None:
+		query["result_list_id"] = result_list_id
+	results_raw = await results_collection.find(query).to_list(length=None)
 
 	# Helper function to resolve and embed reference
 	async def resolve_ref(collection, ref_id_str):

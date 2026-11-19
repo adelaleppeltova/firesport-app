@@ -55,6 +55,7 @@ class ResultBase(BaseModel):
     athlete: Optional[AthleteInDB] = None
     competition: CompetitionInDB
     category: CategoryInDB
+    result_list_id: Optional[str] = None
 
     date: datetime
     team: Optional[str]
@@ -83,6 +84,7 @@ class ResultInDB(ResultBase):
 class ResultAthleteDetail(BaseModel):
     competition: CompetitionInDB
     category: CategoryInDB
+    result_list_id: Optional[str] = None
 
     date: datetime
     team: Optional[str] = None

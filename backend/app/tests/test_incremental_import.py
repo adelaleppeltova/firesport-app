@@ -185,3 +185,78 @@ def test_import_preserves_original_team_and_stores_numeric_start_number(import_c
 def test_invalid_start_number_is_reported(value):
     with pytest.raises(ValueError, match="Neplatné startovní číslo"):
         data_import.DataImporter._parse_start_number(value)
+
+
+def test_verified_lists_keep_two_performances_with_same_start_number(import_collections):
+    race = _race()
+    first = race["competition"]["categories"][0]
+    second = deepcopy(first)
+    second["results"][0].update(first_name="Michal", last_name="Nový")
+    second["results"] = second["results"][:1]
+    race["competition"]["categories"].append(second)
+    blocked = asyncio.run(data_import.DataImporter().import_from_dict(race))
+    assert blocked["competitions_created"] == 0
+    assert "výsledkové listiny" in blocked["errors"][0]
+
+    blocks = {0: "hzs", 1: "sdh"}
+    match = AsyncMock(return_value={
+        "match_status": MatchStatus.needs_review, "match_reason": "insufficient_identity", "matched_athlete": None,
+    })
+    with patch.object(data_import, "decide_athlete_match", match):
+        first_run = asyncio.run(data_import.DataImporter().import_from_dict(race, verified_blocks=blocks))
+        second_run = asyncio.run(data_import.DataImporter().import_from_dict(race, verified_blocks=blocks))
+    assert first_run["results_created"] == second_run["results_duplicates_skipped"] == 3
+    docs = import_collections["results"].documents.values()
+    assert {r["result_list_id"] for r in docs} == {"hzs", "sdh"}
+    assert all("athlete" not in row for row in docs)
+
+
+def test_ambiguous_missing_discipline_never_updates_existing_category(import_collections):
+    from bson import ObjectId
+
+    categories = import_collections["categories"]
+    for discipline in ("100m", "vez"):
+        identifier = ObjectId()
+        categories.documents[identifier] = {"_id": identifier, "name": "Muži", "discipline": discipline}
+    original = deepcopy(categories.documents)
+    race = _race()
+    race["competition"]["categories"][0].pop("discipline")
+    stats = asyncio.run(data_import.DataImporter().import_from_dict(race))
+    assert stats["results_created"] == 0
+    assert "Nejednoznačná kategorie" in stats["errors"][0]
+    categories.update_one.assert_not_called()
+    assert categories.documents == original
+
+
+def test_start_number_without_identity_cannot_confirm_duplicate():
+    from bson import ObjectId
+
+    imp = data_import.DataImporter()
+    comp, cat = map(str, [ObjectId(), ObjectId()])
+    row = imp.build_result_row({"start_number": 8, "rank": 1, "final_time": 11}, cat, comp)
+    assert imp.assess_result(row, [{**row, "_id": ObjectId()}])[0] == "review"
+
+
+def test_penalty_reason_and_district_are_not_silently_overwritten():
+    from bson import ObjectId
+
+    imp = data_import.DataImporter()
+    comp, cat = map(str, [ObjectId(), ObjectId()])
+    raw = {"start_number": 8, "rank": 1, "first_name": "Jan", "last_name": "Novák",
+           "district": "Okres A", "times": [{"try": 1, "status": "invalid", "invalid_reason": "A"}]}
+    row = imp.build_result_row(raw, cat, comp)
+    old = {**row, "_id": ObjectId()}
+    assert imp.assess_result({**row, "district": "Okres B"}, [old])[0] == "review"
+    changed = imp.build_result_row({**raw, "times": [{"try": 1, "status": "invalid", "invalid_reason": "B"}]}, cat, comp)
+    assert imp.assess_result(changed, [old])[0] == "review"
+
+
+def test_same_name_two_people_with_independent_discriminators():
+    from bson import ObjectId
+
+    imp = data_import.DataImporter()
+    comp, cat = map(str, [ObjectId(), ObjectId()])
+    raw = {"start_number": 8, "rank": 1, "first_name": "Jan", "last_name": "Novák", "birth_year": 2000}
+    row = imp.build_result_row(raw, cat, comp)
+    other = imp.build_result_row({**raw, "start_number": 9, "birth_year": 1995}, cat, comp)
+    assert imp.assess_result(row, [{**other, "_id": ObjectId()}]) == ("insert", [])
